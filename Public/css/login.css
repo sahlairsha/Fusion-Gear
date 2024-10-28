@@ -1,0 +1,96 @@
+*{
+    margin:0;
+    padding:0;
+    top:0;
+    box-sizing: border-box;
+}
+
+video{
+	overflow: clip;
+
+}
+
+.videoInsert {
+    position: relative;
+    display: block;
+    width: 30%;
+    -o-object-fit: cover;
+    object-fit: cover;
+    height: 100vh;
+    left : 0;
+    object-position: center center;
+    overflow : hidden;
+}
+
+.form-container{
+
+   position: fixed;
+   top: 10%;
+   right: 20%;
+   left : 47%;
+   width : 35%;
+   height: 80vh;
+   background-color:#ffff;
+   text-align: center;
+   border-radius: 20px;
+   box-shadow: 3px 3px 0px 0px #0000002a;
+   border: 0.5px solid #0000002a;
+
+}
+.form-container h2 {
+    margin-top: 40px;
+	margin-bottom: 20px;
+	color: #333;
+	text-align: center;
+}
+.form-group {
+	margin-bottom: 15px;
+    width : 25vw;
+}
+
+.form-group input {
+	width: 80%;
+	padding: 10px;
+    margin-left: 30%;
+    outline-offset: none;
+	border: none;
+    border-bottom: 1px dotted #0000002a;
+	font-size: 16px;
+	transition: border-color 0.3s ease, box-shadow 0.3s ease; /* Smooth transition */
+}
+.form-group input:focus {
+	border-color: #007bff;
+	outline: none;
+	box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Subtle glow effect */
+}
+.signup-btn {
+	width: 50%;
+	padding: 10px;
+	background-color: #007bff;
+	color: white;
+	border: none;
+	border-radius: 5px;
+	cursor: pointer;
+	font-size: 16px;
+	transition: background-color 0.3s ease, transform 0.3s ease; /* Smooth transition */
+}
+.signup-btn:hover {
+	background-color: #0056b3;
+	transform: scale(1.05); /* Slightly scale the button on hover */
+}
+.google-signup-btn {
+	width: 50%;
+	padding: 10px;
+	background-color: #db4437;
+	color: white;
+	border: none;
+	border-radius: 5px;
+	cursor: pointer;
+	font-size: 16px;
+	margin-top: 15px;
+	transition: background-color 0.3s ease, transform 0.3s ease; /* Smooth transition */
+}
+.google-signup-btn:hover {
+	background-color: #c1352d; /* Darker shade for hover */
+	transform: scale(1.05); /* Slightly scale the button on hover */
+}

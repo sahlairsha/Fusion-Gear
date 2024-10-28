@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signup Page</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="stylesheet" href="/css/signup.css">
+</head>
+<body>
+    <div class="container">
+        <div class="form-container">
+            <h2>Sign Up</h2>
+            <form id="signup-form" method="POST" action="/signup">
+                <div class="form-group">
+                    <label for="full-name">Full Name</label>
+                    <input type="text" id="full-name" name="fullName">
+                    <div id="erorr1" class="error-message text-danger"></div>
+                </div>
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username">
+                    <div id="erorr2" class="error-message text-danger"></div>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email">
+                    <div id="erorr3" class="error-message text-danger"></div>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password">
+                    <div id="erorr4" class="error-message text-danger"></div>
+                </div>
+                <div class="form-group">
+                    <input type="phone" id="phone" name="phone" placeholder="Phone Number">
+                    <div id="erorr5" class="error-message text-danger"></div>
+                </div>
+                <br>
+                <span>Already Have an Account?</span><span><a href="/login">Login</a></span>
+                <br><br>
+                <button type="submit" class="btn btn-primary signup">Sign Up</button>
+            </form>
+            <button type="submit" class="signup-btn">Sign Up with OTP</button>
+            <button type="button" class="google-signup-btn" onclick="googleSignUp()">Sign Up with Google</button>
+        </div>
+        <div class="image-container">
+            <img class="image" src="https://img.freepik.com/free-photo/model-wearing-beautiful-shade-clothing_23-2151428013.jpg?t=st=1729999998~exp=1730003598~hmac=c1b578da1908adc995fc2e3b2452e16fba766f98707426b578ec3fa9b673de68&w=740" alt="image-not-found">
+        </div>
+    </div>
+
+    <script>
+        const signupForm = document.getElementById('signup-form');
+        const nameid = document.getElementById('full-name');
+        const usermaneid = document.getElementById('username');
+        const emailid = document.getElementById('email');
+        const passwordId = document.getElementById('password');
+        const phoneId = document.getElementById('phone');
+        const err1 = document.getElementById('erorr1');
+        const err2 = document.getElementById('erorr2');
+        const err3 = document.getElementById('erorr3');
+        const err4 = document.getElementById('erorr4');
+        const err5 = document.getElementById('erorr5');
+
+        function nameValidation() {
+            const nameval = nameid.value.trim();
+            const namepattern = /^[a-zA-Z\s]{2,50}$/;
+            if (nameval === "") {
+                err1.innerText = "Please Enter the Full Name";
+            } else if (!namepattern.test(nameval)) {
+                err1.innerText = "Name can only contain alphabets and spaces";
+            } else {
+                err1.innerText = "";
+            }
+        }
+
+        function usernameValidation() {
+            const username = usermaneid.value.trim();
+            const usernamepattern = /^[a-zA-Z0-9_.]{3,15}$/;
+            if (username === "") {
+                err2.innerText = "Please Enter The User name";
+            } else if (!usernamepattern.test(username)) {
+                err2.innerText = "Only alphabets, numbers, and underscores. No spaces.";
+            } else {
+                err2.innerText = "";
+            }
+        }
+
+        function emailValidation() {
+            const email = emailid.value.trim();
+            const emailpattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+            if (email === "") {
+                err3.innerText = "Please Enter Email address";
+            } else if (!emailpattern.test(email)) {
+                err3.innerText = "Please enter a valid email ID";
+            } else {
+                err3.innerText = "";
+            }
+        }
+
+        function passwordValidation() {
+            const password = passwordId.value.trim();
+            const passwordpattern = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+            if (password === "") {
+                err4.innerText = "Please Enter a valid password";
+            } else if (!passwordpattern.test(password)) {
+                err4.innerText = "Minimum 8 characters, at least one letter and one number";
+            } else {
+                err4.innerText = "";
+            }
+        }
+
+        function phoneValidation() {
+            const phone = phoneId.value.trim();
+            const phonepattern = /^(\+\d{1,3}[- ]?)?\d{10}$/;
+            const allZero = /^0+$/
+            if (phone === "") {
+                err5.innerText = "Please Enter Your Phone Number";
+            } else if (!phonepattern.test(phone)) {
+                err5.innerText = "Enter Valid Phone Number!!!";
+            }else if(allZero.test(phone.replace(/[-+ ]/g,""))){
+                err5.textContent = "Phone number cannot be all zeros!";
+            }
+             else {
+                err5.innerText = "";
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            signupForm.addEventListener('submit', (e) => {
+                nameValidation();
+                usernameValidation();
+                emailValidation();
+                passwordValidation();
+                phoneValidation();
+
+                const hasError = [err1, err2, err3, err4, err5].some(err => err.innerText !== "");
+                if (hasError) {
+                    e.preventDefault();
+                }
+            });
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVN
