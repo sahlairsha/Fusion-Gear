@@ -1,6 +1,6 @@
 const signupForm = document.getElementById('signup-form');
 const nameid = document.getElementById('full-name');
-const usermaneid = document.getElementById('username');
+const usernameid = document.getElementById('username');
 const emailid = document.getElementById('email');
 const passwordId = document.getElementById('password');
 const cpasswordId = document.getElementById('cpassword');
@@ -27,7 +27,7 @@ function nameValidation() {
 }
 
 function usernameValidation() {
-    const username = usermaneid.value.trim();
+    const username = usernameid.value.trim();
     const usernamepattern = /^[a-zA-Z0-9_.]{3,15}$/;
     if (username === "") {
         err2.innerText = "Please enter the username";
@@ -91,7 +91,7 @@ function confirmPasswordValidation() {
 
 
 nameid.addEventListener('blur', nameValidation);
-usermaneid.addEventListener('blur', usernameValidation);
+usernameid.addEventListener('blur', usernameValidation);
 emailid.addEventListener('blur', emailValidation);
 passwordId.addEventListener('blur', passwordValidation);
 phoneId.addEventListener('blur', phoneValidation);
@@ -110,4 +110,5 @@ signupForm.addEventListener('submit', (e) => {
     if (hasError) {
         e.preventDefault();
     }
+
 });

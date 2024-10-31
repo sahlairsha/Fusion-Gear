@@ -14,9 +14,7 @@ router.get('/signup',userController.loadSignup)
 
 router.post('/signup',userController.signup)
 
-router.get('/login',userController.loadLogin)
-
-router.post('/emailOtp',userController.verifyOtp)
+router.post('/email-otp',userController.verifyOtp)
 
 router.post('/resend-otp',userController.resendOtp)
 
@@ -26,8 +24,13 @@ router.get('/auth/google/callback', passport.authenticate('google',{failureRedir
     res.redirect('/')
 })
 
+router.get('/login',userController.loadLogin)
 
-router.get('*', userController.pageNotFound)
+router.post('/login',userController.login)
+
+router.get('/logout', userController.logout)
+
+router.get('/pagenotfound', userController.pageNotFound)
 
 
 

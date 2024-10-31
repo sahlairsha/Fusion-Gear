@@ -20,7 +20,14 @@ const pageNotFound = async(req,res) =>{
 
 const loadHomePage = async(req,res)=>{
 try {
-    return res.render("home")
+    const user = req.session.user;
+    if(user){
+        const userData = await User.findOne({_id : user._id})
+        res.render("home",{user : userData})
+    }else{
+        return res.render("home")
+    }
+ 
 } catch (error) {
     console.log("Homepage is not found")
     res.status(500).send("Server Error")
@@ -36,14 +43,7 @@ const loadSignup = async(req,res)=>{
     }
 }
 
-const loadLogin = async(req,res)=>{
-    try {
-        return res.render('login')
-    } catch (error) {
-        console.log("Login is not loading", error.message);
-        res.status(500).send('Server Error')
-    }
-}
+
 
 function generateOtp() {
     console.log(Math.floor(100000 + Math.random() * 900000).toString())
@@ -101,11 +101,8 @@ const signup = async (req, res) => {
             return res.json("Email-Error");
         }
 
-        req.session.userOtp = otp;
+        req.session.userOtp = { otp, expires: Date.now() + 10 * 60 * 1000 };
         req.session.userData = { full_name, username, phone, email, password };
-
-        const otpExpires = Date.now() + 10 * 60 * 1000;
-        req.session.userOtp = { otp, expires: otpExpires };
 
         res.render("verification-otp");
     } catch (error) {
@@ -130,7 +127,7 @@ const verifyOtp = async (req, res) => {
     try {
         const { otp } = req.body;
 
-        if (Date.now() > req.session.userOtp.expires) {
+        if (!req.session.userOtp || Date.now() > req.session.userOtp.expires) {
             return res.status(400).json({ success: false, message: "OTP expired. Please request a new one." });
         }
 
@@ -140,7 +137,6 @@ const verifyOtp = async (req, res) => {
 
         const user = req.session.userData;
 
-        // Check if username, email, or phone already exists
         const existingUser = await User.findOne({ $or: [{ username: user.username }, { email: user.email }, { phone: user.phone }] });
         if (existingUser) {
             return res.status(400).json({ success: false, message: "Username, email, or phone already exists" });
@@ -179,7 +175,7 @@ const resendOtp = async (req, res) => {
         }
 
         const otp = generateOtp();
-        req.session.userOtp = otp;
+        req.session.userOtp = { otp, expires: Date.now() + 10 * 60 * 1000 };
 
         console.log(req.session.userOtp)
         const emailSend = await sendVerificationEmail(email, otp);
@@ -198,6 +194,67 @@ const resendOtp = async (req, res) => {
 
 
 
+const loadLogin = async(req,res)=>{
+    try {
+        if(!req.session.user){
+            return res.render('login')
+        }else{
+            res.redirect('/')
+        }
+    } catch (error) {
+        console.log("Login is not loading", error.message);
+        res.redirect('/pagenotfound')
+    }
+}
+
+const login = async (req, res) => {
+    try {
+        const { email, password } = req.body;
+
+        const findUser = await User.findOne({ isAdmin: false, email , username });
+
+        if (!findUser) {
+            return res.render('login', { message: "User is not found" });
+        }
+        if (findUser.isBlocked) {
+            return res.render('login', { message: "This user is blocked by admin" });
+        }
+
+        // Check for password match
+        const passwordMatch =  bcrypt.compare(password, findUser.password);
+        if (!passwordMatch) {
+            return res.render("login", { message: "Invalid Password! Please Try again" });
+        }
+
+        // Save user ID in session
+        req.session.user = findUser._id;
+
+        // Redirect to home page
+        res.redirect('/');
+    } catch (error) {
+        console.error("Login Error", error);
+        res.render("login", { message: "Login Failed, Please try again later" });
+    }
+};
+
+
+const logout = async(req,res)=>{
+    try {
+        req.session.destroy((err)=>{
+            if(err){
+                console.error('Error in session destruction',err.message);
+                return res.redirect('/pagenotfound')
+            }
+            return res.redirect('/login')
+        })
+    } catch (error) {
+        console.log("Logout error",error)
+        res.redirect('/pagenotfound')
+    }
+}
+
+
+
 module.exports = {
     loadHomePage,
     pageNotFound,
@@ -205,5 +262,7 @@ module.exports = {
     loadLogin,
     signup,
     verifyOtp,
-    resendOtp
+    resendOtp,
+    login,
+    logout
 }

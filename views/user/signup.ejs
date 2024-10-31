@@ -12,8 +12,12 @@
   <div class="wrapper">
     <img class="image" src="https://cdn.dribbble.com/userupload/4929101/file/original-5582f76fea9754ec49b18d2681607c0e.jpg?resize=1024x768" alt="signup-image">
     </div>
+    <% if(locals.message && message > 0) { %>
+      <div class="alert alert-danger text-center fs-8">
+          <%= message %>
+      </div>
+  <% } %>
   <div class="signup-container col-lg-8 col-md-6 col-sm-4 col-4">
-
       <h5 class="container-fluid mt-4">Signup</h5>
       <form class="col-lg-h-100 col-md-h-80 col-sm-h-60" id="signup-form" action="/signup" method="POST">
           <input id="full-name" type="text" name="full_name" placeholder="Full Name" autocomplete="full_name">
@@ -35,7 +39,6 @@
       <div class="addition-signup">
         <button type="submit" class="btn  signup-google">
          <img src="https://cdn-icons-png.flaticon.com/128/281/281764.png" class="google-icon" alt="" srcset=""> <a href="/auth/google" class="google-sign text-decoration-none">Signup With Google</a></button>
-        <button type="submit" class="btn  signup-otp"><a href="/otp-signup" class="otp-sign text-decoration-none">Signup with OTP</a></button>
       </div>
   </div>
     <script src="/js/signup-validation.js"></script>

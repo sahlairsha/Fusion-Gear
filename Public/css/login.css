@@ -23,7 +23,10 @@ video{
 }
 
 .form-container{
-
+display: flex;
+align-items: center;
+justify-content: center;
+flex-direction: column;
    position: fixed;
    top: 10%;
    right: 20%;
@@ -32,9 +35,7 @@ video{
    height: 80vh;
    background-color:#ffff;
    text-align: center;
-   border-radius: 20px;
-   box-shadow: 3px 3px 0px 0px #0000002a;
-   border: 0.5px solid #0000002a;
+
 
 }
 .form-container h2 {
@@ -48,23 +49,21 @@ video{
     width : 25vw;
 }
 
-.form-group input {
+ input {
 	width: 80%;
 	padding: 10px;
-    margin-left: 30%;
-    outline-offset: none;
+    outline: none;
 	border: none;
     border-bottom: 1px dotted #0000002a;
 	font-size: 16px;
 	transition: border-color 0.3s ease, box-shadow 0.3s ease; /* Smooth transition */
 }
 .form-group input:focus {
-	border-color: #007bff;
-	outline: none;
-	box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Subtle glow effect */
+   outline: none;
 }
-.signup-btn {
-	width: 50%;
+.login-btn {
+	width: 30%;
+	margin : 10px 0 10px 0 ;
 	padding: 10px;
 	background-color: #007bff;
 	color: white;
@@ -74,23 +73,86 @@ video{
 	font-size: 16px;
 	transition: background-color 0.3s ease, transform 0.3s ease; /* Smooth transition */
 }
-.signup-btn:hover {
-	background-color: #0056b3;
-	transform: scale(1.05); /* Slightly scale the button on hover */
+.login-btn:hover {
+	background-color:#E0FB4A;
+	transform: scale(1.05);
 }
-.google-signup-btn {
+
+
+.create-account{
+	font-size: 12px;
+}
+.google-login-btn {
 	width: 50%;
 	padding: 10px;
-	background-color: #db4437;
-	color: white;
-	border: none;
+	color:#000;
+	border: 1px dotted #000;
 	border-radius: 5px;
 	cursor: pointer;
 	font-size: 16px;
-	margin-top: 15px;
-	transition: background-color 0.3s ease, transform 0.3s ease; /* Smooth transition */
+	margin-top: 10px;
+	transition: transform 0.3s ease;
+	background-color: #fff;
 }
-.google-signup-btn:hover {
-	background-color: #c1352d; /* Darker shade for hover */
-	transform: scale(1.05); /* Slightly scale the button on hover */
+.google-login-btn:hover {
+	border:2px solid #008000;
+	color: #03045e;
+	transform: scale(1.05);
+}
+
+
+input[type="text"],
+input[type="password"],
+input[type="email"] {
+    margin-bottom: 10px;
+    padding: 10px;
+    width: 100%;
+    font-size: clamp(10px, 5vw, 14px);
+    position: relative;
+}
+
+input[type="text"]::placeholder,
+input[type="password"]::placeholder,
+input[type="email"]::placeholder {
+    color: #aaa;
+    transition: transform 0.3s ease, font-size 0.3s ease;
+}
+/* placeholder animation */
+input[type="text"]:focus::placeholder,
+input[type="password"]:focus::placeholder,
+input[type="email"]:focus::placeholder,
+input[type="text"]:not(:placeholder-shown)::placeholder,
+input[type="password"]:not(:placeholder-shown)::placeholder, 
+input[type="email"]:not(:placeholder-shown)::placeholder {
+    transform: translateY(-100%);
+    font-size: 0.75rem;
+    padding-left: 5px;
+
+}
+
+
+.google-icon{
+	width : 20px;
+	height : 20px;
+	margin: 0 20px 5px 0;
+	padding: 0;
+}
+
+.signup-link{
+	color: #000;
+}
+.signup-link:hover{
+	color: #780000;
+}
+
+.error-message{
+	font-size: 14px;
+}
+
+.login-link {
+	color: #fff;
+}
+
+.login-link:hover{
+	color: #000;
 }

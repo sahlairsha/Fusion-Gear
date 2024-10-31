@@ -23,10 +23,10 @@ otpForm.addEventListener('submit', (event) => {
     event.preventDefault();
 
     const otpInput = document.getElementById('otp').value;
-
+        console.log(otpInput);
     $.ajax({
         type: "POST",
-        url: "/emailOtp",
+        url: "/email-otp",
         data: { otp: otpInput },
         success: function (response) {
             if (response.success) {
@@ -86,6 +86,4 @@ document.getElementById('resend-otp').addEventListener('click',(e)=>{
         }
     })
     return false;
-
-
 })
