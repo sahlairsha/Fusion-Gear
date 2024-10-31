@@ -1,5 +1,6 @@
 const express = require('express');
 const session = require('express-session');
+const passport = require('./config/passport')
 const MongoDBStore = require('connect-mongodb-session')(session);
 const path = require('path');
 const dotenv = require('dotenv').config();
@@ -19,13 +20,20 @@ app.use(session({
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
-    store: store, // Attach session store
+    store: store,
     cookie: {
         secure: false,
         httpOnly: true,
-        maxAge: 72 * 60 * 60 * 1000 // 72 hours
+        maxAge: 72 * 60 * 60 * 1000
     }
 }));
+
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+
+
 
 app.use((req, res, next) => {
     res.set('cache-control', 'no-store');

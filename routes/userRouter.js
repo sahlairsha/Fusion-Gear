@@ -2,6 +2,8 @@ const express = require("express");
 
 const router = express.Router();
 
+const passport = require('passport');
+
 const userController = require('../controller/userController')
 
 
@@ -18,7 +20,14 @@ router.post('/emailOtp',userController.verifyOtp)
 
 router.post('/resend-otp',userController.resendOtp)
 
-router.get('*',userController.pageNotFound)
+router.get('/auth/google', passport.authenticate('google',{scope : ['profile','email']}))
+
+router.get('/auth/google/callback', passport.authenticate('google',{failureRedirect : '/signup'}),(req,res)=>{
+    res.redirect('/')
+})
+
+
+router.get('*', userController.pageNotFound)
 
 
 
