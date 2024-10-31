@@ -6,7 +6,7 @@ const {Schema} = mongoose;
 
 
 const userSchema = new Schema({
-    fullName :{
+    full_name :{
         type : String,
         required : true
     },
@@ -29,7 +29,8 @@ const userSchema = new Schema({
     },
     googleId : {
         type : String,
-        unique : true
+        unique : true,
+        sparse : true
     },
     password : {
         type : String,
@@ -98,4 +99,4 @@ const userSchema = new Schema({
 
 const User = mongoose.model("User",userSchema);
 
-module.exports = User
+module.exports = User;

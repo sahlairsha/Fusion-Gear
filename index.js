@@ -1,26 +1,47 @@
 const express = require('express');
-const app = express()
-const path = require("path")
-const env = require('dotenv').config()
-const db = require('./config/db')
+const session = require('express-session');
+const MongoDBStore = require('connect-mongodb-session')(session);
+const path = require('path');
+const dotenv = require('dotenv').config();
+const db = require('./config/db');
 
-app.use(express.json())
-app.use(express.urlencoded({extended : true}))
+const app = express();
 
-app.set('view engine',"ejs")
-app.set('views',[path.join(__dirname,'views/user'),path.join(__dirname,'views/admin')])
+const store = new MongoDBStore({
+    uri: process.env.MONGODB_URI, // Update with your MongoDB URI
+    collection: 'sessions'
+});
 
-app.use(express.static(path.join(__dirname,'Public')))
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-app.use(require('./routes/userRouter'))
+app.use(session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    store: store, // Attach session store
+    cookie: {
+        secure: false,
+        httpOnly: true,
+        maxAge: 72 * 60 * 60 * 1000 // 72 hours
+    }
+}));
 
-//for connection mongoDB
-db()
+app.use((req, res, next) => {
+    res.set('cache-control', 'no-store');
+    next();
+});
 
+app.set('view engine', 'ejs');
+app.set('views', [path.join(__dirname, 'views/user'), path.join(__dirname, 'views/admin')]);
+app.use(express.static(path.join(__dirname, 'Public')));
+app.use(require('./routes/userRouter'));
 
+// Connect to MongoDB
+db();
 
-app.listen(process.env.PORT,()=>{
-    console.log("Server Running");
-})
+app.listen(process.env.PORT, () => {
+    console.log('Server Running');
+});
 
-module.exports = app
+module.exports = app;

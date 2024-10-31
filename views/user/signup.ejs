@@ -4,141 +4,44 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Signup Page</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/css/signup.css">
 </head>
-<body>
-    <div class="container">
-        <div class="form-container">
-            <h2>Sign Up</h2>
-            <form id="signup-form" method="POST" action="/signup">
-                <div class="form-group">
-                    <label for="full-name">Full Name</label>
-                    <input type="text" id="full-name" name="fullName">
-                    <div id="erorr1" class="error-message text-danger"></div>
-                </div>
-                <div class="form-group">
-                    <label for="username">Username</label>
-                    <input type="text" id="username" name="username">
-                    <div id="erorr2" class="error-message text-danger"></div>
-                </div>
-                <div class="form-group">
-                    <label for="email">Email</label>
-                    <input type="email" id="email" name="email">
-                    <div id="erorr3" class="error-message text-danger"></div>
-                </div>
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" name="password">
-                    <div id="erorr4" class="error-message text-danger"></div>
-                </div>
-                <div class="form-group">
-                    <input type="phone" id="phone" name="phone" placeholder="Phone Number">
-                    <div id="erorr5" class="error-message text-danger"></div>
-                </div>
-                <br>
-                <span>Already Have an Account?</span><span><a href="/login">Login</a></span>
-                <br><br>
-                <button type="submit" class="btn btn-primary signup">Sign Up</button>
-            </form>
-            <button type="submit" class="signup-btn">Sign Up with OTP</button>
-            <button type="button" class="google-signup-btn" onclick="googleSignUp()">Sign Up with Google</button>
-        </div>
-        <div class="image-container">
-            <img class="image" src="https://img.freepik.com/free-photo/model-wearing-beautiful-shade-clothing_23-2151428013.jpg?t=st=1729999998~exp=1730003598~hmac=c1b578da1908adc995fc2e3b2452e16fba766f98707426b578ec3fa9b673de68&w=740" alt="image-not-found">
-        </div>
+<body class="signup-body">
+  <div class="wrapper">
+    <img class="image" src="https://cdn.dribbble.com/userupload/4929101/file/original-5582f76fea9754ec49b18d2681607c0e.jpg?resize=1024x768" alt="signup-image">
     </div>
+  <div class="signup-container col-lg-8 col-md-6 col-sm-4 col-4">
 
-    <script>
-        const signupForm = document.getElementById('signup-form');
-        const nameid = document.getElementById('full-name');
-        const usermaneid = document.getElementById('username');
-        const emailid = document.getElementById('email');
-        const passwordId = document.getElementById('password');
-        const phoneId = document.getElementById('phone');
-        const err1 = document.getElementById('erorr1');
-        const err2 = document.getElementById('erorr2');
-        const err3 = document.getElementById('erorr3');
-        const err4 = document.getElementById('erorr4');
-        const err5 = document.getElementById('erorr5');
+      <h5 class="container-fluid mt-4">Signup</h5>
+      <form class="col-lg-h-100 col-md-h-80 col-sm-h-60" id="signup-form" action="/signup" method="POST">
+          <input id="full-name" type="text" name="full_name" placeholder="Full Name" autocomplete="full_name">
+          <div id="error1" class="error-message text-danger"></div>
+          <input id="username" type="text" name="username" placeholder="Username" autocomplete="username">
+          <div id="error2" class="error-message text-danger"></div>
+          <input id="email" type="email" name="email" placeholder="Email" autocomplete="Email">
+          <div id="error3" class="error-message text-danger"></div>
+          <input id="password" type="password" name="password" placeholder="Password" autocomplete="current-password">
+          <div id="error4" class="error-message text-danger"></div>
+          <input id="cpassword" type="password" name="confirm_password" placeholder="Confirm password" autocomplete="current-password">
+          <div id="error6" class="error-message text-danger"></div>
+          <input id="phone" type="text" name="phone" placeholder="Phone Number" autocomplete="current-phone">
+          <div id="error5" class="error-message text-danger"></div>
+          <button type="submit" class="btn signup-btn">Sign Up</button>
+      </form>
+      <span>Already Have an Account?</span><span><a href="/login" class="login-link  text-decoration-none">Login</a></span>
+      <br>
+      <div class="addition-signup">
+        <button type="submit" class="btn  signup-google">
+         <img src="https://cdn-icons-png.flaticon.com/128/281/281764.png" class="google-icon" alt="" srcset=""> <a href="/google-signup" class="google-sign text-decoration-none">Signup With Google</a></button>
+        <button type="submit" class="btn  signup-otp"><a href="/otp-signup" class="otp-sign text-decoration-none">Signup with OTP</a></button>
+      </div>
+  </div>
+    <script src="/js/signup-validation.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
+  </body>
+</html>
 
-        function nameValidation() {
-            const nameval = nameid.value.trim();
-            const namepattern = /^[a-zA-Z\s]{2,50}$/;
-            if (nameval === "") {
-                err1.innerText = "Please Enter the Full Name";
-            } else if (!namepattern.test(nameval)) {
-                err1.innerText = "Name can only contain alphabets and spaces";
-            } else {
-                err1.innerText = "";
-            }
-        }
 
-        function usernameValidation() {
-            const username = usermaneid.value.trim();
-            const usernamepattern = /^[a-zA-Z0-9_.]{3,15}$/;
-            if (username === "") {
-                err2.innerText = "Please Enter The User name";
-            } else if (!usernamepattern.test(username)) {
-                err2.innerText = "Only alphabets, numbers, and underscores. No spaces.";
-            } else {
-                err2.innerText = "";
-            }
-        }
-
-        function emailValidation() {
-            const email = emailid.value.trim();
-            const emailpattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-            if (email === "") {
-                err3.innerText = "Please Enter Email address";
-            } else if (!emailpattern.test(email)) {
-                err3.innerText = "Please enter a valid email ID";
-            } else {
-                err3.innerText = "";
-            }
-        }
-
-        function passwordValidation() {
-            const password = passwordId.value.trim();
-            const passwordpattern = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
-            if (password === "") {
-                err4.innerText = "Please Enter a valid password";
-            } else if (!passwordpattern.test(password)) {
-                err4.innerText = "Minimum 8 characters, at least one letter and one number";
-            } else {
-                err4.innerText = "";
-            }
-        }
-
-        function phoneValidation() {
-            const phone = phoneId.value.trim();
-            const phonepattern = /^(\+\d{1,3}[- ]?)?\d{10}$/;
-            const allZero = /^0+$/
-            if (phone === "") {
-                err5.innerText = "Please Enter Your Phone Number";
-            } else if (!phonepattern.test(phone)) {
-                err5.innerText = "Enter Valid Phone Number!!!";
-            }else if(allZero.test(phone.replace(/[-+ ]/g,""))){
-                err5.textContent = "Phone number cannot be all zeros!";
-            }
-             else {
-                err5.innerText = "";
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            signupForm.addEventListener('submit', (e) => {
-                nameValidation();
-                usernameValidation();
-                emailValidation();
-                passwordValidation();
-                phoneValidation();
-
-                const hasError = [err1, err2, err3, err4, err5].some(err => err.innerText !== "");
-                if (hasError) {
-                    e.preventDefault();
-                }
-            });
-        });
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVN

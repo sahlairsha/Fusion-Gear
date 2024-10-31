@@ -14,6 +14,10 @@ router.post('/signup',userController.signup)
 
 router.get('/login',userController.loadLogin)
 
+router.post('/emailOtp',userController.verifyOtp)
+
+router.post('/resend-otp',userController.resendOtp)
+
 router.get('*',userController.pageNotFound)
 
 
