@@ -4,6 +4,18 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcrypt')
 
 
+
+const pageerror = async(req,res)=>{
+    try {
+        res.render('pageerror')
+    } catch (error) {
+        console.log("Page Error is not loading");
+        res.status(500).send("Internal Server Error")
+    }
+}
+
+
+
 const loadLogin = async(req,res)=>{
     try {
         if(req.session.admin){
@@ -24,7 +36,7 @@ const login = async(req,res)=>{
             const passwordMatch = bcrypt.compare(password,admin.password);
             if(passwordMatch){
                 req.session.admin = true;
-                return res.redirect('/admin/dashboard',{user : req.body})
+                return res.render('/admin/dashboard',{user : req.body})
             }else{
                 return res.redirect('/admin',{message : "User is not existed"})
             }
@@ -50,7 +62,8 @@ const loadDashboard = async(req,res)=>{
 module.exports = {
     loadLogin,
     login,
-    loadDashboard
+    loadDashboard,
+    pageerror
 }
 
 
