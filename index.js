@@ -1,32 +1,37 @@
 const express = require('express');
 const session = require('express-session');
+const sessionStore = require('connect-mongo')
 const passport = require('./config/passport')
-const MongoDBStore = require('connect-mongodb-session')(session);
 const path = require('path');
 const dotenv = require('dotenv').config();
 const db = require('./config/db');
+const nocache = require('nocache')
 
 const app = express();
 
-const store = new MongoDBStore({
-    uri: process.env.MONGODB_URI, // Update with your MongoDB URI
-    collection: 'sessions'
-});
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+app.use(nocache())
+
 app.use(session({
     secret: process.env.SESSION_SECRET,
+    store: sessionStore.create({
+        mongoUrl:process.env.MONGODB_URI,
+        collectionName : 'sessions',
+        ttl : 1000
+    }),
     resave: false,
     saveUninitialized: false,
-    store: store,
     cookie: {
         secure: false,
         httpOnly: true,
-        maxAge: 72 * 60 * 60 * 1000
+        maxAge: 72* 60 * 60 * 1000
     }
 }));
+
+
 
 
 app.use(passport.initialize());
@@ -40,10 +45,16 @@ app.use((req, res, next) => {
     next();
 });
 
+app.use((req, res, next) => {
+    res.locals.user = req.user;
+    next();
+});
+
 app.set('view engine', 'ejs');
 app.set('views', [path.join(__dirname, 'views/user'), path.join(__dirname, 'views/admin')]);
 app.use(express.static(path.join(__dirname, 'Public')));
 app.use(require('./routes/userRouter'));
+app.use(require('./routes/adminRouter'));
 
 // Connect to MongoDB
 db();

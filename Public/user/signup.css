@@ -21,7 +21,7 @@ body {
 .signup-container {
     position: absolute;
     right: 20%;
-    top:20px;
+    top:10px;
     max-width:360px;
     text-align: center;
 }
@@ -84,7 +84,7 @@ input[type="email"]:not(:placeholder-shown)::placeholder {
 
 .signup-btn:hover{
 
-  background-color:#219ebc;
+  background-color:#E0FB4A;
   color: #000;
 
 }

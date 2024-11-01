@@ -4,7 +4,7 @@ const env = require('dotenv').config()
 
 const bcrypt = require('bcrypt')
 
-const User = require('../models/userSchema')
+const User = require('../../models/userSchema')
 
 // for loading other endpoints.
 const pageNotFound = async(req,res) =>{
@@ -27,7 +27,6 @@ try {
     }else{
         return res.render("home")
     }
- 
 } catch (error) {
     console.log("Homepage is not found")
     res.status(500).send("Server Error")
@@ -107,7 +106,7 @@ const signup = async (req, res) => {
         res.render("verification-otp");
     } catch (error) {
         console.error("signup error", error);
-        return res.render("signup", { message: "An error occurred. Please try again.", inputData: req.body || {} });
+        return res.render("signup", { message: "An error occurred. Please try again."});
     }
 };
 
@@ -164,6 +163,7 @@ const verifyOtp = async (req, res) => {
         console.error("Error in verifying OTP", error);
         res.status(500).json({ success: false, message: "An Error Occurred" });
     }
+    console.log("Current session data:", req.session);
 };
 
 
@@ -211,7 +211,7 @@ const login = async (req, res) => {
     try {
         const { email, password } = req.body;
 
-        const findUser = await User.findOne({ isAdmin: false, email , username });
+        const findUser = await User.findOne({ isAdmin: false, email });
 
         if (!findUser) {
             return res.render('login', { message: "User is not found" });
@@ -238,20 +238,27 @@ const login = async (req, res) => {
 };
 
 
-const logout = async(req,res)=>{
+const logout = async (req, res) => {
     try {
-        req.session.destroy((err)=>{
-            if(err){
-                console.error('Error in session destruction',err.message);
-                return res.redirect('/pagenotfound')
+        req.logout((err) => {
+            if (err) {
+                console.log("Error logging out:", err.message);
+                return res.redirect('/pagenotfound');
             }
-            return res.redirect('/login')
-        })
+            req.session.regenerate((err) => { // Regenerate session to clear all data
+                if (err) {
+                    console.log("Error regenerating session:", err.message);
+                    return res.redirect('/pagenotfound');
+                }
+                res.clearCookie('connect.sid');
+                res.redirect('/login');
+            });
+        });
     } catch (error) {
-        console.log("Logout error",error)
-        res.redirect('/pagenotfound')
+        console.log("Logout error", error);
+        res.redirect('/pagenotfound');
     }
-}
+};
 
 
 

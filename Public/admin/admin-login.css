@@ -1,0 +1,32 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+
+body {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: url('https://cdn.dribbble.com/userupload/12306702/file/original-54ef81bd1dcb84a00c4f090d988f0c2e.jpg?resize=1024x768') no-repeat;
+  background-size: cover;
+  font-family: 'Nunito Sans', sans-serif;
+   color: white;
+}
+.login-container {
+  width: 100%;
+  max-width: 400px;
+  padding: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  background-color: hsl(193, 80%, 17%);
+  border-radius: 8px;
+}
+.error-message {
+  color: red;
+  font-size: 0.875rem;
+}
+.text-center{
+  color: white;
+}
