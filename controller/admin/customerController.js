@@ -40,6 +40,30 @@ const customerInfo = async(req,res)=>{
     }
 }
 
+const blockedUser = async(req,res)=>{
+    try {
+        let id = req.query.id;
+        await User.updateOne({_id :id},{$set : {isBlocked : true}})
+        res.redirect('/admin/users')
+    } catch (error) {
+        console.log('Error in blocking user',error)
+        res.redirect('/pageerror')
+    }
+}
+
+const unblockedUser = async(req,res)=>{
+    try {
+        let id = req.query.id;
+        await User.updateOne({_id : id},{$set : {isBlocked : false}})
+        res.redirect('/admin/users')
+    } catch (error) {
+        console.log('Error in blocking user',error)
+        res.redirect('/pageerror')
+    }
+}
+
 module.exports = {
-    customerInfo
+    customerInfo,
+    blockedUser,
+    unblockedUser
 }

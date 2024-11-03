@@ -1,0 +1,75 @@
+<%- include('../../views/partials/admin/header')  %>
+<div class="container mt-4">
+    <h2 class="mb-4">Customer Details</h2>
+    <div class="mb-3">
+        <input type="text" class="form-control" id="searchBar" placeholder="Search customers by name or email">
+    </div>
+
+    <table class="table table-light">
+        <thead class="table-secondary">
+            <tr>
+                <th scope="col"><input type="checkbox" id="selectAll" ></th>
+                <th scope="col">SL. No.</th>
+                <th scope="col">Name</th>
+                <th scope="col">Email</th>
+                <th scope="col">Phone</th>
+                <th scope="col">Block/Unblock</th>
+                <th scope="col">Status</th>
+                <th scope="col">Actions</th>
+            </tr>
+        </thead>
+        <tbody id="customerTableBody">
+            <% data.forEach((data, index) => { %>
+                <tr>
+                    <td><input type="checkbox" class="customer-checkbox"></td>
+                    <td><%= index + 1 %></td>
+                    <td><%= data.full_name %></td>
+                    <td><%= data.email %></td>
+                    <td><%= data.phone %></td>
+                    <td>
+                        <% if(data.isBlocked === false) { %>
+                        <button class="btn btn-warning btn-sm">
+                            <a href="/admin/blockedUser?id=<%=data._id%>" class="text-white" style="text-decoration: none;">Block</a>
+                        </button>
+                        <% }else{ %>
+                        <button class="btn btn-success btn-sm">
+                            <a href="/admin/unblockedUser?id=<%=data._id%>" class="text-white" style="text-decoration: none;">Unblock</a>
+                        </button>
+                        <% } %>
+                </td>
+
+                <td>
+                    <span class="badge <%= data.isBlocked ? 'bg-danger' : 'bg-success' %>">
+                        <%= data.isBlocked ? 'Blocked' : 'Active' %>
+                    </span>
+                </td>
+
+                    <td>
+                        <button class="btn btn-primary btn-sm">Edit</button>
+                        <button class="btn btn-danger btn-sm">Delete</button>
+                    </td>
+                </tr>
+            <% }); %>
+        </tbody>
+    </table>
+
+
+    <div class="pagination-container d-flex align-items-center justify-content-center mt-5">
+        <% if (currentPage > 1) { %>
+        <a class="page-link" href="?page=<%= currentPage - 1 %>">&laquo; Previous</a>
+        <% } %> <% for (let i = 1; i <= totalPages; i++) { %> <% if (i ===
+        currentPage) { %>
+        <span class="current-page"><%= i %></span>
+        <% } else { %>
+        <a class="page-link" href="?page=<%= i %>"><%= i %></a>
+        <% } %> <% } %> <% if (currentPage < totalPages) { %>
+        <a class="page-link" href="?page=<%= currentPage + 1 %>">Next &raquo;</a>
+        <% } %>
+      </div>
+</div>
+
+
+
+
+<script src="/js/admin/customer-search.js"></script>
+<%- include('../../views/partials/admin/footer')  %>

@@ -13,128 +13,115 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <style>
-        body {
-            display: flex;
-            background-color: #ffffff;
-            height: 100vh;
-            margin: 0;
-        }
-        .navbar-aside {
-            background-color: #b0d5de;
-            width: 20%; /* Adjust as needed */
-            height: 100%;
-            position: fixed; /* Fixed position to keep sidebar in place */
-            top: 0; /* Align to the top */
-            left: 0; /* Align to the left */
-            overflow-y: auto; /* Enable scrolling if content overflows */
-        }
-        .main-wrap {
-            margin-left: 20%; /* Offset for sidebar width */
-            width: 80%; /* Remaining space for main content */
-            padding-top: 20px; /* Space for navbar */
-            display: flex;
-            flex-direction: column;
-            align-items: center; /* Center content horizontally */
-        }
-        .navbar {
-            background-color: #8da7ab;
-            position: relative; /* Remove the sticky position */
-            width: 100%; /* Full width */
-            z-index: 1; /* Ensure navbar stays above sidebar */
-        }
-        .menu-item a.menu-link {
-            color: #310505;
-        }
-        .menu-item a.menu-link:hover,
-        .menu-item a.menu-link.active {
-            background-color: #6e7e6e; 
-            color: #ffffff;
-        }
-        .dropdown-menu {
-            background-color: #bb9aaf;
-        }
-        .dropdown-item:hover {
-            background-color: #33053d;
-            color: #ffffff;
-        }
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+.sidebar {
+    width: 250px;
+    background-color:#fdf0d5;
+    height: 100vh;
+}
+a{
+    text-decoration: none;
+}
+
+.sidebar .nav-link {
+    transition: background-color 0.3s;
+    color: #000;
+    font-weight: 500;
+    padding: 15px;
+    text-align: center;
+}
+
+.sidebar .nav-link:hover {
+    background-color: #c1121f;
+    color: #fff;
+}
+
+.icon-custom {
+    margin-right: 10px; /* Space between icon and text */
+}
+.table-light {
+    background-color: #f8f9fa; /* Light background for the table */
+}
+
+.table-light th,
+.table-light td {
+    vertical-align: middle; /* Center align items vertically */
+}
+
+.btn-sm {
+    margin-right: 5px;
+    margin-left: 5px;
+}
+
+.pagination-container .page-link {
+    color: #000;
+    padding: 0.5rem 1rem;
+    border: none;
+}
+
+.pagination-container .current-page {
+    padding: 0.5rem 1rem; /* Match padding with links */
+    color:red; /* Text color for the current page */
+}
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 100%; /* Full width on smaller screens */
+    }
+}
+
     </style>
 </head>
 <body>
-    <div class="screen-overlay"></div>
-    <aside class="navbar-aside" id="offcanvas_aside">
-        <div class="aside-top">
-            <a href="#" class="brand-wrap">
-                <img src="/img/logo.png" class="logo" alt="Men Fashion Dashboard">
-            </a>
-            <div>
-                <button class="btn btn-icon btn-aside-minimize"> <i class="text-muted material-icons md-menu_open"></i> </button>
-            </div>
-        </div>
-        <nav>
-            <ul class="menu-aside">
-                <li class="menu-item">
-                    <a class="menu-link" href="/admin"> <i class="icon material-icons md-home"></i>
-                        <span class="text">Dashboard</span>
-                    </a>
-                </li>
-                <li class="menu-item">
-                    <a class="menu-link" href="/admin/users"> <i class="icon material-icons md-person"></i>
-                        <span class="text">Customers</span>
-                    </a>
-                </li>
-                <li class="menu-item">
-                    <a class="menu-link" href="/admin/category"> <i class="icon material-icons md-person"></i>
-                        <span class="text">Category</span>
-                    </a>
-                </li>
-                <li class="menu-item">
-                    <a class="menu-link" href="/admin/brands"> <i class="icon material-icons md-stars"></i>
-                        <span class="text">Brands</span></a>
-                </li>
-                <li class="menu-item">
-                    <a class="menu-link" href="/admin/addProducts"> <i class="icon material-icons md-add_box"></i>
-                        <span class="text">Add product</span>
-                    </a>
-                </li>
-                <li class="menu-item">
-                    <a class="menu-link" href="/admin/products"> <i class="icon material-icons md-shopping_bag"></i>
-                        <span class="text">Products</span>
-                    </a>
-                </li>
-                <li class="menu-item">
-                    <a class="menu-link" href="/admin/coupon"> <i class="icon material-icons md-class"></i>
-                        <span class="text">Coupon</span></a>
-                </li>
-                <li class="menu-item">
-                    <a class="menu-link" href="/admin/banner"> <i class="icon material-icons md-photo_size_select_actual"></i>
-                        <span class="text">Banner</span></a>
-                </li>
-                <li class="menu-item">
-                    <a class="menu-link" href="/admin/orderList"> <i class="icon material-icons md-shopping_cart"></i>
-                        <span class="text">Orders</span>
-                    </a>
-                </li>
+    <header class="d-flex justify-content-between align-items-center p-3 bg-light border-bottom">
+        <div class="admin-title">Admin Dashboard</div>
+        <div class="profile-dropdown">
+          <div class="dropdown">
+            <button class="btn btn-secondary dropdown-toggle" type="button" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+              Admin Profile
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
+              <li><a class="dropdown-item" href="#">Profile</a></li>
+              <li><a class="dropdown-item" href="#">Settings</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="/admin/login">Logout</a></li>
             </ul>
+          </div>
+        </div>
+      </header>
+      <!-- Sidebar -->
+      <div class="d-flex">
+        <nav class="flex-column pt-4 sidebar">
+            <a href="/admin/dashboard" class="nav-link d-flex align-items-center">
+                <i class="icon-custom"></i> Dashboard
+              </a>
+          <a href="/admin/users" class="nav-link d-flex align-items-center">
+            <i class="icon-custom"></i> Customers
+          </a>
+          <a href="/admin/brands" class="nav-link d-flex align-items-center">
+            <i class="icon-custom"></i> Brand
+          </a>
+          <a href="#" class="nav-link d-flex align-items-center">
+            <i class="icon-custom"></i> Product
+          </a>
+          <a href="#" class="nav-link d-flex align-items-center">
+            <i class="icon-custom"></i> Add Product
+          </a>
+          <a href="#" class="nav-link d-flex align-items-center">
+            <i class="icon-custom"></i> Category
+          </a>
+          <a href="#" class="nav-link d-flex align-items-center">
+            <i class="icon-custom"></i> Banner
+          </a>
+          <a href="#" class="nav-link d-flex align-items-center">
+            <i class="icon-custom"></i> Coupon
+          </a>
+          <a href="#" class="nav-link d-flex align-items-center">
+            <i class="icon-custom"></i> Orders
+          </a>
         </nav>
-    </aside>
-    <main class="main-wrap">
-        <header class="main-header navbar">
-            <div class="col-search">
-            </div>
-            <div class="col-nav">
-                <button class="btn btn-icon btn-mobile me-auto" data-trigger="#offcanvas_aside"> <i class="material-icons md-apps"></i> </button>
-                <ul class="nav">
-                    <li class="dropdown nav-item">
-                        <a class="dropdown-toggle" data-bs-toggle="dropdown" href="#" id="dropdownAccount" aria-expanded="false"> <img class="img-xs rounded-circle" src="/admin-assets/imgs/people/avatar2.jpg" alt="User"></a>
-                        <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownAccount">
-                            <div class="dropdown-divider"></div>
-                            <a class="dropdown-item text-danger" href="/admin/logout"><i class="material-icons md-exit_to_app"></i>Logout</a>
-                        </div>
-                    </li>
-                </ul>
-            </div>
-        </header>
-    </main>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
-</body>
-</html>
+
