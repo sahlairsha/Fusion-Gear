@@ -42,6 +42,10 @@ router.get('/admin/listedCategory',adminAuth,categoryController.listedCategories
 router.get('/admin/unlistedCategory',adminAuth,categoryController.unlistedCategories)
 
 
+//Brand management
+
+router.get('/admin/brands',adminAuth,brandController.getBrandPage)
+router.post('/addBrand',adminAuth,uploads.single("image"),brandController.addBrand);
 
 //Error Page
 router.get('/pageerror',adminController.pageerror)
