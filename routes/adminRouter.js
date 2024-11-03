@@ -6,9 +6,18 @@ const adminController = require('../controller/admin/adminController')
 
 const {adminAuth} = require('../middleware/auth')
 
-router.get('/admin',adminController.loadLogin);
-router.post('/admin',adminController.login)
+const customerController = require('../controller/admin/customerController')
+
+router.get('/admin/login',adminController.loadLogin);
+router.post('/admin/login',adminController.login)
 router.get('/admin/dashboard',adminAuth,adminController.loadDashboard)
+
+
+router.get('/admin/logout',adminController.logout)
+
+
+router.get('/admin/users',adminAuth,customerController.customerInfo)
+
 router.get('/pageerror',adminController.pageerror)
 
 

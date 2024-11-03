@@ -38,12 +38,6 @@ const userSchema = new Schema({
         type : String,
         required : false,
     },
-    otp: {
-        type: String,
-    },
-    otpExpires: {
-        type: Date,
-    },
     isBlocked:{
         type : Boolean,
         default : false

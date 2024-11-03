@@ -9,7 +9,7 @@
         rel="stylesheet" />
     <link rel="stylesheet" href="/css/bootstrap.min.css" />
     <link rel="stylesheet" href="/css/style.css" />
-    <link rel="stylesheet" href="/admin/admin-login.css" />
+    <link rel="stylesheet" href="/css/admin/admin-login.css" />
 </head>
 
 <body>
@@ -21,7 +21,7 @@
             <% } %>
         <h2 class="text-center">Admin Login</h2>
 
-                <form id="adminLoginForm" method="post" action="/admin">
+                <form id="adminLoginForm" method="post" action="/admin/login">
                     <div class="form-group">
                         <label for="adminEmail">Email address</label>
                         <input type="email" class="form-control" id="adminEmail" name="email" />
@@ -35,7 +35,7 @@
                     <button type="submit" class="btn btn-primary btn-block">Login</button>
                 </form>
     </div>
-    <script src="/admin/admin-login-validation.js"></script>
+    <script src="/js/admin/admin-login-validation.js"></script>
     <script src="/js/jquery.min.js"></script>
     <script src="/js/bootstrap.bundle.min.js"></script>
 

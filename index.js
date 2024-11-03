@@ -60,7 +60,7 @@ app.use(require('./routes/adminRouter'));
 db();
 
 app.listen(process.env.PORT, () => {
-    console.log('Server Running');
+    console.log(`Server Running :'http://localhost:${process.env.PORT}' `);
 });
 
 module.exports = app;

@@ -36,12 +36,12 @@ const login = async(req,res)=>{
             const passwordMatch = bcrypt.compare(password,admin.password);
             if(passwordMatch){
                 req.session.admin = true;
-                return res.render('/admin/dashboard',{user : req.body})
+                return res.redirect('/admin/dashboard')
             }else{
-                return res.redirect('/admin',{message : "User is not existed"})
+                return res.redirect('/admin/login',{message : "User is not existed"})
             }
         }else{
-            return res.redirect('/admin')
+            return res.redirect('/admin/login')
         }
     } catch (error) {
         console.log("Admin Login Error",error)
@@ -52,10 +52,27 @@ const login = async(req,res)=>{
 const loadDashboard = async(req,res)=>{
     try {
         if(req.session.admin){
-            res.render("dashboard")
+           return res.render("dashboard")
         }
     } catch (error) {
         res.redirect('/pageerror')
+    }
+}
+
+
+const logout = async(req,res)=>{
+    try {
+        req.session.destroy(err =>{
+            if(err){
+                console.log("Error in destroying session",err)
+                return res.redirect('/pageerror')
+            }
+
+            res.redirect('/admin/login')
+        })
+    } catch (error) {
+        console.log("Unexpected error in logout",error);
+        res.status(500).send("Internal Server Error")
     }
 }
 
@@ -63,7 +80,8 @@ module.exports = {
     loadLogin,
     login,
     loadDashboard,
-    pageerror
+    pageerror,
+    logout
 }
 
 
