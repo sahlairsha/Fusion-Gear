@@ -3,7 +3,7 @@
 // Interactive search functionality
 document.getElementById('searchBar').addEventListener('keyup', function() {
     const filter = this.value.toLowerCase();
-    const rows = document.querySelectorAll('#customerTableBody tr');
+    const rows = document.querySelectorAll('#tableBody tr');
 
     rows.forEach(row => {
         const name = row.cells[2].textContent.toLowerCase(); // Name cell
@@ -18,7 +18,7 @@ document.getElementById('searchBar').addEventListener('keyup', function() {
 
 
 document.getElementById('selectAll').addEventListener('change', function() {
-    const checkboxes = document.querySelectorAll('.customer-checkbox');
+    const checkboxes = document.querySelectorAll('.checkbox');
     checkboxes.forEach(checkbox => {
         checkbox.checked = this.checked;
     });

@@ -6,6 +6,7 @@ const path = require('path');
 const dotenv = require('dotenv').config();
 const db = require('./config/db');
 const nocache = require('nocache')
+const flash = require('connect-flash');
 
 const app = express();
 
@@ -31,8 +32,13 @@ app.use(session({
     }
 }));
 
-
-
+app.use(flash());
+// Make flash messages available in all templates
+app.use((req, res, next) => {
+    res.locals.success_msg = req.flash('success');
+    res.locals.error_msg = req.flash('error');
+    next();
+});
 
 app.use(passport.initialize());
 app.use(passport.session());

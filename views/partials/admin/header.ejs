@@ -21,7 +21,7 @@
 .sidebar {
     width: 250px;
     background-color:#fdf0d5;
-    height: 100vh;
+    height: 130vh;
 }
 a{
     text-decoration: none;
@@ -67,6 +67,12 @@ a{
     padding: 0.5rem 1rem; /* Match padding with links */
     color:red; /* Text color for the current page */
 }
+
+.error-message{
+  font-size: 14px;
+  color: red;
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
     .sidebar {
@@ -111,7 +117,7 @@ a{
           <a href="#" class="nav-link d-flex align-items-center">
             <i class="icon-custom"></i> Add Product
           </a>
-          <a href="#" class="nav-link d-flex align-items-center">
+          <a href="/admin/category" class="nav-link d-flex align-items-center">
             <i class="icon-custom"></i> Category
           </a>
           <a href="#" class="nav-link d-flex align-items-center">

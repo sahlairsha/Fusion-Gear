@@ -1,0 +1,97 @@
+<%- include('../../views/partials/admin/header') %>
+
+<div class="container mt-5">
+    <h2 class="mb-4">Add New Category</h2>
+
+    <!-- Display flash messages for success and error -->
+    <% if (success_msg && success_msg.length > 0) { %>
+        <div class="alert alert-success">
+            <%= success_msg %>
+        </div>
+    <% } %>
+    <% if (error_msg && error_msg.length > 0) { %>
+        <div class="alert alert-danger">
+            <%= error_msg %>
+        </div>
+    <% } %>
+
+    <form id="form-submit" action="/admin/addcategory" method="POST">
+        <div class="mb-3">
+            <label for="name" class="form-label">Category Name</label>
+            <input type="text" class="form-control" id="name" name="name" placeholder="Enter category name">
+            <div id="nameError" class="error-message text-danger"></div>
+        </div>
+
+        <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <textarea class="form-control" id="description" name="description" rows="3" placeholder="Enter category description"></textarea>
+            <div id="descriptionError" class="error-message text-danger"></div>
+        </div>
+
+        <div class="form-check mb-3">
+            <input class="form-check-input" type="checkbox" id="isListed" name="isListed" checked>
+            <label class="form-check-label" for="isListed">
+                List this category
+            </label>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Add item</button>
+    </form>
+</div>
+
+<script>
+    const formSubmit = document.getElementById('form-submit');
+    const nameField = document.getElementById('name');
+    const descriptionField = document.getElementById('description');
+    const categoryOfferField = document.getElementById('categoryOffer');
+
+    const nameError = document.getElementById('nameError');
+    const descriptionError = document.getElementById('descriptionError');
+    const categoryOfferError = document.getElementById('categoryOfferError');
+
+    function formValidation() {
+        let isValid = true;
+
+        // Validate name field
+        if (nameField.value.trim() === '') {
+            nameError.innerText = "Please enter a category name.";
+            isValid = false;
+        } else {
+            nameError.innerText = "";
+        }
+
+        // Validate description field
+        if (descriptionField.value.trim() === '') {
+            descriptionError.innerText = "Please enter a description.";
+            isValid = false;
+        } else {
+            descriptionError.innerText = "";
+        }
+
+        // Validate category offer field
+        if (categoryOfferField.value.trim() === '') {
+            categoryOfferError.innerText = "Please enter a category offer percentage.";
+            isValid = false;
+        } else {
+            categoryOfferError.innerText = "";
+        }
+
+        return isValid;
+    }
+
+    // Add event listeners for blur event on each field
+    nameField.addEventListener('blur', formValidation);
+    descriptionField.addEventListener('blur', formValidation);
+    categoryOfferField.addEventListener('blur', formValidation);
+
+    formSubmit.addEventListener('submit', (e) => {
+        e.preventDefault(); // Prevent the form from submitting by default
+
+        // Run validation
+        if (formValidation()) {
+            formSubmit.submit(); // Only submit the form if validation passes
+        }
+    });
+</script>
+
+<%- include('../../views/partials/admin/footer') %>
