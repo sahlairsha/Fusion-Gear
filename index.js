@@ -21,14 +21,14 @@ app.use(session({
     store: sessionStore.create({
         mongoUrl:process.env.MONGODB_URI,
         collectionName : 'sessions',
-        ttl : 1000
+        ttl : 2000
     }),
     resave: false,
     saveUninitialized: false,
     cookie: {
         secure: false,
         httpOnly: true,
-        maxAge: 72* 60 * 60 * 1000
+        maxAge: 2000
     }
 }));
 

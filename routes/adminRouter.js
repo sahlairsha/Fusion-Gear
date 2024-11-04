@@ -9,6 +9,7 @@ const {adminAuth} = require('../middleware/auth')
 const customerController = require('../controller/admin/customerController')
 const categoryController = require('../controller/admin/categoryController')
 const brandController = require('../controller/admin/brandController')
+const productController = require('../controller/admin/productController')
 
 const multer = require('multer');
 const storage = require("../helper/multer")
@@ -49,6 +50,13 @@ router.post('/admin/brands/add',adminAuth,uploads.single("image"),brandControlle
 router.get('/admin/blockedBrand',adminAuth,brandController.blockedBrand)
 router.get('/admin/unblockedBrand',adminAuth,brandController.unblockedBrand)
 router.get('/admin/deleteBrand',adminAuth,brandController.deleteBrand)
+
+
+
+//Product management
+
+router.get('/admin/addProducts',adminAuth,productController.getProduct)
+router.post('/admin/addProducts',adminAuth,uploads.array("image",4),productController.addProducts);
 
 //Error Page
 router.get('/pageerror',adminController.pageerror)
