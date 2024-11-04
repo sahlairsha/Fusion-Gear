@@ -180,7 +180,6 @@
                     cancelButtonText: 'No, cancel!'
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        // Proceed with deletion if confirmed
                         fetch(deleteUrl, { method: 'DELETE' })
                             .then(response => {
                                 if (response.ok) {

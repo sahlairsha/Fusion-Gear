@@ -18,7 +18,7 @@ const getBrandPage = async(req,res)=>{
         const reverseBrand = brandData.reverse();
 
         res.render("brand",{
-             data: reverseBrand,
+            brand: reverseBrand,
             currentPage : page,
             totalPages : totalPages,
             totalBrand : totalBrand
@@ -42,7 +42,7 @@ const addBrand = async(req,res)=>{
                 brandImage : image
             })
 
-            await brand.save();
+            await newBrand.save();
             res.redirect("/admin/brands")
         }
     } catch (error) {
@@ -51,9 +51,48 @@ const addBrand = async(req,res)=>{
     }
 }
 
+const blockedBrand = async(req,res)=>{
+    try {
+        let id = req.query.id;
+        await Brand.updateOne({_id :id},{$set : {isBlocked : true}})
+        res.redirect('/admin/brands')
+    } catch (error) {
+        console.log('Error in blocking brand',error)
+        res.redirect('/pageerror')
+    }
+}
+
+
+const unblockedBrand = async(req,res)=>{
+    try {
+        let id = req.query.id;
+        await Brand.updateOne({_id :id},{$set : {isBlocked : false}})
+        res.redirect('/admin/brands')
+    } catch (error) {
+        console.log('Error in unblocking brand',error)
+        res.redirect('/pageerror')
+    }
+}
+
+
+const deleteBrand = async (req, res) => {
+    try {
+        let id = req.query.id;
+        await Brand.deleteOne({ _id: id });
+        res.redirect("/admin/brands");
+    } catch (error) {
+        console.error("There is an error in deleting", error);
+        res.redirect("/admin/brands")
+    }
+
+};
+
 
 module.exports = {
     getBrandPage,
-    addBrand
+    addBrand,
+    blockedBrand,
+    unblockedBrand,
+    deleteBrand
 }
 

@@ -45,7 +45,10 @@ router.get('/admin/unlistedCategory',adminAuth,categoryController.unlistedCatego
 //Brand management
 
 router.get('/admin/brands',adminAuth,brandController.getBrandPage)
-router.post('/addBrand',adminAuth,uploads.single("image"),brandController.addBrand);
+router.post('/admin/brands/add',adminAuth,uploads.single("image"),brandController.addBrand);
+router.get('/admin/blockedBrand',adminAuth,brandController.blockedBrand)
+router.get('/admin/unblockedBrand',adminAuth,brandController.unblockedBrand)
+router.delete('/admin/deleteBrand',adminAuth,brandController.deleteBrand)
 
 //Error Page
 router.get('/pageerror',adminController.pageerror)
