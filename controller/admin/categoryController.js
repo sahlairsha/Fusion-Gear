@@ -42,29 +42,28 @@ const categoryInfo = async(req,res)=>{
 }
 
 
-const addCategories = async(req,res)=> {
+const addCategories = async (req, res) => {
     try {
-        const {name,description,categoryOffer} = req.body;
-        const existingCategory = await Category.findOne({name});
+        const { name, description } = req.body;
 
-        if(existingCategory){
-            return res.status(400).json({error : "Category already existed!!"})
+        const existingCategory = await Category.findOne({ name });
+        if (existingCategory) {
+            req.flash('error', 'Category already exists!');
+            return res.redirect('/admin/addcategory'); 
         }
 
+        // Save new category
+        const newCategory = new Category({ name, description });
+        await newCategory.save();
 
-        const newCategory = new Category({
-            name,
-            description,
-            categoryOffer,
-        })
-       await newCategory.save()
-       res.redirect('/admin/category')
-
+        req.flash('success', 'Category added successfully!');
+        res.redirect('/admin/category');
     } catch (error) {
-        console.error("Error in adding new category");
-        res.status(500).json( { error : "Internal Server Error" })
+        console.error("Error in adding new category:", error);
+        req.flash('error', 'Internal Server Error');
+        res.redirect('/admin/addcategory');
     }
-}
+};
 
 
 const editCategories = async(req,res) => {
@@ -87,16 +86,15 @@ const editCategories = async(req,res) => {
 
 const deleteCategories = async (req, res) => {
     try {
-        let id = req.query.id;
+        let {id} = req.query;
+        if(!id){
+            return res.status(400).redirect("/pageerror")
+        }
         await Category.deleteOne({ _id: id });
-
-        // Optionally send a success message or redirect with a message
-        req.flash('success', 'Category deleted successfully!');
         res.redirect('/admin/category');
     } catch (error) {
         console.error("There is an error in deleting", error);
-        req.flash('error', 'Internal Server Error while deleting category.');
-        res.redirect('/admin/category');
+        res.status(500).redirect('/pageerror')
     }
 }
 

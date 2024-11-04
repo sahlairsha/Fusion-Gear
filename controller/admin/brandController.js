@@ -77,12 +77,15 @@ const unblockedBrand = async(req,res)=>{
 
 const deleteBrand = async (req, res) => {
     try {
-        let id = req.query.id;
+        let {id} = req.query;
+        if(!id){
+            return res.status(400).redirect("/pageerror")
+        }
         await Brand.deleteOne({ _id: id });
-        res.redirect("/admin/brands");
+        res.redirect('/admin/brands');
     } catch (error) {
         console.error("There is an error in deleting", error);
-        res.redirect("/admin/brands")
+        res.status(500).redirect('/pageerror')
     }
 
 };

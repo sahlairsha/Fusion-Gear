@@ -12,13 +12,13 @@ const categorySchema = new Schema({
         type : String,
         required : true
     },
-    isListed : {                           // for listing category wise.
+    isListed : {
         type : Boolean,
         default : true
     },
     categoryOffer : {
         type : Number,
-        required : true
+        required : false
     },
     createdAt : {
         type : Date,

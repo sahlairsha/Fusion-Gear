@@ -69,8 +69,8 @@
                       </td>
                     <td>
                         <button class="btn btn-primary mb-2 btn-sm edit-button">Edit</button>
-                        <button class="btn btn-danger btn-sm delete-button  mb-2">
-                            <a href="/admin/deletecategory?id=<%= category._id %>" class="text-white" style="text-decoration: none;">Delete</a>
+                        <button class="btn btn-danger btn-sm delete-button mb-2" data-category-id="<%= category._id %>">
+                            Delete
                         </button>
                     </td>
                 </tr>
@@ -161,54 +161,30 @@
     });
 
     document.addEventListener('DOMContentLoaded', function() {
-        const deleteButtons = document.querySelectorAll('.btn-danger');
+    const deleteButtons = document.querySelectorAll('.btn-danger.delete-button');
 
-        deleteButtons.forEach(button => {
-            button.addEventListener('click', function(event) {
-                event.preventDefault();
+    deleteButtons.forEach(button => {
+        button.addEventListener('click', function(event) {
+            event.preventDefault();
+            const categoryId = button.getAttribute('data-category-id');
+            const deleteUrl = `/admin/deletecategory?id=${categoryId}`;
 
-                const row = button.closest('tr');
-                const categoryId = row.getAttribute('data-category-id');
-                const deleteUrl = `/admin/deletecategory?id=${categoryId}`;
-
-                Swal.fire({
-                    title: 'Are you sure?',
-                    text: 'You will not be able to recover this category!',
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonText: 'Yes, delete it!',
-                    cancelButtonText: 'No, cancel!'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        fetch(deleteUrl, { method: 'DELETE' })
-                            .then(response => {
-                                if (response.ok) {
-                                    // Show success alert
-                                    Swal.fire(
-                                        'Deleted!',
-                                        'Your category has been deleted.',
-                                        'success'
-                                    ).then(() => {
-                                        // Optionally reload or remove the row from the table
-                                        location.reload(); // Reload the page
-                                    });
-                                } else {
-                                    throw new Error('Failed to delete category');
-                                }
-                            })
-                            .catch(error => {
-                                console.error(error);
-                                Swal.fire(
-                                    'Error!',
-                                    'There was a problem deleting your category.',
-                                    'error'
-                                );
-                            });
-                    }
-                });
+            Swal.fire({
+                title: 'Are you sure?',
+                text: 'You will not be able to recover this category!',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, delete it!',
+                cancelButtonText: 'No, cancel!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = deleteUrl;
+                }
             });
         });
     });
+});
+
 
 </script>
 

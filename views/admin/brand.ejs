@@ -1,26 +1,6 @@
 <%- include("../../views/partials/admin/header") %>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <style>
-        .pagination-container {
-            text-align: center;
-        }
-
-        .pagination {
-            display: inline-block;
-        }
-
-        .pagination a,
-        .pagination .current-page {
-            display: inline-block;
-            padding: 5px 10px;
-            margin: 0 2px;
-            border: 1px solid #ddd;
-            text-decoration: none;
-            color: #333;
-        }
-
-        .pagination a:hover {
-            background-color: #f5f5f5;
-        }
         .btn{
             font-size: 14px;
         }
@@ -95,8 +75,8 @@
                                                 <a href="/admin/unblockedBrand?id=<%=brand._id%>" class="text-white">Unblock</a>
                                             </button>
                                             <% } %>
-                                            <button class="btn btn-info" style="width: 80px" onclick="return confirmDelete()">
-                                                <a href="/admin/deleteBrand?id=<%=brand._id%>" class="text-white">Delete</a>
+                                            <button class="btn btn-danger btn-sm delete-button" data-brand-id="<%= brand._id %>">
+                                                Delete
                                             </button>
                                         </td>
                                     </tr>
@@ -127,48 +107,27 @@
     
     </section>
 
-<!--
+
     <script>
-      document.addEventListener('DOMContentLoaded', function() {
-    const deleteButtons = document.querySelectorAll('.btn-danger');
+  document.addEventListener('DOMContentLoaded', function() {
+    const deleteButtons = document.querySelectorAll('.btn-danger.delete-button');
 
     deleteButtons.forEach(button => {
-        button.addEventListener('click', function() {
+        button.addEventListener('click', function(event) {
+            event.preventDefault();
             const brandId = button.getAttribute('data-brand-id');
             const deleteUrl = `/admin/deleteBrand?id=${brandId}`;
 
             Swal.fire({
                 title: 'Are you sure?',
-                text: 'You will not be able to recover this brand!',
+                text: 'You will not be able to recover this Brand!',
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonText: 'Yes, delete it!',
                 cancelButtonText: 'No, cancel!'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    fetch(deleteUrl, { method: 'DELETE' })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                Swal.fire(
-                                    'Deleted!',
-                                    data.message,
-                                    'success'
-                                ).then(() => {
-                                    location.reload(); // Reload the page after deletion
-                                });
-                            } else {
-                                throw new Error(data.message);
-                            }
-                        })
-                        .catch(error => {
-                            console.error(error);
-                            Swal.fire(
-                                'Error!',
-                                'There was a problem deleting your brand.',
-                                'error'
-                            );
-                        });
+                    window.location.href = deleteUrl;
                 }
             });
         });
@@ -176,14 +135,8 @@
 });
 
 
-    </script> -->
-
-
-    <script>
-
-function confirmDelete(){
-    confirm("Are you sure?")
-}
-
     </script>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <%- include("../../views/partials/admin/footer") %>

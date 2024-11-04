@@ -37,7 +37,7 @@ router.post('/admin/addcategory',adminAuth,categoryController.addCategories)
 router.post('/admin/addOffer',adminAuth,categoryController.addOffer)
 router.post('/admin/removeOffer',adminAuth,categoryController.removeOffer)
 router.put('/admin/editcategory',adminAuth,categoryController.editCategories)
-router.delete('/admin/deletecategory',adminAuth,categoryController.deleteCategories)
+router.get('/admin/deletecategory',adminAuth,categoryController.deleteCategories)
 router.get('/admin/listedCategory',adminAuth,categoryController.listedCategories)
 router.get('/admin/unlistedCategory',adminAuth,categoryController.unlistedCategories)
 
@@ -48,7 +48,7 @@ router.get('/admin/brands',adminAuth,brandController.getBrandPage)
 router.post('/admin/brands/add',adminAuth,uploads.single("image"),brandController.addBrand);
 router.get('/admin/blockedBrand',adminAuth,brandController.blockedBrand)
 router.get('/admin/unblockedBrand',adminAuth,brandController.unblockedBrand)
-router.delete('/admin/deleteBrand',adminAuth,brandController.deleteBrand)
+router.get('/admin/deleteBrand',adminAuth,brandController.deleteBrand)
 
 //Error Page
 router.get('/pageerror',adminController.pageerror)

@@ -3,7 +3,6 @@
 <div class="container mt-5">
     <h2 class="mb-4">Add New Category</h2>
 
-    <!-- Display flash messages for success and error -->
     <% if (success_msg && success_msg.length > 0) { %>
         <div class="alert alert-success">
             <%= success_msg %>
@@ -43,16 +42,13 @@
     const formSubmit = document.getElementById('form-submit');
     const nameField = document.getElementById('name');
     const descriptionField = document.getElementById('description');
-    const categoryOfferField = document.getElementById('categoryOffer');
 
     const nameError = document.getElementById('nameError');
     const descriptionError = document.getElementById('descriptionError');
-    const categoryOfferError = document.getElementById('categoryOfferError');
 
     function formValidation() {
         let isValid = true;
 
-        // Validate name field
         if (nameField.value.trim() === '') {
             nameError.innerText = "Please enter a category name.";
             isValid = false;
@@ -60,36 +56,20 @@
             nameError.innerText = "";
         }
 
-        // Validate description field
         if (descriptionField.value.trim() === '') {
             descriptionError.innerText = "Please enter a description.";
             isValid = false;
         } else {
             descriptionError.innerText = "";
         }
-
-        // Validate category offer field
-        if (categoryOfferField.value.trim() === '') {
-            categoryOfferError.innerText = "Please enter a category offer percentage.";
-            isValid = false;
-        } else {
-            categoryOfferError.innerText = "";
-        }
-
-        return isValid;
+        return isValid;  // Return true if valid, false if not
     }
 
-    // Add event listeners for blur event on each field
-    nameField.addEventListener('blur', formValidation);
-    descriptionField.addEventListener('blur', formValidation);
-    categoryOfferField.addEventListener('blur', formValidation);
-
     formSubmit.addEventListener('submit', (e) => {
-        e.preventDefault(); // Prevent the form from submitting by default
-
-        // Run validation
+        e.preventDefault(); 
+      
         if (formValidation()) {
-            formSubmit.submit(); // Only submit the form if validation passes
+            formSubmit.submit(); 
         }
     });
 </script>

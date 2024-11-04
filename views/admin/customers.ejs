@@ -16,7 +16,6 @@
                 <th scope="col">Phone</th>
                 <th scope="col">Block/Unblock</th>
                 <th scope="col">Status</th>
-                <th scope="col">Actions</th>
             </tr>
         </thead>
         <tbody id="tableBody">
@@ -44,11 +43,6 @@
                         <%= data.isBlocked ? 'Blocked' : 'Active' %>
                     </span>
                 </td>
-
-                    <td>
-                        <button class="btn btn-primary btn-sm">Edit</button>
-                        <button class="btn btn-danger btn-sm">Delete</button>
-                    </td>
                 </tr>
             <% }); %>
         </tbody>
