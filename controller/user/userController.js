@@ -6,6 +6,8 @@ const bcrypt = require('bcrypt')
 
 const User = require('../../models/userSchema')
 
+
+
 // for loading other endpoints.
 const pageNotFound = async(req,res) =>{
     try {
@@ -90,9 +92,9 @@ const signup = async (req, res) => {
 
         const findUser = await User.findOne({ email });
         if (findUser) {
-            return res.render("signup", { message: "User Already Exists"});
+            req.flash('error', 'User already exists');
+            return res.redirect('/signup');
         }
-
         const otp = generateOtp();
         const emailSend = await sendVerificationEmail(email, otp);
         console.log("OTP sent", otp);
@@ -104,6 +106,11 @@ const signup = async (req, res) => {
         req.session.userData = { full_name, username, phone, email, password };
 
         res.render("verification-otp");
+
+
+        if(req.session.userData.googleId){
+            res.redirect('/login')
+          }
     } catch (error) {
         console.error("signup error", error);
         return res.render("signup", { message: "An error occurred. Please try again."});
@@ -169,7 +176,8 @@ const verifyOtp = async (req, res) => {
 
 const resendOtp = async (req, res) => {
     try {
-        const {email} = req.session.userData;
+        const {email} = req.session.user;
+        console.log(req.session.userData)
         if (!email) {
             return res.status(400).json({ success: false, message: "Email not found in session" });
         }
@@ -238,28 +246,21 @@ const login = async (req, res) => {
 };
 
 
-const logout = async (req, res) => {
+const logout = (req, res) => {
     try {
-        req.logout((err) => {
-            if (err) {
-                console.log("Error logging out:", err.message);
-                return res.redirect('/pagenotfound');
+        req.session.destroy(err =>{
+            if(err){
+                console.log("Error in destroying session",err)
+                return res.redirect('/pageerror')
             }
-            req.session.regenerate((err) => { // Regenerate session to clear all data
-                if (err) {
-                    console.log("Error regenerating session:", err.message);
-                    return res.redirect('/pagenotfound');
-                }
-                res.clearCookie('connect.sid');
-                res.redirect('/login');
-            });
-        });
+
+            res.redirect('/login')
+        })
     } catch (error) {
-        console.log("Logout error", error);
-        res.redirect('/pagenotfound');
+        console.log("Unexpected error in logout",error);
+        res.status(500).send("Internal Server Error")
     }
 };
-
 
 
 module.exports = {

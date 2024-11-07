@@ -2,21 +2,17 @@ const User = require('../models/userSchema');
 
 
 const userAuth = (req,res,next)=>{
-    if(req.session.user){
-        User.findById(req.session.user)
-        .then(data =>{
-            if(data && !data.isBlocked){
-                next();
-            }else{
-                res.redirect('/login')
-            }
-        }).catch(err=>{
-            console.log("Error in user auth middleware");
-            res.status(500).send("Internal server Error")
-        })
-    }else{
-        res.redirect('/login')
-    }
+    User.findOne({isAdmin : false , isBlocked : false})
+    .then(data =>{
+        if(data){
+            next();
+        }else{
+            res.redirect('/login')
+        }
+    }).catch(err=>{
+        console.log("Error in admin auth middleware");
+        res.status(500).send("Internal Server Error")
+    })
 }
 
 
@@ -26,7 +22,7 @@ const adminAuth = (req,res,next)=>{
         if(data){
             next();
         }else{
-            res.redirect('/admin')
+            res.redirect('/admin/login')
         }
     }).catch(err=>{
         console.log("Error in admin auth middleware");

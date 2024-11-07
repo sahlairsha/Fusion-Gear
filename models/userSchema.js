@@ -47,7 +47,7 @@ const userSchema = new Schema({
         default : false
     },
     cart :[{
-        type : Schema.Types.ObjectId,
+        type : mongoose.Schema.Types.ObjectId,
         ref : "Cart"
     }],
     wallet : {
@@ -55,11 +55,11 @@ const userSchema = new Schema({
         default : 0,
     },
     whishlist : [{
-        type : Schema.Types.ObjectId,
+        type :mongoose.Schema.Types.ObjectId,
         ref : "Wishlist"
     }],
     orderHistory:[{
-        type : Schema.Types.ObjectId,
+        type : mongoose.Schema.Types.ObjectId,
         ref : "Order"
     }],
     createdOn : {
@@ -73,12 +73,12 @@ const userSchema = new Schema({
         type : Boolean
     },
     redeemedUser : [{
-        type :Schema.Types.ObjectId,
+        type : mongoose.Schema.Types.ObjectId,
         ref :"User"
     }],
     serachHistroy:[{
         category : {
-            type : Schema.Types.ObjectId,
+            type : mongoose.Schema.Types.ObjectId,
             ref : "Category"
         },
         brand : {

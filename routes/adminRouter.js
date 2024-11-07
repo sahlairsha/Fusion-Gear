@@ -8,7 +8,6 @@ const {adminAuth} = require('../middleware/auth')
 
 const customerController = require('../controller/admin/customerController')
 const categoryController = require('../controller/admin/categoryController')
-const brandController = require('../controller/admin/brandController')
 const productController = require('../controller/admin/productController')
 
 const multer = require('multer');
@@ -35,31 +34,29 @@ router.get('/admin/unblockedUser',adminAuth,customerController.unblockedUser)
 router.get('/admin/category',adminAuth,categoryController.categoryInfo)
 router.get('/admin/addcategory',adminAuth,categoryController.inputCategories)
 router.post('/admin/addcategory',adminAuth,categoryController.addCategories)
-router.post('/admin/addOffer',adminAuth,categoryController.addOffer)
-router.post('/admin/removeOffer',adminAuth,categoryController.removeOffer)
 router.put('/admin/editcategory',adminAuth,categoryController.editCategories)
 router.get('/admin/deletecategory',adminAuth,categoryController.deleteCategories)
-router.get('/admin/listedCategory',adminAuth,categoryController.listedCategories)
-router.get('/admin/unlistedCategory',adminAuth,categoryController.unlistedCategories)
-
-
-//Brand management
-
-router.get('/admin/brands',adminAuth,brandController.getBrandPage)
-router.post('/admin/brands/add',adminAuth,uploads.single("image"),brandController.addBrand);
-router.get('/admin/blockedBrand',adminAuth,brandController.blockedBrand)
-router.get('/admin/unblockedBrand',adminAuth,brandController.unblockedBrand)
-router.get('/admin/deleteBrand',adminAuth,brandController.deleteBrand)
+router.get('/admin/restorecategory',adminAuth,categoryController.restoreCategories)
 
 
 
 //Product management
 
-router.get('/admin/addProducts',adminAuth,productController.getProduct)
-router.post('/admin/addProducts',adminAuth,uploads.array("image",4),productController.addProducts);
+router.get('/admin/add-products',adminAuth,productController.getProduct)
+router.post('/admin/add-products',adminAuth,uploads.array("image",4),productController.addProducts);
+router.get("/admin/products",adminAuth,productController.getAllProducts)
+router.get("/admin/editproducts",adminAuth,productController.getEditProducts)
+router.post("/admin/editproducts/:id",adminAuth,uploads.array('image',4),productController.editProducts)
+router.post("/deleteImage",adminAuth,productController.deleteImage);
+router.get("/admin/deleteproducts",adminAuth,productController.deleteProducts)
+router.get("/admin/restoreproduct",adminAuth,productController.deleteProducts)
+
+router.get('/admin/blockedproduct',adminAuth,productController.blockProducts)
+router.get('/admin/unblockedproduct',adminAuth,productController.unblockProducts)
 
 //Error Page
-router.get('/pageerror',adminController.pageerror)
+router.get('/pageerror',adminController.pageerror);
+
 
 
 

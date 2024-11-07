@@ -1,0 +1,106 @@
+<%- include('../../views/partials/admin/header')  %>
+
+
+<div class="container mt-4">
+    <h2 class="mb-4">Customer Details</h2>
+  
+    <div class="mb-3">
+        <input type="text" class="form-control" id="searchBar" placeholder="Search customers by name or email">
+    </div>
+
+    <table class="table table-light">
+        <thead class="table-secondary">
+            <tr>
+                <th scope="col"><input type="checkbox" id="selectAll" ></th>
+                <th scope="col">#</th>
+                <th scope="col">Name</th>
+                <th scope="col">Description</th>
+                <th scope="col">Category</th>
+                <th scope="col">Sale Price</th>
+                <th scope="col">Qty</th>
+                <th scope="col">Color</th>
+                <th scope="col">size</th>
+                <th scope="col">Block/Unblock</th>
+                <th scope="col">Actions</th>
+            </tr>
+        </thead>
+        <tbody id="tableBody" >
+            <% data.forEach((data, index) => { %>
+                <tr data-product-id ="<%=data._id%>">
+                    <td><input type="checkbox" class="checkbox"></td>
+                    <td><%= index + 1 %></td>
+                    <td><%= data.productName %></td>
+                    <td class="w-25"><%= data.description %></td>
+                    <td>
+                        <%= data.category ? data.category.name : 'No Category' %>
+                    </td>
+                    <td><%= data.salePrice%></td>
+                    <td><%= data.quantity%></td>
+                    <td><%= data.color%></td>
+                    <td><%= data.size%></td>
+                    <td>
+                        <% if(data.isBlocked === false) { %>
+                        <button class="btn btn-warning btn-sm">
+                            <a href="/admin/blockedproduct?id=<%=data._id%>" class="text-white" style="text-decoration: none;">Block</a>
+                        </button>
+                        <% }else{ %>
+                        <button class="btn btn-success btn-sm">
+                            <a href="/admin/unblockedproduct?id=<%=data._id%>" class="text-white" style="text-decoration: none;">Unblock</a>
+                        </button>
+                        <% } %>
+                </td>
+
+                <td>
+                    <button class="btn btn-primary mb-2 btn-sm edit-button">
+                        <a class="text-white" href="/admin/editproducts?id=<%= data._id %>">Edit</a>
+                    </button>
+                    <% if (data.deleted === false) { %>
+                        <button class="btn btn-warning btn-sm">
+                            <a href="/admin/deleteproducts?id=<%= data._id %>" class="text-white" style="text-decoration: none;" >Delete</a>
+                        </button>
+                    <% } else { %>
+                        <button class="btn btn-success btn-sm">
+                            <a href="/admin/restoreproduct?id=<%= data._id %>" class="text-white" style="text-decoration: none;">Restore</a>
+                        </button>
+                    <% } %>
+                </td>
+
+                </tr>
+            <% }); %>
+        </tbody>
+    </table>
+
+
+    <div class="pagination-container d-flex align-items-center justify-content-center mt-5">
+        <% if (currentPage > 1) { %>
+        <a class="page-link" href="?page=<%= currentPage - 1 %>">&laquo; Previous</a>
+        <% } %> <% for (let i = 1; i <= totalPages; i++) { %> <% if (i ===
+        currentPage) { %>
+        <span class="current-page"><%= i %></span>
+        <% } else { %>
+        <a class="page-link" href="?page=<%= i %>"><%= i %></a>
+        <% } %> <% } %> <% if (currentPage < totalPages) { %>
+        <a class="page-link" href="?page=<%= currentPage + 1 %>">Next &raquo;</a>
+        <% } %>
+      </div>
+</div>
+
+
+
+
+
+
+
+
+
+<script src="/js/admin/customer-search.js"></script>
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+
+
+
+<%- include('../../views/partials/admin/footer')  %>

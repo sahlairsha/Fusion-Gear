@@ -46,24 +46,23 @@ const addCategories = async (req, res) => {
     try {
         const { name, description } = req.body;
 
-        const existingCategory = await Category.findOne({ name });
-        if (existingCategory) {
-            req.flash('error', 'Category already exists!');
-            return res.redirect('/admin/addcategory'); 
-        }
 
-        // Save new category
         const newCategory = new Category({ name, description });
         await newCategory.save();
 
         req.flash('success', 'Category added successfully!');
-        res.redirect('/admin/category');
+        res.redirect('/admin/addCategory');
     } catch (error) {
-        console.error("Error in adding new category:", error);
-        req.flash('error', 'Internal Server Error');
-        res.redirect('/admin/addcategory');
+        if (error.code === 11000) {
+            req.flash("error",'Category name must be unique.')
+            return res.redirect("/admin/addCategory")
+        } else {
+            console.error("Error creating category:", error);
+            res.status(500).redirect('/pageerror');
+        }
     }
 };
+
 
 
 const editCategories = async(req,res) => {
@@ -86,11 +85,17 @@ const editCategories = async(req,res) => {
 
 const deleteCategories = async (req, res) => {
     try {
-        let {id} = req.query;
+        let id = req.query.id;
         if(!id){
             return res.status(400).redirect("/pageerror")
         }
-        await Category.deleteOne({ _id: id });
+        await Category.updateOne(
+            {
+                _id: id ,
+                isDeleted : false
+             },
+             {$set : { isDeleted : true , deletedAt : Date.now()}},
+             {new : true});
         res.redirect('/admin/category');
     } catch (error) {
         console.error("There is an error in deleting", error);
@@ -98,96 +103,29 @@ const deleteCategories = async (req, res) => {
     }
 }
 
-
-
-const addOffer = async(req,res)=>{
-    try{
-
-        const percentage = parseInt(req.body.percentage)
-        const categoryId = req.body.categoryId;
-
-        const category = await Category.findById(categoryId);
-        if(!category){
-            res.status(404).json({status : false , message : "Category Not Found"})
-        }
-        const products = await Products.find({category : category._id})
-
-        const hasProductOffer = products.some((product)=> product.productOffer > percentage)
-        if(hasProductOffer){
-            return res.json({status : false , message : "Product within this category already have product offer"})
-        }
-
-        await Category.updateOne({_id : categoryId},{$set :{categoryOffer : percentage}});
-
-        for(const product of products){
-            product.productOffer = 0;
-            product.salePrice = product.regularPrice;
-            await product.save()
-        }
-
-        res.json({status : true})
-
-    }catch(error){
-        res.status(500).json({status : false , message : "Internal Server Error"})
-    }
-}
-
-
-
-const removeOffer = async(req,res)=>{
-    try{
-
-        const categoryId = req.body.categoryId;
-        const category = await Category.findById(categoryId);
-
-        if(!category){
-            return res.status(404).json({status : false , message : "Category not Found"})
-        }
-
-        const percentage = category.categoryOffer;
-        const products = await Products.find({category : category._id})
-
-        if(products.length > 0){
-            for(const product of products){
-                product.salePrice += Math.floor(product.regularPrice * (percentage/100));
-                product.productOffer = 0;
-                await product.save()
-            }
-        }
-
-        category.categoryOffer = 0
-        await category.save();
-        res.json({status : true})
-
-    }catch(error){
-        res.status(500).json({status : false , message : "Internal Server Error"})
-    }
-}
-
-
-const listedCategories = async(req,res)=>{
+const restoreCategories = async (req, res) => {
     try {
         let id = req.query.id;
-        await Category.updateOne({_id :id},{$set : {isListed : true}})
-        res.redirect('/admin/category')
+        if(!id){
+            return res.status(400).redirect("/pageerror")
+        }
+        await Category.updateOne(
+            {
+                _id: id,
+                isDeleted : true
+             },
+             {$set : {isDeleted : false , deletedAt : null }},
+             {new : true});
+        res.redirect('/admin/category');
     } catch (error) {
-        console.log('Error in blocking user',error)
-        res.redirect('/pageerror')
+        console.error("There is an error in restoring", error);
+        res.status(500).redirect('/pageerror')
     }
 }
 
 
 
-const unlistedCategories = async(req,res)=>{
-    try {
-        let id = req.query.id;
-        await Category.updateOne({_id :id},{$set : {isListed : false}})
-        res.redirect('/admin/category')
-    } catch (error) {
-        console.log('Error in blocking user',error)
-        res.redirect('/pageerror')
-    }
-}
+
 
 
 
@@ -196,9 +134,6 @@ module.exports = {
     addCategories,
     editCategories,
     deleteCategories,
+    restoreCategories,
     inputCategories,
-    addOffer,
-    removeOffer,
-    listedCategories,
-    unlistedCategories
 }

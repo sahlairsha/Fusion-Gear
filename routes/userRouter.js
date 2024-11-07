@@ -1,13 +1,14 @@
-const express = require("express");  // @ts-ignore
+const express = require("express");
 
 const router = express.Router();
 
 const passport = require('../config/passport');
 
 const userController = require('../controller/user/userController')
+const {userAuth} = require('../middleware/auth')
 
 
-router.get('/',userController.loadHomePage)
+router.get('/',userAuth,userController.loadHomePage)
 
 router.get('/signup',userController.loadSignup)
 
@@ -22,17 +23,6 @@ router.get('/auth/google', passport.authenticate('google',{scope : ['profile','e
 router.get('/auth/google/callback', passport.authenticate('google',{failureRedirect : '/signup'}),(req,res)=>{
     res.redirect('/')
 })
-
-router.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] ,  prompt: 'select_account' }));
-
-router.get('/auth/google/callback',
-    passport.authenticate('google', { failureRedirect: '/login' }),
-    (req, res) => {
-        res.redirect('/');
-    }
-);
-
-
 
 router.get('/login',userController.loadLogin)
 

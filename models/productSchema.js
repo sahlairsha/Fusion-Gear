@@ -11,12 +11,8 @@ const productSchema = new Schema({
         type : String,
         required : true
     },
-    brand : {
-        type : String,
-        required : true
-    },
     category :{
-        type : Schema.Types.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref : "Category",
         required : true
     },
@@ -45,8 +41,8 @@ const productSchema = new Schema({
         required : true
     },
     size :{
-        type : String,
-        required : true
+        type : [String],
+        required : false
     },
     isBlocked :{
         type : Boolean,
@@ -57,6 +53,14 @@ const productSchema = new Schema({
         enum : ["Available","Out Of Stock","Unavailable","Sold out"],
         required : true,
         default : "Available"
+    },
+    isDeleted : {
+        type : Boolean,
+        default : false
+    },
+    deletedAt: {
+        type: Date,
+        default: null
     }
 },{timestamps : true})
 

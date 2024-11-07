@@ -12,13 +12,12 @@
   <div class="wrapper">
     <img class="image" src="https://cdn.dribbble.com/userupload/4929101/file/original-5582f76fea9754ec49b18d2681607c0e.jpg?resize=1024x768" alt="signup-image">
     </div>
-    <% if(locals.message && message > 0) { %>
-      <div class="alert alert-danger text-center fs-8">
-          <%= message %>
-      </div>
-  <% } %>
+    
   <div class="signup-container col-lg-8 col-md-6 col-sm-4 col-4">
       <h5 class="container-fluid mt-4">Signup</h5>
+      <% if (locals.flash.error && locals.flash.error.length > 0) { %>
+        <div class="alert alert-danger"><%= locals.flash.error %></div>
+    <% } %>
       <form class="col-lg-h-100 col-md-h-80 col-sm-h-60" id="signup-form" action="/signup" method="POST">
           <input id="full-name" type="text" name="full_name" placeholder="Full Name" autocomplete="full_name">
           <div id="error1" class="error-message text-danger"></div>
