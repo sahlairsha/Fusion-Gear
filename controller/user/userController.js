@@ -109,7 +109,7 @@ const signup = async (req, res) => {
 
 
         if(req.session.userData.googleId){
-            res.redirect('/login')
+            res.redirect('/')
           }
     } catch (error) {
         console.error("signup error", error);

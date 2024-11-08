@@ -4,7 +4,11 @@ const router = express.Router();
 
 const passport = require('../config/passport');
 
+
+
 const userController = require('../controller/user/userController')
+
+const productController = require('../controller/user/productController')
 const {userAuth} = require('../middleware/auth')
 
 
@@ -29,6 +33,9 @@ router.get('/login',userController.loadLogin)
 router.post('/login',userController.login)
 
 router.get('/logout', userController.logout)
+
+
+router.get("/products",userAuth, productController.getproducts)
 
 router.get('/pagenotfound', userController.pageNotFound)
 

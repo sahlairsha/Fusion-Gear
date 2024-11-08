@@ -97,7 +97,7 @@ const getAllProducts = async(req,res)=>{
             })
             .limit(limit * 1)
             .skip((page - 1) * limit)
-            .populate('category') 
+            .populate('category')
             .exec();
             const count = await Product.find({
                 $or : [
@@ -112,7 +112,7 @@ const getAllProducts = async(req,res)=>{
                     data : productData,
                     category : category,
                     totalPages : Math.ceil(count/limit),
-                    currentPage : page
+                    currentPage: page
                 })
             }else{
                 req.flash("error","Category not found,Please try again");

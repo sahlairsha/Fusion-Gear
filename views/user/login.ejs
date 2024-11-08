@@ -25,9 +25,9 @@
                     <div id="error2" class="error-message text-danger text-center"></div>
                 </div>
 
-                <% if (locals.message) { %>
+                <% if (flash.error) { %>
                     <div class="alert alert-danger text-center">
-                        <%= message %>
+                        <%= flash.error %>
                     </div>
                 <% } %>
                 <button type="submit" class="login-btn"><a class="login-link text-decoration-none" href="">Login</a></button>

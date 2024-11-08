@@ -1,6 +1,6 @@
 const express = require('express');
 const session = require('express-session');
-const sessionStore = require('connect-mongo');
+const sessionStorage = require("connect-mongo")
 const passport = require('./config/passport');
 const path = require('path');
 const env = require('dotenv').config();
@@ -18,22 +18,16 @@ app.use(nocache());
 
 app.use(session({
     secret: process.env.SESSION_SECRET,
-    store: sessionStore.create({
+    store:  sessionStorage.create({
         mongoUrl: process.env.MONGODB_URI,
         collectionName: 'sessions',
-        ttl: 24 * 60 * 60 // 24 hours in seconds
     }),
     resave: false,
-    saveUninitialized: false,
-    cookie: {
-        secure: false,
-        httpOnly: true,
-        maxAge: 24 * 60 * 60 * 1000 // 24 hours in milliseconds
-    }
+    saveUninitialized: true,
+    cookie:{secure : false}
 }));
 
 app.use(flash());
-// Middleware to make flash messages available in all templates
 app.use((req, res, next) => {
     res.locals.flash = req.flash();
     next();
@@ -48,7 +42,8 @@ app.use((req, res, next) => {
 });
 
 app.use((req, res, next) => {
-    res.locals.user = req.user;
+    console.log("User in locals:", res.locals.user); 
+    res.locals.user = req.session.user;  
     next();
 });
 

@@ -44,18 +44,7 @@
                     <nav class="header__menu mobile-menu">
                         <ul>
                             <li class="active"><a href="/">Home</a></li>
-                            <li><a href="#">Shop</a></li>
-                            <li><a href="#">Pages</a>
-                                <ul class="dropdown">
-                                    <li><a href="./about.html">About Us</a></li>
-                                    <li><a href="./shop-details.html">Shop Details</a></li>
-                                    <li><a href="./shopping-cart.html">Shopping Cart</a></li>
-                                    <li><a href="./checkout.html">Check Out</a></li>
-                                    <li><a href="./blog-details.html">Blog Details</a></li>
-                                </ul>
-                            </li>
-                            <li><a href="./blog.html">Blog</a></li>
-                            <li><a href="./contact.html">Contacts</a></li>
+                            <li><a href="/products">products</a></li>
                         </ul>
                     </nav>
                 </div>
@@ -69,10 +58,10 @@
                                     <a href="/logout">Logout</a>
                                 </div>
                             </div>
-                        <%} else {%>
-                        <a href="/signup" class="signup-link text-danger">Sign Up</a>
-                        <a href="/login" class="login-link text-danger ">Login</a>
-                        <%}%>
+                        <% } else { %>
+                            <a href="/signup" class="signup-link text-danger">Sign Up</a>
+                            <a href="/login" class="login-link text-danger">Login</a>
+                        <% } %>
                         <a href="#" class="search-switch"><img src="img/icon/search.png" alt=""></a>
                         <a href="#"><img src="img/icon/heart.png" alt=""></a>
                         <a href="#"><img src="img/icon/cart.png" alt=""> <span>0</span></a>
