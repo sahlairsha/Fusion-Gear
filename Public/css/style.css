@@ -29,7 +29,11 @@
 /*----------------------------------------*/
 /* Template default CSS
 /*----------------------------------------*/
-
+*{
+	padding: 0;
+	margin: 0;
+	box-sizing: border-box;
+}
 html,
 body {
 	height: 100%;
@@ -321,6 +325,7 @@ ol {
 
 .header {
 	background: #ffffff;
+	height:15vh;
 }
 
 .header__top {
@@ -408,7 +413,10 @@ ol {
 }
 
 .header__logo {
-	padding: 30px 0;
+	position: absolute;
+	padding:0;
+	left: 0;
+	top:10px;
 }
 
 .header__logo a {
@@ -4016,5 +4024,11 @@ ol {
 .header{
 	position: relative;
 	z-index: 500;
+}
+
+.logo-heading{
+	padding-bottom: 20PX;
+	color:#fff;
+	font-size: 40px;
 }
 

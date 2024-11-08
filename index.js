@@ -19,7 +19,7 @@ app.use(nocache());
 app.use(session({
     secret: process.env.SESSION_SECRET,
     store:  sessionStorage.create({
-        mongoUrl: process.env.MONGODB_URI,
+        mongoUrl:process.env.MONGODB_URI,
         collectionName: 'sessions',
     }),
     resave: false,
@@ -27,23 +27,29 @@ app.use(session({
     cookie:{secure : false}
 }));
 
+app.use(passport.initialize());
+app.use(passport.session());
+
+
+
+app.use((req, res, next) => {
+    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+    next();
+});
+
+
 app.use(flash());
 app.use((req, res, next) => {
     res.locals.flash = req.flash();
     next();
 });
 
-app.use(passport.initialize());
-app.use(passport.session());
+
+
+
 
 app.use((req, res, next) => {
-    res.set('cache-control', 'no-store');
-    next();
-});
-
-app.use((req, res, next) => {
-    console.log("User in locals:", res.locals.user); 
-    res.locals.user = req.session.user;  
+    res.locals.user = req.user;
     next();
 });
 

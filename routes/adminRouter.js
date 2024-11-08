@@ -46,10 +46,10 @@ router.get('/admin/add-products',adminAuth,productController.getProduct)
 router.post('/admin/add-products',adminAuth,uploads.array("image",4),productController.addProducts);
 router.get("/admin/products",adminAuth,productController.getAllProducts)
 router.get("/admin/editproducts",adminAuth,productController.getEditProducts)
-router.post("/admin/editproducts/:id",adminAuth,uploads.array('image',4),productController.editProducts)
+router.post("/admin/editproducts/:id", adminAuth, uploads.array('image', 4), productController.editProducts);
 router.post("/deleteImage",adminAuth,productController.deleteImage);
 router.get("/admin/deleteproducts",adminAuth,productController.deleteProducts)
-router.get("/admin/restoreproduct",adminAuth,productController.deleteProducts)
+router.get("/admin/restoreproducts",adminAuth,productController.restoreProduct)
 
 router.get('/admin/blockedproduct',adminAuth,productController.blockProducts)
 router.get('/admin/unblockedproduct',adminAuth,productController.unblockProducts)

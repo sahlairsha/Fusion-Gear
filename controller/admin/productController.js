@@ -156,7 +156,7 @@ const editProducts = async(req,res) =>{
         const product = await Product.findOne({_id:id});
         const data = req.body;
         const existingProduct = await Product.findOne({
-            productName : productName,
+            productName : data.productName,
             _id : {$ne : id}
         })
         if(existingProduct){
@@ -190,7 +190,7 @@ if(req.files.length > 0){
 }
 
 
-await product.findByIdAndUpdate(id,updateFields,{new : true});
+await Product.findByIdAndUpdate(id,updateFields,{new : true});
 
 res.redirect("/admin/products")
 

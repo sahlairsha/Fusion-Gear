@@ -8,10 +8,9 @@ const categorySchema = new Schema({
         type : String,
         required : true,
         trim: true,
-        lowercase: true,  // Store the name in lowercase
+        lowercase: true, 
         validate: {
             validator: async function(value) {
-                // Check if the categoryName exists in a case-insensitive way
                 const existingCategory = await Category.findOne({
                     categoryName: value.toLowerCase()
                 });

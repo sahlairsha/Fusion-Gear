@@ -51,16 +51,16 @@
                 </td>
 
                 <td>
-                    <button class="btn btn-primary mb-2 btn-sm edit-button">
+                    <button class="btn btn-primary btn-md edit-button">
                         <a class="text-white" href="/admin/editproducts?id=<%= data._id %>">Edit</a>
                     </button>
-                    <% if (data.deleted === false) { %>
-                        <button class="btn btn-warning btn-sm">
-                            <a href="/admin/deleteproducts?id=<%= data._id %>" class="text-white" style="text-decoration: none;" >Delete</a>
+                    <% if (data.isDeleted === false) { %>
+                        <button class="btn btn-warning btn-md">
+                            <a href="/admin/deleteproducts?id=<%= data._id %>" class="text-white" style="text-decoration: none;">Delete</a>
                         </button>
                     <% } else { %>
-                        <button class="btn btn-success btn-sm">
-                            <a href="/admin/restoreproduct?id=<%= data._id %>" class="text-white" style="text-decoration: none;">Restore</a>
+                        <button class="btn btn-success btn-md">
+                            <a href="/admin/restoreproducts?id=<%= data._id %>" class="text-white" style="text-decoration: none;">Restore</a>
                         </button>
                     <% } %>
                 </td>

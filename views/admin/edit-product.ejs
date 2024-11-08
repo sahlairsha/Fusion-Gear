@@ -84,8 +84,8 @@
             <div class="container-fluid w-75 col-lg-6">
                 <div class="card mb-4">
                     <div class="card-body">
-                        <form method="post" action="/admin/editproducts?id=<%=product._id%>" enctype="multipart/form-data"
-                            onsubmit="return validateForm()">
+                        <form method="post" action="/admin/editproducts/<%= product._id %>" enctype="multipart/form-data" onsubmit="return validateForm()">
+
                             <div class="mb-4">
                                 <label for="product_name" class="form-label">Product Name</label>
                                 <input type="text" placeholder="Type here" value="<%=product.productName%>" name="productName" class="form-control border" id="product_name">
@@ -125,7 +125,7 @@
                                 <div class="col-lg-4">
                                     <div class="mb-4">
                                         <label class="form-label">Color</label>
-                                        <input name="color" type="text" class="form-control border" value="<%=product.color  %>">
+                                        <input name="color" type="text" class="form-control border" value="<%=product.color%>">
                                     </div>
                                     <div id="color-error" class="error-message"></div>
                                 </div>
