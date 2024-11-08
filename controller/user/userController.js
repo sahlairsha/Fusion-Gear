@@ -248,14 +248,13 @@ const login = async (req, res) => {
 
 const logout = (req, res) => {
     try {
-        req.session.destroy(err =>{
-            if(err){
-                console.log("Error in destroying session",err)
-                return res.redirect('/pageerror')
+        req.session.destroy((err) => {
+            if (err) {
+                console.log('Error destroying session:', err);
+                return res.redirect('/');
             }
-
-            res.redirect('/login')
-        })
+            res.redirect('/login');
+        });
     } catch (error) {
         console.log("Unexpected error in logout",error);
         res.status(500).send("Internal Server Error")
