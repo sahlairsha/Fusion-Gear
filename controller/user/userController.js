@@ -23,10 +23,10 @@ const pageNotFound = async(req,res) =>{
 const loadHomePage = async (req, res) => {
     try {
         if (req.session.user) {
-            const userData = await User.findById(req.session.user);  // Fetch user details by session ID
+            const userData = await User.findById(req.session.user); 
             res.render("home", { user: userData });
         } else {
-            res.render("home", { user: null });  // Render without user data if not logged in
+            res.render("home", { user: null });  
         }
     } catch (error) {
         console.error("Error loading homepage:", error);
@@ -123,6 +123,10 @@ const verifyOtp = async (req, res) => {
     try {
         const { otp } = req.body;
 
+        // Log session data for debugging
+        console.log("Session OTP:", req.session.userOtp?.otp);
+        console.log("Entered OTP:", otp);
+
         if (!req.session.userOtp || Date.now() > req.session.userOtp.expires) {
             return res.status(400).json({ success: false, message: "OTP expired. Please request a new one." });
         }
@@ -131,18 +135,9 @@ const verifyOtp = async (req, res) => {
             return res.status(400).json({ success: false, message: "Invalid OTP. Please try again!" });
         }
 
+        // Save user as intended if OTP is correct
         const user = req.session.userData;
-
-        const existingUser = await User.findOne({
-            $or: [{ username: user.username }, { email: user.email }, { phone: user.phone }]
-        });
-
-        if (existingUser) {
-            return res.status(400).json({ success: false, message: "Username, email, or phone already exists" });
-        }
-
         const passwordHash = await securePassword(user.password);
-
         const saveUser = new User({
             full_name: user.full_name,
             username: user.username,
@@ -153,8 +148,8 @@ const verifyOtp = async (req, res) => {
 
         await saveUser.save();
 
-        req.session.user = saveUser._id; // Save the user ID for further session handling
-        req.session.userOtp = null; // Clear OTP only, keep userData intact
+        req.session.user = saveUser._id;
+        req.session.userOtp = null; // Clear OTP only
 
         res.json({ success: true, redirectUrl: '/' });
     } catch (error) {
@@ -162,7 +157,6 @@ const verifyOtp = async (req, res) => {
         res.status(500).json({ success: false, message: "An Error Occurred" });
     }
 };
-
 
 const resendOtp = async (req, res) => {
     try {

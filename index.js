@@ -7,7 +7,9 @@ const env = require('dotenv').config();
 const db = require('./config/db');
 const nocache = require('nocache');
 const flash = require('connect-flash');
-
+const { cacheControl } = require("./middleware/cache-control")
+const {flashMessage} = require("./middleware/flash")
+const {setUserInfo} = require("./middleware/userInfo")
 
 const app = express();
 
@@ -18,40 +20,29 @@ app.use(nocache());
 
 app.use(session({
     secret: process.env.SESSION_SECRET,
-    store:  sessionStorage.create({
-        mongoUrl:process.env.MONGODB_URI,
+    store: sessionStorage.create({
+        mongoUrl: process.env.MONGODB_URI,
         collectionName: 'sessions',
     }),
     resave: false,
     saveUninitialized: true,
-    cookie:{secure : false}
+    cookie: {
+        secure: false,
+        maxAge: 10 * 60 * 1000
+    }
 }));
+
 
 app.use(passport.initialize());
 app.use(passport.session());
 
+app.use(setUserInfo)
 
-
-app.use((req, res, next) => {
-    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
-    next();
-});
-
+app.use(cacheControl)
 
 app.use(flash());
-app.use((req, res, next) => {
-    res.locals.flash = req.flash();
-    next();
-});
+app.use(flashMessage)
 
-
-
-
-
-app.use((req, res, next) => {
-    res.locals.user = req.user;
-    next();
-});
 
 app.set('view engine', 'ejs');
 app.set('views', [path.join(__dirname, 'views/user'), path.join(__dirname, 'views/admin')]);

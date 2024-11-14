@@ -17,13 +17,10 @@ function startTimer() {
 }
 startTimer();
 
-const otpForm = document.getElementById('otpForm');
-
 otpForm.addEventListener('submit', (event) => {
     event.preventDefault();
 
     const otpInput = document.getElementById('otp').value;
-        console.log(otpInput);
     $.ajax({
         type: "POST",
         url: "/email-otp",
@@ -57,12 +54,14 @@ otpForm.addEventListener('submit', (event) => {
 });
 
 
+
 document.getElementById('resend-otp').addEventListener('click',(e)=>{
 
     clearInterval(timerInterval);
     timer = 60
     document.getElementById("otp").disabled=false;
     document.getElementById("timerValue").classList.remove('expired');
+
     startTimer();
 
     $.ajax({

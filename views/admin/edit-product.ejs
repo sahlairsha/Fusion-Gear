@@ -68,11 +68,7 @@
             margin-top: 30px;
         }
 
-        /* #imgView1, #imgView2, #imgView3, #imgView4 {
-            width: 200px;
-           height: 200px;
-           object-fit: cover;
-} */
+ 
     </style>
     <section class="content-main">
         <div class="row">
@@ -168,7 +164,7 @@
                                                         <img class="rounded" style="width: 50px; height: 60px;"
                                                             src="/uploads/re-image/<%=product.productImage[i]%>"
                                                             alt="">
-                                                        <i onclick="deleteSingleImage('<%=product.productImage[i]%>','<%= product._id%>')" style="position: absolute; margin-left: .5rem; cursor: pointer;" class="fa-thin fa-x"></i>
+                                                        <i onclick="deleteSingleImage('<%=product.productImage[i]%>','<%= product._id %>')" style="position: absolute; margin-left: .5rem; cursor: pointer;" class="fa-thin fa-x"></i>
                                                     </td>
                                                 </div>
 

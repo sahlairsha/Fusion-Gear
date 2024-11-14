@@ -954,7 +954,7 @@ ol {
 
 .product__item {
 	overflow: hidden;
-	margin-bottom: 40px;
+	margin-bottom: 30px;
 }
 
 .product__item.sale .product__item__pic .label {
@@ -1021,7 +1021,7 @@ ol {
 .product__item__pic .product__hover li {
 	list-style: none;
 	margin-bottom: 10px;
-	position: relative;
+	position: absolute;
 }
 
 .product__item__pic .product__hover li:hover span {
@@ -1035,7 +1035,7 @@ ol {
 	display: inline-block;
 	padding: 4px 10px;
 	font-size: 12px;
-	position: absolute;
+	position: relative;
 	left: -78px;
 	top: 5px;
 	z-index: 1;
