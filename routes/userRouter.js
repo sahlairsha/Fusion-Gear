@@ -35,8 +35,11 @@ router.post('/login',userController.login)
 
 router.get('/logout', userController.logout)
 
-
+//Product details and lists
 router.get("/products",userAuth, userproductController.loadProducts)
+router.get("/product/view",userAuth, userproductController.loadProductsDetails)
+
+
 
 router.get('/pagenotfound', userController.pageNotFound)
 

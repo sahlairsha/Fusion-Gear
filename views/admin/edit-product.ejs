@@ -8,13 +8,11 @@
         .error-message {
             color: red;
         }
-
-
         .thumbnails-container {
-    display: flex;
-    overflow-x: auto;
-    gap: 10px;
-}
+        display: flex;
+        overflow-x: auto;
+        gap: 10px;
+        }
 
 .thumbnail {
     position: relative;
@@ -89,7 +87,7 @@
                             </div>
                             <div class="mb-4">
                                 <label class="form-label">Full description</label>
-                                <textarea placeholder="Type here" id="descriptionid" value="<%=product.description%>" name="description" class="form-control border" rows="4"></textarea>
+                                <textarea placeholder="Type here" id="descriptionid" value="<%=product.description%>" name="description" class="form-control border" rows="4"><%=product.description%></textarea>
                                 <div id="description-error" class="error-message"></div>
                             </div>
                             <div class="row">
@@ -162,7 +160,7 @@
                                                     <td>
                                                         <input type="hidden" value="<%=product.productImage[i]%>" id="imageDatas">
                                                         <img class="rounded" style="width: 50px; height: 60px;"
-                                                            src="/uploads/re-image/<%=product.productImage[i]%>"
+                                                            src="/uploads/public-image/<%=product.productImage[i]%>"
                                                             alt="">
                                                         <i onclick="deleteSingleImage('<%=product.productImage[i]%>','<%= product._id %>')" style="position: absolute; margin-left: .5rem; cursor: pointer;" class="fa-thin fa-x"></i>
                                                     </td>
@@ -270,8 +268,8 @@
                    const category = document.getElementsByName('category')[0].value;
                    const images = document.getElementById('input1')
                    const quantity=document.getElementsByName('quantity')
-        imageDatas = document.getElementById("imageDatas")?.value;
-                   let isValid = true;    
+                   imageDatas = document.getElementById("imageDatas")?.value;
+                   let isValid = true;
                    if (name.trim() === "") {
            displayErrorMessage('productName-error', 'Please enter a product name.');
            isValid = false;
@@ -316,19 +314,16 @@
                    errorElement.innerText = message;
                    errorElement.style.display = "block";
                }
-        
-        
+
                function clearErrorMessages() {
                    const errorElements = document.getElementsByClassName('error-message');
                    Array.from(errorElements).forEach(element => {
                        element.innerText = '';
                    });
                    const errorMessage = document.getElementById('errorMessage');
-        
-        
+
                }
-        
-        
+
 
                function deleteSingleImage(imageId,productId){
                 $.ajax({
@@ -347,10 +342,6 @@
                }
 
 
-
-
-        
-        
         function viewImage1(event) {
                    document.getElementById('imgView1').src = URL.createObjectURL(event.target.files[0])
                }
@@ -419,7 +410,7 @@
                        const img = document.createElement("img");
                        img.src = URL.createObjectURL(file);
                        img.alt = "thumbnail";
-                       img.style.width = "50px";
+                       img.style.width = "100px";
                        img.style.height = "auto";
                        const removeIcon = document.createElement("span");
                        removeIcon.classList.add("remove-icon");

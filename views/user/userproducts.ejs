@@ -1,11 +1,15 @@
 <%-include('../../views/partials/user/header') %>
+
 <style>
     .product__item{
-        display:flex;
-        flex-direction : column;
-        border:1px solid;
+        border-radius: 2px;
+        border : 1px solid #0000;
     }
-</style>
+    .alert{
+        margin-top: -100px;
+        margin-left: 500px;
+    }
+    </style>
   <!-- Breadcrumb Section Begin -->
   <section class="breadcrumb-option">
     <div class="container">
@@ -15,7 +19,7 @@
                     <h4>Products</h4>
                     <div class="breadcrumb__links">
                         <a href="/">Home</a>
-                        <span>Shop</span>
+                        <span>Products</span>
                     </div>
                 </div>
             </div>
@@ -25,9 +29,19 @@
 <!-- Breadcrumb Section End -->
 
 <!-- Shop Section Begin -->
+
+
+<% if(flash.error){ %>
+    <div class="alert alert-danger d-flex align-item-center justify-content-center w-25 alert-box"><%=flash.error%></div>
+<% } %>
+
+
 <section class="shop spad">
+
     <div class="container">
+
         <div class="row">
+
             <div class="col-lg-3">
                 <div class="shop__sidebar">
                     <div class="shop__sidebar__search">
@@ -224,37 +238,43 @@
                 </div>
                 <div class="row">
                     <% products.forEach(product => { %>
-                    <div class="col-lg-4 col-md-6 col-sm-6">           
-                        <div class="product__item">                         
-                            <div class="product__item__pic set-bg">
-                                <img src="" alt="" srcset="">       
-                                <ul class="product__hover">
-                                    <li><a href="#"><img src="img/icon/heart.png" alt=""></a></li>
-                                    <li><a href="#"><img src="img/icon/compare.png" alt=""> <span>Compare</span></a>
-                                    </li>
-                                    <li><a href="#"><img src="img/icon/search.png" alt=""></a></li>
-                                </ul>
+                    <div class="col-lg-4 col-md-6 col-sm-6">
+                        <div class="product-card">
+                            <!-- Product Image with Hover Overlay -->
+                            <div class="product-image">
+                              <img src="/uploads/public-image/<%= product.productImage[0] %>" alt="<%= product.productName %>">
+                                <div class="product-overlay">
+                                    <a href="/product/view?id=<%=product._id%>" class="overlay-icon">View Product</a>
+                                </div>
                             </div>
-                            <div class="product__item__text">
-                               <h6><%= product.productName %></h6>
-                                <a href="#" class="add-cart">+ Add To Cart</a>
-                                <div class="rating">
-                                    <i class="fa fa-star-o"></i>
-                                    <i class="fa fa-star-o"></i>
-                                    <i class="fa fa-star-o"></i>
-                                    <i class="fa fa-star-o"></i>
-                                    <i class="fa fa-star-o"></i>
-                                </div>
-                                <h5> &#8377;<%=product.salePrice%></h5>
-                                <div class="product__color__select me-auto">
-                                    <label class="<%=product.color%>" value="<%=product.color%>" for="pc-1">
-                                        <input type="radio" id="pc-1">
-                                    </label>
-                                </div>
+
+                            <!-- Product Details -->
+                            <div class="product-details">
+                                <h6 class="product-name"><%= product.productName %></h6>
+                                <div class="product-price">&#8377;<%= product.salePrice %></div>
+                                 <!-- Size Options -->
+                <div class="product-sizes">
+
+                        <span class="size-box"><%= product.size %></span>
+ 
+                </div>
+
+                                  <!-- Rating Section
+                                  <div class="rating">
+                                    <% for(let i = 1; i <= 5; i++) { %>
+                                        <i class="fa <%= i <= product.rating ? 'fa-star' : 'fa-star-o' %>"></i>
+                                    <% } %>
+                                </div> -->
+
+
+                                <button class="add-cart-btn">+ Add to Cart</button>
+                                <button class="buy-now-btn ">Buy Now</button>
                             </div>
                         </div>
-                        <%})%>
                     </div>
+                    <% }) %>
+                </div>
+                
                 <!-- <div class="row">
                     <div class="col-lg-12">
                         <div class="product__pagination">

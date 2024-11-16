@@ -4,16 +4,11 @@
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs/dist/cropper.min.css">
     </head>
     <style>
-        .error-message {
-            color: red;
+ .thumbnails-container {
+        display: flex;
+        overflow-x: auto;
+        gap: 10px;
         }
-
-
-        .thumbnails-container {
-    display: flex;
-    overflow-x: auto;
-    gap: 10px;
-}
 
 .thumbnail {
     position: relative;
@@ -67,11 +62,8 @@
             margin-top: 30px;
         }
 
-        /* #imgView1, #imgView2, #imgView3, #imgView4 {
-            width: 200px;
-           height: 200px;
-           object-fit: cover;
-} */
+ 
+
     </style>
     <section class="content-main">
         <div class="row">
@@ -123,16 +115,16 @@
 
                                 <div class="col-lg-4">
                                     <div class="mb-4">
-                                        <label class="form-label">Color</label>
-                                        <input name="color" type="text" class="form-control border">
+                                        <label class="form-label">Colors (comma-separated)</label>
+                                        <input name="color" type="text" class="form-control border" placeholder="e.g., red, green, blue">
                                     </div>
                                     <div id="color-error" class="error-message"></div>
                                 </div>
 
                                 <div class="col-lg-4">
                                     <div class="mb-4">
-                                        <label class="form-label">size</label>
-                                        <input name="size" type="text" class="form-control border">
+                                        <label class="form-label">Sizes (comma-separated)</label>
+                                        <input name="size" type="text" class="form-control border" placeholder="e.g., S, M, L, XL">
                                     </div>
                                     <div id="size-error" class="error-message"></div>
                                 </div>
@@ -163,7 +155,7 @@
                                 </div>
                                 <div class="row">
                                     <div class="card-body align-items-center " style="margin-bottom: 20px;">
-                                        <img src="" alt="" id="imgView1">
+                                        <img src="" class="" alt="" id="imgView1">
                                         <input class="form-control" type="file" name="image" id="input1"
                                             accept="image/png, image/jpeg, image/jpg"
                                             onchange="viewImage1(event), viewImage(event, 1)">
@@ -267,43 +259,43 @@
         }
 
 
-    function viewImage(event, index) {
-    const input = event.target;
-    const reader = new FileReader();
+        function viewImage(event, index) {
+                   let input = event.target;
+                   let reader = new FileReader();
+                   reader.onload = function () {
+                       let dataURL = reader.result;
+                       let image = document.getElementById('imgView' + index);
+                       image.src = dataURL;
+                       let cropper = new Cropper(image, {
+                           aspectRatio: 1,
+                           viewMode: 1,
+                           guides: true,
+                           background: false,
+                           autoCropArea: 1,
+                           zoomable: true
+                       });
+                       let cropperContainer = document.querySelector('#croppedImg' + index).parentNode;
+                       cropperContainer.style.display = 'block';
 
-    reader.onload = function () {
-        const dataURL = reader.result;
-        const image = document.getElementById(`imgView${index}`);
-        image.src = dataURL;
-
-        const cropperContainer = document.querySelector(`#croppedImg${index}`).parentNode;
-        image.style.width = "200px"
-        image.style.height = "200px"
-        cropperContainer.style.display = 'block';
-
-        const cropper = new Cropper(image, {
-            aspectRatio: 1,
-            scalable: true,
-            viewMode: 1,
-            guides: true,
-            background: false,
-            autoCropArea: 1,
-            zoomable: true
-        });
-
-        const saveButton = document.querySelector(`#saveButton${index}`);
-        saveButton.addEventListener('click', async function () {
-            const croppedCanvas = cropper.getCroppedCanvas();
-            const croppedImage = document.getElementById(`croppedImg${index}`);
-            croppedImage.src = croppedCanvas.toDataURL("image/png");
-
-            cropperContainer.style.display = 'none';
-            cropper.destroy();
-        });
-    };
-    reader.readAsDataURL(input.files[0]);
-}
-
+                       let saveButton = document.querySelector('#saveButton' + index);
+                       saveButton.addEventListener('click', async function () {
+                           let croppedCanvas = cropper.getCroppedCanvas();
+                           let croppedImage = document.getElementById("croppedImg" + index);
+                           croppedImage.src = croppedCanvas.toDataURL('image/jpeg', 1.0);
+                           let timestamp = new Date().getTime();
+                           let fileName = `cropped-img-${timestamp}-${index}.png`;
+                           await croppedCanvas.toBlob(blob => {
+                               let input = document.getElementById('input' + index);
+                               let imgFile = new File([blob], fileName, blob)
+                               const fileList = new DataTransfer();
+                               fileList.items.add(imgFile);
+                               input.files = fileList.files
+                           });
+                           cropperContainer.style.display = 'none';
+                       });
+                   };
+                   reader.readAsDataURL(input.files[0]);
+               }
         // Thunmbnail setup
 
         const selectedImages = [];
@@ -320,7 +312,7 @@ function validateForm() {
     const salePrice = document.getElementsByName('salePrice')[0].value;
     const quantity = document.getElementsByName('quantity')[0].value;
     const color = document.getElementsByName('color')[0].value;
-    const size = document.getElementsByName('color')[0].value;
+    const size = document.getElementsByName('size')[0].value;
     const category = document.getElementsByName('category')[0].value;
     let isValid = true;
 
@@ -407,7 +399,6 @@ function handleFileSelect(event) {
             const img = document.createElement("img");
             img.src = URL.createObjectURL(file);
             img.alt = "thumbnail";
-
             const removeIcon = document.createElement("span");
             removeIcon.classList.add("remove-icon");
             removeIcon.innerHTML = "&times;";

@@ -5,7 +5,7 @@ const User = require('../../models/userSchema')
 const fs = require('fs');
 const path = require('path');
 const sharp = require('sharp');
-const { triggerAsyncId } = require('async_hooks');
+
 
 
 const getProduct = async(req,res)=>{
@@ -39,8 +39,8 @@ const addProducts = async (req, res) => {
                 try {
                     const originalImagePath = req.files[i].path;
                     const resizedImagePath = path.join(__dirname, '../../Public/uploads/public-image', req.files[i].filename);
-                    await sharp(originalImagePath).resize({ width: 440, height: 440 }).toFile(resizedImagePath);
-                    images.push(req.files[i].filename);
+                    await sharp(originalImagePath).toFile(resizedImagePath);
+                    images.push(req.files[i].filename)
                 } catch (error) {
                     console.error("Image processing error:", error);
                     req.flash("error", "Error processing images");
@@ -63,12 +63,12 @@ const addProducts = async (req, res) => {
         const newProduct = new Product({
             productName: product.productName,
             description: product.description,
-            category: categoryId,  // Use categoryId directly
+            category: categoryId,
             regularPrice: product.regularPrice,
             salePrice: product.salePrice,
             createdOn: new Date(),
             quantity: product.quantity,
-            size: product.size,  // size is optional, handle if not available
+            size: product.size,
             color: product.color,
             productImage: images,
             status: 'Available'
@@ -161,7 +161,7 @@ const editProducts = async(req,res) =>{
         })
         if(existingProduct){
              req.flash("error","Product with this name already existed, Please try again");
-            res.redirect("/admin/editproducts")
+             res.redirect("/admin/editproducts")
         }
 
 
@@ -169,7 +169,7 @@ const editProducts = async(req,res) =>{
 
         if(req.files && req.files.length > 0){
             for(let i=0;i<req.files.length ; i++){
-                images.push(res.files[i].filename)
+                images.push(req.files[i].filename)
             }
         }
 
@@ -185,6 +185,7 @@ const editProducts = async(req,res) =>{
             size : data.size,
 
         }
+
 if(req.files.length > 0){
     updateFields.$push = {productImage : {$each : images}}
 }
@@ -207,7 +208,7 @@ const deleteImage = async(req,res)=>{
     try {
         const {imageNameToServer ,productIdToServer } = req.body;
         const product = await Product.findByIdAndUpdate(productIdToServer,{$pull : {productImage : imageNameToServer}})
-        const imagePath = path.join("Public","uploads","re-image",imageNameToServer)
+        const imagePath = path.join("Public","uploads","public-image",imageNameToServer)
 
         if(fs.existsSync(imagePath)){
             fs.unlinkSync(imagePath);
