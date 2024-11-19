@@ -28,7 +28,7 @@ app.use(session({
     saveUninitialized: true,
     cookie: {
         secure: false,
-        maxAge: 10 * 60 * 1000
+        maxAge: 72 * 60 * 60 * 1000
     }
 }));
 
@@ -41,12 +41,15 @@ app.use(setUserInfo)
 app.use(cacheControl)
 
 app.use(flash());
-app.use(flashMessage)
+app.use(flashMessage);
+
 
 
 app.set('view engine', 'ejs');
 app.set('views', [path.join(__dirname, 'views/user'), path.join(__dirname, 'views/admin')]);
 app.use(express.static(path.join(__dirname, 'Public')));
+
+//Routes for the User and Admin
 app.use(require('./routes/userRouter'));
 app.use(require('./routes/adminRouter'));
 

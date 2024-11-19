@@ -3,9 +3,6 @@ const express = require("express");
 const router = express.Router();
 
 const passport = require('../config/passport');
-
-
-
 const userController = require('../controller/user/userController')
 const userproductController = require('../controller/user/userproductController')
 const {userAuth} = require('../middleware/auth')
@@ -36,8 +33,8 @@ router.post('/login',userController.login)
 router.get('/logout', userController.logout)
 
 //Product details and lists
-router.get("/products",userAuth, userproductController.loadProducts)
-router.get("/product/view",userAuth, userproductController.loadProductsDetails)
+router.get("/products",userAuth,userproductController.loadProducts)
+router.get("/product/view",userAuth,userproductController.loadProductsDetails)
 
 
 

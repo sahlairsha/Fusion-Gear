@@ -1,6 +1,7 @@
 
 const Product = require("../../models/productSchema");
 const User = require("../../models/userSchema");
+const Category = require("../../models/categorySchema")
 
 const loadProducts = async(req, res) => {
     try {
@@ -8,7 +9,7 @@ const loadProducts = async(req, res) => {
             const userData = await User.findById(req.session.user);
             const productData = await Product.find()
             res.render("userproducts", { user: userData , products : productData});
-            console.log(productData);  
+              
         } else {
             res.render("userproducts", { user: null , products: productData});
         }
@@ -34,8 +35,11 @@ const loadProductsDetails = async (req, res) => {
             return res.redirect("/product/view");
         }
 
+        const category = await Category.findOne({ _id: productData.category})
+        
+
         const userData = req.session.user ? await User.findById(req.session.user) : null;
-        res.render("productlist", { user: userData, product: productData });
+        res.render("productlist", { user: userData, product: productData, category : category});
     } catch (error) {
         console.error("Error loading product details page:", error);
         res.redirect("/pagenotfound");

@@ -9,6 +9,13 @@
         margin-top: -100px;
         margin-left: 500px;
     }
+
+    .description p {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    max-width: 100%; /* Adjust to fit your layout */
+}
     </style>
   <!-- Breadcrumb Section Begin -->
   <section class="breadcrumb-option">
@@ -252,15 +259,12 @@
                             <div class="product-details">
                                 <h6 class="product-name"><%= product.productName %></h6>
                                 <div class="product-price">&#8377;<%= product.salePrice %></div>
-                                 <!-- Size Options -->
-                <div class="product-sizes">
 
-                        <span class="size-box"><%= product.size %></span>
- 
-                </div>
+                                <div class="description">
+                                    <p><%=product.description%></p>
+                                </div>
 
-                                  <!-- Rating Section
-                                  <div class="rating">
+                                  <!-- <div class="rating">
                                     <% for(let i = 1; i <= 5; i++) { %>
                                         <i class="fa <%= i <= product.rating ? 'fa-star' : 'fa-star-o' %>"></i>
                                     <% } %>
@@ -274,8 +278,7 @@
                     </div>
                     <% }) %>
                 </div>
-                
-                <!-- <div class="row">
+                <div class="row">
                     <div class="col-lg-12">
                         <div class="product__pagination">
                             <a class="active" href="#">1</a>
@@ -285,7 +288,7 @@
                             <a href="#">21</a>
                         </div>
                     </div>
-                </div> -->
+                </div>
             </div>
         </div>
     </div>
