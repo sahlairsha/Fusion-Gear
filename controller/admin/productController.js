@@ -101,7 +101,7 @@ const getAllProducts = async(req,res)=>{
             .exec();
             const count = await Product.find({
                 $or : [
-                    {ProductName : { $regex : new RegExp(".*" + search + ".*")}}
+                    { productName: { $regex: new RegExp(".*" + search + ".*") } }
                 ]
             }).countDocuments();
 

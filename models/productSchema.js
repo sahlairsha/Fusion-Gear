@@ -48,12 +48,6 @@ const productSchema = new Schema({
         type : Boolean,
         default : false
     },
-    status :{
-        type : String,
-        enum : ["Available","Out Of Stock","Unavailable","Sold out"],
-        required : true,
-        default : "Available"
-    },
     isDeleted : {
         type : Boolean,
         default : false
@@ -61,8 +55,25 @@ const productSchema = new Schema({
     deletedAt: {
         type: Date,
         default: null
-    }
+    },
+    ratings: {
+        average: { type: Number, default: 0 },
+         count: { type: Number, default: 0 }   
+    },
 },{timestamps : true})
+
+
+productSchema.virtual('status').get(function () {
+    if (this.quantity > 0) {
+        return "Available";
+    } else if (this.quantity === 0) {
+        return "Sold out";
+    } else {
+        return "Unavailable";
+    }
+});
+
+
 
 const Product = mongoose.model("Product",productSchema)
 

@@ -88,7 +88,12 @@ const userSchema = new Schema({
             type : Date,
             default : Date.now
         }
-    }]
+    }],
+
+    ratedProducts: [{ 
+        product_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Product' },
+        rating: { type: Number, required: true }
+    }],
 })
 
 

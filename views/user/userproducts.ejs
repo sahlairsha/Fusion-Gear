@@ -16,6 +16,37 @@
     text-overflow: ellipsis;
     max-width: 100%; /* Adjust to fit your layout */
 }
+
+.product-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: #ff6b6b;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.product-badge.available {
+    background-color: #28a745; /* Green for Available */
+}
+
+.product-badge.sold-out {
+    background-color: #dc3545; /* Red for Sold Out */
+}
+
+.product-badge.unavailable {
+    background-color: #ffc107;
+}
+
+.product-badge.out-of-stock {
+    background-color: #6c757d; /* Grey for Out of Stock */
+}
+
+
     </style>
   <!-- Breadcrumb Section Begin -->
   <section class="breadcrumb-option">
@@ -228,7 +259,7 @@
                     <div class="row">
                         <div class="col-lg-6 col-md-6 col-sm-6">
                             <div class="shop__product__option__left">
-                                <p>Showing 1–12 of 126 results</p>
+                                <p>Showing <%= currentPage%>– <%=limit%> of <%= totalProduct %> results</p>
                             </div>
                         </div>
                         <div class="col-lg-6 col-md-6 col-sm-6">
@@ -246,10 +277,17 @@
                 <div class="row">
                     <% products.forEach(product => { %>
                     <div class="col-lg-4 col-md-6 col-sm-6">
-                        <div class="product-card">
+                        <div class="product-card mb-4">
                             <!-- Product Image with Hover Overlay -->
                             <div class="product-image">
                               <img src="/uploads/public-image/<%= product.productImage[0] %>" alt="<%= product.productName %>">
+
+
+                               <!-- Stock Status Badge -->
+                               <div class="product-badge 
+                               <%= product.status ? product.status.toLowerCase().replace(/ /g, '-') : 'available' %> ">
+                               <%= product.status %>
+                           </div>
                                 <div class="product-overlay">
                                     <a href="/product/view?id=<%=product._id%>" class="overlay-icon">View Product</a>
                                 </div>
@@ -281,11 +319,19 @@
                 <div class="row">
                     <div class="col-lg-12">
                         <div class="product__pagination">
-                            <a class="active" href="#">1</a>
-                            <a href="#">2</a>
-                            <a href="#">3</a>
-                            <span>...</span>
-                            <a href="#">21</a>
+                            <% if (currentPage > 1) { %>
+                                <a href="?page=<%= currentPage - 1 %>">&laquo;</a>
+                            <% } %>
+                            <% for (let i = 1; i <= totalPages; i++) { %>
+                                <% if (i === currentPage) { %>
+                                    <a class="active" href="?page=<%= i %>"><%= i %></a>
+                                <% } else { %>
+                                    <a href="?page=<%= i %>"><%= i %></a>
+                                <% } %>
+                            <% } %>
+                            <% if (currentPage < totalPages) { %>
+                                <a href="?page=<%= currentPage + 1 %>">&raquo;</a>
+                            <% } %>
                         </div>
                     </div>
                 </div>

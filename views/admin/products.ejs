@@ -1,8 +1,21 @@
 <%- include('../../views/partials/admin/header')  %>
+<style>
+    table {
+        table-layout: fixed; /* Ensure columns respect the set width */
+        width: 100%; /* Full width of the container */
+    }
+    .description {
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        width: 30%; /* Set desired width for the description */
+    }
+</style>
+
 
 
 <div class="container mt-4">
-    <h2 class="mb-4">Customer Details</h2>
+    <h2 class="mb-4">Product Details </h2>
   
     <div class="mb-3">
         <input type="text" class="form-control" id="searchBar" placeholder="Search customers by name or email">
@@ -30,7 +43,7 @@
                     <td><input type="checkbox" class="checkbox"></td>
                     <td><%= index + 1 %></td>
                     <td><%= data.productName %></td>
-                    <td class="w-25"><%= data.description %></td>
+                    <td class="description"><%= data.description %></td>
                     <td>
                         <%= data.category ? data.category.name : 'No Category' %>
                     </td>
@@ -51,15 +64,15 @@
                 </td>
 
                 <td>
-                    <button class="btn btn-primary btn-md edit-button">
+                    <button class="btn btn-primary btn-sm edit-button mb-2">
                         <a class="text-white" href="/admin/editproducts?id=<%= data._id %>">Edit</a>
                     </button>
                     <% if (data.isDeleted === false) { %>
-                        <button class="btn btn-warning btn-md">
+                        <button class="btn btn-info btn-sm">
                             <a href="/admin/deleteproducts?id=<%= data._id %>" class="text-white" style="text-decoration: none;">Delete</a>
                         </button>
                     <% } else { %>
-                        <button class="btn btn-success btn-md">
+                        <button class="btn btn-success btn-sm">
                             <a href="/admin/restoreproducts?id=<%= data._id %>" class="text-white" style="text-decoration: none;">Restore</a>
                         </button>
                     <% } %>
@@ -87,14 +100,6 @@
         <% } %>
     </div>
 </div>
-
-
-
-
-
-
-
-
 
 <script src="/js/admin/customer-search.js"></script>
 

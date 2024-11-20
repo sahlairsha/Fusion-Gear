@@ -10,8 +10,11 @@ const flash = require('connect-flash');
 const { cacheControl } = require("./middleware/cache-control")
 const {flashMessage} = require("./middleware/flash")
 const {setUserInfo} = require("./middleware/userInfo")
+const cors = require("cors")
 
 const app = express();
+
+app.use(cors());
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

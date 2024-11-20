@@ -23,10 +23,10 @@ const pageNotFound = async(req,res) =>{
 const loadHomePage = async (req, res) => {
     try {
         if (req.session.user) {
-            const userData = await User.findById(req.session.user); 
+            const userData = await User.findById(req.session.user);
             res.render("home", { user: userData });
         } else {
-            res.render("home", { user: null });  
+            res.render("home", { user: null });
         }
     } catch (error) {
         console.error("Error loading homepage:", error);

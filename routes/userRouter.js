@@ -4,7 +4,7 @@ const router = express.Router();
 
 const passport = require('../config/passport');
 const userController = require('../controller/user/userController')
-const userproductController = require('../controller/user/userproductController')
+const userproductController = require('../controller/user/userproductController');
 const {userAuth} = require('../middleware/auth')
 
 
@@ -37,6 +37,16 @@ router.get("/products",userAuth,userproductController.loadProducts)
 router.get("/product/view",userAuth,userproductController.loadProductsDetails)
 
 
+
+// Product Rating
+
+router.post('/rate', userproductController.rateProduct);
+router.get('/ratings/:product_id', userproductController.getProductRatings);
+
+
+//Coupon
+router.get("/coupon",userproductController.getCoupon)
+router.post('/apply-coupon',userproductController.applyCoupon)
 
 router.get('/pagenotfound', userController.pageNotFound)
 
