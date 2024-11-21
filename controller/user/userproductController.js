@@ -75,15 +75,13 @@ const loadProductsDetails = async (req, res) => {
             return res.redirect("/product/view");
         }
 
-        // Fetch user details if logged in
         const userData = req.session.user
             ? await User.findById(req.session.user).lean() 
             : null;
-        // Render product details page
         res.render("productlist", {
             user: userData,
             product: productData,
-            category: productData.category // Use populated category
+            category: productData.category
         });
 
     } catch (error) {
@@ -188,7 +186,7 @@ const coupons = [
         expiryDate: new Date("2024-11-30"),
         minimumPurchase: 1000,
         usageLimit: 50,
-        description: "Save $50 on your order of &#8377;1000 or more. Valid until November 30, 2024."
+        description: "Save &#8377;50 on your order of &#8377;1000 or more. Valid until November 30, 2024."
     }
 ];
 

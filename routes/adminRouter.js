@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 const adminController = require('../controller/admin/adminController');
-const { adminAuth } = require('../middleware/auth');
+const adminAuth  = require('../middleware/adminAuth');
 
 const customerController = require('../controller/admin/customerController');
 const categoryController = require('../controller/admin/categoryController');
@@ -18,6 +18,8 @@ const editUploads = multer({ storage: editedStorage });
 router.get('/admin/login', adminController.loadLogin);
 router.post('/admin/login', adminController.login);
 router.get('/admin/logout', adminController.logout);
+
+router.get('/admin_profile',adminAuth,adminController.getProfile)
 
 // Dashboard
 router.get('/admin/dashboard', adminAuth, adminController.loadDashboard);

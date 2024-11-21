@@ -5,7 +5,7 @@ const router = express.Router();
 const passport = require('../config/passport');
 const userController = require('../controller/user/userController')
 const userproductController = require('../controller/user/userproductController');
-const {userAuth} = require('../middleware/auth')
+const userAuth = require('../middleware/auth')
 
 
 router.get('/',userAuth,userController.loadHomePage)

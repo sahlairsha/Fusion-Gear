@@ -28,10 +28,11 @@ app.use(session({
         collectionName: 'sessions',
     }),
     resave: false,
-    saveUninitialized: true,
-    cookie: {
-        secure: false,
-        maxAge: 72 * 60 * 60 * 1000
+    saveUninitialized: false,
+    cookie:{
+        secure : false,
+        httpOnly : true,
+        maxAge : 72 * 60 * 60 * 1000
     }
 }));
 
@@ -41,10 +42,13 @@ app.use(passport.session());
 
 app.use(setUserInfo)
 
+
+
 app.use(cacheControl)
 
 app.use(flash());
 app.use(flashMessage);
+
 
 
 

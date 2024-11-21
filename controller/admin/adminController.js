@@ -16,68 +16,89 @@ const pageerror = async(req,res)=>{
 
 
 
+const getProfile = async(req,res) =>{
+
+        if(req.session.admin){
+            res.render('admin-profile', { user : req.session.admin })
+        }else{
+            console.log("Some Error Occure to load the profile page")
+            res.redirect('/admin/login')
+        }
+}
+
+
 const loadLogin = async(req,res)=>{
     try {
         if(req.session.admin){
-            return res.redirect('/admin/dashboard')
+            return res.redirect("/admin_profile")
         }
-        res.render("admin-login",{message : null})
+            res.render("admin-login",{message : req.flash('error')})
     } catch (error) {
         console.error("Error in loading login page",error)
-        res.status(500).send("Server Error")
+        res.redirect("/pageerror")
     }
 }
 
-const login = async(req,res)=>{
+const login = async (req, res) => {
     try {
-        const {email,password} = req.body;
-        const admin = await User.findOne({isAdmin: true,email});
-        if(admin){
-            const passwordMatch = bcrypt.compare(password,admin.password);
-            if(passwordMatch){
-                req.session.admin = true;
-                return res.redirect('/admin/dashboard')
-            }else{
-                return res.redirect('/admin/login',{message : "User is not existed"})
-            }
-        }else{
-            return res.redirect('/admin/login')
+        const { email, password } = req.body;
+
+        const findAdmin = await User.findOne({ isAdmin: true, email });
+
+        if (!findAdmin) {
+            req.flash("error", "Admin not found. Please try again ")
+            return res.redirect('admin-login');
+        }
+
+        const passwordMatch = await bcrypt.compare(password, findAdmin.password);
+        if (!passwordMatch) {
+            req.flash("error", "Invalid Password! Try again.")
+            return res.redirect("/admin/login");
+        }
+
+        req.session.admin = findAdmin._id;
+        console.log(req.session.admin)
+
+        res.redirect('/admin_profile');
+    } catch (error) {
+        console.error("Login Error", error);
+        req.flash("error", "Login failed. Try again later.")
+        res.redirect("/admin/login");
+    }
+};
+
+const loadDashboard = async (req, res) => {
+    try {
+        if (req.session.admin) {
+            const adminData = await User.findById(req.session.admin)
+            return res.render("dashboard",{admin:adminData})
+        } else {
+            return res.render("dashboard",{admin:null})
         }
     } catch (error) {
-        console.log("Admin Login Error",error)
-        return res.redirect("/pageerror")
+        console.log("Error loading dashboard", error);
+        res.redirect('/pageerror');
     }
-}
+};
 
-const loadDashboard = async(req,res)=>{
+const logout = async (req, res) => {
     try {
-        if(req.session.admin){
-           return res.render("dashboard")
-        }
-    } catch (error) {
-        res.redirect('/pageerror')
-    }
-}
-
-
-const logout = async(req,res)=>{
-    try {
-        req.session.destroy(err =>{
-            if(err){
-                console.log("Error in destroying session",err)
-                return res.redirect('/pageerror')
+        req.session.destroy((err) => {
+            if (err) {
+                console.log('Error destroying session:', err);
             }
-
-            res.redirect('/admin/login')
-        })
+            res.redirect('/admin/login');
+        });
     } catch (error) {
         console.log("Unexpected error in logout",error);
         res.status(500).send("Internal Server Error")
     }
-}
+};
+
 
 module.exports = {
     loadLogin,
+    getProfile,
     login,
     loadDashboard,
     pageerror,
