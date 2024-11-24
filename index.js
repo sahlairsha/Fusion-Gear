@@ -41,9 +41,6 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use(setUserInfo)
-
-
-
 app.use(cacheControl)
 
 app.use(flash());

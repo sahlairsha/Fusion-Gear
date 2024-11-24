@@ -94,6 +94,10 @@ const userSchema = new Schema({
         product_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Product' },
         rating: { type: Number, required: true }
     }],
+    profile_pic : {
+        type : String,
+        required : false
+    }
 })
 
 

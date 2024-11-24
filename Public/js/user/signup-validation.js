@@ -14,6 +14,19 @@ const err4 = document.getElementById('error4');
 const err5 = document.getElementById('error5');
 const err6 = document.getElementById('error6');
 
+
+
+ // Enable the signup button after the page loads
+ window.addEventListener('load', () => {
+    const signupButton = document.getElementById('signup-btn');
+    if (signupButton) {
+      signupButton.disabled = false;
+    }
+  });
+
+
+
+
 function nameValidation() {
     const nameval = nameid.value.trim();
     const namepattern = /^[a-zA-Z\s]{2,50}$/;

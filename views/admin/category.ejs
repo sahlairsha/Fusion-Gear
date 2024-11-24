@@ -77,31 +77,49 @@
 <script src="/js/admin/customer-search.js"></script>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const editButtons = document.querySelectorAll('.edit-button');
+   document.addEventListener('DOMContentLoaded', function () {
+    const editButtons = document.querySelectorAll('.edit-button');
 
-        editButtons.forEach(button => {
-            button.addEventListener('click', function() {
-                const row = button.closest('tr');
-                const nameCell = row.cells[2];
-                const descriptionCell = row.cells[3];
+    editButtons.forEach(button => {
+        button.addEventListener('click', function () {
+            const row = button.closest('tr');
+            const nameCell = row.cells[2];
+            const descriptionCell = row.cells[3];
 
-                const isEditable = nameCell.contentEditable === 'true';
-                nameCell.contentEditable = !isEditable;
-                descriptionCell.contentEditable = !isEditable;
+            const isEditable = nameCell.contentEditable === 'true';
+            nameCell.contentEditable = !isEditable;
+            descriptionCell.contentEditable = !isEditable;
 
-                if (isEditable) {
-                    const categoryId = row.getAttribute('data-category-id');
-                    const updatedName = nameCell.textContent;
-                    const updatedDescription = descriptionCell.textContent;
+            if (isEditable) {
+                const categoryId = row.getAttribute('data-category-id');
+                const updatedName = nameCell.textContent.trim();
+                const updatedDescription = descriptionCell.textContent.trim();
 
-                    // Make an AJAX request to update the category in the database
-                    fetch(`/admin/editcategory?id=${categoryId}&name=${encodeURIComponent(updatedName)}&description=${encodeURIComponent(updatedDescription)}`, {
-                        method: 'PUT',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                    })
+                // Validation: Check if the fields are empty or only spaces
+                if (updatedName === "" || updatedDescription === "") {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'Name and Description cannot be empty or spaces only.',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+
+                    // Revert fields to non-editable mode and reset button text
+                    nameCell.contentEditable = 'false';
+                    descriptionCell.contentEditable = 'false';
+                    button.textContent = "Edit";
+
+                    return; // Exit without saving changes
+                }
+
+                // Make an AJAX request to update the category in the database
+                fetch(`/admin/editcategory?id=${categoryId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ name: updatedName, description: updatedDescription }),
+                })
                     .then(response => {
                         if (response.ok) {
                             return response.json();
@@ -109,7 +127,6 @@
                         throw new Error('Failed to save changes');
                     })
                     .then(updatedCategory => {
-
                         Swal.fire({
                             title: 'Success!',
                             text: 'Changes saved successfully!',
@@ -131,39 +148,13 @@
                             confirmButtonText: 'OK'
                         });
                     });
-                } else {
-                    button.textContent = "Save";
-                    nameCell.focus();
-                }
-            });
-        });
-    });
-
-    document.addEventListener('DOMContentLoaded', function() {
-    const deleteButtons = document.querySelectorAll('.btn-danger.delete-button');
-
-    deleteButtons.forEach(button => {
-        button.addEventListener('click', function(event) {
-            event.preventDefault();
-            const categoryId = button.getAttribute('data-category-id');
-            const deleteUrl = `/admin/deletecategory?id=${categoryId}`;
-
-            Swal.fire({
-                title: 'Are you sure?',
-                text: 'You will not be able to recover this category!',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Yes, delete it!',
-                cancelButtonText: 'No, cancel!'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    window.location.href = deleteUrl;
-                }
-            });
+            } else {
+                button.textContent = "Save";
+                nameCell.focus();
+            }
         });
     });
 });
-
 
 </script>
 

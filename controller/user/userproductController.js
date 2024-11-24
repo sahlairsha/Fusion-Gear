@@ -19,9 +19,10 @@ const loadProducts = async (req, res) => {
         const limit = 6;
 
         // Build query with optional search
-        const query = search
-            ? { name: { $regex: search, $options: "i" } } // Case-insensitive search
-            : {};
+        const query = {
+            isDeleted: false, // Exclude soft-deleted products
+            ...(search && { name: { $regex: search, $options: "i" } }),
+        };
 
         const productData = await Product.find(query)
             .limit(limit)

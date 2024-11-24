@@ -29,6 +29,7 @@ router.get('/admin/users', adminAuth, customerController.customerInfo);
 router.get('/admin/blockedUser', adminAuth, customerController.blockedUser);
 router.get('/admin/unblockedUser', adminAuth, customerController.unblockedUser);
 
+
 // Category management
 router.get('/admin/category', adminAuth, categoryController.categoryInfo);
 router.get('/admin/addcategory', adminAuth, categoryController.inputCategories);
