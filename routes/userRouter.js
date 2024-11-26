@@ -3,8 +3,11 @@ const express = require("express");
 const router = express.Router();
 
 const passport = require('../config/passport');
+
+
 const userController = require('../controller/user/userController')
 const userproductController = require('../controller/user/userproductController');
+const userprofileController = require('../controller/user/userprofileController')
 const userAuth = require('../middleware/auth')
 
 
@@ -48,7 +51,15 @@ router.get('/ratings/:product_id', userproductController.getProductRatings);
 router.get("/coupon",userproductController.getCoupon)
 router.post('/apply-coupon',userproductController.applyCoupon)
 
+
+//user profile
+
+router.get('/userProfile',userAuth,userprofileController.getProfile)
+router.put('/update-profile',userAuth,userprofileController.editProfile)
+
 router.get('/pagenotfound', userController.pageNotFound)
+
+
 
 
 

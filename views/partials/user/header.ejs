@@ -23,6 +23,8 @@
     <link rel="stylesheet" href="/css/slicknav.min.css" type="text/css">
     <link rel="stylesheet" href="/css/style.css" type="text/css">
     <link rel="stylesheet" href="/css/user/productlist.css">
+    <link rel="stylesheet" href="/css/user/profile-sidebar.css">
+    <link rel="stylesheet" href="/css/user/profile-alert.css">
 </head>
 
 <style>
@@ -62,7 +64,7 @@
                             <div class="dropdown">
                                 <a href="#" class="sign-in-link"><%= user.full_name %></a>
                                 <div class="dropdown-content">
-                                    <a href="/userProfile">Profile</a>
+                                    <a href="/userProfile?id=<%=user._id%>">Profile</a>
                                     <a href="/logout">Logout</a>
                                 </div>
                             </div>

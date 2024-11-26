@@ -1,0 +1,30 @@
+
+    <div class="profile-container">
+        <!-- Left Sidebar -->
+        <div class="sidebar">
+            <!-- Profile Details -->
+            <div class="profile-details">
+                <div class="profile-pic">
+                    <!-- Add your profile picture here -->
+                    <img src="/uploads/public-image/1731693129480-cropped-img-1731693094468-2.png" alt="Profile Picture" class="avatar">
+                </div>
+                <div class="user-info">
+                    <h6 class="user-name"><%=user.full_name%></h6>
+                    <p class="user-email"><%=user.email%></p>
+                </div>
+            </div>
+
+            <!-- Navigation Links -->
+            <ul class="nav-list">
+              <li><a href="/userProfile?id=<%=user._id%>" class="<%= activePage === 'profile' ? 'active' : '' %>">My Profile</a></li>
+              <li><a href="#" class="<%= activePage === 'orders' ? 'active' : '' %>">My Orders</a></li>
+              <li><a href="#" class="<%= activePage === 'address' ? 'active' : '' %>">Address</a></li>
+              <li><a href="#" class="<%= activePage === 'cart' ? 'active' : '' %>">Cart</a></li>
+              <li><a href="#" class="<%= activePage === 'wishlist' ? 'active' : '' %>">Wishlist</a></li>
+              <li><a href="#" class="<%= activePage === 'coupon' ? 'active' : '' %>">Coupon</a></li>
+              <li><a href="#" class="<%= activePage === 'wallet' ? 'active' : '' %>">Wallet</a></li>
+              <li><a href="#" class="<%= activePage === 'referral' ? 'active' : '' %>">Referral Details</a></li>
+            </ul>
+            <!-- Logout Button -->
+            <button class="logout-btn"><a class="text-decoration-none text-white" href="/logout">Logout</a></button>
+        </div>
