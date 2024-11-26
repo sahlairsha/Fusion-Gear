@@ -2,6 +2,7 @@
     display: flex;
     width: 90%;
     max-width: 1200px;
+    margin-left: 30px;
     background: #fff;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
@@ -15,7 +16,8 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    border-right: 1px solid #e0e0e0;
+    border: 1.75px dotted #e0e0e0;
+    border-radius: 4px;
     margin-bottom: 30px;
   }
   
@@ -55,19 +57,21 @@
   .edit-btn, .logout-btn {
     margin: 15px 0;
     padding: 10px 20px;
-    border: none;
+    border: 1px dotted #000;
     border-radius: 4px;
     cursor: pointer;
-    background-color: #007bff;
-    color: white;
+    background-color: transparent;
+    color: #000;
     font-size: 14px;
+    font-weight: 600;
     transition: background-color 0.3s;
   }
-  
+
   .edit-btn:hover, .logout-btn:hover {
-    background-color: #0056b3;
+    background-color: #000;
+    color: #fff;
   }
-  
+
   .nav-list {
     list-style: none;
     width: 100%;
@@ -94,8 +98,10 @@
   /* Content area styles */
   .content-area {
     flex: 1;
+    width: 300px;
     padding: 20px;
     margin-left: 50px;
+    margin-bottom: 20px;
 
   }
 
@@ -125,7 +131,7 @@
   }
 
   form button {
-    background-color: #28a745;
+    background-color:#003049;
     color: white;
     padding: 10px 20px;
     border: none;
@@ -135,7 +141,7 @@
   }
 
   form button:hover {
-    background-color: #218838;
+    background-color: #780000;
   }
 
   /* Responsive design */
@@ -152,7 +158,18 @@
       padding: 15px;
     }
   }
-.nav-list a.active {
-background-color: #007bff;
-color: white;
+
+
+
+  .nav-list a.active {
+    background-color: #0000006e;
+    color: white;
+    border-left: 5px solid #000;
+}
+
+.logout-btn a{
+  color: #000;
+}
+.logout-btn a:hover{
+  color:#fff;
 }
