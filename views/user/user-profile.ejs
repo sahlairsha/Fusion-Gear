@@ -34,11 +34,6 @@
         <input type="text" id="phone" name="phone" value="<%=user.phone%>" placeholder="Enter your phone number" readonly>
     </div>
 
-    <!-- Password -->
-    <div class="form-group">
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" value="<%=user.password%>" placeholder="Enter new password" readonly>
-    </div>
 
     <!-- Submit Button -->
     <div class="form-group">
@@ -81,8 +76,8 @@ function updateProfile(event) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            showAlert("Profile updated successfully!", "success");
-            location.reload();
+            sessionStorage.setItem("successMessage", "Profile updated successfully!");
+            location.reload(); // Reload the page
         } else {
             showAlert("Error updating profile. Please try again.", "error");
         }
@@ -93,24 +88,20 @@ function updateProfile(event) {
     });
 }
 
-// Function to show alerts with custom design
-function showAlert(message, type) {
-    const alertMessage = document.getElementById("alert-message");
-    alertMessage.textContent = message;
-    alertMessage.style.display = "block";
-
-    // Set the alert type (success or error)
-    if (type === "success") {
-        alertMessage.className = "alert alert-success";
-    } else {
-        alertMessage.className = "alert alert-error";
+document.addEventListener("DOMContentLoaded", () => {
+    const successMessage = sessionStorage.getItem("successMessage");
+    if (successMessage) {
+        Swal.fire({
+            icon: "success",
+            title: "Success",
+            text: successMessage,
+            timer: 3000,
+            showConfirmButton: false,
+        });
+        sessionStorage.removeItem("successMessage");
     }
+});
 
-    // Auto-hide the alert after 3 seconds
-    setTimeout(() => {
-        alertMessage.style.display = "none";
-    }, 3000);
-}
 
 </script>
 

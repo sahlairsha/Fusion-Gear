@@ -32,13 +32,8 @@ const editProfile = async (req, res) => {
     }
 
     // Extract data from request body
-    const { full_name, username, email, phone, password } = req.body;
+    const { full_name, username, email, phone } = req.body;
 
-    // Hash password if provided
-    let hashedPassword = null;
-    if (password) {
-      hashedPassword = await bcrypt.hash(password, 10);
-    }
 
     // Update user information
     const updatedUser = await User.findByIdAndUpdate(
@@ -48,7 +43,6 @@ const editProfile = async (req, res) => {
         username,
         phone,
         email,
-        hashedPassword
       },
       { new: true }
     );

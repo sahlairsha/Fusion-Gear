@@ -1,3 +1,5 @@
+
+
 const signupForm = document.getElementById('signup-form');
 const nameid = document.getElementById('full-name');
 const usernameid = document.getElementById('username');
@@ -124,4 +126,4 @@ signupForm.addEventListener('submit', (e) => {
         e.preventDefault();
     }
 
-});
+},{once: true});
