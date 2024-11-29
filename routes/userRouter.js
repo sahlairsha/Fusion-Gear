@@ -78,6 +78,12 @@ router.post('/apply-coupon',userproductController.applyCoupon)
 router.get('/userProfile',userAuth,userprofileController.getProfile)
 router.put('/update-profile',userAuth,userprofileController.editProfile)
 
+
+//address view 
+
+router.get('/address-view',userAuth,userprofileController.viewAddress)
+router.post('/address-view',userAuth,userprofileController.addAddress)
+
 router.get('/pagenotfound', userController.pageNotFound)
 
 

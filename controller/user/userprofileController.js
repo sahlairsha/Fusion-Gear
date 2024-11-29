@@ -1,5 +1,6 @@
 
 const User = require("../../models/userSchema");
+const Address = require("../../models/addressSchema")
 const bcrypt = require("bcrypt");
 
 const getProfile = async (req, res) => {
@@ -63,7 +64,54 @@ const editProfile = async (req, res) => {
 
 
 
+
+const viewAddress = async(req,res)=>{
+  try{
+    const addressData = await Address.find({ user_id: req.session.user });
+    res.render('address-view',{address :addressData,addressType: addressData?.addressType,activePage : "address"})
+  }catch(error){
+    console.log("Error in viewing address",error)
+    res.redirect('/pageerror')
+  }
+}
+
+
+const addAddress = async(req,res)=>{
+  try{
+
+    const {recipient_name,streetAddress, city, state, landMark, pincode,phone,altPhone, addressType } = req.body;
+
+    // Create a new address
+    const newAddress = new Address({
+      user_id: req.session.user,
+      address: {
+        recipient_name,
+          streetAddress,
+          city,
+          state,
+          landMark,
+          pincode,
+          phone,
+          altPhone,
+          addressType
+      }
+  });
+
+  await newAddress.save();
+
+  req.flash('success_msg', 'Address added successfully!');
+  res.redirect('/address-view');
+
+  }catch(error){
+    console.error(error);
+    res.status(500).send('Server Error');
+  }
+}
+
+
 module.exports = {
     getProfile,
-    editProfile
+    editProfile,
+    viewAddress,
+    addAddress
 }
