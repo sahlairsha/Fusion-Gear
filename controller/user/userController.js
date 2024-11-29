@@ -179,7 +179,7 @@ const verifyOtp = async (req, res) => {
 
          // Only hash and set password if not a Google signup
          if (!user.googleId) {
-            newUser.password = await securePassword(user.password);
+            saveUser.password = await securePassword(user.password);
         }
 
         await saveUser.save();

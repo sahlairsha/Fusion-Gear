@@ -67,6 +67,7 @@ router.post('/rate', userproductController.rateProduct);
 router.get('/ratings/:product_id', userproductController.getProductRatings);
 
 
+
 //Coupon
 router.get("/coupon",userproductController.getCoupon)
 router.post('/apply-coupon',userproductController.applyCoupon)
