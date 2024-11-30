@@ -8,8 +8,8 @@ const addressSchema = new Schema({
         ref : "User",
         required : true
     },
-   
     address:[{
+
         recipient_name:{
             type : String,
             required : true

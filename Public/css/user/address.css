@@ -1,0 +1,79 @@
+.badge{
+    background-color:#0000002c;
+    font-size: 12px;
+}
+.list-group-item {
+position: relative;
+}
+
+.more-options {
+position: absolute;
+top: 10px;
+right: 10px;
+}
+
+.more-options .btn {
+padding: 0;
+background: transparent;
+border: none;
+cursor: pointer;
+color: inherit;
+}
+
+
+.more-options i {
+color: #333; /* You can change this to any color you prefer */
+}
+
+/* Optional: Change the color when hovering over the button */
+.more-options .btn:hover i {
+color: #000; /* Set the hover color for the icon */
+}
+
+/* Dropdown list initially hidden */
+.dropdown-list {
+display: none;
+position: absolute;
+right: 0;
+top: 0;
+background-color: #fff;
+border: 1px solid #ccc;
+border-radius: 5px;
+box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
+width: 100px;
+z-index: 10;
+}
+
+/* Show the dropdown when hovering over the 3-dot button */
+.more-options:hover .dropdown-list {
+display: block;
+}
+
+/* Style the dropdown items */
+.dropdown-item {
+padding: 8px 12px;
+text-decoration: none;
+color: #333;
+cursor: pointer;
+display: block;
+font-size: 14px;
+}
+
+/* Hover effect for dropdown items */
+.dropdown-item:hover {
+background-color: #f0f0f0;
+color: rgba(0, 0, 255, 0.616);
+}
+.error-message {
+color: red;
+font-size: 14px;
+}
+
+.form-check-label{
+margin-bottom: 23px;
+font-size: 14px;
+font-weight: 600;
+}
+.form-control{
+width : 400px;
+}

@@ -79,10 +79,13 @@ router.get('/userProfile',userAuth,userprofileController.getProfile)
 router.put('/update-profile',userAuth,userprofileController.editProfile)
 
 
-//address view 
+//address view
 
 router.get('/address-view',userAuth,userprofileController.viewAddress)
 router.post('/address-view',userAuth,userprofileController.addAddress)
+router.delete('/address-view/delete/:id',userAuth,userprofileController.deleteAddress)
+router.get('/address-view/edit/:id',userAuth,userprofileController.editAddress)
+router.post('/address-view/update/:id',userAuth,userprofileController.updateAddress);
 
 router.get('/pagenotfound', userController.pageNotFound)
 

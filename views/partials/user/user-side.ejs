@@ -1,4 +1,13 @@
 
+
+<% if (flash.success_msg) { %>
+    <div class="alert alert-success"><%= flash.success_msg %></div>
+  <% } %>
+  <% if (flash.error_msg) { %>
+    <div class="alert alert-danger"><%= flash.error_msg %></div>
+  <% } %>
+
+
     <div class="profile-container">
         <!-- Left Sidebar -->
         <div class="sidebar">

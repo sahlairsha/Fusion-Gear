@@ -97,6 +97,7 @@ const addAddress = async(req,res)=>{
       }
   });
 
+
   await newAddress.save();
 
   req.flash('success_msg', 'Address added successfully!');
@@ -104,8 +105,63 @@ const addAddress = async(req,res)=>{
 
   }catch(error){
     console.error(error);
-    res.status(500).send('Server Error');
+    res.redirect('/pagenotfound');
   }
+}
+
+
+const deleteAddress = async(req,res)=>{
+  try {
+    const addressId = req.params.id;
+    await Address.updateOne(
+      { "address._id": addressId },
+      { $pull: { address: { _id: addressId } } }
+    );
+    res.status(200).json({ message: "Address deleted successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Failed to delete address" });
+  }
+}
+
+const editAddress = async(req,res)=>{
+  try {
+    const address = await Address.findOne({ 'address._id': req.params.id }, { 'address.$': 1 });
+    if (!address) return res.status(404).json({ message: 'Address not found' });
+    res.json(address.address[0]);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' });
+  }
+}
+
+
+const updateAddress = async(req,res)=>{
+
+  const { recipient_name, streetAddress, city, state, landMark, pincode, phone, altPhone, addressType } = req.body;
+
+  try {
+    await Address.updateOne(
+      { 'address._id': req.params.id },
+      {
+        $set: {
+          'address.$.recipient_name': recipient_name,
+          'address.$.streetAddress': streetAddress,
+          'address.$.city': city,
+          'address.$.state': state,
+          'address.$.landMark': landMark,
+          'address.$.pincode': pincode,
+          'address.$.phone': phone,
+          'address.$.altPhone': altPhone,
+          'address.$.addressType': addressType,
+        },
+      }
+    );
+    res.redirect('/address-view');
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Failed to update address');
+  }
+
 }
 
 
@@ -113,5 +169,8 @@ module.exports = {
     getProfile,
     editProfile,
     viewAddress,
-    addAddress
+    addAddress,
+    deleteAddress,
+    editAddress,
+    updateAddress
 }
