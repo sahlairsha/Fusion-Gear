@@ -46,6 +46,10 @@
     background-color: #6c757d; /* Grey for Out of Stock */
 }
 
+.product-empty{
+    margin-left: 300px;
+    margin-top: 200px;
+}
 
     </style>
   <!-- Breadcrumb Section Begin -->
@@ -275,6 +279,9 @@
                     </div>
                 </div>
                 <div class="row">
+                    <%if (products.length === 0){%>
+                        <div class="product-empty"><p class="">There is no Product Available</p></div>
+                        <%}else{%>
                     <% products.forEach(product => { %>
                     <div class="col-lg-4 col-md-6 col-sm-6">
                         <div class="product-card mb-4">
@@ -335,6 +342,8 @@
                         </div>
                     </div>
                 </div>
+                <%}%>
+
             </div>
         </div>
     </div>
