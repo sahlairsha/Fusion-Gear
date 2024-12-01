@@ -8,6 +8,7 @@ const passport = require('../config/passport');
 const userController = require('../controller/user/userController')
 const userproductController = require('../controller/user/userproductController');
 const userprofileController = require('../controller/user/userprofileController')
+const userCartController = require('../controller/user/userCartController')
 const userAuth = require('../middleware/auth')
 
 
@@ -87,6 +88,10 @@ router.post('/address-view',userAuth,userprofileController.addAddress)
 router.delete('/address-view/delete/:id',userAuth,userprofileController.deleteAddress)
 router.get('/address-view/edit/:id',userAuth,userprofileController.editAddress)
 router.post('/address-view/update/:id',userAuth,userprofileController.updateAddress);
+
+
+//cart 
+router.get('/cart',userAuth,userCartController.getCart)
 
 router.get('/pagenotfound', userController.pageNotFound)
 
