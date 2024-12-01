@@ -1,7 +1,80 @@
 
-   
    <%-include('../../views/partials/user/header') %>
-   
+<style>
+
+.address-box {
+    background-color: #f9f9f9; 
+    padding: 20px; 
+    border-radius: 10px; 
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    width: 90%; 
+    max-width: 700px; 
+    position: relative; 
+    margin-bottom: 40px;
+}
+
+
+.address-box h6 {
+    font-size: 1.2rem;
+    font-weight: 600; 
+    color: #333; 
+    margin-bottom: 10px; 
+}
+
+
+.address-box p {
+    font-size: 1rem;
+    color: #555; 
+    margin: 5px 0;
+}
+
+
+.address-box button {
+    background-color: #4CAF50; 
+    color: white;
+    border: none; 
+    padding: 8px 20px; 
+    border-radius: 5px;
+    font-size: 1rem; /* Font size */
+    cursor: pointer; /* Pointer cursor on hover */
+    transition: background-color 0.3s; /* Smooth color transition on hover */
+    position: absolute; /* Position the button absolutely */
+    top: 20px; /* Position the button from the top */
+    right: 20px; /* Align the button to the right */
+}
+
+/* Hover effect for the change button */
+.address-box button:hover {
+    background-color: #45a049; /* Slightly darker green on hover */
+}
+
+/* Styling for the link inside the button */
+.address-box button a {
+    color: white; /* White text for the link */
+    text-decoration: none; /* Remove underline */
+}
+
+/* Adding some responsiveness for mobile view */
+@media (max-width: 768px) {
+    .address-box {
+        padding: 15px; /* Reduced padding on smaller screens */
+        width: 95%; /* Adjust the width on smaller screens */
+    }
+
+    .address-box h6 {
+        font-size: 1.1rem; /* Slightly smaller heading on mobile */
+    }
+
+    .address-box p {
+        font-size: 0.9rem; /* Smaller font size for the text */
+    }
+}
+
+
+</style>
+
+
    <!-- Breadcrumb Section Begin -->
     <section class="breadcrumb-option">
         <div class="container">
@@ -10,8 +83,8 @@
                     <div class="breadcrumb__text">
                         <h4>Shopping Cart</h4>
                         <div class="breadcrumb__links">
-                            <a href="./index.html">Home</a>
-                            <a href="./shop.html">Shop</a>
+                            <a href="/">Home</a>
+                            <a href="/products">Products</a>
                             <span>Shopping Cart</span>
                         </div>
                     </div>
@@ -24,6 +97,16 @@
     <!-- Shopping Cart Section Begin -->
     <section class="shopping-cart spad">
         <div class="container">
+            <div class="row">
+                <div class="address-box">
+                    <h6>Receipient name</h6>
+                    <p>Thalayillath House, Kalikadavu, Kerala</p>
+                    <p>LandMark</p>
+                    <p>75202943579</p>
+                    <button><a href="#">Change</a></button>
+                </div>
+                
+            </div>
             <div class="row">
                 <div class="col-lg-8">
                     <div class="shopping__cart__table">
