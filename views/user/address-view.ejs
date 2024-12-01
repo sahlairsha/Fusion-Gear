@@ -1,0 +1,109 @@
+<%- include('../../views/partials/user/header') %>
+<%- include('../../views/partials/user/user-side') %>
+<link rel="stylesheet" href="/css/user/address.css">
+<div class="content-area container mt-5">
+
+    <% if (address.length === 0 || !address.some(doc => doc.address.length > 0)) { %>
+        <div class="text-center">
+            <p class="fs-4">There is no address available. <br> <button class="btn btn-primary mt-3" id="showFormBtn">Add New Address</button></p>
+        </div>
+    <% } else { %>
+        <!-- Display existing addresses -->
+        <h3 class="mb-4">Your Addresses</h3>
+        <ul class="list-group mb-4">
+            <% address.forEach(function(doc) { %>
+                <% doc.address.forEach(function(addr) { %>
+                    <li class="list-group-item">
+                        <h6><%= addr.recipient_name %>
+                            <% if (addr.addressType) { %>
+                                <span class="badge mb-2"><%=addr.addressType%></span>
+                            <% } %>
+                        </h4>
+                        <strong><%= addr.streetAddress %>, <%= addr.city %>, <%= addr.state %></strong><br>
+                        Pincode: <%= addr.pincode %> <br>
+                        Landmark: <%= addr.landMark || 'N/A' %><br>
+                        <span class="text-muted">Phone: <%= addr.phone || 'N/A' %></span>
+                        <div class="more-options">
+                        <button class="btn btn-link"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+                        <div class="dropdown-list">
+                          <ul>
+                          <li><a href="#" class="dropdown-item edit-address" data-id="<%= addr._id %>">Edit</a>
+                            <li><a href="#"class="dropdown-item delete-address" data-id="<%= addr._id %>">Delete</a></li>
+                         </ul>
+                        </div>
+                        </div>
+                    </li>
+                <% }); %>
+            <% }); %>
+        </ul>
+        <!-- Button to show the form -->
+        <button class="btn btn-primary" id="showFormBtn">Add New Address</button>
+    <% } %>
+
+    <!-- Address Form (Initially Hidden) -->
+    <div class="mt-5" id="addressFormContainer" style="display: none;">
+        <h2 class="mb-4">Add New Address</h2>
+        <form id="addressForm" action="/address-view" method="POST">
+            <div class="mb-3">
+                <label for="name" class="form-label">Name</label>
+                <input type="text" class="form-control" id="recipient_name" name="recipient_name">
+                <div id="error1" class="error-message"></div>
+            </div>
+            <div class="mb-3">
+                <label for="streetAddress" class="form-label">Street Address</label>
+                <input type="text" class="form-control" id="streetAddress" name="streetAddress">
+                <div id="error2" class="error-message"></div>
+            </div>
+            <div class="mb-3">
+                <label for="city" class="form-label">City</label>
+                <input type="text" class="form-control" id="city" name="city">
+                <div id="error3" class="error-message"></div>
+            </div>
+            <div class="mb-3">
+                <label for="state" class="form-label">State</label>
+                <input type="text" class="form-control" id="state" name="state">
+                <div id="error4" class="error-message"></div>
+            </div>
+            <div class="mb-3">
+                <label for="landMark" class="form-label">Landmark (Optional)</label>
+                <input type="text" class="form-control" id="landMark" name="landMark">
+            </div>
+            <div class="mb-3">
+                <label for="pincode" class="form-label">Pincode</label>
+                <input type="text" class="form-control" id="pincode" name="pincode">
+                <div id="error5" class="error-message"></div>
+            </div>
+
+            <div class="mb-3">
+                <label for="Phone" class="form-label">Phone No:</label>
+                <input type="tel" class="form-control" id="phone" name="phone"  placeholder="10-digit phone number">
+                <div id="error6" class="error-message"></div>
+            </div>
+            <div class="mb-3">
+                <label for="altPhone" class="form-label">Alternate Phone (Optional)</label>
+                <input type="tel" class="form-control" id="altPhone" name="altPhone"  placeholder="10-digit phone number">
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Address Type</label><br>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="addressType" id="home" value="Home">
+                    <label class="form-check-label" for="home">Home</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="addressType" id="work" value="Work">
+                    <label class="form-check-label" for="work">Work</label>
+                </div>
+                <div id="error7" class="error-message"></div>
+            </div>
+
+            <button type="submit" class="btn btn-primary mt-3">Add Address</button>
+        </form>
+        </div>
+    </div>
+</div>
+</div>
+
+<script src="/js/user/addressManagement.js"></script>
+<script src="/js/user/addressValidation.js"></script>
+<%- include('../../views/partials/user/footer') %>

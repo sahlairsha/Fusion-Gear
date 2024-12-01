@@ -1,8 +1,6 @@
 
 const Product = require("../../models/productSchema");
 const User = require("../../models/userSchema");
-const Category = require("../../models/categorySchema")
-
 
 const loadProducts = async (req, res) => {
     try {
@@ -278,6 +276,9 @@ const applyCoupon = async (req, res) => {
         res.status(500).json({ message: 'Internal server error.' });
     }
 };
+
+
+
 
 
 

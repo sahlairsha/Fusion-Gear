@@ -1,4 +1,13 @@
 
+
+<% if (flash.success_msg) { %>
+    <div class="alert alert-success"><%= flash.success_msg %></div>
+  <% } %>
+  <% if (flash.error_msg) { %>
+    <div class="alert alert-danger"><%= flash.error_msg %></div>
+  <% } %>
+
+
     <div class="profile-container">
         <!-- Left Sidebar -->
         <div class="sidebar">
@@ -18,7 +27,7 @@
             <ul class="nav-list">
               <li><a href="/userProfile?id=<%=user._id%>" class="<%= activePage === 'profile' ? 'active' : '' %>">My Profile</a></li>
               <li><a href="#" class="<%= activePage === 'orders' ? 'active' : '' %>">My Orders</a></li>
-              <li><a href="#" class="<%= activePage === 'address' ? 'active' : '' %>">Address</a></li>
+              <li><a href="/address-view" class="<%= activePage === 'address' ? 'active' : '' %>">Address</a></li>
               <li><a href="#" class="<%= activePage === 'cart' ? 'active' : '' %>">Cart</a></li>
               <li><a href="#" class="<%= activePage === 'wishlist' ? 'active' : '' %>">Wishlist</a></li>
               <li><a href="#" class="<%= activePage === 'coupon' ? 'active' : '' %>">Coupon</a></li>
