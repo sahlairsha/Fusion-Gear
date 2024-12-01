@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <%- include('../../views/partials/user/header') %>
 
 <style>
@@ -6,31 +7,62 @@
     background-color: #fff; 
     padding: 20px; 
     border-radius: 10px; 
+=======
+
+ <%-include('../../views/partials/user/header') %>
+<style>
+
+.address-box {
+    background-color: #f9f9f9; 
+    padding: 20px; 
+    border-radius: 10px; 
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+>>>>>>> 6a01ce8 (new updation)
     margin-bottom: 20px;
     width: 90%; 
     max-width: 700px; 
     position: relative; 
+<<<<<<< HEAD
     margin-bottom: 50px;
     border: 1px dotted #000;
     align-items: center;
 }
+=======
+    margin-bottom: 40px;
+}
+
+
+>>>>>>> 6a01ce8 (new updation)
 .address-box h6 {
     font-size: 1.2rem;
     font-weight: 600; 
     color: #333; 
+<<<<<<< HEAD
     margin-bottom: 5px; 
 }
+=======
+    margin-bottom: 10px; 
+}
+
+
+>>>>>>> 6a01ce8 (new updation)
 .address-box p {
     font-size: 1rem;
     color: #555; 
     margin: 5px 0;
 }
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> 6a01ce8 (new updation)
 .address-box button {
     background-color: #4CAF50; 
     color: white;
     border: none; 
     padding: 8px 20px; 
     border-radius: 5px;
+<<<<<<< HEAD
     font-size: 1rem;
     cursor: pointer;
     transition: background-color 0.3s;
@@ -219,10 +251,64 @@ input[type="number"]::-webkit-inner-spin-button {
                         <a href="/">Home</a>
                         <a href="/products">Products</a>
                         <span>Cart</span>
+=======
+    font-size: 1rem; /* Font size */
+    cursor: pointer; /* Pointer cursor on hover */
+    transition: background-color 0.3s; /* Smooth color transition on hover */
+    position: absolute; /* Position the button absolutely */
+    top: 20px; /* Position the button from the top */
+    right: 20px; /* Align the button to the right */
+}
+
+/* Hover effect for the change button */
+.address-box button:hover {
+    background-color: #45a049; /* Slightly darker green on hover */
+}
+
+/* Styling for the link inside the button */
+.address-box button a {
+    color: white; /* White text for the link */
+    text-decoration: none; /* Remove underline */
+}
+
+/* Adding some responsiveness for mobile view */
+@media (max-width: 768px) {
+    .address-box {
+        padding: 15px; /* Reduced padding on smaller screens */
+        width: 95%; /* Adjust the width on smaller screens */
+    }
+
+    .address-box h6 {
+        font-size: 1.1rem; /* Slightly smaller heading on mobile */
+    }
+
+    .address-box p {
+        font-size: 0.9rem; /* Smaller font size for the text */
+    }
+}
+
+
+</style>
+
+
+   <!-- Breadcrumb Section Begin -->
+    <section class="breadcrumb-option">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="breadcrumb__text">
+                        <h4>Shopping Cart</h4>
+                        <div class="breadcrumb__links">
+                            <a href="/">Home</a>
+                            <a href="/products">Products</a>
+                            <span>Shopping Cart</span>
+                        </div>
+>>>>>>> 6a01ce8 (new updation)
                     </div>
                 </div>
             </div>
         </div>
+<<<<<<< HEAD
     </div>
 </section>
 <!-- Breadcrumb Section End -->
@@ -287,10 +373,50 @@ input[type="number"]::-webkit-inner-spin-button {
                                         <div class="product__cart__item__text">
                                             <h6><%= item.product_id.productName %></h6>
                                             <h5>Price: ₹<%= item.product_id.salePrice %></h5>
+=======
+    </section>
+    <!-- Breadcrumb Section End -->
+
+    <!-- Shopping Cart Section Begin -->
+    <section class="shopping-cart spad">
+        <div class="container">
+            <div class="row">
+                <div class="address-box">
+                    <h6>Receipient name</h6>
+                    <p>Thalayillath House, Kalikadavu, Kerala</p>
+                    <p>LandMark</p>
+                    <p>75202943579</p>
+                    <button><a href="#">Change</a></button>
+                </div>
+                
+            </div>
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="shopping__cart__table">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Quantity</th>
+                                    <th>Total</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="product__cart__item">
+                                        <div class="product__cart__item__pic">
+                                            <img src="img/shopping-cart/cart-1.jpg" alt="">
+                                        </div>
+                                        <div class="product__cart__item__text">
+                                            <h6>T-shirt Contrast Pocket</h6>
+                                            <h5>$98.49</h5>
+>>>>>>> 6a01ce8 (new updation)
                                         </div>
                                     </td>
                                     <td class="quantity__item">
                                         <div class="quantity">
+<<<<<<< HEAD
                                             <button class="btn-decrement" data-product-id="<%= item.product_id._id %>">-</button>
                                             <input type="number" value="<%= item.quantity %>" min="1" data-product-id="<%= item.product_id._id %>" class="quantity-input">
                                             <button class="btn-increment" data-product-id="<%= item.product_id._id %>">+</button>
@@ -318,10 +444,112 @@ input[type="number"]::-webkit-inner-spin-button {
                     </ul>
                     <div class="checkout-btn">
                         <a href="/checkout" class="primary-btn">Proceed to Checkout</a>
+=======
+                                            <div class="pro-qty-2">
+                                                <input type="text" value="1">
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="cart__price">$ 30.00</td>
+                                    <td class="cart__close"><i class="fa fa-close"></i></td>
+                                </tr>
+                                <tr>
+                                    <td class="product__cart__item">
+                                        <div class="product__cart__item__pic">
+                                            <img src="img/shopping-cart/cart-2.jpg" alt="">
+                                        </div>
+                                        <div class="product__cart__item__text">
+                                            <h6>Diagonal Textured Cap</h6>
+                                            <h5>$98.49</h5>
+                                        </div>
+                                    </td>
+                                    <td class="quantity__item">
+                                        <div class="quantity">
+                                            <div class="pro-qty-2">
+                                                <input type="text" value="1">
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="cart__price">$ 32.50</td>
+                                    <td class="cart__close"><i class="fa fa-close"></i></td>
+                                </tr>
+                                <tr>
+                                    <td class="product__cart__item">
+                                        <div class="product__cart__item__pic">
+                                            <img src="img/shopping-cart/cart-3.jpg" alt="">
+                                        </div>
+                                        <div class="product__cart__item__text">
+                                            <h6>Basic Flowing Scarf</h6>
+                                            <h5>$98.49</h5>
+                                        </div>
+                                    </td>
+                                    <td class="quantity__item">
+                                        <div class="quantity">
+                                            <div class="pro-qty-2">
+                                                <input type="text" value="1">
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="cart__price">$ 47.00</td>
+                                    <td class="cart__close"><i class="fa fa-close"></i></td>
+                                </tr>
+                                <tr>
+                                    <td class="product__cart__item">
+                                        <div class="product__cart__item__pic">
+                                            <img src="img/shopping-cart/cart-4.jpg" alt="">
+                                        </div>
+                                        <div class="product__cart__item__text">
+                                            <h6>Basic Flowing Scarf</h6>
+                                            <h5>$98.49</h5>
+                                        </div>
+                                    </td>
+                                    <td class="quantity__item">
+                                        <div class="quantity">
+                                            <div class="pro-qty-2">
+                                                <input type="text" value="1">
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="cart__price">$ 30.00</td>
+                                    <td class="cart__close"><i class="fa fa-close"></i></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-6">
+                            <div class="continue__btn">
+                                <a href="#">Continue Shopping</a>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-6">
+                            <div class="continue__btn update__btn">
+                                <a href="#"><i class="fa fa-spinner"></i> Update cart</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="cart__discount">
+                        <h6>Discount codes</h6>
+                        <form action="#">
+                            <input type="text" placeholder="Coupon code">
+                            <button type="submit">Apply</button>
+                        </form>
+                    </div>
+                    <div class="cart__total">
+                        <h6>Cart total</h6>
+                        <ul>
+                            <li>Subtotal <span>$ 169.50</span></li>
+                            <li>Total <span>$ 169.50</span></li>
+                        </ul>
+                        <a href="#" class="primary-btn">Proceed to checkout</a>
+>>>>>>> 6a01ce8 (new updation)
                     </div>
                 </div>
             </div>
         </div>
+<<<<<<< HEAD
 
         <!-- Coupon Section -->
         <!-- <div class="row">
@@ -464,3 +692,8 @@ function updateCartUI(data) {
 
 
 <%- include('../../views/partials/user/footer') %>
+=======
+    </section>
+    <!-- Shopping Cart Section End -->
+    <%-include('../../views/partials/user/footer') %>
+>>>>>>> 6a01ce8 (new updation)
