@@ -156,3 +156,14 @@ input[type="email"]:not(:placeholder-shown)::placeholder {
 .login-link:hover{
 	color: #000;
 }
+
+.reset{
+	color: #000;
+	display: flex;
+	font-size: 12px;
+	margin-left: 240px;
+}
+
+.reset:hover{
+	color: #780000;
+}

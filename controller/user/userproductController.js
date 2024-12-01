@@ -6,31 +6,41 @@ const Category = require("../../models/categorySchema")
 
 const loadProducts = async (req, res) => {
     try {
-        let search = "";
-        if (req.query.search) {
-            search = req.query.search;
-        }
+        let search = req.query.search ? req.query.search.trim() : "";
+        let page = parseInt(req.query.page) || 1;
+        const limit = 9;
+        const sort = req.query.sort || "productName";
 
-        let page = 1;
-        if (req.query.page) {
-            page = parseInt(req.query.page);
-        }
+        let query = {
+            isDeleted: false,
+            isBlocked: false,
+          };
+          if (search) {
+            query.productName = { $regex: search, $options: 'i' };
+          }
 
-        const limit = 6;
 
-        // Build query with optional search
-        const query = {
-            isDeleted: false, // Exclude soft-deleted products
-            ...(search && { name: { $regex: search, $options: "i" } }),
-        };
+          let sortQuery = {};
+          if (sort === 'featured') {
+              sortQuery = { featured: -1 }; // Sort by featured (featured products first)
+          } else if (sort === 'priceLowToHigh') {
+              sortQuery = { salePrice: 1 }; // Sort by price from low to high
+          } else if (sort === 'priceHighToLow') {
+              sortQuery = { salePrice: -1 }; // Sort by price from high to low
+          } else {
+              sortQuery = { [sort]: 1 }; // Default sort by productName or another field
+          }
+
+
 
         const productData = await Product.find(query)
             .limit(limit)
             .skip((page - 1) * limit)
+            .sort(sortQuery)
             .exec();
 
-        const count = await Product.find(query).countDocuments();
-
+        // Count total products for pagination
+        const count = await Product.countDocuments(query);
         const totalPages = Math.ceil(count / limit);
 
         const data = {
@@ -39,8 +49,11 @@ const loadProducts = async (req, res) => {
             totalProduct: count,
             limit,
             currentPage: page,
+            sort
+
         };
 
+        // Load user data if logged in
         if (req.session.user) {
             const userData = await User.findById(req.session.user);
             data.user = userData;
@@ -54,6 +67,9 @@ const loadProducts = async (req, res) => {
         res.status(500).send("Server Error");
     }
 };
+
+
+
 
 
 const loadProductsDetails = async (req, res) => {
@@ -76,8 +92,10 @@ const loadProductsDetails = async (req, res) => {
             return res.redirect("/product/view");
         }
 
+
+
         const userData = req.session.user
-            ? await User.findById(req.session.user).lean() 
+            ? await User.findById(req.session.user).lean()
             : null;
         res.render("productlist", {
             user: userData,
@@ -91,6 +109,10 @@ const loadProductsDetails = async (req, res) => {
         res.redirect("/pagenotfound");
     }
 };
+
+
+
+
 
 const submitRating = async (req, res) => {
     const { rating } = req.body;
@@ -129,6 +151,7 @@ const submitRating = async (req, res) => {
         // Save changes
         await user.save();
         await product.save();
+
 
         // Send the updated data back to the front-end
         return res.status(200).json({
@@ -209,8 +232,6 @@ const getCoupon = async(req,res)=>{
 const applyCoupon = async (req, res) => {
     const { code } = req.body;
     const productId = req.query.id;
-
-   
 
     try {
         const product = await Product.findById(productId);

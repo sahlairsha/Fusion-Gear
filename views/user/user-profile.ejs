@@ -1,0 +1,109 @@
+<%-include('../../views/partials/user/header') %>
+<%-include('../../views/partials/user/user-side')%>
+
+<div class="content-area">
+  <!-- Custom Alert Box -->
+
+
+  <form id="edit-form">
+    <div id="alert-message" class="alert" style="display: none;"></div>
+    <input type="hidden" name="_method" value="PUT">
+    <button type="button" id="edit-btn" class="edit-btn" onclick="enableEdit()">Edit Profile</button>
+
+    <!-- Full Name -->
+    <div class="form-group">
+        <label for="full_name">Full Name:</label>
+        <input type="text" id="full_name" name="full_name" required placeholder="Enter your full name" value="<%=user.full_name%>" readonly>
+    </div>
+
+    <!-- Username -->
+    <div class="form-group">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" placeholder="Enter your username" value="<%=user.username%>" readonly>
+    </div>
+
+    <!-- Email -->
+    <div class="form-group">
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required placeholder="Enter your email" value="<%=user.email%>" readonly>
+    </div>
+
+    <!-- Phone -->
+    <div class="form-group">
+        <label for="phone">Phone:</label>
+        <input type="text" id="phone" name="phone" value="<%=user.phone%>" placeholder="Enter your phone number" readonly>
+    </div>
+
+
+    <!-- Submit Button -->
+    <div class="form-group">
+        <button type="button" id="update-btn" class="save-btn" onclick="updateProfile(event)">Save Changes</button>
+    </div>
+</form>
+
+</div>
+</div>
+<script>
+ function enableEdit() {
+    // Enable all form inputs (remove readonly and disabled attributes)
+    const formInputs = document.querySelectorAll("#edit-form input");
+    formInputs.forEach(input => {
+        input.removeAttribute("readonly");
+        input.removeAttribute("disabled");
+    });
+    document.getElementById("update-btn").style.display = "inline-block";
+    document.getElementById("edit-btn").style.display = "none";
+}
+
+
+function updateProfile(event) {
+    event.preventDefault();
+    const formData = new FormData(document.getElementById("edit-form"));
+
+    // Convert form data to an object
+    const data = {};
+    formData.forEach((value, key) => {
+        data[key] = value;
+    });
+
+    fetch('/update-profile', {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            sessionStorage.setItem("successMessage", "Profile updated successfully!");
+            location.reload(); // Reload the page
+        } else {
+            showAlert("Error updating profile. Please try again.", "error");
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showAlert("An error occurred while updating your profile.", "error");
+    });
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    const successMessage = sessionStorage.getItem("successMessage");
+    if (successMessage) {
+        Swal.fire({
+            icon: "success",
+            title: "Success",
+            text: successMessage,
+            timer: 3000,
+            showConfirmButton: false,
+        });
+        sessionStorage.removeItem("successMessage");
+    }
+});
+
+
+</script>
+
+
+<%-include('../../views/partials/user/footer') %>

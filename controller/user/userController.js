@@ -1,5 +1,5 @@
 const nodemailer = require('nodemailer')
-
+const crypto = require('crypto');
 const env = require('dotenv').config()
 
 const bcrypt = require('bcrypt')
@@ -75,10 +75,33 @@ async function sendVerificationEmail(email, otp) {
     }
 }
 
+const validateAvatar = async (avatarUrl) => {
+    try {
+      const response = await fetch(avatarUrl);
+      if (!response.ok) {
+        throw new Error(`Avatar URL is invalid: ${response.statusText}`);
+      }
+      return true;
+    } catch (error) {
+      console.error("Error validating avatar URL:", error);
+      return false;
+    }
+  };
+
+
+
 const signup = async (req, res) => {
     try {
-        const { full_name, username, phone, email, password, confirm_password } = req.body;
+        const { full_name, username, phone, email, password, confirm_password,googleId,profile_pic } = req.body;
+// Generate an avatar URL (use Google profile if available, fallback to RoboHash)
+    let avatarUrl = profile_pic || (googleId
+    ? `https://robohash.org/${googleId}?set=set3&size=200x200`
+    : `https://www.gravatar.com/avatar/${crypto.createHash('md5').update(email.trim().toLowerCase()).digest('hex')}?d=robohash&r=g&s=200`);
 
+// Handle password validation only if user is not using Google
+if (!googleId && password !== confirm_password) {
+    return res.render("signup", { message: "Passwords do not match" });
+}
         if (password !== confirm_password) {
             return res.render("signup", { message: "Passwords do not match" });
         }
@@ -89,6 +112,12 @@ const signup = async (req, res) => {
             return res.redirect('/signup');
         }
 
+          // Validate the avatar URL before proceeding
+          const isAvatarValid = await validateAvatar(avatarUrl);
+          if (!isAvatarValid) {
+              return res.render("signup", { message: "Invalid avatar. Please try again." });
+          }
+
         const otp = generateOtp();
         const emailSent = await sendVerificationEmail(email, otp);
         console.log("OTP Send:",otp)
@@ -97,7 +126,7 @@ const signup = async (req, res) => {
         }
 
         req.session.userOtp = { otp, expires: Date.now() + 10 * 60 * 1000 };
-        req.session.userData = { full_name, username, phone, email, password };
+        req.session.userData = { full_name, username, phone, email, password ,  profile_pic: avatarUrl , googleId };
 
         res.render("verification-otp");
     } catch (error) {
@@ -143,13 +172,20 @@ const verifyOtp = async (req, res) => {
             username: user.username,
             email: user.email,
             password: passwordHash,
-            phone: user.phone
+            phone: user.phone,
+            profile_pic:user.profile_pic,
+            googleId: user.googleId || null
         });
+
+         // Only hash and set password if not a Google signup
+         if (!user.googleId) {
+            saveUser.password = await securePassword(user.password);
+        }
 
         await saveUser.save();
 
         req.session.user = saveUser._id;
-        req.session.userOtp = null; // Clear OTP only
+        req.session.userOtp = null;
 
         res.json({ success: true, redirectUrl: '/' });
     } catch (error) {
@@ -244,6 +280,99 @@ const logout = (req, res) => {
 };
 
 
+
+
+// Securely generate a reset token
+const generateResetToken = () => crypto.randomBytes(32).toString('hex');
+
+// Hash the token for secure storage
+const hashToken = (token) => crypto.createHash('sha256').update(token).digest('hex');
+
+// Send reset email
+const sendResetEmail = async (email, resetLink) => {
+    const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASSWORD
+        }
+    });
+
+    const mailOptions = {
+        from: process.env.EMAIL_USER,
+        to: email,
+        subject: 'Password Reset Request',
+        html: `<p>You requested a password reset. Click the link below to reset your password:</p>
+               <a href="${resetLink}">Reset Password</a>
+               <p>If you did not request this, please ignore this email.</p>`
+    };
+
+    return transporter.sendMail(mailOptions);
+};
+
+const forgotPassword = async (req, res) => {
+    try {
+        const { email } = req.body;
+        const user = await User.findOne({ email });
+
+        if (!user) {
+            req.flash('error', 'No account with that email found.');
+            return res.redirect('/forgot-password');
+        }
+
+        const resetToken = generateResetToken();
+        user.resetToken = hashToken(resetToken);
+        user.resetTokenExpiry = Date.now() + 3600000;  // Token expires in 1 hour
+        await user.save();
+
+        const resetLink = `http://localhost:3001/reset-password?token=${resetToken}`;
+        await sendResetEmail(email, resetLink);
+
+        req.flash('success', 'Password reset link sent to your email.');
+        res.redirect('/forgot-password');
+    } catch (error) {
+        console.error('Error in forgot password:', error);
+        req.flash('error', 'An error occurred. Please try again.');
+        res.redirect('/forgot-password');
+    }
+};
+
+const resetPassword = async (req, res) => {
+    try {
+        const { token } = req.query;
+        const { newPassword, confirmPassword } = req.body;
+
+        if (newPassword !== confirmPassword) {
+            req.flash('error', 'Passwords do not match.');
+            return res.redirect(`/reset-password?token=${token}`);
+        }
+
+        const hashedToken = hashToken(token);
+        const user = await User.findOne({
+            resetToken: hashedToken,
+            resetTokenExpiry: { $gt: Date.now() }
+        });
+
+        if (!user) {
+            req.flash('error', 'Invalid or expired token.');
+            return res.redirect('/forgot-password');
+        }
+
+        user.password = newPassword;
+        user.resetToken = undefined;
+        user.resetTokenExpiry = undefined;
+        await user.save();
+
+        req.flash('success', 'Password reset successful. Please log in.');
+        res.redirect('/login');
+    } catch (error) {
+        console.error('Error resetting password:', error);
+        req.flash('error', 'An error occurred. Please try again.');
+        res.redirect('/forgot-password');
+    }
+};
+
+
 module.exports = {
     loadHomePage,
     pageNotFound,
@@ -253,5 +382,7 @@ module.exports = {
     verifyOtp,
     resendOtp,
     login,
-    logout
+    logout,
+    forgotPassword,
+    resetPassword
 }

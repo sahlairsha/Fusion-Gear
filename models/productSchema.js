@@ -56,9 +56,17 @@ const productSchema = new Schema({
         type: Date,
         default: null
     },
+    views: {
+        type: Number,
+        default: 0
+    },
+    featured: {
+        type: Boolean,
+        default: false
+    },
     ratings: {
         average: { type: Number, default: 0 },
-         count: { type: Number, default: 0 }   
+         count: { type: Number, default: 0 }
     },
 },{timestamps : true})
 

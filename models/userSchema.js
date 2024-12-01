@@ -38,6 +38,10 @@ const userSchema = new Schema({
         type : String,
         required : false,
     },
+    profile_pic : {
+        type : String,
+        default: ''
+    },
     isBlocked:{
         type : Boolean,
         default : false
@@ -90,14 +94,19 @@ const userSchema = new Schema({
         }
     }],
 
-    ratedProducts: [{ 
+    ratedProducts: [{
         product_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Product' },
         rating: { type: Number, required: true }
     }],
-    profile_pic : {
+    resetToken:{
         type : String,
-        required : false
+        default : ''
+    },
+    resetTokenExpiry:{
+        type : Date,
+        default: Date.now
     }
+
 })
 
 

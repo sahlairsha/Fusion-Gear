@@ -3,8 +3,11 @@ const express = require("express");
 const router = express.Router();
 
 const passport = require('../config/passport');
+
+
 const userController = require('../controller/user/userController')
 const userproductController = require('../controller/user/userproductController');
+const userprofileController = require('../controller/user/userprofileController')
 const userAuth = require('../middleware/auth')
 
 
@@ -32,6 +35,26 @@ router.post('/login',userController.login)
 
 router.get('/logout', userController.logout)
 
+router.get('/forgot-password', (req, res) => {
+    res.render('forgot-password');
+});
+
+router.post('/forgot-password', userController.forgotPassword);
+
+router.get('/reset-password', (req, res) => {
+    const { token } = req.query;
+    if (!token) {
+        req.flash('error', 'Invalid request. No token provided.');
+        return res.redirect('/forgot-password');
+    }
+    res.render('reset-password', { token });
+});
+
+router.post('/reset-password', userController.resetPassword);
+
+
+
+
 //Product details and lists
 router.get("/products",userAuth,userproductController.loadProducts)
 router.get("/product/view",userAuth,userproductController.loadProductsDetails)
@@ -44,11 +67,21 @@ router.post('/rate', userproductController.rateProduct);
 router.get('/ratings/:product_id', userproductController.getProductRatings);
 
 
+
 //Coupon
 router.get("/coupon",userproductController.getCoupon)
 router.post('/apply-coupon',userproductController.applyCoupon)
 
+
+
+//user profile
+
+router.get('/userProfile',userAuth,userprofileController.getProfile)
+router.put('/update-profile',userAuth,userprofileController.editProfile)
+
 router.get('/pagenotfound', userController.pageNotFound)
+
+
 
 
 

@@ -1,4 +1,5 @@
 <%-include('../../views/partials/user/header') %>
+<<<<<<< HEAD
 
 <style>
     .product__item{
@@ -52,6 +53,9 @@
 }
 
     </style>
+=======
+<link rel="stylesheet" href="/css/user/product-display.css">
+>>>>>>> product-display
   <!-- Breadcrumb Section Begin -->
   <section class="breadcrumb-option">
     <div class="container">
@@ -267,14 +271,14 @@
                             </div>
                         </div>
                         <div class="col-lg-6 col-md-6 col-sm-6">
-                            <div class="shop__product__option__right">
-                                <p>Sort by Price:</p>
-                                <select>
-                                    <option value="">Low To High</option>
-                                    <option value="">$0 - $55</option>
-                                    <option value="">$55 - $100</option>
+                            <form id="productFilterForm">
+                                <select id="sortOptions" onchange="loadSortedProducts()">
+                                    <option value="productName">Sort by Name</option>
+                                    <option value="priceLowToHigh">Price: Low to High</option>
+                                    <option value="priceHighToLow">Price: High to Low</option>
+                                    <option value="featured">Featured First</option>
                                 </select>
-                            </div>
+                              </form>
                         </div>
                     </div>
                 </div>
@@ -285,7 +289,6 @@
                     <% products.forEach(product => { %>
                     <div class="col-lg-4 col-md-6 col-sm-6">
                         <div class="product-card mb-4">
-                            <!-- Product Image with Hover Overlay -->
                             <div class="product-image">
                               <img src="/uploads/public-image/<%= product.productImage[0] %>" alt="<%= product.productName %>">
 
@@ -327,17 +330,13 @@
                     <div class="col-lg-12">
                         <div class="product__pagination">
                             <% if (currentPage > 1) { %>
-                                <a href="?page=<%= currentPage - 1 %>">&laquo;</a>
+                                <a href="?page=<%= currentPage - 1 %>&sort=<%= sort %>'">&laquo;</a>
                             <% } %>
                             <% for (let i = 1; i <= totalPages; i++) { %>
-                                <% if (i === currentPage) { %>
-                                    <a class="active" href="?page=<%= i %>"><%= i %></a>
-                                <% } else { %>
-                                    <a href="?page=<%= i %>"><%= i %></a>
-                                <% } %>
+                                <a href="?page=<%= i %>"><%= i %></a>
                             <% } %>
                             <% if (currentPage < totalPages) { %>
-                                <a href="?page=<%= currentPage + 1 %>">&raquo;</a>
+                                <a href="?page=<%= currentPage + 1 %>&sort=<%= sort %>'">&raquo;</a>
                             <% } %>
                         </div>
                     </div>
@@ -348,6 +347,40 @@
         </div>
     </div>
 </section>
-<!-- Shop Section End -->
+
+<script>
+    function loadSortedProducts() {
+    const sortOption = document.getElementById('sortOptions').value;
+    const currentPage = 1; // Adjust the current page based on pagination logic
+    // Make an AJAX request to the server with the selected sort option using jQuery
+    $.ajax({
+        url: `/products?sort=${sortOption}&page=${currentPage}`,
+        method: 'GET',
+        dataType: 'json', // Expecting JSON response
+        success: function(data) {
+            const products = data.products;
+            const productList = document.getElementById('product-list');
+            productList.innerHTML = ''; // Clear current product list
+
+            // Render the products dynamically
+            products.forEach(product => {
+                const productElement = document.createElement('div');
+                productElement.classList.add('product');
+                productElement.innerHTML = `
+                    <h3>${product.productName}</h3>
+                    <p>${product.description}</p>
+                    <p>Price: ₹${product.salePrice}</p>
+                    ${product.featured ? '<span class="featured-badge">Featured</span>' : ''}
+                `;
+                productList.appendChild(productElement);
+            });
+        },
+        error: function(xhr, status, error) {
+            console.error('Error loading sorted products:', error);
+        }
+    });
+}
+
+</script>
 
 <%-include('../../views/partials/user/footer') %>
