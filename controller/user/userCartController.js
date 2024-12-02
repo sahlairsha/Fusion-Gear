@@ -171,16 +171,119 @@ const updateQuantity = async (req, res) => {
     }
 };
 
-
-
-const getCheckout = async(req,res)=>{
+const getCheckout = async (req, res) => {
     try {
-        res.render('checkout')
+        // Fetch the user and their saved addresses
+        const userId = req.session.user;
+        const addresses = await Address.find({ user_id: userId });
+
+        // Pass addresses to the checkout page
+        res.render('checkout', { addresses: addresses[0]?.address || [] });
     } catch (error) {
-        console.log("Error in Loading checkout page",error);
-        res.redirect('/pagenotfound')
+        console.log("Error in Loading checkout page", error);
+        res.redirect('/pagenotfound');
     }
 }
+
+
+const getAddress = async(req,res)=>{
+    
+    const addressId = req.params.id;
+
+    // Find the address in the database by its ID
+    await Address.findById(addressId, (err, address) => {
+        if (err) {
+            return res.status(500).json({ success: false, message: 'Error fetching address details' });
+        }
+
+        if (!address) {
+            return res.status(404).json({ success: false, message: 'Address not found' });
+        }
+
+        // Return the address details as JSON
+        res.json(address);
+    });
+}
+
+const saveAddress = async (req, res) => {
+    try {
+        const { recipient_name, streetAddress, city, state, pincode, phone, altPhone, addressType } = req.body;
+
+        // Validate the required fields (optional but recommended)
+        if (!recipient_name || !streetAddress || !city || !state || !pincode || !phone || !addressType) {
+            return res.status(400).json({ success: false, message: 'Please fill in all required fields.' });
+        }
+
+        // Construct the new address object
+        const newAddress = {
+            recipient_name,
+            streetAddress,
+            city,
+            state,
+            pincode,
+            phone,
+            altPhone,
+            addressType
+        };
+
+        // Get the user ID from the authenticated session or token
+        const userId = req.user.id;  // Assuming `req.user.id` contains the authenticated user's ID
+
+        // Check if the user already has an address document
+        let address = await Address.findOne({ user_id: userId });
+
+        // If no address document exists, create a new one
+        if (!address) {
+            address = new Address({ user_id: userId, address: [] });
+        }
+
+        // Push the new address into the address array
+        address.address.push(newAddress);
+
+        // Save the address document
+        await address.save();
+
+        // Return a success response
+        res.json({ success: true, message: 'Address saved successfully' });
+
+    } catch (error) {
+        console.error('Error saving address:', error);
+        res.status(500).json({ success: false, message: 'Failed to save address' });
+    }
+};
+
+const editAddress = async(req,res)=>{
+    try {
+        const { addressId, recipient_name, streetAddress, city, state, pincode, phone, altPhone, addressType } = req.body;
+
+        const updatedAddress = await Address.findOneAndUpdate(
+            { _id: addressId, userId: req.user._id }, // Only allow editing of the user's own address
+            {
+                recipient_name,
+                streetAddress,
+                city,
+                state,
+                pincode,
+                phone,
+                altPhone,
+                addressType
+            },
+            { new: true } // Return the updated document
+        );
+
+        if (!updatedAddress) {
+            return res.status(404).json({ success: false, message: 'Address not found or you do not have permission to edit this address.' });
+        }
+
+        res.status(200).json({ success: true, message: 'Address updated successfully.' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: 'Error updating address.' });
+    }
+}
+
+
+
 
 
 module.exports = {
@@ -188,5 +291,8 @@ module.exports = {
     addToCart,
     removeFromCart,
     updateQuantity,
-    getCheckout
+    getCheckout,
+    saveAddress,
+    editAddress,
+    getAddress
 };

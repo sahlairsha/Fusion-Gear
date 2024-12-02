@@ -100,7 +100,10 @@ router.delete("/cart/delete/:productId",userAuth,userCartController.removeFromCa
 
 
 router.get('/checkout',userAuth,userCartController.getCheckout)
+router.post('/save-address',userAuth,userCartController.saveAddress)
+router.get('/get-address-details/:id',userAuth,userCartController.getAddress)
 
+router.put('/edit-address', userAuth, userCartController.editAddress);
 router.get('/pagenotfound', userController.pageNotFound)
 
 
