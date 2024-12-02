@@ -9,6 +9,8 @@ const userController = require('../controller/user/userController')
 const userproductController = require('../controller/user/userproductController');
 const userprofileController = require('../controller/user/userprofileController')
 const userCartController = require('../controller/user/userCartController')
+
+
 const userAuth = require('../middleware/auth')
 
 
@@ -71,7 +73,7 @@ router.get('/ratings/:product_id', userproductController.getProductRatings);
 
 //Coupon
 router.get("/coupon",userproductController.getCoupon)
-router.post('/apply-coupon',userproductController.applyCoupon)
+
 
 
 
@@ -90,8 +92,12 @@ router.get('/address-view/edit/:id',userAuth,userprofileController.editAddress)
 router.post('/address-view/update/:id',userAuth,userprofileController.updateAddress);
 
 
-//cart 
-router.get('/cart',userAuth,userCartController.getCart)
+//cart
+router.get('/cart',userAuth,userCartController.getCartPage)
+router.post('/cart', userAuth, userCartController.applyCoupon);
+router.post('/cart/add/:productId',userAuth,userCartController.addToCart)
+router.delete("/cart/delete/:productId",userAuth,userCartController.removeFromCart)
+router.put('/cart/update/:productId',userAuth,userCartController.updateCartQuantity)
 
 router.get('/pagenotfound', userController.pageNotFound)
 

@@ -227,55 +227,7 @@ const getCoupon = async(req,res)=>{
 
 
 
-const applyCoupon = async (req, res) => {
-    const { code } = req.body;
-    const productId = req.query.id;
 
-    try {
-        const product = await Product.findById(productId);
-
-        if (!product) {
-            return res.status(404).json({ message: 'Product not found.' });
-        }
-
-        // Find the matching coupon
-        const coupon = coupons.find((c) => c.code === code);
-
-        if (!coupon) {
-            return res.status(404).json({ message: 'Invalid coupon code.' });
-        }
-
-        if (coupon.expiryDate < new Date()) {
-            return res.status(400).json({ message: 'Coupon has expired.' });
-        }
-
-        if (coupon.minimumPurchase > product.salePrice) {
-            return res.status(400).json({
-                message: `Minimum purchase of ${coupon.minimumPurchase} required for this coupon.`
-            });
-        }
-
-        // Calculate discount
-        let discount = 0;
-        if (coupon.discountType === 'percentage') {
-            discount = (product.salePrice * coupon.discountValue) / 100;
-        } else if (coupon.discountType === 'fixed') {
-            discount = coupon.discountValue;
-        }
-
-        const discountedPrice = Math.max(0, product.salePrice - discount);
-
-        res.status(200).json({
-            message: 'Coupon applied successfully!',
-            originalPrice: product.salePrice,
-            discount,
-            discountedPrice
-        });
-    } catch (error) {
-        console.error('Error applying coupon:', error);
-        res.status(500).json({ message: 'Internal server error.' });
-    }
-};
 
 
 
@@ -288,6 +240,5 @@ module.exports = {
     loadProductsDetails,
     rateProduct,
     getProductRatings,
-    applyCoupon,
     getCoupon
 }

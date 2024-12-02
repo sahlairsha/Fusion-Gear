@@ -116,9 +116,9 @@
                                 <input type="text" id="couponCode" placeholder="Enter coupon code" />
                                 <button class="apply_button" onclick="applyCoupon()">Apply Coupon</button>
                             </div>
-                            <p id="couponMessage"></p>
+                            <!-- <p id="couponMessage"></p>
                             <p class="coupon_price">Original Price: &#8377;<span id="originalPrice"><%= product.salePrice %></span></p>
-                            <p class="coupon_price">Discounted Price: &#8377;<span id="discountedTotal"><%= product.price %></span></p>
+                            <p class="coupon_price">Discounted Price: &#8377;<span id="discountedTotal"><%= product.price %></span></p> -->
                         </div>
                     </div>
                 </div>
@@ -398,48 +398,6 @@ document.addEventListener('DOMContentLoaded', fetchRatings);
 </script>
 
 
-<script>
-  async function applyCoupon() {
-    const code = document.getElementById('couponCode').value;
-    const productId = '<%= product._id %>';
-
-    try {
-        const response = await fetch('http://localhost:3001/apply-coupon?id=<%= product._id %>', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ code })
-        });
-
-        const result = await response.json();
-
-        if (response.ok) {
-            Swal.fire({
-                title: "Coupon Applied!",
-                html: `<p>${result.message}</p>
-                       <p><strong>Original Price:</strong> $${result.originalPrice}</p>
-                       <p><strong>Discount:</strong> $${result.discount}</p>
-                       <p><strong>Discounted Price:</strong> $${result.discountedPrice}</p>`,
-                icon: "success"
-            });
-            document.getElementById('discountedTotal').innerText = result.discountedPrice.toFixed(2);
-        } else {
-            Swal.fire({
-                title: "Error",
-                text: result.message,
-                icon: "error"
-            });
-        }
-    } catch (error) {
-        console.error('Error applying coupon:', error);
-        Swal.fire({
-            title: "Error",
-            text: "An error occurred while applying the coupon. Please try again.",
-            icon: "error"
-        });
-    }
-}
-
-</script>
 
 
 <script>

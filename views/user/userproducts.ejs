@@ -263,7 +263,8 @@
                                 </div> -->
 
 
-                                <button class="add-cart-btn">+ Add to Cart</button>
+                                <button class="add-cart-btn"><a href="#" onclick="addToCart('<%= product._id %>')" class="add-cart-link">+ Add to Cart</a>
+                                </button>
                                 <button class="buy-now-btn ">Buy Now</button>
                             </div>
                         </div>
@@ -292,39 +293,27 @@
     </div>
 </section>
 
-<script>
-    function loadSortedProducts() {
-    const sortOption = document.getElementById('sortOptions').value;
-    const currentPage = 1; // Adjust the current page based on pagination logic
-    // Make an AJAX request to the server with the selected sort option using jQuery
-    $.ajax({
-        url: `/products?sort=${sortOption}&page=${currentPage}`,
-        method: 'GET',
-        dataType: 'json', // Expecting JSON response
-        success: function(data) {
-            const products = data.products;
-            const productList = document.getElementById('product-list');
-            productList.innerHTML = ''; // Clear current product list
 
-            // Render the products dynamically
-            products.forEach(product => {
-                const productElement = document.createElement('div');
-                productElement.classList.add('product');
-                productElement.innerHTML = `
-                    <h3>${product.productName}</h3>
-                    <p>${product.description}</p>
-                    <p>Price: ₹${product.salePrice}</p>
-                    ${product.featured ? '<span class="featured-badge">Featured</span>' : ''}
-                `;
-                productList.appendChild(productElement);
-            });
+<script>
+   function addToCart(productId) {
+    $.ajax({
+        url: '/cart/add/' + productId,  
+        method: 'POST',
+        contentType: 'application/json',
+        success: function(response) {
+            alert('Product added to cart successfully!');
+            window.location.href = '/cart';
         },
-        error: function(xhr, status, error) {
-            console.error('Error loading sorted products:', error);
+        error: function() {
+            alert('Failed to add product to cart!');
         }
     });
 }
 
 </script>
+
+
+
+
 
 <%-include('../../views/partials/user/footer') %>

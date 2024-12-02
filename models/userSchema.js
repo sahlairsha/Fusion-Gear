@@ -51,8 +51,13 @@ const userSchema = new Schema({
         default : false
     },
     cart :[{
+       product_id: {
         type : mongoose.Schema.Types.ObjectId,
-        ref : "Cart"
+        ref : "Product"
+       },
+       quantity:{
+        type : Number,
+       }
     }],
     wallet : {
         type : Number,
@@ -93,7 +98,6 @@ const userSchema = new Schema({
             default : Date.now
         }
     }],
-
     ratedProducts: [{
         product_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Product' },
         rating: { type: Number, required: true }
