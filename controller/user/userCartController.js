@@ -177,8 +177,29 @@ const getCheckout = async (req, res) => {
         const userId = req.session.user;
         const addresses = await Address.find({ user_id: userId });
 
+        const user = await User.findById(userId).populate('cart.product_id');
+        const cartItems = user.cart.filter(item => item.product_id);
+
+        const countItems = cartItems.length;
+        req.session.cartCount = countItems;
+
+        // Calculate cart total
+    const cartTotal = cartItems.reduce((total, item) => {
+        return total + (item.product_id.salePrice * item.quantity);
+    }, 0);
+
+    const shippingCharges = cartTotal > 500 ? 0 : 5;
+    const netAmount = cartTotal + shippingCharges;
+
         // Pass addresses to the checkout page
-        res.render('checkout', { addresses: addresses[0]?.address || [] });
+        res.render('checkout', { 
+            addresses: addresses[0]?.address || [],
+            cartCount : req.session.cartCount,
+            shippingCharges,
+            netAmount,
+            cartTotal
+        }
+        );
     } catch (error) {
         console.log("Error in Loading checkout page", error);
         res.redirect('/pagenotfound');
