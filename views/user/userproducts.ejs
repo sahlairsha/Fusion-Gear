@@ -301,8 +301,17 @@
         method: 'POST',
         contentType: 'application/json',
         success: function(response) {
-            alert('Product added to cart successfully!');
-            window.location.href = '/cart';
+            Swal.fire({
+                title: "Success",
+                icon: "success",
+                text: "Product Added Successfully",
+                showConfirmButton: true,
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = '/cart';
+                }
+            });
+            
         },
         error: function() {
             alert('Failed to add product to cart!');

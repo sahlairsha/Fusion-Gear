@@ -1,7 +1,6 @@
 
  <%-include('../../views/partials/user/header') %>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
+ <link rel="stylesheet" href="/css/user/productlist.css">
  <!-- Shop Details Section Begin -->
  <section class="shop-details">
     <div class="product__details__pic">
@@ -88,7 +87,7 @@
                                             <input type="text" value="1">
                                         </div>
                                     </div>
-                                    <a href="#" class="primary-btn">add to cart</a>
+                                    <a href="/cart" class="primary-btn">Go To Cart</a>
                                 </div>
                                 <div class="product__details__btns__option">
                                     <a href="#"><i class="fa fa-heart"></i> add to wishlist</a>
@@ -111,14 +110,6 @@
                                 <div id="couponList"></div>
                             </div>
 
-
-                            <div class="prodcut_coupon">
-                                <input type="text" id="couponCode" placeholder="Enter coupon code" />
-                                <button class="apply_button" onclick="applyCoupon()">Apply Coupon</button>
-                            </div>
-                            <!-- <p id="couponMessage"></p>
-                            <p class="coupon_price">Original Price: &#8377;<span id="originalPrice"><%= product.salePrice %></span></p>
-                            <p class="coupon_price">Discounted Price: &#8377;<span id="discountedTotal"><%= product.price %></span></p> -->
                         </div>
                     </div>
                 </div>
@@ -404,7 +395,7 @@ document.addEventListener('DOMContentLoaded', fetchRatings);
 function formatDate(date) {
     const day = String(date.getDate()).padStart(2, '0');
     const month = String(date.getMonth() + 1).padStart(2, '0');
-    const year = date.getFullYear(); 
+    const year = date.getFullYear();
     return `${day}-${month}-${year}`;
 }
 

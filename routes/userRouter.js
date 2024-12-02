@@ -94,10 +94,12 @@ router.post('/address-view/update/:id',userAuth,userprofileController.updateAddr
 
 //cart
 router.get('/cart',userAuth,userCartController.getCartPage)
-router.post('/cart', userAuth, userCartController.applyCoupon);
 router.post('/cart/add/:productId',userAuth,userCartController.addToCart)
+router.post('/cart/update-quantity/:productId', userAuth, userCartController.updateQuantity);
 router.delete("/cart/delete/:productId",userAuth,userCartController.removeFromCart)
-router.put('/cart/update/:productId',userAuth,userCartController.updateCartQuantity)
+
+
+router.get('/checkout',userAuth,userCartController.getCheckout)
 
 router.get('/pagenotfound', userController.pageNotFound)
 

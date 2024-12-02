@@ -100,24 +100,6 @@
     cursor: pointer;
 }
 
-.qty-btn {
-    padding: 5px 10px;
-    background-color: #000;
-    color: #fff;
-    border: none;
-    cursor: pointer;
-    border-radius: 4px;
-    margin: 0 5px;
-    font-size: 16px;
-    width: 40px;
-    text-align: center;
-}
-
-.qty-btn:hover {
-    background-color: #555;
-}
-
-
 .checkout-btn .primary-btn:hover {
     background-color: #787877;
 }
@@ -184,6 +166,46 @@ input[type="number"]::-webkit-inner-spin-button {
     
 }
 
+.quantity-input{
+    border: none;
+    background-color: #ffff;
+}
+
+.remove-item{
+    margin-left: 20px;
+}
+
+.quantity {
+    display: flex;
+    align-items: center;
+}
+
+.quantity button {
+    background-color: #fff;
+    border: none;
+    font-size: 1.2rem;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+.quantity input {
+    width: 50px;
+    text-align: center;
+    font-size: 1.2rem;
+    margin: 0 10px;
+    padding: 5px;
+    border: 1px solid #ccc;
+}
+
+.quantity button:hover {
+    background-color: #ccc;
+}
+
+.quantity button:focus {
+    outline: none;
+}
+
+
 </style>
 
 <!-- Breadcrumb Section Begin -->
@@ -208,6 +230,7 @@ input[type="number"]::-webkit-inner-spin-button {
 <!-- Shopping Cart Section Begin -->
 <section class="shopping-cart spad">
     <div class="container">
+        <!-- Address Section -->
         <div class="row">
             <div class="address-box">
                 <% if (address.length === 0 || !address.some(doc => doc.address.length > 0)) { %>
@@ -215,30 +238,29 @@ input[type="number"]::-webkit-inner-spin-button {
                         <p class="fs-4">There is no address available. <br> <button class="btn btn-primary" id="showFormBtn">Add New Address</button></p>
                     </div>
                 <% } else { %>
-                      <!-- Display the first available address from any document -->
-                <h3 class="mb-4">Your Address</h3>
-                <ul class="list-group mb-4">
-                    <% let foundAddress = null; %>
-                    <% address.some(function(doc) { %>
-                        <% if (doc.address.length > 0) { %>
-                            <% foundAddress = doc.address[0]; %> 
-                           <% return true;%>
+                    <h3 class="mb-4">Your Address</h3>
+                    <ul class="list-group mb-4">
+                        <% let foundAddress = null; %>
+                        <% address.some(function(doc) { %>
+                            <% if (doc.address.length > 0) { %>
+                                <% foundAddress = doc.address[0]; %> 
+                               <% return true; %>
+                            <% } %>
+                        <% }); %>
+                        <% if (foundAddress) { %>
+                            <li class="list-group-item">
+                                <h6><%= foundAddress.recipient_name %>
+                                    <% if (foundAddress.addressType) { %>
+                                        <span class="badge badge-secondary mb-2"><%= foundAddress.addressType %></span>
+                                    <% } %>
+                                </h6>
+                                <strong><%= foundAddress.streetAddress %>, <%= foundAddress.city %>, <%= foundAddress.state %></strong><br>
+                                Pincode: <%= foundAddress.pincode %> <br>
+                                Landmark: <%= foundAddress.landMark || 'N/A' %><br>
+                                <span class="text-muted">Phone: <%= foundAddress.phone || 'N/A' %></span>
+                            </li>
                         <% } %>
-                    <% }); %>
-                    <% if (foundAddress) { %>
-                        <li class="list-group-item">
-                            <h6><%= foundAddress.recipient_name %>
-                                <% if (foundAddress.addressType) { %>
-                                    <span class="badge badge-secondary mb-2"><%= foundAddress.addressType %></span>
-                                <% } %>
-                            </h6>
-                            <strong><%= foundAddress.streetAddress %>, <%= foundAddress.city %>, <%= foundAddress.state %></strong><br>
-                            Pincode: <%= foundAddress.pincode %> <br>
-                            Landmark: <%= foundAddress.landMark || 'N/A' %><br>
-                            <span class="text-muted">Phone: <%= foundAddress.phone || 'N/A' %></span>
-                        </li>
-                    <% } %>
-                </ul>
+                    </ul>
                 <% } %>
             </div>
         </div>
@@ -252,7 +274,6 @@ input[type="number"]::-webkit-inner-spin-button {
                             <tr>
                                 <th>Product</th>
                                 <th>Quantity</th>
-                                <th>Total</th>
                                 <th></th>
                             </tr>
                         </thead>
@@ -260,15 +281,9 @@ input[type="number"]::-webkit-inner-spin-button {
                             <% cartItems.forEach(item => { %>
                                 <tr>
                                     <td class="product__cart__item">
-                                        <% if (item.product_id.productImage && item.product_id.productImage.length > 0) { %>
-                                            <div class="product__cart__item__pic">
-                                                <img src="/uploads/public-image/<%= item.product_id.productImage[0] %>" alt="<%= item.product_id.productName %>">
-                                            </div>
-                                        <% } else { %>
-                                            <div class="product__cart__item__pic">
-                                                <img src="/path/to/default-image.jpg" alt="No Image Available">
-                                            </div>
-                                        <% } %>
+                                        <div class="product__cart__item__pic">
+                                           <a href="/product/view?id=<%= item.product_id._id%>"><img src="/uploads/public-image/<%= item.product_id.productImage[0] %>" alt="<%= item.product_id.productName %>"></a> 
+                                        </div>
                                         <div class="product__cart__item__text">
                                             <h6><%= item.product_id.productName %></h6>
                                             <h5>Price: ₹<%= item.product_id.salePrice %></h5>
@@ -276,14 +291,13 @@ input[type="number"]::-webkit-inner-spin-button {
                                     </td>
                                     <td class="quantity__item">
                                         <div class="quantity">
-                                            <button class="qty-btn dec-btn" data-product-id="<%= item.product_id._id %>">-</button>
-                                            <input type="number" value="<%= item.quantity %>" min="1" data-product-id="<%= item.product_id._id %>">
-                                            <button class="qty-btn inc-btn" data-product-id="<%= item.product_id._id %>">+</button>
+                                            <button class="btn-decrement" data-product-id="<%= item.product_id._id %>">-</button>
+                                            <input type="number" value="<%= item.quantity %>" min="1" data-product-id="<%= item.product_id._id %>" class="quantity-input">
+                                            <button class="btn-increment" data-product-id="<%= item.product_id._id %>">+</button>
                                         </div>
                                     </td>
-                                    <td class="cart__price">₹<%= cartTotal%></td>
                                     <td class="cart__close">
-                                        <a href="#" class="remove-item" data-product-id="<%= item.product_id._id %>" ><i class="fa fa-close"></i></a>
+                                        <a href="#" class="remove-item" data-product-id="<%= item.product_id._id %>"><i class="fa fa-close"></i></a>
                                     </td>
                                 </tr>
                             <% }) %>
@@ -310,7 +324,7 @@ input[type="number"]::-webkit-inner-spin-button {
         </div>
 
         <!-- Coupon Section -->
-        <div class="row">
+        <!-- <div class="row">
             <div class="col-lg-12">
                 <div class="coupon__input">
                     <input id="coupon-code" class="coupon-field" type="text" name="couponCode" placeholder="Enter Coupon Code">
@@ -319,72 +333,22 @@ input[type="number"]::-webkit-inner-spin-button {
                 </div>
                 <div id="couponMessage" style="color: green;"> <%= couponMessage %> </div>
             </div>
-        </div>
+        </div> -->
     </div>
 </section>
-<!-- Shopping Cart Section End -->
-
-<%- include('../../views/partials/user/footer') %>
 
 <script>
-
-// Apply Coupon AJAX Request
-async function applyCoupon(couponCode) {
-    if (couponCode.trim() === '') {
-        return;
-    }
-
-
-    try {
-        const response = await fetch('/cart', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ couponCode })
-        });
-
-        const data = await response.json();
-
-        if (response.ok) {
-            updateCartUI(data);
-            Swal.fire({
-                icon: 'success',
-                title: 'Coupon Applied',
-                text: data.couponMessage || 'Coupon applied successfully!',
-            });
-        } else {
-            Swal.fire({
-                icon: 'error',
-                title: 'Failed',
-                text: data.message || 'Error applying coupon',
-            });
-        }
-    } catch (error) {
-        Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: 'Error applying coupon',
-        });
-    }
-}
-
-function updateCartUI(data) {
-    document.querySelector('#cartTotal').textContent = `₹${data.cartTotal}`;
-    document.querySelector('#discount').textContent = `-₹${data.discount}`;
-    document.querySelector('#grossAmount').textContent = `₹${data.grossAmount}`;
-    document.querySelector('#shippingCharges').textContent = `₹${data.shippingCharges}`;
-    document.querySelector('#netAmount').textContent = `₹${data.netAmount}`;
-    document.querySelector('#couponMessage').textContent = data.couponMessage || '';
-}
-
-
+    document.getElementById('showFormBtn').addEventListener('click',function(){
+        window.location.href = "/address-view"
+    })
 </script>
 
 
+
 <script>
-    // Attach event listener to dynamically loaded content
-    document.addEventListener('click', async (event) => {
+
+// Attach event listener to dynamically loaded content
+document.addEventListener('click', async (event) => {
     if (event.target.closest('.remove-item')) {
         event.preventDefault(); // Prevent default behavior
 
@@ -426,8 +390,6 @@ function updateCartUI(data) {
     }
 });
 
-
-
 function updateCartUI(data) {
     document.querySelector('#cartTotal').textContent = `₹${data.cartTotal}`;
     document.querySelector('#discount').textContent = `-₹${data.discount}`;
@@ -435,82 +397,70 @@ function updateCartUI(data) {
     document.querySelector('#couponMessage').textContent = data.couponMessage || '';
 }
 
-
 </script>
 
 
 <script>
-    document.getElementById('coupon-btn').addEventListener('click',()=>{
+    document.addEventListener('click', async (event) => {
+    if (event.target.closest('.btn-increment') || event.target.closest('.btn-decrement')) {
+        event.preventDefault(); // Prevent default behavior
 
-        const couponCode = document.getElementById('coupon-code').value;
-        const err = document.getElementById('coupon-err');
+        const isIncrement = event.target.closest('.btn-increment') ? true : false;
+        const productId = event.target.closest('button').getAttribute('data-product-id');
+        const quantityInput = document.querySelector(`input[data-product-id="${productId}"]`);
+        let quantity = parseInt(quantityInput.value);
 
-        if(couponCode.trim() === ''){
-            err.innerText = "Please Enter the code"
-        }else{
-            err.innerText = ''
-     }
+        // Increment or decrement quantity
+        if (isIncrement) {
+            quantity++;
+        } else if (quantity > 1) {
+            quantity--;
+        }
 
+        // Update quantity input value
+        quantityInput.value = quantity;
 
-    })
+        // Send AJAX request to update quantity in the cart
+        try {
+            const response = await fetch(`/cart/update-quantity/${productId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ quantity })
+            });
 
+            const data = await response.json();
 
-    document.getElementById('showFormBtn').addEventListener('click',function(){
-
-        window.location.href = "/address-view"
-    })
-</script>
-
-<script>
-    document.querySelectorAll('.qty-btn').forEach(button => {
-        button.addEventListener('click', async (event) => {
-            event.preventDefault();
-            const productId = button.getAttribute('data-product-id');
-            const inputField = document.querySelector(`input[data-product-id="${productId}"]`);
-            let quantity = parseInt(inputField.value);
-    
-            // Increment or decrement quantity
-            if (button.classList.contains('inc-btn')) {
-                quantity += 1;
-            } else if (button.classList.contains('dec-btn') && quantity > 1) {
-                quantity -= 1;
-            }
-    
-            // Update the input field
-            inputField.value = quantity;
-    
-            // Send AJAX request to backend
-            try {
-                const response = await fetch(`/cart/update/${productId}`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ quantity })
+            if (response.ok) {
+                updateCartUI(data); // Update the cart UI with new totals
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Failed',
+                    text: 'Failed to update product quantity',
                 });
-    
-                const data = await response.json();
-    
-                if (response.ok) {
-                    updateCartUI(data, productId, quantity);
-                } else {
-                    Swal.fire('Error', data.message || 'Failed to update quantity', 'error');
-                }
-            } catch (error) {
-                Swal.fire('Error', 'An error occurred while updating quantity', 'error');
             }
-        });
-    });
-    
-    function updateCartUI(data, productId, quantity) {
-        const productRow = document.querySelector(`tr[data-product-id="${productId}"]`);
-        const pricePerUnit = parseFloat(productRow.querySelector('.product__cart__item__text h5').textContent.replace('Price: ₹', ''));
-        const productTotal = pricePerUnit * quantity;
-    
-        productRow.querySelector('.cart__price').textContent = `₹${productTotal.toFixed(2)}`;
-    
-        // Update cart totals dynamically
-        document.querySelector('#cartTotal').textContent = `₹${data.cartTotal}`;
-        document.querySelector('#netAmount').textContent = `₹${data.netAmount}`;
-        document.querySelector('#shippingCharges').textContent = data.shippingCharges === '0.00' ? 'Free' : `₹${data.shippingCharges}`;
+        } catch (error) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Error updating quantity',
+            });
+        }
     }
-    </script>
-    
+});
+
+function updateCartUI(data) {
+    document.querySelector('#cartTotal').textContent = `₹${data.cartTotal}`;
+    document.querySelector('#discount').textContent = `-₹${data.discount}`;
+    document.querySelector('#shippingCharges').textContent = `₹${data.shippingCharges}`;
+    document.querySelector('#netAmount').textContent = `₹${data.netAmount}`;
+}
+
+</script>
+
+
+
+
+<%- include('../../views/partials/user/footer') %>
