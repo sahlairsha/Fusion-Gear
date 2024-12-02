@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Page</title>
+    <style>
+        .container {
+            width: 50%;
+            margin: 50px auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+        .payment-methods {
+            margin: 20px 0;
+        }
+        .payment-option {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .payment-option input {
+            margin-right: 10px;
+        }
+        .proceed-btn {
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .proceed-btn:hover {
+            background-color: #45a049;
+        }
+
+        .place-order{
+            text-decoration: none;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Payment Options</h2>
+    <form id="payment-form">
+        <div class="payment-methods">
+            <div class="payment-option">
+                <input type="radio" id="upi" name="payment_method" value="UPI" required>
+                <label for="upi">UPI</label>
+            </div>
+            <div class="payment-option">
+                <input type="radio" id="net_banking" name="payment_method" value="Net Banking" required>
+                <label for="net_banking">Net Banking</label>
+            </div>
+            <div class="payment-option">
+                <input type="radio" id="cod" name="payment_method" value="COD" required>
+                <label for="cod">Cash on Delivery (COD)</label>
+            </div>
+        </div>
+
+        <button type="submit" class="proceed-btn"><a class="place-order" href="/order-confirm">Proceed</a></button>
+    </form>
+</div>
+
+
+
+<script>
+    document.getElementById('payment-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const paymentMethod = document.querySelector('input[name="payment_method"]:checked').value;
+    });
+</script>
+
+</body>
+</html>

@@ -8,7 +8,8 @@ const passport = require('../config/passport');
 const userController = require('../controller/user/userController')
 const userproductController = require('../controller/user/userproductController');
 const userprofileController = require('../controller/user/userprofileController')
-const userCartController = require('../controller/user/userCartController')
+const userCartController = require('../controller/user/userCartController');
+const userPaymentController = require("../controller/user/userPaymentController");
 
 
 const userAuth = require('../middleware/auth')
@@ -102,8 +103,11 @@ router.delete("/cart/delete/:productId",userAuth,userCartController.removeFromCa
 router.get('/checkout',userAuth,userCartController.getCheckout)
 router.post('/save-address',userAuth,userCartController.saveAddress)
 router.get('/get-address-details/:id',userAuth,userCartController.getAddress)
-
 router.put('/edit-address', userAuth, userCartController.editAddress);
+
+
+router.get("/payment",userAuth,userPaymentController.getPayment)
+router.get("/order-confirm",userAuth,userPaymentController.orderConfirmation)
 router.get('/pagenotfound', userController.pageNotFound)
 
 
