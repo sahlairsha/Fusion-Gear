@@ -46,6 +46,12 @@
             text-decoration: none;
             color: white;
         }
+
+        .error-message{
+            color: red;
+            font-size: 14px;
+            margin-bottom: 2px;
+        }
     </style>
 </head>
 <body>
@@ -55,19 +61,21 @@
     <form id="payment-form">
         <div class="payment-methods">
             <div class="payment-option">
-                <input type="radio" id="upi" name="payment_method" value="UPI" required>
+                <input type="radio" id="upi" name="payment_method" value="UPI">
                 <label for="upi">UPI</label>
             </div>
             <div class="payment-option">
-                <input type="radio" id="net_banking" name="payment_method" value="Net Banking" required>
+                <input type="radio" id="net_banking" name="payment_method" value="Net Banking">
                 <label for="net_banking">Net Banking</label>
             </div>
             <div class="payment-option">
-                <input type="radio" id="cod" name="payment_method" value="COD" required>
+                <input type="radio" id="cod" name="payment_method" value="COD">
                 <label for="cod">Cash on Delivery (COD)</label>
             </div>
-        </div>
 
+           
+        </div>
+        <div id="error-message" class="error-message"></div>
         <button type="submit" class="proceed-btn"><a class="place-order" href="/order-confirm">Proceed</a></button>
     </form>
 </div>
@@ -75,10 +83,18 @@
 
 
 <script>
-    document.getElementById('payment-form').addEventListener('submit', function(e) {
+ document.getElementById('payment-form').addEventListener('submit', function(e) {
         e.preventDefault();
+        
+        const paymentMethod = document.querySelector('input[name="payment_method"]:checked');
+        const errorMessage = document.getElementById('error-message');
 
-        const paymentMethod = document.querySelector('input[name="payment_method"]:checked').value;
+        if (!paymentMethod) {
+            errorMessage.textContent = 'Please select a payment method.';
+        } else {
+            errorMessage.textContent = '';  // Clear any previous error message
+            alert('You have selected ' + paymentMethod.value + ' as your payment method.');
+        }
     });
 </script>
 

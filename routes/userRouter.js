@@ -105,9 +105,12 @@ router.post('/save-address',userAuth,userCartController.saveAddress)
 router.get('/get-address-details/:id',userAuth,userCartController.getAddress)
 router.put('/edit-address', userAuth, userCartController.editAddress);
 
-
 router.get("/payment",userAuth,userPaymentController.getPayment)
-router.get("/order-confirm",userAuth,userPaymentController.orderConfirmation)
+router.get("/order-confirm",userAuth,userPaymentController.getOrderConfirmation)
+
+
+
+
 router.get('/pagenotfound', userController.pageNotFound)
 
 

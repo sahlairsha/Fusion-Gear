@@ -1,3 +1,8 @@
+const Order = require('../../models/orderSchema');
+const User = require('../../models/userSchema');
+
+
+
 const getPayment = async(req,res)=>{
 
     try{
@@ -9,15 +14,18 @@ const getPayment = async(req,res)=>{
 }
 
 
-const  orderConfirmation = async(req,res)=>{
-    try {
-        res.render("order-confirmation")
-    } catch (error) {
-        res.redirect("/pagenotFound")
+const getOrderConfirmation = async(req,res)=>{
+    try{
+
+        res.render('order-confirmation')
+
+    }catch(error){
+        res.redirect('/pagenotfound')
     }
+
 }
 
 module.exports = {
     getPayment,
-    orderConfirmation
+    getOrderConfirmation
 }
