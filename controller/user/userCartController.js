@@ -2,26 +2,6 @@ const Product = require("../../models/productSchema");
 const User = require("../../models/userSchema");
 const Address = require('../../models/addressSchema')
 
-const coupons = [
-    {
-        code: "DISCOUNT10",
-        discountType: "percentage",
-        discountValue: 10,
-        expiryDate: new Date("2024-12-31"),
-        minimumPurchase: 500,
-        usageLimit: 100,
-        description: "Get 10% off on your purchase of ₹500 or more. Valid until December 31, 2024."
-    },
-    {
-        code: "FLAT50",
-        discountType: "fixed",
-        discountValue: 50,
-        expiryDate: new Date("2024-11-30"),
-        minimumPurchase: 1000,
-        usageLimit: 50,
-        description: "Save ₹50 on your order of ₹1000 or more. Valid until November 30, 2024."
-    }
-];
 
 const getCartPage = async (req, res) => {
     const userId = req.session.user;
@@ -207,24 +187,6 @@ const getCheckout = async (req, res) => {
 }
 
 
-const getAddress = async(req,res)=>{
-    
-    const addressId = req.params.id;
-
-    // Find the address in the database by its ID
-    await Address.findById(addressId, (err, address) => {
-        if (err) {
-            return res.status(500).json({ success: false, message: 'Error fetching address details' });
-        }
-
-        if (!address) {
-            return res.status(404).json({ success: false, message: 'Address not found' });
-        }
-
-        // Return the address details as JSON
-        res.json(address);
-    });
-}
 
 const saveAddress = async (req, res) => {
     try {
@@ -273,47 +235,11 @@ const saveAddress = async (req, res) => {
     }
 };
 
-const editAddress = async(req,res)=>{
-    try {
-        const { addressId, recipient_name, streetAddress, city, state, pincode, phone, altPhone, addressType } = req.body;
-
-        const updatedAddress = await Address.findOneAndUpdate(
-            { _id: addressId, userId: req.user._id }, // Only allow editing of the user's own address
-            {
-                recipient_name,
-                streetAddress,
-                city,
-                state,
-                pincode,
-                phone,
-                altPhone,
-                addressType
-            },
-            { new: true } // Return the updated document
-        );
-
-        if (!updatedAddress) {
-            return res.status(404).json({ success: false, message: 'Address not found or you do not have permission to edit this address.' });
-        }
-
-        res.status(200).json({ success: true, message: 'Address updated successfully.' });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ success: false, message: 'Error updating address.' });
-    }
-}
-
-
-
-
-
 module.exports = {
     getCartPage,
     addToCart,
     removeFromCart,
     updateQuantity,
     getCheckout,
-    saveAddress,
-    editAddress,
-    getAddress
+    saveAddress
 };

@@ -7,29 +7,49 @@ const loadProducts = async (req, res) => {
         let search = req.query.search ? req.query.search.trim() : "";
         let page = parseInt(req.query.page) || 1;
         const limit = 9;
-        const sort = req.query.sort || "productName";
+        const sort = req.query.sort || "productName"; // Default sort by productName
 
         let query = {
             isDeleted: false,
             isBlocked: false,
-          };
-          if (search) {
+        };
+        
+        if (search) {
             query.productName = { $regex: search, $options: 'i' };
-          }
+        }
 
-
-          let sortQuery = {};
-          if (sort === 'featured') {
-              sortQuery = { featured: -1 }; // Sort by featured (featured products first)
-          } else if (sort === 'priceLowToHigh') {
-              sortQuery = { salePrice: 1 }; // Sort by price from low to high
-          } else if (sort === 'priceHighToLow') {
-              sortQuery = { salePrice: -1 }; // Sort by price from high to low
-          } else {
-              sortQuery = { [sort]: 1 }; // Default sort by productName or another field
-          }
-
-
+        let sortQuery = {};
+        
+        // Sorting logic based on selected option
+        switch (sort) {
+            case 'popularity':
+                sortQuery = { views: -1 };
+                break;
+            case 'priceLowToHigh':
+                sortQuery = { salePrice: 1 };
+                break;
+            case 'priceHighToLow':
+                sortQuery = { salePrice: -1 };
+                break;
+            case 'averageRating':
+                sortQuery = { 'ratings.average': -1 };
+                break;
+            case 'featured':
+                sortQuery = { featured: -1 };
+                break;
+            case 'newArrivals':
+                sortQuery = { createdAt: -1 };
+                break;
+            case 'aToZ':
+                sortQuery = { productName: 1 };
+                break;
+            case 'zToA':
+                sortQuery = { productName: -1 };
+                break;
+            default:
+                sortQuery = { [sort]: 1 };
+                break;
+        }
 
         const productData = await Product.find(query)
             .limit(limit)
@@ -37,7 +57,6 @@ const loadProducts = async (req, res) => {
             .sort(sortQuery)
             .exec();
 
-        // Count total products for pagination
         const count = await Product.countDocuments(query);
         const totalPages = Math.ceil(count / limit);
 
@@ -47,11 +66,10 @@ const loadProducts = async (req, res) => {
             totalProduct: count,
             limit,
             currentPage: page,
-            sort
-
+            sort,
+            search
         };
 
-        // Load user data if logged in
         if (req.session.user) {
             const userData = await User.findById(req.session.user);
             data.user = userData;
@@ -65,8 +83,6 @@ const loadProducts = async (req, res) => {
         res.status(500).send("Server Error");
     }
 };
-
-
 
 
 
