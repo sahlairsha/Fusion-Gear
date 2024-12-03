@@ -21,16 +21,11 @@ const pageNotFound = async(req,res) =>{
 
 
 const loadHomePage = async (req, res) => {
-    try {
-        if (req.session.user) {
-            const userData = await User.findById(req.session.user);
-            res.render("home", { user: userData });
-        } else {
-            res.render("home", { user: null });
-        }
-    } catch (error) {
-        console.error("Error loading homepage:", error);
-        res.status(500).send("Server Error");
+    if (!req.session.user) {
+        res.render('home', { user: null });
+    } else {
+        const userData = await User.findById(req.session.user);
+        res.render('home', { user: userData });
     }
 };
 const loadSignup = async(req,res)=>{
@@ -234,6 +229,7 @@ const loadLogin = async(req,res)=>{
 
 const login = async (req, res) => {
     try {
+      
         const { email, password } = req.body;
 
         const findUser = await User.findOne({ isAdmin: false, email });
@@ -255,7 +251,9 @@ const login = async (req, res) => {
 
         req.session.user = findUser._id;
 
-        res.redirect('/');
+        if (req.session.user) {
+            return res.redirect('/');
+        }
     } catch (error) {
         console.error("Login Error", error);
         req.flash("error", "Login failed. Try again later.")
@@ -271,7 +269,7 @@ const logout = (req, res) => {
                 console.log('Error destroying session:', err);
                 return res.redirect('/');
             }
-            res.redirect('/login');
+            res.redirect('/');
         });
     } catch (error) {
         console.log("Unexpected error in logout",error);
