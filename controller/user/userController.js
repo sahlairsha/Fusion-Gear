@@ -92,11 +92,7 @@ const signup = async (req, res) => {
 let avatarUrl;
 
 if (googleId) {
-<<<<<<< HEAD
     avatarUrl = `https://www.gravatar.com/avatar/${crypto.createHash('md5').update(email.trim().toLowerCase()).digest('hex')}?d=robohash&r=g&s=200`; 
-=======
-    avatarUrl = `https://robohash.org/${googleId}?set=set3&size=200x200`; 
->>>>>>> e4da7f69fe43b7dc8c513910b73746af414a9e35
 } else {
     avatarUrl = profile_pic || `https://www.gravatar.com/avatar/${crypto.createHash('md5').update(email.trim().toLowerCase()).digest('hex')}?d=robohash&r=g&s=200`;
 }
