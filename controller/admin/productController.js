@@ -137,7 +137,7 @@ const getEditProducts = async (req, res) => {
 
         res.render("edit-product",{
             product : product,
-            category:category
+            category: category
         })
 
     } catch (error) {
@@ -153,7 +153,7 @@ const editProducts = async(req,res) =>{
 
     try {
         const id = req.params.id;
-        const product = await Product.findOne({_id:id});
+        const product = await Product.findOne({_id: id });
         const data = req.body;
         const existingProduct = await Product.findOne({
             productName : data.productName,

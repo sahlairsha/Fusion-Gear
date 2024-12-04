@@ -35,8 +35,8 @@
             <div class="col-lg-3">
                 <div class="shop__sidebar">
                     <div class="shop__sidebar__search">
-                        <form action="#">
-                            <input type="text" placeholder="Search...">
+                        <form action="/products" method="GET">
+                            <input type="text" name="search" placeholder="Search...">
                             <button type="submit"><span class="icon_search"></span></button>
                         </form>
                     </div>
@@ -216,12 +216,19 @@
                         </div>
                         <div class="col-lg-6 col-md-6 col-sm-6">
                             <div class="shop__product__option__right">
-                                <p>Sort by Price:</p>
-                                <select>
-                                    <option value="">Low To High</option>
-                                    <option value="">$0 - $55</option>
-                                    <option value="">$55 - $100</option>
-                                </select>
+                                <form method="GET" action="/products">
+                                    <select name="sort" id="sort" onchange="this.form.submit()">
+                                        <option value="popularity" <%= sort === 'popularity' ? 'selected' : '' %>>Popularity</option>
+                                        <option value="priceLowToHigh" <%= sort === 'priceLowToHigh' ? 'selected' : '' %>>Price: Low to High</option>
+                                        <option value="priceHighToLow" <%= sort === 'priceHighToLow' ? 'selected' : '' %>>Price: High to Low</option>
+                                        <option value="averageRating" <%= sort === 'averageRating' ? 'selected' : '' %>>Average Ratings</option>
+                                        <option value="featured" <%= sort === 'featured' ? 'selected' : '' %>>Featured</option>
+                                        <option value="newArrivals" <%= sort === 'newArrivals' ? 'selected' : '' %>>New Arrivals</option>
+                                        <option value="aToZ" <%= sort === 'aToZ' ? 'selected' : '' %>>A - Z</option>
+                                        <option value="zToA" <%= sort === 'zToA' ? 'selected' : '' %>>Z - A</option>
+                                    </select>
+                                </form>
+                                
                             </div>
                         </div>
                     </div>
@@ -263,7 +270,8 @@
                                 </div> -->
 
 
-                                <button class="add-cart-btn">+ Add to Cart</button>
+                                <button class="add-cart-btn"><a href="#" onclick="addToCart('<%= product._id %>')" class="add-cart-link">+ Add to Cart</a>
+                                </button>
                                 <button class="buy-now-btn ">Buy Now</button>
                             </div>
                         </div>
@@ -272,19 +280,25 @@
                 </div>
                 <div class="row">
                     <div class="col-lg-12">
-                        <div class="product__pagination">
+                        <div class="product__pagination d-flex align-item-center justify-content-center">
+                            <!-- Previous Page -->
                             <% if (currentPage > 1) { %>
-                                <a href="?page=<%= currentPage - 1 %>&sort=<%= sort %>'">&laquo;</a>
+                                <a class="text-secondary" href="?page=<%= currentPage - 1 %>&sort=<%= sort %>&search=<%= search %>">&laquo; Previous</a>
                             <% } %>
+                
+                            <!-- Page Numbers -->
                             <% for (let i = 1; i <= totalPages; i++) { %>
-                                <a href="?page=<%= i %>"><%= i %></a>
+                                <a class="text-secondary" href="?page=<%= i %>&sort=<%= sort %>&search=<%= search %>"><%= i %></a>
                             <% } %>
+                
+                            <!-- Next Page -->
                             <% if (currentPage < totalPages) { %>
-                                <a href="?page=<%= currentPage + 1 %>&sort=<%= sort %>'">&raquo;</a>
+                                <a class="text-secondary" href="?page=<%= currentPage + 1 %>&sort=<%= sort %>&search=<%= search %>">Next &raquo;</a>
                             <% } %>
                         </div>
                     </div>
                 </div>
+
                 <%}%>
 
             </div>
@@ -292,39 +306,36 @@
     </div>
 </section>
 
-<script>
-    function loadSortedProducts() {
-    const sortOption = document.getElementById('sortOptions').value;
-    const currentPage = 1; // Adjust the current page based on pagination logic
-    // Make an AJAX request to the server with the selected sort option using jQuery
-    $.ajax({
-        url: `/products?sort=${sortOption}&page=${currentPage}`,
-        method: 'GET',
-        dataType: 'json', // Expecting JSON response
-        success: function(data) {
-            const products = data.products;
-            const productList = document.getElementById('product-list');
-            productList.innerHTML = ''; // Clear current product list
 
-            // Render the products dynamically
-            products.forEach(product => {
-                const productElement = document.createElement('div');
-                productElement.classList.add('product');
-                productElement.innerHTML = `
-                    <h3>${product.productName}</h3>
-                    <p>${product.description}</p>
-                    <p>Price: ₹${product.salePrice}</p>
-                    ${product.featured ? '<span class="featured-badge">Featured</span>' : ''}
-                `;
-                productList.appendChild(productElement);
+<script>
+   function addToCart(productId) {
+    $.ajax({
+        url: '/cart/add/' + productId,  
+        method: 'POST',
+        contentType: 'application/json',
+        success: function(response) {
+            Swal.fire({
+                title: "Success",
+                icon: "success",
+                text: "Product Added Successfully",
+                showConfirmButton: true,
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = '/cart';
+                }
             });
+            
         },
-        error: function(xhr, status, error) {
-            console.error('Error loading sorted products:', error);
+        error: function() {
+            alert('Failed to add product to cart!');
         }
     });
 }
 
 </script>
+
+
+
+
 
 <%-include('../../views/partials/user/footer') %>

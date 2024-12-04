@@ -7,29 +7,49 @@ const loadProducts = async (req, res) => {
         let search = req.query.search ? req.query.search.trim() : "";
         let page = parseInt(req.query.page) || 1;
         const limit = 9;
-        const sort = req.query.sort || "productName";
+        const sort = req.query.sort || "productName"; // Default sort by productName
 
         let query = {
             isDeleted: false,
             isBlocked: false,
-          };
-          if (search) {
+        };
+        
+        if (search) {
             query.productName = { $regex: search, $options: 'i' };
-          }
+        }
 
-
-          let sortQuery = {};
-          if (sort === 'featured') {
-              sortQuery = { featured: -1 }; // Sort by featured (featured products first)
-          } else if (sort === 'priceLowToHigh') {
-              sortQuery = { salePrice: 1 }; // Sort by price from low to high
-          } else if (sort === 'priceHighToLow') {
-              sortQuery = { salePrice: -1 }; // Sort by price from high to low
-          } else {
-              sortQuery = { [sort]: 1 }; // Default sort by productName or another field
-          }
-
-
+        let sortQuery = {};
+        
+        // Sorting logic based on selected option
+        switch (sort) {
+            case 'popularity':
+                sortQuery = { views: -1 };
+                break;
+            case 'priceLowToHigh':
+                sortQuery = { salePrice: 1 };
+                break;
+            case 'priceHighToLow':
+                sortQuery = { salePrice: -1 };
+                break;
+            case 'averageRating':
+                sortQuery = { 'ratings.average': -1 };
+                break;
+            case 'featured':
+                sortQuery = { featured: -1 };
+                break;
+            case 'newArrivals':
+                sortQuery = { createdAt: -1 };
+                break;
+            case 'aToZ':
+                sortQuery = { productName: 1 };
+                break;
+            case 'zToA':
+                sortQuery = { productName: -1 };
+                break;
+            default:
+                sortQuery = { [sort]: 1 };
+                break;
+        }
 
         const productData = await Product.find(query)
             .limit(limit)
@@ -37,7 +57,6 @@ const loadProducts = async (req, res) => {
             .sort(sortQuery)
             .exec();
 
-        // Count total products for pagination
         const count = await Product.countDocuments(query);
         const totalPages = Math.ceil(count / limit);
 
@@ -47,11 +66,10 @@ const loadProducts = async (req, res) => {
             totalProduct: count,
             limit,
             currentPage: page,
-            sort
-
+            sort,
+            search
         };
 
-        // Load user data if logged in
         if (req.session.user) {
             const userData = await User.findById(req.session.user);
             data.user = userData;
@@ -65,8 +83,6 @@ const loadProducts = async (req, res) => {
         res.status(500).send("Server Error");
     }
 };
-
-
 
 
 
@@ -227,55 +243,7 @@ const getCoupon = async(req,res)=>{
 
 
 
-const applyCoupon = async (req, res) => {
-    const { code } = req.body;
-    const productId = req.query.id;
 
-    try {
-        const product = await Product.findById(productId);
-
-        if (!product) {
-            return res.status(404).json({ message: 'Product not found.' });
-        }
-
-        // Find the matching coupon
-        const coupon = coupons.find((c) => c.code === code);
-
-        if (!coupon) {
-            return res.status(404).json({ message: 'Invalid coupon code.' });
-        }
-
-        if (coupon.expiryDate < new Date()) {
-            return res.status(400).json({ message: 'Coupon has expired.' });
-        }
-
-        if (coupon.minimumPurchase > product.salePrice) {
-            return res.status(400).json({
-                message: `Minimum purchase of ${coupon.minimumPurchase} required for this coupon.`
-            });
-        }
-
-        // Calculate discount
-        let discount = 0;
-        if (coupon.discountType === 'percentage') {
-            discount = (product.salePrice * coupon.discountValue) / 100;
-        } else if (coupon.discountType === 'fixed') {
-            discount = coupon.discountValue;
-        }
-
-        const discountedPrice = Math.max(0, product.salePrice - discount);
-
-        res.status(200).json({
-            message: 'Coupon applied successfully!',
-            originalPrice: product.salePrice,
-            discount,
-            discountedPrice
-        });
-    } catch (error) {
-        console.error('Error applying coupon:', error);
-        res.status(500).json({ message: 'Internal server error.' });
-    }
-};
 
 
 
@@ -288,6 +256,5 @@ module.exports = {
     loadProductsDetails,
     rateProduct,
     getProductRatings,
-    applyCoupon,
     getCoupon
 }

@@ -1030,12 +1030,16 @@ li{
 /* Add to Cart Button */
 .add-cart-btn {
     background-color:#000;
-    color: #fff;
+   
     border: none;
     padding: 8px 15px;
     border-radius: 10px;
     cursor: pointer;
     transition: background-color 0.3s ease;
+}
+
+.add-cart-link {
+	color: #fff;
 }
 .buy-now-btn{
 	background-color: transparent;
@@ -1049,8 +1053,12 @@ li{
 
 .add-cart-btn:hover {
    background-color: #fff;
-   color : #000;
+  
    border: 1px solid #000;
+}
+
+.add-cart-link:hover{
+	color : #000;
 }
 
 .buy-now-btn:hover {
@@ -3466,8 +3474,6 @@ li{
 }
 
 
-
-
 /* Styles for signup and login */
 .header__nav__option .sign-in-link{
 	font-size: 16px;
@@ -3539,4 +3545,8 @@ li{
 .color-options {
     display: flex; 
     gap: 5px; 
+}
+.error-message {
+	color: red;
+	font-size: 14px;
 }

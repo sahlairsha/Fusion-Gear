@@ -8,7 +8,10 @@ const passport = require('../config/passport');
 const userController = require('../controller/user/userController')
 const userproductController = require('../controller/user/userproductController');
 const userprofileController = require('../controller/user/userprofileController')
-const userCartController = require('../controller/user/userCartController')
+const userCartController = require('../controller/user/userCartController');
+const userPaymentController = require("../controller/user/userPaymentController");
+
+
 const userAuth = require('../middleware/auth')
 
 
@@ -72,7 +75,7 @@ router.get('/ratings/:product_id', userproductController.getProductRatings);
 
 //Coupon
 router.get("/coupon",userproductController.getCoupon)
-router.post('/apply-coupon',userproductController.applyCoupon)
+
 
 
 
@@ -91,8 +94,22 @@ router.get('/address-view/edit/:id',userAuth,userprofileController.editAddress)
 router.post('/address-view/update/:id',userAuth,userprofileController.updateAddress);
 
 
-//cart 
-router.get('/cart',userAuth,userCartController.getCart)
+//cart
+router.get('/cart',userAuth,userCartController.getCartPage)
+router.post('/cart/add/:productId',userAuth,userCartController.addToCart)
+router.post('/cart/update-quantity/:productId', userAuth, userCartController.updateQuantity);
+router.delete("/cart/delete/:productId",userAuth,userCartController.removeFromCart)
+
+
+router.get('/checkout',userAuth,userCartController.getCheckout)
+router.post('/save-address',userAuth,userCartController.saveAddress)
+
+
+router.get("/payment",userAuth,userPaymentController.getPayment)
+router.get("/order-confirm",userAuth,userPaymentController.getOrderConfirmation)
+
+
+
 
 router.get('/pagenotfound', userController.pageNotFound)
 

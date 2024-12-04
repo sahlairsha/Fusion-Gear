@@ -1,0 +1,404 @@
+<%- include('../../views/partials/user/header') %>
+
+<style>
+    .checkout__form {
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    .checkout__form .col-lg-8 {
+        margin-bottom: 30px; /* Ensures space between billing and order details on smaller screens */
+    }
+
+    .order-details-box {
+        border: 1px solid #ccc;
+        padding: 20px;
+        border-radius: 4px;
+        background-color: #f9f9f9;
+        position: relative;
+        margin-top: 20px; /* Ensures space between the form and the order summary box */
+    }
+
+    .order-details-box h6 {
+        font-size: 18px;
+        font-weight: bold;
+        margin-bottom: 20px;
+    }
+
+    .order-summary-item {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+    }
+
+    .order-summary-item p {
+        margin: 0;
+    }
+
+
+    input[type="text"] {
+        width: 400px;
+        height: 50px;
+        margin-bottom: 20px;
+        padding-left: 20px;
+        border: 1px solid #0000002a;
+        border-radius: 4px;
+    }
+
+    label {
+        padding-top: 20px;
+        padding-bottom: 5px;
+    }
+
+    .model-form {
+        margin-top: 50px;
+    }
+
+    h6 {
+        font-weight: 600;
+    }
+
+
+    .save-address {
+        border: none;
+        background-color: black;
+        color: white;
+        width: 100%;
+        padding: 15px;
+        border-radius: 4px;
+        cursor: pointer;
+        margin-top: 20px;
+    }
+
+    /* Ensure the right alignment on large screens */
+    .col-lg-4 {
+        padding-left: 30px; /* Adjust padding to align the content better */
+    }
+
+    /* For smaller screens */
+    @media (max-width: 768px) {
+        .checkout__form {
+            flex-direction: column; /* Stack the columns on smaller screens */
+        }
+
+        .order-details-box {
+            width: 100%;
+            margin-top: 20px;
+        }
+    }
+    
+    .edit-address-btn{
+        background-color: #000;
+        border: none;
+        color: #fff;
+        width: 100px;
+        height: 50px;
+        margin-left: 30px;
+        border-radius: 4px;
+        padding: 5px 0px 5px 0px;
+    }
+</style>
+
+<section class="breadcrumb-option">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="breadcrumb__text">
+                    <h4>Check Out</h4>
+                    <div class="breadcrumb__links">
+                        <a href="/">Home</a>
+                        <a href="/products">Product</a>
+                        <span>Check Out</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="checkout spad">
+    <div class="container">
+        <div class="checkout__form">
+            <form action="#">
+                <div class="row">
+                    <!-- Billing Details Section -->
+                    <div class="col-lg-8 col-md-12">
+                        <h6 class="checkout__title">Billing Details</h6>
+                        <div class="checkout__input">
+                            <p>Select Address<span>*</span></p>
+                            <select name="address" id="addressSelect">
+                                <% if (addresses.length > 0) { %>
+                                    <% addresses.forEach(address => { %>
+                                        <option value="<%= address._id %>">
+                                            <%= address.recipient_name %>, <%= address.streetAddress %>, <%= address.city %>, <%= address.state %> - <%= address.pincode %>
+                                        </option>
+                                    <% }) %>
+                                <% } else { %>
+                                    <option>No saved addresses</option>
+                                <% } %>
+                            </select>
+                            <button class="edit-address-btn" id="editAddressBtn"><a class="text-decoration-none text-white" href="/address-view">Edit Address</a></button>
+                            <button class="save-address" type="button" id="addNewAddressBtn">Add New Address</button>
+                        </div>
+
+                        <!-- Modal form to add or edit address -->
+                        <div class="model-form" id="newAddressModal" style="display:none;">
+                            <h6 id="modalTitle">Add New Address</h6>
+                            <label for="newRecipient">Name<span class="text-danger">*</span></label><br>
+                            <input type="text" id="newRecipient" placeholder="Recipient Name">
+                            <div id="error1" class="error-message"></div>
+
+                            <label for="newStreet">Street Address<span class="text-danger">*</span></label><br>
+                            <input type="text" id="newStreet" placeholder="Street Address">
+                            <div id="error2" class="error-message"></div>
+
+                            <label for="newCity">City<span class="text-danger">*</span></label><br>
+                            <input type="text" id="newCity" placeholder="City">
+                            <div id="error3" class="error-message"></div>
+
+                            <label for="newState">State<span class="text-danger">*</span></label><br>
+                            <input type="text" id="newState" placeholder="State">
+                            <div id="error4" class="error-message"></div>
+
+                            <label for="newPincode">Pincode<span class="text-danger">*</span></label><br>
+                            <input type="text" id="newPincode" placeholder="Pincode">
+                            <div id="error5" class="error-message"></div>
+
+                            <label for="newPhone">Phone Number<span class="text-danger">*</span></label><br>
+                            <input type="text" id="newPhone" placeholder="Phone">
+                            <div id="error6" class="error-message"></div><br>
+
+                            <label for="newAltPhone">Alternative Phone (Optional)</label><br>
+                            <input type="text" id="newAltPhone" placeholder="Alternative Phone"><br>
+
+                            <label for="newAddressType">Address Type<span class="text-danger">*</span></label><br>
+                            <select id="newAddressType">
+                                <option value="">Select</option>
+                                <option value="Home">Home</option>
+                                <option value="Work">Work</option>
+                            </select><br>
+                            <br><div id="error7" class="error-message"></div>
+
+                            <!-- Other form fields here... -->
+
+                            <button class="save-address" type="button" id="saveAddressBtn">Save Address</button>
+                        </div>
+                    </div>
+
+                    <!-- Order Details Box on the right side -->
+                    <div class="col-lg-4 col-md-12">
+                        <div class="order-details-box">
+                            <h6>Order Summary</h6>
+                            <div class="order-summary-item">
+                                <p>Items:</p>
+                                <p> <%=cartCount%> items</p>
+                            </div>
+                            <div class="order-summary-item">
+                                <p>Subtotal:</p>
+                                <p><%=cartTotal%></p>
+                            </div>
+                            <div class="order-summary-item">
+                                <p>Shipping:</p>
+                                <p><%=shippingCharges%></p>
+                            </div>
+                            <div class="order-summary-item">
+                                <p>Total:</p>
+                                <p><%=netAmount%></p>
+                            </div>
+                            <button class="save-address" type="submit"><a class="text-decoration-none text-white" href="/payment">Proceed to Payment</a></button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+
+
+<script>
+// Event listener for opening the modal to add a new address
+document.getElementById('addNewAddressBtn').addEventListener('click', function() {
+    document.getElementById('newAddressModal').style.display = ( document.getElementById('newAddressModal').style.display === 'none' ||     document.getElementById('newAddressModal').style.display=== '') ? 'block' : 'none';
+    
+    document.getElementById('modalTitle').textContent = 'Add New Address';
+    document.getElementById('saveAddressBtn').setAttribute('data-edit', 'false');
+    if(document.getElementById('newAddressModal').style.display === 'none'){
+        document.getElementById('addNewAddressBtn').innerText = "Add New Address"
+    }else{
+        document.getElementById('addNewAddressBtn').innerText = "Close"
+    }
+});
+
+// Event listener for selecting an address
+document.getElementById('addressSelect').addEventListener('change', function() {
+    const selectedAddressId = this.value;
+    const editButton = document.getElementById('editAddressBtn');
+
+    if (selectedAddressId) {
+        editButton.style.display = 'inline-block';
+        editButton.setAttribute('data-id', selectedAddressId); // Set the ID to the button for editing
+    } else {
+        editButton.style.display = 'none';
+    }
+});
+
+// Event listener for the edit button
+document.getElementById('editAddressBtn').addEventListener('click', function() {
+    const addressId = this.getAttribute('data-id');
+    // Fetch address details to populate in the form
+    const selectedAddress = addresses.find(address => address._id === addressId);
+
+    if (selectedAddress) {
+        // Fill the form with the saved address details
+        document.getElementById('newRecipient').value = selectedAddress.recipient_name;
+        document.getElementById('newStreet').value = selectedAddress.streetAddress;
+        document.getElementById('newCity').value = selectedAddress.city;
+        document.getElementById('newState').value = selectedAddress.state;
+        document.getElementById('newPincode').value = selectedAddress.pincode;
+        document.getElementById('newPhone').value = selectedAddress.phone;
+        document.getElementById('newAltPhone').value = selectedAddress.altPhone;
+        document.getElementById('newAddressType').value = selectedAddress.addressType;
+        
+        // Display the modal and change title to "Edit Address"
+        document.getElementById('newAddressModal').style.display = 'block';
+        document.getElementById('modalTitle').textContent = 'Edit Address';
+        document.getElementById('saveAddressBtn').setAttribute('data-edit', 'true'); // Editing existing address
+    }
+});
+
+// Save address button event listener
+document.getElementById('saveAddressBtn').addEventListener('click', function(e) {
+    const isNameValid = nameValidation();
+    const isAddressValid = addressValidation();
+    const isAddressTypeValid = addressTypeValidation();
+
+    if (!isNameValid || !isAddressValid || !isAddressTypeValid) {
+        e.preventDefault(); // Prevent submission if validation fails
+        return;
+    }
+
+    // Collecting new address data
+    const newAddress = {
+        recipient_name: document.getElementById('newRecipient').value.trim(),
+        streetAddress: document.getElementById('newStreet').value.trim(),
+        city: document.getElementById('newCity').value.trim(),
+        state: document.getElementById('newState').value.trim(),
+        pincode: document.getElementById('newPincode').value.trim(),
+        phone: document.getElementById('newPhone').value.trim(),
+        altPhone: document.getElementById('newAltPhone').value.trim(),
+        addressType: document.getElementById('newAddressType').value.trim()
+    };
+
+    fetch('/save-address', {
+        method: 'POST',
+        body: JSON.stringify(newAddress),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(result => {
+        if (result.success) {
+            location.reload();
+        } else {
+            console.error('Error saving address:', result.message);
+        }
+    })
+    .catch(err => console.error('Error saving address:', err));
+});
+
+// Validation functions
+
+function nameValidation() {
+    const name = document.getElementById('newRecipient').value.trim();
+    const errorElement = document.getElementById('error1');
+    const namePattern = /^[a-zA-Z\s]{2,50}$/;
+
+    if (name === "") {
+        errorElement.innerText = "Please enter the full name.";
+        return false;
+    } else if (!namePattern.test(name)) {
+        errorElement.innerText = "Name can only contain alphabets and spaces.";
+        return false;
+    } else {
+        errorElement.innerText = "";
+        return true;
+    }
+}
+
+function addressValidation() {
+    let valid = true;
+
+    // Street Address
+    const street = document.getElementById('newStreet').value.trim();
+    const streetError = document.getElementById('error2');
+    if (street === "") {
+        streetError.innerText = "Please enter the street address.";
+        valid = false;
+    } else {
+        streetError.innerText = "";
+    }
+
+    // City
+    const city = document.getElementById('newCity').value.trim();
+    const cityError = document.getElementById('error3');
+    if (city === "") {
+        cityError.innerText = "Please enter the city.";
+        valid = false;
+    } else {
+        cityError.innerText = "";
+    }
+
+    // State
+    const state = document.getElementById('newState').value.trim();
+    const stateError = document.getElementById('error4');
+    if (state === "") {
+        stateError.innerText = "Please enter the state.";
+        valid = false;
+    } else {
+        stateError.innerText = "";
+    }
+
+    // Pincode
+    const pincode = document.getElementById('newPincode').value.trim();
+    const pincodeError = document.getElementById('error5');
+    const pincodePattern = /^\d{6}$/;
+    if (!pincodePattern.test(pincode)) {
+        pincodeError.innerText = "Please enter a valid 6-digit pincode.";
+        valid = false;
+    } else {
+        pincodeError.innerText = "";
+    }
+
+    // Phone
+    const phone = document.getElementById('newPhone').value.trim();
+    const phoneError = document.getElementById('error6');
+    const phonePattern = /^(\+\d{1,3}[- ]?)?\d{10}$/;
+    if (!phonePattern.test(phone)) {
+        phoneError.innerText = "Please enter a valid phone number.";
+        valid = false;
+    } else {
+        phoneError.innerText = "";
+    }
+
+    return valid;
+}
+
+function addressTypeValidation() {
+    const addressType = document.getElementById('newAddressType').value.trim();
+    const errorElement = document.getElementById('error7');
+
+    if (addressType === "") {
+        errorElement.innerText = "Please select an address type.";
+        return false;
+    } else {
+        errorElement.innerText = "";
+        return true;
+    }
+}
+
+
+
+</script>
+
+<%- include('../../views/partials/user/footer') %>

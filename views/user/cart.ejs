@@ -1,240 +1,466 @@
+<%- include('../../views/partials/user/header') %>
 
-   <%-include('../../views/partials/user/header') %>
 <style>
-
+/* Your custom styles */
 .address-box {
-    background-color: #f9f9f9; 
+    background-color: #fff; 
     padding: 20px; 
     border-radius: 10px; 
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     margin-bottom: 20px;
     width: 90%; 
     max-width: 700px; 
     position: relative; 
-    margin-bottom: 40px;
+    margin-bottom: 50px;
+    border: 1px dotted #000;
+    align-items: center;
 }
-
-
 .address-box h6 {
     font-size: 1.2rem;
     font-weight: 600; 
     color: #333; 
-    margin-bottom: 10px; 
+    margin-bottom: 5px; 
 }
-
-
 .address-box p {
     font-size: 1rem;
     color: #555; 
     margin: 5px 0;
 }
-
-
 .address-box button {
     background-color: #4CAF50; 
     color: white;
     border: none; 
     padding: 8px 20px; 
     border-radius: 5px;
-    font-size: 1rem; /* Font size */
-    cursor: pointer; /* Pointer cursor on hover */
-    transition: background-color 0.3s; /* Smooth color transition on hover */
-    position: absolute; /* Position the button absolutely */
-    top: 20px; /* Position the button from the top */
-    right: 20px; /* Align the button to the right */
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    position: absolute; 
+    top: 18px; 
+    right: 20px;
 }
-
-/* Hover effect for the change button */
 .address-box button:hover {
-    background-color: #45a049; /* Slightly darker green on hover */
+    background-color: #45a049;
 }
-
-/* Styling for the link inside the button */
 .address-box button a {
-    color: white; /* White text for the link */
-    text-decoration: none; /* Remove underline */
+    color: white;
+    text-decoration: none;
 }
 
-/* Adding some responsiveness for mobile view */
+/* Add to your existing CSS */
+
+/* Align the cart summary properly */
+.shopping__cart__summary {
+    background-color: #ffff;
+    border: 1px solid #ddd;
+    padding: 20px;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: space-between;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Adjust cart totals item list */
+.shopping__cart__summary ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+}
+
+.shopping__cart__summary ul li {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px dotted #ccc;
+    font-size: 1.1rem;
+}
+
+.shopping__cart__summary ul li span {
+    font-weight: bold;
+}
+
+/* Adjust checkout button */
+.checkout-btn {
+    width: 100%;
+    margin-top: 20px;
+}
+
+.checkout-btn .primary-btn {
+    width: 100%;
+    padding: 12px 0;
+    background-color: #000;
+    color: white;
+    border: none;
+    font-size: 14px;
+    border-radius: 6px;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.checkout-btn .primary-btn:hover {
+    background-color: #787877;
+}
+
+@media (max-width: 768px) {
+    /* Make cart summary more compact on smaller screens */
+    .shopping__cart__summary {
+        padding: 15px;
+    }
+
+    .shopping__cart__summary ul li {
+        font-size: 1rem;
+    }
+
+    .checkout-btn .primary-btn {
+        font-size: 1rem;
+        padding: 10px 0;
+    }
+}
+
+
 @media (max-width: 768px) {
     .address-box {
-        padding: 15px; /* Reduced padding on smaller screens */
-        width: 95%; /* Adjust the width on smaller screens */
+        padding: 15px;
+        width: 95%;
     }
-
     .address-box h6 {
-        font-size: 1.1rem; /* Slightly smaller heading on mobile */
+        font-size: 1.1rem;
     }
-
     .address-box p {
-        font-size: 0.9rem; /* Smaller font size for the text */
+        font-size: 0.9rem;
     }
+}
+
+/* Hides the default increment and decrement buttons in number input fields */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+
+.coupon-field{
+    width: 250px;
+    padding-left: 20px;
+    height: 45px;
+    border-radius: 4px;
+    border: 1px dotted #000;
+    background-color: #fff;
+}
+
+.apply-button{
+    width: 80px;
+    height: 45px;
+    background-color: #000;
+    color: #fff;
+    border-radius: 4px;
+    border: none;
+
+}
+.product__cart__item__pic{
+    width:80px;
+    height: 40px;
+    
+}
+
+.quantity-input{
+    border: none;
+    background-color: #ffff;
+}
+
+.remove-item{
+    margin-left: 20px;
+}
+
+.quantity {
+    display: flex;
+    align-items: center;
+}
+
+.quantity button {
+    background-color: #fff;
+    border: none;
+    font-size: 1.2rem;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+.quantity input {
+    width: 50px;
+    text-align: center;
+    font-size: 1.2rem;
+    margin: 0 10px;
+    padding: 5px;
+    border: 1px solid #ccc;
+}
+
+.quantity button:hover {
+    background-color: #ccc;
+}
+
+.quantity button:focus {
+    outline: none;
 }
 
 
 </style>
 
-
-   <!-- Breadcrumb Section Begin -->
-    <section class="breadcrumb-option">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="breadcrumb__text">
-                        <h4>Shopping Cart</h4>
-                        <div class="breadcrumb__links">
-                            <a href="/">Home</a>
-                            <a href="/products">Products</a>
-                            <span>Shopping Cart</span>
-                        </div>
+<!-- Breadcrumb Section Begin -->
+<section class="breadcrumb-option">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="breadcrumb__text">
+                    <h4>Shopping Cart</h4>
+                    <div class="breadcrumb__links">
+                        <a href="/">Home</a>
+                        <a href="/products">Products</a>
+                        <span>Cart</span>
                     </div>
                 </div>
             </div>
         </div>
-    </section>
-    <!-- Breadcrumb Section End -->
+    </div>
+</section>
+<!-- Breadcrumb Section End -->
 
-    <!-- Shopping Cart Section Begin -->
-    <section class="shopping-cart spad">
-        <div class="container">
-            <div class="row">
-                <div class="address-box">
-                    <h6>Receipient name</h6>
-                    <p>Thalayillath House, Kalikadavu, Kerala</p>
-                    <p>LandMark</p>
-                    <p>75202943579</p>
-                    <button><a href="#">Change</a></button>
-                </div>
-                
+<!-- Shopping Cart Section Begin -->
+<section class="shopping-cart spad">
+    <div class="container">
+        <!-- Address Section -->
+        <div class="row">
+            <div class="address-box">
+                <% if (address.length === 0 || !address.some(doc => doc.address.length > 0)) { %>
+                    <div class="text-center">
+                        <p class="fs-4">There is no address available. <br> <button class="btn btn-primary" id="showFormBtn">Add New Address</button></p>
+                    </div>
+                <% } else { %>
+                    <h3 class="mb-4">Your Address</h3>
+                    <ul class="list-group mb-4">
+                        <% let foundAddress = null; %>
+                        <% address.some(function(doc) { %>
+                            <% if (doc.address.length > 0) { %>
+                                <% foundAddress = doc.address[0]; %> 
+                               <% return true; %>
+                            <% } %>
+                        <% }); %>
+                        <% if (foundAddress) { %>
+                            <li class="list-group-item">
+                                <h6><%= foundAddress.recipient_name %>
+                                    <% if (foundAddress.addressType) { %>
+                                        <span class="badge badge-secondary mb-2"><%= foundAddress.addressType %></span>
+                                    <% } %>
+                                </h6>
+                                <strong><%= foundAddress.streetAddress %>, <%= foundAddress.city %>, <%= foundAddress.state %></strong><br>
+                                Pincode: <%= foundAddress.pincode %> <br>
+                                Landmark: <%= foundAddress.landMark || 'N/A' %><br>
+                                <span class="text-muted">Phone: <%= foundAddress.phone || 'N/A' %></span>
+                            </li>
+                        <% } %>
+                    </ul>
+                <% } %>
             </div>
-            <div class="row">
-                <div class="col-lg-8">
-                    <div class="shopping__cart__table">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Product</th>
-                                    <th>Quantity</th>
-                                    <th>Total</th>
-                                    <th></th>
-                                </tr>
-                            </thead>
-                            <tbody>
+        </div>
+
+        <!-- Cart Table -->
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="shopping__cart__table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Quantity</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% cartItems.forEach(item => { %>
                                 <tr>
                                     <td class="product__cart__item">
                                         <div class="product__cart__item__pic">
-                                            <img src="img/shopping-cart/cart-1.jpg" alt="">
+                                           <a href="/product/view?id=<%= item.product_id._id%>"><img src="/uploads/public-image/<%= item.product_id.productImage[0] %>" alt="<%= item.product_id.productName %>"></a> 
                                         </div>
                                         <div class="product__cart__item__text">
-                                            <h6>T-shirt Contrast Pocket</h6>
-                                            <h5>$98.49</h5>
+                                            <h6><%= item.product_id.productName %></h6>
+                                            <h5>Price: ₹<%= item.product_id.salePrice %></h5>
                                         </div>
                                     </td>
                                     <td class="quantity__item">
                                         <div class="quantity">
-                                            <div class="pro-qty-2">
-                                                <input type="text" value="1">
-                                            </div>
+                                            <button class="btn-decrement" data-product-id="<%= item.product_id._id %>">-</button>
+                                            <input type="number" value="<%= item.quantity %>" min="1" data-product-id="<%= item.product_id._id %>" class="quantity-input">
+                                            <button class="btn-increment" data-product-id="<%= item.product_id._id %>">+</button>
                                         </div>
                                     </td>
-                                    <td class="cart__price">$ 30.00</td>
-                                    <td class="cart__close"><i class="fa fa-close"></i></td>
+                                    <td class="cart__close">
+                                        <a href="#" class="remove-item" data-product-id="<%= item.product_id._id %>"><i class="fa fa-close"></i></a>
+                                    </td>
                                 </tr>
-                                <tr>
-                                    <td class="product__cart__item">
-                                        <div class="product__cart__item__pic">
-                                            <img src="img/shopping-cart/cart-2.jpg" alt="">
-                                        </div>
-                                        <div class="product__cart__item__text">
-                                            <h6>Diagonal Textured Cap</h6>
-                                            <h5>$98.49</h5>
-                                        </div>
-                                    </td>
-                                    <td class="quantity__item">
-                                        <div class="quantity">
-                                            <div class="pro-qty-2">
-                                                <input type="text" value="1">
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="cart__price">$ 32.50</td>
-                                    <td class="cart__close"><i class="fa fa-close"></i></td>
-                                </tr>
-                                <tr>
-                                    <td class="product__cart__item">
-                                        <div class="product__cart__item__pic">
-                                            <img src="img/shopping-cart/cart-3.jpg" alt="">
-                                        </div>
-                                        <div class="product__cart__item__text">
-                                            <h6>Basic Flowing Scarf</h6>
-                                            <h5>$98.49</h5>
-                                        </div>
-                                    </td>
-                                    <td class="quantity__item">
-                                        <div class="quantity">
-                                            <div class="pro-qty-2">
-                                                <input type="text" value="1">
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="cart__price">$ 47.00</td>
-                                    <td class="cart__close"><i class="fa fa-close"></i></td>
-                                </tr>
-                                <tr>
-                                    <td class="product__cart__item">
-                                        <div class="product__cart__item__pic">
-                                            <img src="img/shopping-cart/cart-4.jpg" alt="">
-                                        </div>
-                                        <div class="product__cart__item__text">
-                                            <h6>Basic Flowing Scarf</h6>
-                                            <h5>$98.49</h5>
-                                        </div>
-                                    </td>
-                                    <td class="quantity__item">
-                                        <div class="quantity">
-                                            <div class="pro-qty-2">
-                                                <input type="text" value="1">
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="cart__price">$ 30.00</td>
-                                    <td class="cart__close"><i class="fa fa-close"></i></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="row">
-                        <div class="col-lg-6 col-md-6 col-sm-6">
-                            <div class="continue__btn">
-                                <a href="#">Continue Shopping</a>
-                            </div>
-                        </div>
-                        <div class="col-lg-6 col-md-6 col-sm-6">
-                            <div class="continue__btn update__btn">
-                                <a href="#"><i class="fa fa-spinner"></i> Update cart</a>
-                            </div>
-                        </div>
-                    </div>
+                            <% }) %>
+                        </tbody>
+                    </table>
                 </div>
-                <div class="col-lg-4">
-                    <div class="cart__discount">
-                        <h6>Discount codes</h6>
-                        <form action="#">
-                            <input type="text" placeholder="Coupon code">
-                            <button type="submit">Apply</button>
-                        </form>
-                    </div>
-                    <div class="cart__total">
-                        <h6>Cart total</h6>
-                        <ul>
-                            <li>Subtotal <span>$ 169.50</span></li>
-                            <li>Total <span>$ 169.50</span></li>
-                        </ul>
-                        <a href="#" class="primary-btn">Proceed to checkout</a>
+            </div>
+
+            <!-- Cart Summary -->
+            <div class="col-lg-4">
+                <div class="shopping__cart__summary">
+                    <h5>Cart totals</h5>
+                    <ul>
+                        <li>Subtotal <span id="cartTotal">₹<%= cartTotal %></span></li>
+                        <li>Discount <span id="discount">-₹<%= discount %></span></li>
+                        <li>Shipping <span id="shippingCharges">₹<%= shippingCharges %></span></li>
+                        <li>Total <span id="netAmount">₹<%= netAmount %></span></li>
+                    </ul>
+                    <div class="checkout-btn">
+                        <a href="/checkout" class="primary-btn">Proceed to Checkout</a>
                     </div>
                 </div>
             </div>
         </div>
-    </section>
-    <!-- Shopping Cart Section End -->
-    <%-include('../../views/partials/user/footer') %>
+
+        <!-- Coupon Section -->
+        <!-- <div class="row">
+            <div class="col-lg-12">
+                <div class="coupon__input">
+                    <input id="coupon-code" class="coupon-field" type="text" name="couponCode" placeholder="Enter Coupon Code">
+                    <button class="apply-button" id="coupon-btn" type="button" onclick="applyCoupon(document.querySelector('input[name=couponCode]').value)">Apply</button>
+                    <div id="coupon-err" class="error-message"></div>
+                </div>
+                <div id="couponMessage" style="color: green;"> <%= couponMessage %> </div>
+            </div>
+        </div> -->
+    </div>
+</section>
+
+<script>
+    document.getElementById('showFormBtn').addEventListener('click',function(){
+        window.location.href = "/address-view"
+    })
+</script>
+
+
+
+<script>
+
+// Attach event listener to dynamically loaded content
+document.addEventListener('click', async (event) => {
+    if (event.target.closest('.remove-item')) {
+        event.preventDefault(); // Prevent default behavior
+
+        const productId = event.target.closest('.remove-item').getAttribute('data-product-id');
+
+        try {
+            const response = await fetch(`/cart/delete/${productId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                event.target.closest('tr').remove(); // Remove row from table
+                updateCartUI(data);
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Removed',
+                    text: 'Product removed from cart successfully!',
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Failed',
+                    text: data.message || 'Failed to remove item',
+                });
+            }
+        } catch (error) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Error removing item',
+            });
+        }
+    }
+});
+
+function updateCartUI(data) {
+    document.querySelector('#cartTotal').textContent = `₹${data.cartTotal}`;
+    document.querySelector('#discount').textContent = `-₹${data.discount}`;
+    document.querySelector('#netAmount').textContent = `₹${data.netAmount}`;
+    document.querySelector('#couponMessage').textContent = data.couponMessage || '';
+}
+
+</script>
+
+
+<script>
+    document.addEventListener('click', async (event) => {
+    if (event.target.closest('.btn-increment') || event.target.closest('.btn-decrement')) {
+        event.preventDefault(); // Prevent default behavior
+
+        const isIncrement = event.target.closest('.btn-increment') ? true : false;
+        const productId = event.target.closest('button').getAttribute('data-product-id');
+        const quantityInput = document.querySelector(`input[data-product-id="${productId}"]`);
+        let quantity = parseInt(quantityInput.value);
+
+        // Increment or decrement quantity
+        if (isIncrement) {
+            quantity++;
+        } else if (quantity > 1) {
+            quantity--;
+        }
+
+        // Update quantity input value
+        quantityInput.value = quantity;
+
+        // Send AJAX request to update quantity in the cart
+        try {
+            const response = await fetch(`/cart/update-quantity/${productId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ quantity })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                updateCartUI(data); // Update the cart UI with new totals
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Failed',
+                    text: 'Failed to update product quantity',
+                });
+            }
+        } catch (error) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Error updating quantity',
+            });
+        }
+    }
+});
+
+function updateCartUI(data) {
+    document.querySelector('#cartTotal').textContent = `₹${data.cartTotal}`;
+    document.querySelector('#discount').textContent = `-₹${data.discount}`;
+    document.querySelector('#shippingCharges').textContent = `₹${data.shippingCharges}`;
+    document.querySelector('#netAmount').textContent = `₹${data.netAmount}`;
+}
+
+</script>
+
+
+
+
+<%- include('../../views/partials/user/footer') %>

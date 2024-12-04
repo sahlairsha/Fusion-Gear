@@ -15,6 +15,7 @@ const getProfile = async (req, res) => {
       return res.status(404).send("User not found");
     }
 
+
     res.render("user-profile", { user : userData , activePage : "profile"});
   } catch (error) {
     console.error(error);
@@ -68,7 +69,7 @@ const editProfile = async (req, res) => {
 const viewAddress = async(req,res)=>{
   try{
     const addressData = await Address.find({ user_id: req.session.user });
-    res.render('address-view',{address :addressData,addressType: addressData?.addressType,activePage : "address"})
+    res.render('address-view',{address : addressData, addressType: addressData?.addressType, activePage : "address"})
   }catch(error){
     console.log("Error in viewing address",error)
     res.redirect('/pageerror')
