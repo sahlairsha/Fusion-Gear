@@ -92,7 +92,7 @@ const signup = async (req, res) => {
 let avatarUrl;
 
 if (googleId) {
-    avatarUrl = `https://robohash.org/${googleId}?set=set3&size=200x200`; 
+    avatarUrl = `https://robohash.org/${googleId}?set=set3&size=200x200`;
 } else {
     avatarUrl = profile_pic || `https://www.gravatar.com/avatar/${crypto.createHash('md5').update(email.trim().toLowerCase()).digest('hex')}?d=robohash&r=g&s=200`;
 }
@@ -175,7 +175,6 @@ const verifyOtp = async (req, res) => {
             googleId: user.googleId || null
         });
 
-         // Only hash and set password if not a Google signup
          if (!user.googleId) {
             saveUser.password = await securePassword(user.password);
         }
