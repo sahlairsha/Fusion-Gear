@@ -92,7 +92,7 @@ const signup = async (req, res) => {
 let avatarUrl;
 
 if (googleId) {
-    avatarUrl = `https://robohash.org/${googleId}?set=set3&size=200x200`; 
+    avatarUrl = `https://www.gravatar.com/avatar/${crypto.createHash('md5').update(email.trim().toLowerCase()).digest('hex')}?d=robohash&r=g&s=200`; 
 } else {
     avatarUrl = profile_pic || `https://www.gravatar.com/avatar/${crypto.createHash('md5').update(email.trim().toLowerCase()).digest('hex')}?d=robohash&r=g&s=200`;
 }
@@ -109,12 +109,6 @@ if (!googleId && password !== confirm_password) {
             req.flash('error', 'User already exists');
             return res.redirect('/signup');
         }
-
-          // Validate the avatar URL before proceeding
-          const isAvatarValid = await validateAvatar(avatarUrl);
-          if (!isAvatarValid) {
-              return res.render("signup", { message: "Invalid avatar. Please try again." });
-          }
 
         const otp = generateOtp();
         const emailSent = await sendVerificationEmail(email, otp);
@@ -164,6 +158,12 @@ const verifyOtp = async (req, res) => {
 
         // Save user as intended if OTP is correct
         const user = req.session.userData;
+          // Validate the avatar URL before proceeding
+          const isAvatarValid = await validateAvatar(avatarUrl);
+          if (!isAvatarValid) {
+              return res.render("signup", { message: "Invalid avatar. Please try again." });
+          }
+
         const passwordHash = await securePassword(user.password);
         const saveUser = new User({
             full_name: user.full_name,
@@ -171,7 +171,7 @@ const verifyOtp = async (req, res) => {
             email: user.email,
             password: passwordHash,
             phone: user.phone,
-            profile_pic:user.profile_pic,
+            profile_pic: user.profile_pic,
             googleId: user.googleId || null
         });
 

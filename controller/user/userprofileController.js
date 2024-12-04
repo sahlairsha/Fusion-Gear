@@ -34,9 +34,9 @@ const editProfile = async (req, res) => {
     }
 
     // Extract data from request body
-    const { full_name, username, email, phone } = req.body;
+    const { full_name, username, phone , password , cpassword } = req.body;
 
-
+    const hashedPassword = await bcrypt.hash(password,10);
     // Update user information
     const updatedUser = await User.findByIdAndUpdate(
       userId,
@@ -44,7 +44,7 @@ const editProfile = async (req, res) => {
         full_name,
         username,
         phone,
-        email,
+        password : hashedPassword
       },
       { new: true }
     );
@@ -80,7 +80,7 @@ const viewAddress = async(req,res)=>{
 const addAddress = async(req,res)=>{
   try{
 
-    const {recipient_name,streetAddress, city, state, landMark, pincode,phone,altPhone, addressType } = req.body;
+    const {recipient_name,streetAddress, city, state, landMark, pincode,phone,altPhone,addressType } = req.body;
 
     // Create a new address
     const newAddress = new Address({
