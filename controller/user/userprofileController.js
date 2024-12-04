@@ -33,6 +33,7 @@ const editProfile = async (req, res) => {
       return res.status(401).json({ success: false, message: 'Unauthorized access' });
     }
 
+<<<<<<< HEAD
 
     const { full_name, username, phone , password , cpassword } = req.body;
 
@@ -46,6 +47,23 @@ const editProfile = async (req, res) => {
 if (password && password.trim() !== "") {
   updateData.password = await bcrypt.hash(password, 10);
 }
+=======
+    // Extract data from request body
+    const { full_name, username, phone , password , cpassword } = req.body;
+
+    const hashedPassword = await bcrypt.hash(password,10);
+    // Update user information
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      {
+        full_name,
+        username,
+        phone,
+        password : hashedPassword
+      },
+      { new: true }
+    );
+>>>>>>> fa885a8 (Password field is added in user profile)
 
 
 const updatedUser = await User.findByIdAndUpdate(

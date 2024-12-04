@@ -92,9 +92,13 @@ const signup = async (req, res) => {
 let avatarUrl;
 
 if (googleId) {
+<<<<<<< HEAD
 
     avatarUrl = `https://www.gravatar.com/avatar/${crypto.createHash('md5').update(email.trim().toLowerCase()).digest('hex')}?d=robohash&r=g&s=200`; 
 
+=======
+    avatarUrl = `https://www.gravatar.com/avatar/${crypto.createHash('md5').update(email.trim().toLowerCase()).digest('hex')}?d=robohash&r=g&s=200`; 
+>>>>>>> fa885a8 (Password field is added in user profile)
 } else {
     avatarUrl = profile_pic || `https://www.gravatar.com/avatar/${crypto.createHash('md5').update(email.trim().toLowerCase()).digest('hex')}?d=robohash&r=g&s=200`;
 }
