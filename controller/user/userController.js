@@ -320,7 +320,7 @@ const forgotPassword = async (req, res) => {
 
         const resetToken = generateResetToken();
         user.resetToken = hashToken(resetToken);
-        user.resetTokenExpiry = Date.now() + 3600000;  // Token expires in 1 hour
+        user.resetTokenExpiry = Date.now() + 3600000;
         await user.save();
 
         const resetLink = `http://localhost:3001/reset-password?token=${resetToken}`;
