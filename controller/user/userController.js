@@ -94,6 +94,7 @@ let avatarUrl;
 if (googleId) {
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     avatarUrl = `https://robohash.org/${googleId}?set=set3&size=200x200`;
 =======
     avatarUrl = `https://www.gravatar.com/avatar/${crypto.createHash('md5').update(email.trim().toLowerCase()).digest('hex')}?d=robohash&r=g&s=200`; 
@@ -101,6 +102,9 @@ if (googleId) {
 =======
     avatarUrl = `https://robohash.org/${googleId}?set=set3&size=200x200`; 
 >>>>>>> e4da7f6 (google avatar bug fixed)
+=======
+    avatarUrl = `https://www.gravatar.com/avatar/${crypto.createHash('md5').update(email.trim().toLowerCase()).digest('hex')}?d=robohash&r=g&s=200`; 
+>>>>>>> 39c36d6 (new changes added in google signup)
 } else {
     avatarUrl = profile_pic || `https://www.gravatar.com/avatar/${crypto.createHash('md5').update(email.trim().toLowerCase()).digest('hex')}?d=robohash&r=g&s=200`;
 }
