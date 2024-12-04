@@ -229,7 +229,6 @@ const loadLogin = async(req,res)=>{
 
 const login = async (req, res) => {
     try {
-      
         const { email, password } = req.body;
 
         const findUser = await User.findOne({ isAdmin: false, email });
@@ -254,6 +253,7 @@ const login = async (req, res) => {
         if (req.session.user) {
             return res.redirect('/');
         }
+
     } catch (error) {
         console.error("Login Error", error);
         req.flash("error", "Login failed. Try again later.")

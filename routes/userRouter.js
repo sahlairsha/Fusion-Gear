@@ -12,7 +12,8 @@ const userCartController = require('../controller/user/userCartController')
 const userAuth = require('../middleware/auth')
 
 
-router.get('/',userAuth,userController.loadHomePage)
+
+router.get('/',userController.loadHomePage)
 
 router.get('/signup',userController.loadSignup)
 
