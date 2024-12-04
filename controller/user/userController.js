@@ -93,11 +93,14 @@ const validateAvatar = async (avatarUrl) => {
 const signup = async (req, res) => {
     try {
         const { full_name, username, phone, email, password, confirm_password,googleId,profile_pic } = req.body;
-// Generate an avatar URL (use Google profile if available, fallback to RoboHash)
-    let avatarUrl = profile_pic || (googleId
-    ? `https://robohash.org/${googleId}?set=set3&size=200x200`
-    : `https://www.gravatar.com/avatar/${crypto.createHash('md5').update(email.trim().toLowerCase()).digest('hex')}?d=robohash&r=g&s=200`);
 
+let avatarUrl;
+
+if (googleId) {
+    avatarUrl = `https://robohash.org/${googleId}?set=set3&size=200x200`; 
+} else {
+    avatarUrl = profile_pic || `https://www.gravatar.com/avatar/${crypto.createHash('md5').update(email.trim().toLowerCase()).digest('hex')}?d=robohash&r=g&s=200`;
+}
 // Handle password validation only if user is not using Google
 if (!googleId && password !== confirm_password) {
     return res.render("signup", { message: "Passwords do not match" });
@@ -126,7 +129,7 @@ if (!googleId && password !== confirm_password) {
         }
 
         req.session.userOtp = { otp, expires: Date.now() + 10 * 60 * 1000 };
-        req.session.userData = { full_name, username, phone, email, password ,  profile_pic: avatarUrl , googleId };
+        req.session.userData = { full_name, username, phone, email, password ,profile_pic: avatarUrl , googleId };
 
         res.render("verification-otp");
     } catch (error) {
@@ -322,7 +325,7 @@ const forgotPassword = async (req, res) => {
 
         const resetToken = generateResetToken();
         user.resetToken = hashToken(resetToken);
-        user.resetTokenExpiry = Date.now() + 3600000;  // Token expires in 1 hour
+        user.resetTokenExpiry = Date.now() + 3600000;
         await user.save();
 
         const resetLink = `http://localhost:3001/reset-password?token=${resetToken}`;
