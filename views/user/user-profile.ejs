@@ -15,6 +15,27 @@
             <div id="error1" class="error-message"></div>
         </div>
 
+        <!-- Username -->
+        <div class="form-group">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" placeholder="Enter your username" value="<%= user.username %>" readonly>
+            <div id="error2" class="error-message"></div>
+        </div>
+
+        <!-- Phone -->
+        <div class="form-group">
+            <label for="phone">Phone:</label>
+            <input type="text" id="phone" name="phone" value="<%= user.phone %>" placeholder="Enter your phone number" readonly>
+            <div id="error3" class="error-message"></div>
+        </div>
+
+           <!-- Password -->
+    <div class="form-group" id="password-group" style="display: none;">
+        <label for="password">New Password:</label>
+        <input type="password" id="password" name="password" readonly>
+        <div id="error4" class="error-message"></div>
+    </div>
+
     <!-- Confirm Password -->
     <div class="form-group" id="confirm-password-group" style="display: none;">
         <label for="cpassword">Confirm Password:</label>
@@ -57,9 +78,6 @@ function enableEdit() {
     document.getElementById("confirm-password-group").style.display = isGoogleSignup ? 'none' : 'block';
 
     document.getElementById("update-btn").style.display = "inline-block";
-    document.getElementById('passwordLabel').innerText = "New Password";
-    document.getElementById('confirmLabel').style.display = "inline-block";
-    document.getElementById('cpassword').style.display ="inline-block"
     document.getElementById("edit-btn").style.display = "none";
 }
 
@@ -180,6 +198,7 @@ function updateProfile(event) {
     })
     .then(data => {
         if (data.success) {
+           
             showAlert("Profile updated successfully!", "success");
             setTimeout(() => location.reload(), 1000);
         } else {
