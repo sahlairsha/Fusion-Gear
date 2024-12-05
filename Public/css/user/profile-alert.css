@@ -35,4 +35,9 @@
 .save-btn{
     display: flex;
     margin-left: 330px;
+    border: none;
+    background-color: black;
+    color:#fff;
+    width: 150px;
+    height: 50px;
 }
