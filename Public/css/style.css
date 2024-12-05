@@ -1911,30 +1911,6 @@ li{
 	text-align: center;
 }
 
-.continue__btn.update__btn {
-	text-align: right;
-}
-
-.continue__btn.update__btn a {
-	color: #ffffff;
-	background: #111111;
-	border-color: #111111;
-}
-
-.continue__btn.update__btn a i {
-	margin-right: 5px;
-}
-
-.continue__btn a {
-	color: #111111;
-	font-size: 14px;
-	font-weight: 700;
-	letter-spacing: 2px;
-	text-transform: uppercase;
-	border: 1px solid #e1e1e1;
-	padding: 14px 35px;
-	display: inline-block;
-}
 
 .cart__discount {
 	margin-bottom: 60px;

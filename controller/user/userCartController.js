@@ -42,7 +42,7 @@ const getCartPage = async (req, res) => {
 
 
 
-
+// Add product to cart
 const addToCart = async (req, res) => {
     try {
         const { productId } = req.params;
@@ -54,7 +54,7 @@ const addToCart = async (req, res) => {
             return res.status(404).json({ success: false, message: 'Product not found' });
         }
 
-
+       
         const user = await User.findOne({ _id: userId });
 
         
@@ -100,7 +100,7 @@ const addToCart = async (req, res) => {
     }
 };
 
-
+// Helper function to calculate the cart totals
 async function calculateCartTotals(userId) {
     const user = await User.findById(userId).populate('cart.product_id');
     const cartItems = user.cart.filter(item => item.product_id);
@@ -125,8 +125,8 @@ async function calculateCartTotals(userId) {
 
 // Remove product from cart
 const removeFromCart = async (req, res) => {
-    const  userId  = req.session.user; 
-    const { productId } = req.params; 
+    const  userId  = req.session.user; // Get the user from the session or token
+    const { productId } = req.params; // Get product ID from the URL
     try {
 
       const updateData =  await User.updateOne(
@@ -155,17 +155,17 @@ const removeFromCart = async (req, res) => {
 
 const updateQuantity = async (req, res) => {
     const { productId } = req.params;
-    const { quantity } = req.body; // Get new quantity from request
+    const { quantity } = req.body;
     const userId = req.session.user;
 
     try {
-        // Find the product by ID
+       
         const product = await Product.findById(productId);
         if (!product) {
             return res.status(404).json({ success: false, message: 'Product not found' });
         }
 
-        // Check if the requested quantity exceeds the available stock
+        
         if (quantity > product.quantity) {
             return res.json({
                 success: false,
@@ -187,7 +187,7 @@ const updateQuantity = async (req, res) => {
         // Recalculate cart totals after updating quantity
         const updatedCartTotals = await calculateCartTotals(userId);
 
-        // Send back updated totals
+        
         res.json(updatedCartTotals);
     } catch (error) {
         console.error('Error updating quantity:', error);
@@ -207,21 +207,13 @@ const getCheckout = async (req, res) => {
         const countItems = cartItems.length;
         req.session.cartCount = countItems;
 
-        // Calculate cart total
-    const cartTotal = cartItems.reduce((total, item) => {
-        return total + (item.product_id.salePrice * item.quantity);
-    }, 0);
 
-    const shippingCharges = cartTotal > 500 ? 0 : 5;
-    const netAmount = cartTotal + shippingCharges;
-
+        const updateCartTotal = await calculateCartTotals(userId)
         // Pass addresses to the checkout page
         res.render('checkout', { 
             addresses: addresses[0]?.address || [],
             cartCount : req.session.cartCount,
-            shippingCharges,
-            netAmount,
-            cartTotal
+            ...updateCartTotal
         }
         );
     } catch (error) {

@@ -1,5 +1,4 @@
 
-
  <%-include('../../views/partials/user/header') %>
 <style>
 
@@ -32,46 +31,72 @@
 
 
 .address-box button {
-    background-color: #4CAF50; 
+    background-color: #000; 
     color: white;
     border: none; 
     padding: 8px 20px; 
     border-radius: 5px;
-    font-size: 1rem; /* Font size */
-    cursor: pointer; /* Pointer cursor on hover */
-    transition: background-color 0.3s; /* Smooth color transition on hover */
-    position: absolute; /* Position the button absolutely */
-    top: 20px; /* Position the button from the top */
-    right: 20px; /* Align the button to the right */
+    font-size: 1rem; 
+    cursor: pointer; 
+    transition: background-color 0.3s; 
+    position: absolute;
+    right: 20px; 
 }
 
 /* Hover effect for the change button */
 .address-box button:hover {
-    background-color: #45a049; /* Slightly darker green on hover */
+    background-color: #45a049;
 }
 
-/* Styling for the link inside the button */
+
 .address-box button a {
-    color: white; /* White text for the link */
-    text-decoration: none; /* Remove underline */
+    color: white;
+    text-decoration: none; 
 }
 
 /* Adding some responsiveness for mobile view */
 @media (max-width: 768px) {
     .address-box {
-        padding: 15px; /* Reduced padding on smaller screens */
-        width: 95%; /* Adjust the width on smaller screens */
+        padding: 15px;
+        width: 95%; 
     }
 
     .address-box h6 {
-        font-size: 1.1rem; /* Slightly smaller heading on mobile */
+        font-size: 1.1rem; 
     }
 
     .address-box p {
-        font-size: 0.9rem; /* Smaller font size for the text */
+        font-size: 0.9rem; 
     }
 }
+.continue_btn{
+    width: 200px;
+    height: 50px;
+    border-radius: 4px;
+    border:1px solid #000;
+    text-align: center;
+    padding-top: 10px;
+    background-color: #fff;
+    transition: 0.5s ease-in-out;
+}
+.continue_btn a{
+    color: #000;
+    text-transform: uppercase;
+    font-weight : 500;
+    transition: 0.5s ease-in-out;
 
+}
+.continue_btn:hover{
+background-color: #000;
+
+}
+.continue_btn a:hover{
+    color:#fff;
+}
+.product__cart__item__pic{
+    width: 80px;
+    height: 30px;
+}
 
 </style>
 
@@ -100,11 +125,34 @@
         <div class="container">
             <div class="row">
                 <div class="address-box">
-                    <h6>Receipient name</h6>
-                    <p>Thalayillath House, Kalikadavu, Kerala</p>
-                    <p>LandMark</p>
-                    <p>75202943579</p>
-                    <button><a href="#">Change</a></button>
+    <% if (address.length === 0 || !address.some(doc => doc.address.length > 0)) { %>
+        <div class="text-center">
+            <p class="fs-4">There is no address available. <br> <button class="btn btn-primary mt-3" id="showFormBtn">Add New Address</button></p>
+        </div>
+    <% } else { %>
+        <!-- Display existing addresses -->
+        <h3 class="mb-4">Your Addresses</h3>
+        <ul class="list-group mb-4">
+            <% address.forEach(function(doc) { %>
+                <% doc.address.forEach(function(addr) { %>
+                    <li class="list-group-item">
+                        <h6><%= addr.recipient_name %>
+                            <% if (addr.addressType) { %>
+                                <span class="badge mb-2"><%=addr.addressType%></span>
+                            <% } %>
+                        </h4>
+                        <strong><%= addr.streetAddress %>, <%= addr.city %>, <%= addr.state %></strong><br>
+                        Pincode: <%= addr.pincode %> <br>
+                        Landmark: <%= addr.landMark || 'N/A' %><br>
+                        <span class="text-muted">Phone: <%= addr.phone || 'N/A' %></span>
+                    </li>
+                <% }); %>
+            <% }); %>
+        </ul>
+        <!-- Button to show the form -->
+        <button class="btn btn-primary" id="showFormBtn">Change</button>
+    <% } %>
+
                 </div>
             </div>
             <div class="row">
@@ -115,110 +163,42 @@
                                 <tr>
                                     <th>Product</th>
                                     <th>Quantity</th>
-                                    <th>Total</th>
                                     <th></th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
+                                <% cartItems.forEach(item => { %>
+                                <tr class="remove-item" data-product-id ="<%=item.product_id%>">
                                     <td class="product__cart__item">
                                         <div class="product__cart__item__pic">
-                                            <img src="img/shopping-cart/cart-1.jpg" alt="">
+                                            <img src="/uploads/public-image/<%=item.product_id.productImage[0]  %>" alt="<%= item.product_id.productName %>">
                                         </div>
                                         <div class="product__cart__item__text">
-                                            <h6>T-shirt Contrast Pocket</h6>
-                                            <h5>$98.49</h5>
+                                            <h6><%=item.product_id.productName%></h6>
+                                            <h5>&#8377;<%= item.product_id.salePrice%></h5>
                                         </div>
                                     </td>
-                                    <td class="quantity__item">
 
-                                        <div class="quantity">
-                                            <div class="pro-qty-2">
-                                                <input type="text" value="1">
-                                            </div>
-
-                                        <div class="quantity" >
-                                            <button class="btn-decrement" data-product-id="<%= item.product_id._id %>">-</button>
-                                            <input type="number" value="<%= item.quantity %>" min="1" data-product-id="<%= item.product_id._id %>" class="quantity-input">
-                                            <button class="btn-increment" data-available-stock = '<%=item.product_id.quantity%>' data-product-id="<%= item.product_id._id %>">+</button>
-
-                                        </div>
-                                    </td>
-                                    <td class="cart__price">$ 30.00</td>
-                                    <td class="cart__close"><i class="fa fa-close"></i></td>
-                                </tr>
-                                <tr>
-                                    <td class="product__cart__item">
-                                        <div class="product__cart__item__pic">
-                                            <img src="img/shopping-cart/cart-2.jpg" alt="">
-                                        </div>
-                                        <div class="product__cart__item__text">
-                                            <h6>Diagonal Textured Cap</h6>
-                                            <h5>$98.49</h5>
-                                        </div>
-                                    </td>
                                     <td class="quantity__item">
                                         <div class="quantity">
-                                            <div class="pro-qty-2">
-                                                <input type="text" value="1">
+                                            <div class="pro-qty-2 d-flex align-items-center">
+                                                <button class="btn btn-sm btn-outline-secondary btn-decrement me-2" data-product-id="<%= item.product_id._id %>" data-available-stock="<%= item.product_id.quantity %>">-</button>
+                                                <input type="text" value="<%= item.quantity %>" data-product-id="<%= item.product_id._id %>" readonly style="width: 40px; text-align: center;">
+                                                <button class="btn btn-sm btn-outline-secondary btn-increment ms-2" data-product-id="<%= item.product_id._id %>" data-available-stock="<%= item.product_id.quantity %>">+</button>
                                             </div>
                                         </div>
-                                    </td>
-                                    <td class="cart__price">$ 32.50</td>
-                                    <td class="cart__close"><i class="fa fa-close"></i></td>
+                                        </div>
+                        
+                             <td><i class="fa fa-close"></i></td>
                                 </tr>
-                                <tr>
-                                    <td class="product__cart__item">
-                                        <div class="product__cart__item__pic">
-                                            <img src="img/shopping-cart/cart-3.jpg" alt="">
-                                        </div>
-                                        <div class="product__cart__item__text">
-                                            <h6>Basic Flowing Scarf</h6>
-                                            <h5>$98.49</h5>
-                                        </div>
-                                    </td>
-                                    <td class="quantity__item">
-                                        <div class="quantity">
-                                            <div class="pro-qty-2">
-                                                <input type="text" value="1">
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="cart__price">$ 47.00</td>
-                                    <td class="cart__close"><i class="fa fa-close"></i></td>
-                                </tr>
-                                <tr>
-                                    <td class="product__cart__item">
-                                        <div class="product__cart__item__pic">
-                                            <img src="img/shopping-cart/cart-4.jpg" alt="">
-                                        </div>
-                                        <div class="product__cart__item__text">
-                                            <h6>Basic Flowing Scarf</h6>
-                                            <h5>$98.49</h5>
-                                        </div>
-                                    </td>
-                                    <td class="quantity__item">
-                                        <div class="quantity">
-                                            <div class="pro-qty-2">
-                                                <input type="text" value="1">
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="cart__price">$ 30.00</td>
-                                    <td class="cart__close"><i class="fa fa-close"></i></td>
-                                </tr>
-                            </tbody>
+                                <% }); %>
+                        </tbody>
                         </table>
                     </div>
                     <div class="row">
                         <div class="col-lg-6 col-md-6 col-sm-6">
-                            <div class="continue__btn">
-                                <a href="#">Continue Shopping</a>
-                            </div>
-                        </div>
-                        <div class="col-lg-6 col-md-6 col-sm-6">
-                            <div class="continue__btn update__btn">
-                                <a href="#"><i class="fa fa-spinner"></i> Update cart</a>
+                            <div class="continue_btn">
+                                <a  href="/products">Continue Shopping</a>
                             </div>
                         </div>
                     </div>
@@ -234,10 +214,12 @@
                     <div class="cart__total">
                         <h6>Cart total</h6>
                         <ul>
-                            <li>Subtotal <span>$ 169.50</span></li>
-                            <li>Total <span>$ 169.50</span></li>
+                            <li>SubTotal<span><%=cartTotal%></span></li>
+                            <li>Discount<span><%=discount%></span></li>
+                            <li>shipping fee <span><%=shippingCharges%></span></li>
+                            <li>Total <span><%= netAmount%></span></li>
                         </ul>
-                        <a href="#" class="primary-btn">Proceed to checkout</a>
+                        <a href="/checkout" class="primary-btn">Proceed to checkout</a>
                     </div>
                 </div>
             </div>
@@ -246,8 +228,6 @@
     </section>
 
 
-    </div>
-</section>
 
 <script>
     document.getElementById('showFormBtn').addEventListener('click',function(){
@@ -313,12 +293,13 @@ function updateCartUI(data) {
 
 
 <script>
-   document.addEventListener('click', async (event) => {
+document.addEventListener('click', async (event) => {
     if (event.target.closest('.btn-increment') || event.target.closest('.btn-decrement')) {
-        event.preventDefault(); // Prevent default behavior
+        event.preventDefault();
 
-        const isIncrement = event.target.closest('.btn-increment') ? true : false;
-        const productId = event.target.closest('button').getAttribute('data-product-id');
+        const button = event.target.closest('button');
+        const isIncrement = button.classList.contains('btn-increment');
+        const productId = button.getAttribute('data-product-id');
         const quantityInput = document.querySelector(`input[data-product-id="${productId}"]`);
         let quantity = parseInt(quantityInput.value);
 
@@ -329,23 +310,18 @@ function updateCartUI(data) {
             quantity--;
         }
 
-        // Get the available stock from the product (This could be from a hidden input or data attribute)
-        const availableStock = parseInt(event.target.closest('button').getAttribute('data-available-stock'));
+        const availableStock = parseInt(button.getAttribute('data-available-stock'));
 
         // Check if the updated quantity exceeds available stock
         if (quantity > availableStock) {
             Swal.fire({
                 icon: 'error',
                 title: 'Stock Exceeded',
-                text: `Only ${availableStock} items are available in stock. Please update your quantity.`,
+                text: `Only ${availableStock} items are available in stock.`,
             });
             return;
         }
 
-        // Update quantity input value
-        quantityInput.value = quantity;
-
-        // Send AJAX request to update quantity in the cart
         try {
             const response = await fetch(`/cart/update-quantity/${productId}`, {
                 method: 'POST',
@@ -357,35 +333,39 @@ function updateCartUI(data) {
 
             const data = await response.json();
 
-            if (response.ok) {
+            if (response.ok && data.success) {
+                quantityInput.value = quantity;
                 updateCartUI(data);
             } else {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Failed',
-                    text: 'Failed to update product quantity',
-                });
+                throw new Error(data.message || 'Failed to update product quantity');
             }
         } catch (error) {
+            console.error('Error updating quantity:', error);
             Swal.fire({
                 icon: 'error',
                 title: 'Error',
-                text: 'Error updating quantity',
+                text: error.message || 'Error updating quantity. Please try again.',
             });
         }
     }
 });
 
 function updateCartUI(data) {
-    document.querySelector('#cartTotal').textContent = `₹${data.cartTotal}`;
-    document.querySelector('#discount').textContent = `-₹${data.discount}`;
-    document.querySelector('#shippingCharges').textContent = `₹${data.shippingCharges}`;
-    document.querySelector('#netAmount').textContent = `₹${data.netAmount}`;
-}
+    // Make sure these elements exist in your HTML
+    const cartTotalElement = document.querySelector('#cartTotal');
+    const discountElement = document.querySelector('#discount');
+    const shippingChargesElement = document.querySelector('#shippingCharges');
+    const netAmountElement = document.querySelector('#netAmount');
 
+    if (cartTotalElement) cartTotalElement.textContent = `₹${data.cartTotal}`;
+    if (discountElement) discountElement.textContent = `-₹${data.discount}`;
+    if (shippingChargesElement) shippingChargesElement.textContent = `₹${data.shippingCharges}`;
+    if (netAmountElement) netAmountElement.textContent = `₹${data.netAmount}`;
+}
 </script>
 
 
 
 
 <%- include('../../views/partials/user/footer') %>
+
