@@ -131,10 +131,17 @@
                                         </div>
                                     </td>
                                     <td class="quantity__item">
+<<<<<<< HEAD
                                         <div class="quantity">
                                             <div class="pro-qty-2">
                                                 <input type="text" value="1">
                                             </div>
+=======
+                                        <div class="quantity" >
+                                            <button class="btn-decrement" data-product-id="<%= item.product_id._id %>">-</button>
+                                            <input type="number" value="<%= item.quantity %>" min="1" data-product-id="<%= item.product_id._id %>" class="quantity-input">
+                                            <button class="btn-increment" data-available-stock = '<%=item.product_id.quantity%>' data-product-id="<%= item.product_id._id %>">+</button>
+>>>>>>> cf86610 (Set the qty is controlled by the available stock)
                                         </div>
                                     </td>
                                     <td class="cart__price">$ 30.00</td>
@@ -235,6 +242,7 @@
                 </div>
             </div>
         </div>
+<<<<<<< HEAD
     </section>
     <!-- Shopping Cart Section End -->
 <<<<<<< HEAD
@@ -245,3 +253,160 @@
 =======
     <%-include('../../views/partials/user/footer') %>
 >>>>>>> e4da7f69fe43b7dc8c513910b73746af414a9e35
+=======
+
+        <!-- Coupon Section -->
+        <!-- <div class="row">
+            <div class="col-lg-12">
+                <div class="coupon__input">
+                    <input id="coupon-code" class="coupon-field" type="text" name="couponCode" placeholder="Enter Coupon Code">
+                    <button class="apply-button" id="coupon-btn" type="button" onclick="applyCoupon(document.querySelector('input[name=couponCode]').value)">Apply</button>
+                    <div id="coupon-err" class="error-message"></div>
+                </div>
+                <div id="couponMessage" style="color: green;"> <%= couponMessage %> </div>
+            </div>
+        </div> -->
+    </div>
+</section>
+
+<script>
+    document.getElementById('showFormBtn').addEventListener('click',function(){
+        window.location.href = "/address-view"
+    })
+</script>
+
+
+
+<script>
+
+// Attach event listener to dynamically loaded content
+document.addEventListener('click', async (event) => {
+    if (event.target.closest('.remove-item')) {
+        event.preventDefault(); // Prevent default behavior
+
+        const productId = event.target.closest('.remove-item').getAttribute('data-product-id');
+
+        try {
+            const response = await fetch(`/cart/delete/${productId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                event.target.closest('tr').remove(); // Remove row from table
+                updateCartUI(data);
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Removed',
+                    text: 'Product removed from cart successfully!',
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Failed',
+                    text: data.message || 'Failed to remove item',
+                });
+            }
+        } catch (error) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Error removing item',
+            });
+        }
+    }
+});
+
+function updateCartUI(data) {
+    document.querySelector('#cartTotal').textContent = `₹${data.cartTotal}`;
+    document.querySelector('#discount').textContent = `-₹${data.discount}`;
+    document.querySelector('#netAmount').textContent = `₹${data.netAmount}`;
+    document.querySelector('#couponMessage').textContent = data.couponMessage || '';
+}
+
+</script>
+
+
+<script>
+   document.addEventListener('click', async (event) => {
+    if (event.target.closest('.btn-increment') || event.target.closest('.btn-decrement')) {
+        event.preventDefault(); // Prevent default behavior
+
+        const isIncrement = event.target.closest('.btn-increment') ? true : false;
+        const productId = event.target.closest('button').getAttribute('data-product-id');
+        const quantityInput = document.querySelector(`input[data-product-id="${productId}"]`);
+        let quantity = parseInt(quantityInput.value);
+
+        // Increment or decrement quantity
+        if (isIncrement) {
+            quantity++;
+        } else if (quantity > 1) {
+            quantity--;
+        }
+
+        // Get the available stock from the product (This could be from a hidden input or data attribute)
+        const availableStock = parseInt(event.target.closest('button').getAttribute('data-available-stock'));
+
+        // Check if the updated quantity exceeds available stock
+        if (quantity > availableStock) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Stock Exceeded',
+                text: `Only ${availableStock} items are available in stock. Please update your quantity.`,
+            });
+            return; 
+        }
+
+        // Update quantity input value
+        quantityInput.value = quantity;
+
+        // Send AJAX request to update quantity in the cart
+        try {
+            const response = await fetch(`/cart/update-quantity/${productId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ quantity })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                updateCartUI(data);
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Failed',
+                    text: 'Failed to update product quantity',
+                });
+            }
+        } catch (error) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Error updating quantity',
+            });
+        }
+    }
+});
+
+function updateCartUI(data) {
+    document.querySelector('#cartTotal').textContent = `₹${data.cartTotal}`;
+    document.querySelector('#discount').textContent = `-₹${data.discount}`;
+    document.querySelector('#shippingCharges').textContent = `₹${data.shippingCharges}`;
+    document.querySelector('#netAmount').textContent = `₹${data.netAmount}`;
+}
+
+</script>
+
+
+
+
+<%- include('../../views/partials/user/footer') %>
+>>>>>>> cf86610 (Set the qty is controlled by the available stock)

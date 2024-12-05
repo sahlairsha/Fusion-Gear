@@ -16,7 +16,7 @@ const getCartPage = async (req, res) => {
 
 
         const totalAmount = cartItems.reduce((total, item) => {
-            return total + (item.product_id.salePrice * item.quantity);
+                return total + (item.product_id.salePrice * item.quantity);
         }, 0);
 
         const shippingCharges = totalAmount > 500 ? 0 : 5;
@@ -43,21 +43,53 @@ const getCartPage = async (req, res) => {
 
 
 // Add product to cart
-const addToCart = async(req, res) => {
+// Add product to cart
+const addToCart = async (req, res) => {
     try {
         const { productId } = req.params;
         const userId = req.session.user;
 
-          const user = await User.findOneAndUpdate(
-            { _id: userId, "cart.product_id": productId }, 
-            { $inc: { "cart.$.quantity": 1 } }, 
-            { new: true } 
-        );
+        // Find the product by ID
+        const product = await Product.findById(productId);
+        if (!product) {
+            return res.status(404).json({ success: false, message: 'Product not found' });
+        }
 
-        if (!user) {
+       
+        const user = await User.findOne({ _id: userId });
+
+        
+        const existingItem = user.cart.find(item => item.product_id.toString() === productId);
+
+        if (existingItem) {
+        
+            const newQuantity = existingItem.quantity + 1;
+            if (newQuantity > product.quantity) {
+                return res.json({
+                    success: false,
+                    message: `Only ${product.quantity} left in stock. You can add up to ${product.quantity} to the cart.`
+                });
+            }
+
+            
+            await User.updateOne(
+                { _id: userId, "cart.product_id": productId },
+                { $inc: { "cart.$.quantity": 1 } },
+                { new: true }
+            );
+        } else {
+           
+            if (product.quantity < 1) {
+                return res.json({
+                    success: false,
+                    message: `Product is out of stock`
+                });
+            }
+
+            
             await User.findByIdAndUpdate(
                 userId,
-                { $push: { cart: { product_id: productId, quantity: 1 } } }, 
+                { $push: { cart: { product_id: productId, quantity: 1 } } },
                 { new: true }
             );
         }
@@ -122,13 +154,26 @@ const removeFromCart = async (req, res) => {
     }
 };
 
-
 const updateQuantity = async (req, res) => {
     const { productId } = req.params;
     const { quantity } = req.body; // Get new quantity from request
     const userId = req.session.user;
 
     try {
+        // Find the product by ID
+        const product = await Product.findById(productId);
+        if (!product) {
+            return res.status(404).json({ success: false, message: 'Product not found' });
+        }
+
+        // Check if the requested quantity exceeds the available stock
+        if (quantity > product.quantity) {
+            return res.json({
+                success: false,
+                message: `Only ${product.quantity} left in stock.`
+            });
+        }
+
         // Find the cart item and update its quantity
         const user = await User.findOneAndUpdate(
             { _id: userId, "cart.product_id": productId },
@@ -140,7 +185,7 @@ const updateQuantity = async (req, res) => {
             return res.status(404).json({ success: false, message: 'Product not found in cart' });
         }
 
-        // Recalculate cart totals
+        // Recalculate cart totals after updating quantity
         const updatedCartTotals = await calculateCartTotals(userId);
 
         // Send back updated totals
