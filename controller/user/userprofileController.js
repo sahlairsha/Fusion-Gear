@@ -33,6 +33,7 @@ const editProfile = async (req, res) => {
       return res.status(401).json({ success: false, message: 'Unauthorized access' });
     }
 
+<<<<<<< HEAD
 
     const { full_name, username, phone , password , cpassword } = req.body;
 
@@ -54,6 +55,24 @@ const updatedUser = await User.findByIdAndUpdate(
   { new: true }
 );
 
+=======
+    // Extract data from request body
+    const { full_name, username, email, phone } = req.body;
+
+
+    // Update user information
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      {
+        full_name,
+        username,
+        phone,
+        email,
+      },
+      { new: true }
+    );
+
+>>>>>>> 66bc275d102849a2f84f7893bfe7e513c6b31950
 if (!updatedUser) {
   return res.status(404).json({ success: false, message: 'User not found' });
 }

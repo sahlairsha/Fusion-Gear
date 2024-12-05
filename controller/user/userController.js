@@ -95,6 +95,7 @@ if (googleId) {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 
     avatarUrl = `https://www.gravatar.com/avatar/${crypto.createHash('md5').update(email.trim().toLowerCase()).digest('hex')}?d=robohash&r=g&s=200`; 
 
@@ -102,11 +103,9 @@ if (googleId) {
     avatarUrl = `https://www.gravatar.com/avatar/${crypto.createHash('md5').update(email.trim().toLowerCase()).digest('hex')}?d=robohash&r=g&s=200`; 
 >>>>>>> fa885a8 (Password field is added in user profile)
 =======
-    avatarUrl = `https://robohash.org/${googleId}?set=set3&size=200x200`; 
->>>>>>> e4da7f6 (google avatar bug fixed)
 =======
-    avatarUrl = `https://www.gravatar.com/avatar/${crypto.createHash('md5').update(email.trim().toLowerCase()).digest('hex')}?d=robohash&r=g&s=200`; 
->>>>>>> 39c36d6 (new changes added in google signup)
+>>>>>>> 66bc275d102849a2f84f7893bfe7e513c6b31950
+    avatarUrl = `https://robohash.org/${googleId}?set=set3&size=200x200`; 
 } else {
     avatarUrl = profile_pic || `https://www.gravatar.com/avatar/${crypto.createHash('md5').update(email.trim().toLowerCase()).digest('hex')}?d=robohash&r=g&s=200`;
 }
