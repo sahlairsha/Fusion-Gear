@@ -1,114 +1,236 @@
 <%-include('../../views/partials/user/header') %>
-
 <link rel="stylesheet" href="/css/user/profile-alert.css">
 <%-include('../../views/partials/user/user-side')%>
 
 <div class="content-area">
-  <!-- Custom Alert Box -->
-  <form id="edit-form">
-    <div id="alert-message" class="alert" style="display: none;"></div>
-    <input type="hidden" name="_method" value="PUT">
-    <button type="button" id="edit-btn" class="edit-btn" onclick="enableEdit()">Edit Profile</button>
+    <form id="edit-form" data-google-signup="<%= user.googleId %>">
+        <div id="alert-message" class="alert" style="display: none;"></div>
+        <input type="hidden" name="_method" value="PUT">
+        <button type="button" id="edit-btn" class="edit-btn" onclick="enableEdit()">Edit Profile</button>
 
-    <!-- Full Name -->
-    <div class="form-group">
-        <label for="full_name">Full Name:</label>
-        <input type="text" id="full_name" name="full_name" required placeholder="Enter your full name" value="<%=user.full_name%>" readonly>
+        <!-- Full Name -->
+        <div class="form-group">
+            <label for="full_name">Full Name:</label>
+            <input type="text" id="full_name" name="full_name" required placeholder="Enter your full name" value="<%= user.full_name %>" readonly>
+            <div id="error1" class="error-message"></div>
+        </div>
+
+        <!-- Username -->
+        <div class="form-group">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" placeholder="Enter your username" value="<%= user.username %>" readonly>
+            <div id="error2" class="error-message"></div>
+        </div>
+
+        <!-- Phone -->
+        <div class="form-group">
+            <label for="phone">Phone:</label>
+            <input type="text" id="phone" name="phone" value="<%= user.phone %>" placeholder="Enter your phone number" readonly>
+            <div id="error3" class="error-message"></div>
+        </div>
+
+           <!-- Password -->
+    <div class="form-group" id="password-group" style="display: none;">
+        <label for="password">New Password:</label>
+        <input type="password" id="password" name="password" readonly>
+        <div id="error4" class="error-message"></div>
     </div>
 
-    <!-- Username -->
-    <div class="form-group">
-        <label for="username">Username:</label>
-        <input type="text" id="username" name="username" placeholder="Enter your username" value="<%=user.username%>" readonly>
+    <!-- Confirm Password -->
+    <div class="form-group" id="confirm-password-group" style="display: none;">
+        <label for="cpassword">Confirm Password:</label>
+        <input type="password" id="cpassword" name="confirm-password" readonly>
+        <div id="error5" class="error-message"></div>
     </div>
-
-    <!-- Phone -->
-    <div class="form-group">
-        <label for="phone">Phone:</label>
-        <input type="text" id="phone" name="phone" value="<%=user.phone%>" placeholder="Enter your phone number" readonly>
-    </div>
-
-    <div class="form-group">
-
- <label id="passwordLabel" for="password">Password:</label>
-        <input type="password" id="password" name="password" value="<%=user.password%>" placeholder="Create New Password" readonly>
-    </div>
-
-    <label style="display: none;"  id="confirmLabel" for="Confirm-password">Confirm Password:</label>
-        <input style="display: none;" type="password" id="cpassword" name="confirm-password" placeholder="Pleas Enter the New Password" readonly>
-    </div>
-
-    <!-- Submit Button -->
-    <div class="form-group">
-        <button type="button" id="update-btn" class="save-btn" onclick="updateProfile(event)">Save Changes</button>
-    </div>
-</form>
-
+        <!-- Submit Button -->
+        <div class="form-group">
+            <button type="button" id="update-btn" class="save-btn" style="display: none;" onclick="updateProfile(event)">Save Changes</button>
+        </div>
+    </form>
 </div>
 </div>
+
 <script>
- function enableEdit() {
-    // Enable all form inputs (remove readonly and disabled attributes)
+
+
+document.addEventListener("DOMContentLoaded", () => {
+    const isGoogleSignup = !!document.getElementById('edit-form').getAttribute('data-google-signup');
+    if (isGoogleSignup) {
+        console.log("Google signup detected. Hiding password fields.");
+        document.getElementById('password-group').style.display = 'none';
+        document.getElementById('confirm-password-group').style.display = 'none';
+    }
+});
+
+// Enable Edit Mode
+function enableEdit() {
+    console.log("Enable edit triggered.");
     const formInputs = document.querySelectorAll("#edit-form input");
+    const isGoogleSignup = !!document.getElementById('edit-form').getAttribute('data-google-signup');
+
     formInputs.forEach(input => {
-        input.removeAttribute("readonly");
-        input.removeAttribute("disabled");
-        
+        if (!(isGoogleSignup && (input.id === 'password' || input.id === 'cpassword'))) {
+            input.removeAttribute("readonly");
+        }
     });
+
+    document.getElementById("password-group").style.display = isGoogleSignup ? 'none' : 'block';
+    document.getElementById("confirm-password-group").style.display = isGoogleSignup ? 'none' : 'block';
+
     document.getElementById("update-btn").style.display = "inline-block";
-    document.getElementById('passwordLabel').innerText = "New Password";
-    document.getElementById('confirmLabel').style.display = "inline-block";
-    document.getElementById('cpassword').style.display ="inline-block"
     document.getElementById("edit-btn").style.display = "none";
 }
 
-
+// Update Profile
 function updateProfile(event) {
-    event.preventDefault();
-    const formData = new FormData(document.getElementById("edit-form"));
+    console.log("Update button is triggered");
+    const isGoogleSignup = !!document.getElementById('edit-form').getAttribute('data-google-signup');
+    event.preventDefault(); // Prevent default form submission
 
-    // Convert form data to an object
+    const nameVal = document.getElementById('full_name').value.trim();
+    const err1 = document.getElementById('error1');
+
+    const usernameVal = document.getElementById('username').value.trim();
+    const err2 = document.getElementById('error2');
+
+    const phone = document.getElementById('phone').value.trim();
+    const err3 = document.getElementById('error3');
+
+    const password = document.getElementById('password').value.trim();
+    const err4 = document.getElementById('error4');
+
+    const cpassword = document.getElementById('cpassword').value.trim();
+    const err5 = document.getElementById('error5');
+
+    // Validation Functions
+    function nameValidation() {
+        const namepattern = /^[a-zA-Z\s]{2,50}$/;
+        if (nameVal === "") {
+            err1.innerText = "Please enter the full name";
+        } else if (!namepattern.test(nameVal)) {
+            err1.innerText = "Name can only contain alphabets and spaces";
+        } else {
+            err1.innerText = "";
+        }
+    }
+
+    function usernameValidation() {
+        const usernamepattern = /^[a-zA-Z0-9_.]{3,15}$/;
+        if (usernameVal === "") {
+            err2.innerText = "Please enter the username";
+        } else if (!usernamepattern.test(usernameVal)) {
+            err2.innerText = "Only alphabets, numbers, and underscores. No spaces.";
+        } else {
+            err2.innerText = "";
+        }
+    }
+
+    function phoneValidation() {
+        const phonepattern = /^(\+\d{1,3}[- ]?)?\d{10}$/;
+        const allZero = /^0+$/;
+        if (phone === "") {
+            err3.innerText = "Please enter your phone number";
+        } else if (!phonepattern.test(phone)) {
+            err3.innerText = "Enter a valid phone number!";
+        } else if (allZero.test(phone.replace(/[-+ ]/g, ""))) {
+            err3.innerText = "Phone number cannot be all zeros!";
+        } else {
+            err3.innerText = "";
+        }
+    }
+
+    function passwordValidation() {
+        const passwordpattern = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+        if (password === "") {
+            err4.innerText = "Please enter a valid password";
+        } else if (!passwordpattern.test(password)) {
+            err4.innerText = "Minimum 8 characters, at least one letter and one number";
+        } else {
+            err4.innerText = "";
+        }
+    }
+
+    function confirmPasswordValidation() {
+        if (cpassword === "") {
+            err5.innerText = "Enter the password for confirmation";
+        } else if (password !== cpassword) {
+            err5.innerText = "Passwords do not match";
+        } else {
+            err5.innerText = "";
+        }
+    }
+
+    // Validate inputs
+    nameValidation();
+    usernameValidation();
+    phoneValidation();
+    if (!isGoogleSignup) {
+        passwordValidation();
+        confirmPasswordValidation();
+    }
+
+    // Check if there are any validation errors
+    const hasError = [err1, err2, err3, err4, err5].some(err => err.innerText !== "");
+    if (hasError) {
+        return; // Stop execution if there are errors
+    }
+
+    const formData = new FormData(document.getElementById("edit-form"));
     const data = {};
     formData.forEach((value, key) => {
         data[key] = value;
     });
 
+    // Exclude password fields for Google signups
+    if (isGoogleSignup) {
+        delete data.password;
+        delete data['confirm-password'];
+    }
+
     fetch('/update-profile', {
         method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) throw new Error("Network response was not ok");
+        return response.json();
+    })
     .then(data => {
         if (data.success) {
-            sessionStorage.setItem("successMessage", "Profile updated successfully!");
-            location.reload();
+           
+            showAlert("Profile updated successfully!", "success");
+            setTimeout(() => location.reload(), 1000);
         } else {
-            showAlert("Error updating profile. Please try again.", "error");
+            showAlert(data.message || "Error updating profile.", "error");
         }
     })
     .catch(error => {
-        console.error('Error:', error);
+        console.error("Fetch error:", error);
         showAlert("An error occurred while updating your profile.", "error");
     });
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-    const successMessage = sessionStorage.getItem("successMessage");
-    if (successMessage) {
-        Swal.fire({
-            icon: "success",
-            title: "Success",
-            text: successMessage,
-            timer: 3000,
-            showConfirmButton: false,
-        });
-        sessionStorage.removeItem("successMessage");
-    }
-});
+// Show Alert
+function showAlert(message, type) {
+    const alertBox = document.getElementById('alert-message');
+    alertBox.innerText = message;
+    alertBox.style.display = 'block';
 
+    if (type === 'success') {
+        alertBox.className = 'alert success';
+        alertBox.style.backgroundColor = "#c7f9cc";
+        alertBox.style.color = "green";
+    } else {
+        alertBox.className = 'alert error';
+        alertBox.style.backgroundColor = "#f8d7da";
+        alertBox.style.color = "red";
+    }
+
+    setTimeout(() => alertBox.style.display = 'none', 2000);
+}
+
+document.getElementById("edit-form").addEventListener('submit', updateProfile);
 
 </script>
 
