@@ -42,8 +42,7 @@ const getCartPage = async (req, res) => {
 
 
 
-// Add product to cart
-// Add product to cart
+
 const addToCart = async (req, res) => {
     try {
         const { productId } = req.params;
@@ -55,7 +54,7 @@ const addToCart = async (req, res) => {
             return res.status(404).json({ success: false, message: 'Product not found' });
         }
 
-       
+
         const user = await User.findOne({ _id: userId });
 
         
@@ -101,7 +100,7 @@ const addToCart = async (req, res) => {
     }
 };
 
-// Helper function to calculate the cart totals
+
 async function calculateCartTotals(userId) {
     const user = await User.findById(userId).populate('cart.product_id');
     const cartItems = user.cart.filter(item => item.product_id);
@@ -126,8 +125,8 @@ async function calculateCartTotals(userId) {
 
 // Remove product from cart
 const removeFromCart = async (req, res) => {
-    const  userId  = req.session.user; // Get the user from the session or token
-    const { productId } = req.params; // Get product ID from the URL
+    const  userId  = req.session.user; 
+    const { productId } = req.params; 
     try {
 
       const updateData =  await User.updateOne(
