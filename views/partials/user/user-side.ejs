@@ -1,11 +1,11 @@
-    
+
     <link rel="stylesheet" href="/css/user/profile-sidebar.css">
-    
+
 <% if (flash.success_msg) { %>
-    <div class="alert alert-success"><%= flash.success_msg %></div>
+    <div id="successAlert" class="alert alert-success"><%= flash.success_msg %></div>
   <% } %>
   <% if (flash.error_msg) { %>
-    <div class="alert alert-danger"><%= flash.error_msg %></div>
+    <div id="errorAlert" class="alert alert-danger"><%= flash.error_msg %></div>
   <% } %>
 
 
@@ -38,3 +38,26 @@
             <!-- Logout Button -->
             <button class="logout-btn"><a href="/logout">Logout</a></button>
         </div>
+
+
+        <script>
+     window.addEventListener('load', () => {
+    const successAlert = document.getElementById('successAlert');
+    const errorAlert = document.getElementById('errorAlert');
+
+    // Timeout for success message
+    if (successAlert) {
+        setTimeout(() => {
+            successAlert.style.display = 'none';
+        }, 2000); // Hide after 5 seconds
+    }
+
+    // Timeout for error message
+    if (errorAlert) {
+        setTimeout(() => {
+            errorAlert.style.display = 'none';
+        }, 2000);
+    }
+});
+
+        </script>

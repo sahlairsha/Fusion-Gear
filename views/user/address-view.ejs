@@ -1,6 +1,7 @@
 <%- include('../../views/partials/user/header') %>
-<%- include('../../views/partials/user/user-side') %>
 <link rel="stylesheet" href="/css/user/address.css">
+<%- include('../../views/partials/user/user-side') %>
+
 <div class="content-area container mt-5">
 
     <% if (address.length === 0 || !address.some(doc => doc.address.length > 0)) { %>
@@ -280,11 +281,11 @@ window.addEventListener('load', () => {
   if (successMessage) {
     Swal.fire({
       title: 'Deleted!',
-      text: successMessage,
+      text:  successMessage,
       icon: 'success',
       confirmButtonText: 'OK'
     });
-    localStorage.removeItem('deleteSuccess'); // Clear the success message
+    localStorage.removeItem('deleteSuccess');
   } else if (errorMessage) {
     Swal.fire({
       title: 'Error!',
