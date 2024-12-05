@@ -14,30 +14,6 @@
             <input type="text" id="full_name" name="full_name" required placeholder="Enter your full name" value="<%= user.full_name %>" readonly>
             <div id="error1" class="error-message"></div>
         </div>
-<<<<<<< HEAD
-
-        <!-- Username -->
-        <div class="form-group">
-            <label for="username">Username:</label>
-            <input type="text" id="username" name="username" placeholder="Enter your username" value="<%= user.username %>" readonly>
-            <div id="error2" class="error-message"></div>
-        </div>
-
-        <!-- Phone -->
-        <div class="form-group">
-            <label for="phone">Phone:</label>
-            <input type="text" id="phone" name="phone" value="<%= user.phone %>" placeholder="Enter your phone number" readonly>
-            <div id="error3" class="error-message"></div>
-        </div>
-
-           <!-- Password -->
-    <div class="form-group" id="password-group" style="display: none;">
-        <label for="password">New Password:</label>
-        <input type="password" id="password" name="password" readonly>
-        <div id="error4" class="error-message"></div>
-    </div>
-=======
->>>>>>> 66bc275d102849a2f84f7893bfe7e513c6b31950
 
     <!-- Confirm Password -->
     <div class="form-group" id="confirm-password-group" style="display: none;">
@@ -45,42 +21,11 @@
         <input type="password" id="cpassword" name="confirm-password" readonly>
         <div id="error5" class="error-message"></div>
     </div>
-<<<<<<< HEAD
         <!-- Submit Button -->
         <div class="form-group">
             <button type="button" id="update-btn" class="save-btn" style="display: none;" onclick="updateProfile(event)">Save Changes</button>
         </div>
     </form>
-=======
-
-    <!-- Email -->
-    <div class="form-group">
-        <label for="email">Email:</label>
-        <input type="email" id="email" name="email" required placeholder="Enter your email" value="<%=user.email%>" readonly>
-    </div>
-
-        <!-- Phone -->
-        <div class="form-group">
-            <label for="phone">Phone:</label>
-            <input type="text" id="phone" name="phone" value="<%= user.phone %>" placeholder="Enter your phone number" readonly>
-            <div id="error3" class="error-message"></div>
-        </div>
-
-           <!-- Password -->
-    <div class="form-group" id="password-group" style="display: none;">
-        <label for="password">New Password:</label>
-        <input type="password" id="password" name="password" readonly>
-        <div id="error4" class="error-message"></div>
-    </div>
-
-
-    <!-- Submit Button -->
-    <div class="form-group">
-        <button type="button" id="update-btn" class="save-btn" onclick="updateProfile(event)">Save Changes</button>
-    </div>
-</form>
-
->>>>>>> 66bc275d102849a2f84f7893bfe7e513c6b31950
 </div>
 </div>
 
@@ -103,14 +48,9 @@ function enableEdit() {
     const isGoogleSignup = !!document.getElementById('edit-form').getAttribute('data-google-signup');
 
     formInputs.forEach(input => {
-<<<<<<< HEAD
         if (!(isGoogleSignup && (input.id === 'password' || input.id === 'cpassword'))) {
             input.removeAttribute("readonly");
         }
-=======
-        input.removeAttribute("readonly");
-        input.removeAttribute("disabled");
->>>>>>> 66bc275d102849a2f84f7893bfe7e513c6b31950
     });
 
     document.getElementById("password-group").style.display = isGoogleSignup ? 'none' : 'block';
@@ -240,13 +180,8 @@ function updateProfile(event) {
     })
     .then(data => {
         if (data.success) {
-<<<<<<< HEAD
             showAlert("Profile updated successfully!", "success");
             setTimeout(() => location.reload(), 1000);
-=======
-            sessionStorage.setItem("successMessage", "Profile updated successfully!");
-            location.reload(); // Reload the page
->>>>>>> 66bc275d102849a2f84f7893bfe7e513c6b31950
         } else {
             showAlert(data.message || "Error updating profile.", "error");
         }
