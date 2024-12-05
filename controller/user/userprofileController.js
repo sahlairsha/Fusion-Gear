@@ -33,26 +33,21 @@ const editProfile = async (req, res) => {
       return res.status(401).json({ success: false, message: 'Unauthorized access' });
     }
 
-
-    const { full_name, username, phone , password , cpassword } = req.body;
-
- const updateData = {
-  full_name,
-  username,
-  phone,
-};
+    // Extract data from request body
+    const { full_name, username, email, phone } = req.body;
 
 
-if (password && password.trim() !== "") {
-  updateData.password = await bcrypt.hash(password, 10);
-}
-
-
-const updatedUser = await User.findByIdAndUpdate(
-  userId,
-  updateData,
-  { new: true }
-);
+    // Update user information
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      {
+        full_name,
+        username,
+        phone,
+        email,
+      },
+      { new: true }
+    );
 
 if (!updatedUser) {
   return res.status(404).json({ success: false, message: 'User not found' });

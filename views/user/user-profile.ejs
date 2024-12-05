@@ -15,12 +15,17 @@
             <div id="error1" class="error-message"></div>
         </div>
 
-        <!-- Username -->
-        <div class="form-group">
-            <label for="username">Username:</label>
-            <input type="text" id="username" name="username" placeholder="Enter your username" value="<%= user.username %>" readonly>
-            <div id="error2" class="error-message"></div>
-        </div>
+    <!-- Username -->
+    <div class="form-group">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" placeholder="Enter your username" value="<%=user.username%>" readonly>
+    </div>
+
+    <!-- Email -->
+    <div class="form-group">
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required placeholder="Enter your email" value="<%=user.email%>" readonly>
+    </div>
 
         <!-- Phone -->
         <div class="form-group">
@@ -36,17 +41,13 @@
         <div id="error4" class="error-message"></div>
     </div>
 
-    <!-- Confirm Password -->
-    <div class="form-group" id="confirm-password-group" style="display: none;">
-        <label for="cpassword">Confirm Password:</label>
-        <input type="password" id="cpassword" name="confirm-password" readonly>
-        <div id="error5" class="error-message"></div>
+
+    <!-- Submit Button -->
+    <div class="form-group">
+        <button type="button" id="update-btn" class="save-btn" onclick="updateProfile(event)">Save Changes</button>
     </div>
-        <!-- Submit Button -->
-        <div class="form-group">
-            <button type="button" id="update-btn" class="save-btn" style="display: none;" onclick="updateProfile(event)">Save Changes</button>
-        </div>
-    </form>
+</form>
+
 </div>
 </div>
 
@@ -69,15 +70,17 @@ function enableEdit() {
     const isGoogleSignup = !!document.getElementById('edit-form').getAttribute('data-google-signup');
 
     formInputs.forEach(input => {
-        if (!(isGoogleSignup && (input.id === 'password' || input.id === 'cpassword'))) {
-            input.removeAttribute("readonly");
-        }
+        input.removeAttribute("readonly");
+        input.removeAttribute("disabled");
     });
 
     document.getElementById("password-group").style.display = isGoogleSignup ? 'none' : 'block';
     document.getElementById("confirm-password-group").style.display = isGoogleSignup ? 'none' : 'block';
 
     document.getElementById("update-btn").style.display = "inline-block";
+    document.getElementById('passwordLabel').innerText = "New Password";
+    document.getElementById('confirmLabel').style.display = "inline-block";
+    document.getElementById('cpassword').style.display ="inline-block"
     document.getElementById("edit-btn").style.display = "none";
 }
 
@@ -198,9 +201,8 @@ function updateProfile(event) {
     })
     .then(data => {
         if (data.success) {
-           
-            showAlert("Profile updated successfully!", "success");
-            setTimeout(() => location.reload(), 1000);
+            sessionStorage.setItem("successMessage", "Profile updated successfully!");
+            location.reload(); // Reload the page
         } else {
             showAlert(data.message || "Error updating profile.", "error");
         }
