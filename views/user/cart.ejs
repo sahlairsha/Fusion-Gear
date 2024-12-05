@@ -290,10 +290,10 @@ input[type="number"]::-webkit-inner-spin-button {
                                         </div>
                                     </td>
                                     <td class="quantity__item">
-                                        <div class="quantity">
+                                        <div class="quantity" >
                                             <button class="btn-decrement" data-product-id="<%= item.product_id._id %>">-</button>
                                             <input type="number" value="<%= item.quantity %>" min="1" data-product-id="<%= item.product_id._id %>" class="quantity-input">
-                                            <button class="btn-increment" data-product-id="<%= item.product_id._id %>">+</button>
+                                            <button class="btn-increment" data-available-stock = '<%=item.product_id.quantity%>' data-product-id="<%= item.product_id._id %>">+</button>
                                         </div>
                                     </td>
                                     <td class="cart__close">
@@ -401,7 +401,7 @@ function updateCartUI(data) {
 
 
 <script>
-    document.addEventListener('click', async (event) => {
+   document.addEventListener('click', async (event) => {
     if (event.target.closest('.btn-increment') || event.target.closest('.btn-decrement')) {
         event.preventDefault(); // Prevent default behavior
 
@@ -415,6 +415,19 @@ function updateCartUI(data) {
             quantity++;
         } else if (quantity > 1) {
             quantity--;
+        }
+
+        // Get the available stock from the product (This could be from a hidden input or data attribute)
+        const availableStock = parseInt(event.target.closest('button').getAttribute('data-available-stock'));
+
+        // Check if the updated quantity exceeds available stock
+        if (quantity > availableStock) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Stock Exceeded',
+                text: `Only ${availableStock} items are available in stock. Please update your quantity.`,
+            });
+            return; 
         }
 
         // Update quantity input value
@@ -433,7 +446,7 @@ function updateCartUI(data) {
             const data = await response.json();
 
             if (response.ok) {
-                updateCartUI(data); // Update the cart UI with new totals
+                updateCartUI(data);
             } else {
                 Swal.fire({
                     icon: 'error',
