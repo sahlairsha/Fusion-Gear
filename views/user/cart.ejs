@@ -1,5 +1,10 @@
 <%- include('../../views/partials/user/header') %>
 
+<<<<<<< HEAD
+=======
+
+ <%-include('../../views/partials/user/header') %>
+>>>>>>> main
 <style>
 /* Your custom styles */
 .address-box {
@@ -165,6 +170,16 @@ input[type="number"]::-webkit-inner-spin-button {
     height: 40px;
     
 }
+.cart__close {
+ display: flex;
+ align-content: center;
+ justify-content: center;
+}
+.quantity {
+display: flex;
+ align-content: center;
+ justify-content: center;
+}
 
 .quantity-input{
     border: none;
@@ -290,6 +305,7 @@ input[type="number"]::-webkit-inner-spin-button {
                                             <h5>Price: ₹<%= item.product_id.salePrice %></h5>
                                         </div>
                                     </td>
+<<<<<<< HEAD
                                     <td class="quantity__item">
                                         <div class="quantity">
                                             <button class="btn-decrement" data-available-stock="<%= item.product_id.quantity  %>" data-product-id="<%= item.product_id._id %>">-</button>
@@ -302,9 +318,26 @@ input[type="number"]::-webkit-inner-spin-button {
                                     </td>
                                 </tr>
                             <% }) %>
+=======
+                                    <td class="quantity__item ">
+                                        <div class="quantity">
+                                            <div class="pro-qty-2 d-flex align-items-center">
+                                                <button id="button-decrement" class="btn btn-sm btn-outline-secondary btn-decrement me-2" data-product-id="<%= item.product_id._id %>" data-available-stock="<%= item.product_id.quantity %>">-</button>
+                                                <input type="text" value="<%= item.quantity %>" data-product-id="<%= item.product_id._id %>" readonly style="width: 40px; text-align: center;">
+                                                <button id="button-increment" class="btn btn-sm btn-outline-secondary btn-increment ms-2" data-product-id="<%= item.product_id._id %>" data-available-stock="<%= item.product_id.quantity %>">+</button>
+                                            </div>
+                                        </div>
+                                    </td>
+                             <td class="cart__close remove-item" data-product-id="<%= item.product_id._id %>">
+                                <i class="fa fa-close"></i>
+                            </td>
+                         </tr>
+  <% }); %>
+>>>>>>> main
                         </tbody>
                     </table>
                 </div>
+<<<<<<< HEAD
             </div>
             <div class="col-lg-4">
                 <div class="cart__total">
@@ -316,6 +349,26 @@ input[type="number"]::-webkit-inner-spin-button {
                         <li>Total <span><%= netAmount%></span></li>
                     </ul>
                     <a href="/checkout" class="primary-btn">Proceed to checkout</a>
+=======
+                <div class="col-lg-4">
+                    <div class="cart__discount">
+                        <h6>Discount codes</h6>
+                        <form action="#">
+                            <input type="text" placeholder="Coupon code">
+                            <button type="submit">Apply</button>
+                        </form>
+                    </div>
+                    <div class="cart__total">
+                        <h6>Cart total</h6>
+                        <ul>
+                            <li>SubTotal<span id="cartTotal"><%=cartTotal%></span></li>
+                            <li>Discount<span id="discount"><%=discount%></span></li>
+                            <li>shipping fee <span id="shippingCharges"><%=shippingCharges%></span></li>
+                            <li>Total <span id="netAmount"><%= netAmount%></span></li>
+                        </ul>
+                        <a href="/checkout" class="primary-btn">Proceed to checkout</a>
+                    </div>
+>>>>>>> main
                 </div>
             </div>
         </div>
@@ -335,7 +388,7 @@ input[type="number"]::-webkit-inner-spin-button {
 // Attach event listener to dynamically loaded content
 document.addEventListener('click', async (event) => {
     if (event.target.closest('.remove-item')) {
-        event.preventDefault(); // Prevent default behavior
+        event.preventDefault();
 
         const productId = event.target.closest('.remove-item').getAttribute('data-product-id');
 
@@ -350,7 +403,7 @@ document.addEventListener('click', async (event) => {
             const data = await response.json();
 
             if (response.ok) {
-                event.target.closest('tr').remove(); // Remove row from table
+                event.target.closest('tr').remove();
                 updateCartUI(data);
 
                 Swal.fire({
@@ -377,9 +430,8 @@ document.addEventListener('click', async (event) => {
 
 function updateCartUI(data) {
     document.querySelector('#cartTotal').textContent = `₹${data.cartTotal}`;
-    document.querySelector('#discount').textContent = `-₹${data.discount}`;
     document.querySelector('#netAmount').textContent = `₹${data.netAmount}`;
-    document.querySelector('#couponMessage').textContent = data.couponMessage || '';
+    document.querySelector('#shippingCharges').textContent = `₹${data.shippingCharges}`
 }
 
 </script>
@@ -390,27 +442,42 @@ function updateCartUI(data) {
     if (event.target.closest('.btn-increment') || event.target.closest('.btn-decrement')) {
         event.preventDefault(); // Prevent default behavior
 
+<<<<<<< HEAD
         const isIncrement = event.target.closest('.btn-increment') ? true : false;
         const productId = event.target.closest('button').getAttribute('data-product-id');
+=======
+        const isIncrement = event.target.closest('.btn-increment');
+        const isDecrement = event.target.closest('.btn-decrement');
+        const productId = isIncrement ? isIncrement.getAttribute('data-product-id') : isDecrement.getAttribute('data-product-id');
+>>>>>>> main
         const quantityInput = document.querySelector(`input[data-product-id="${productId}"]`);
         let quantity = parseInt(quantityInput.value);
 
-        // Increment or decrement quantity
+         // Increment or decrement quantity
         if (isIncrement) {
             quantity++;
-        } else if (quantity > 1) {
+        } else if (isDecrement && quantity > 1) {
             quantity--;
         }
 
+<<<<<<< HEAD
         // Update quantity input value
         quantityInput.value = quantity;
         const availableStock = event.target.closest('button').getAttribute('data-available-stock');
+=======
+        const availableStock = parseInt(isIncrement ? isIncrement.getAttribute('data-available-stock') : isDecrement.getAttribute('data-available-stock'), 10);
+>>>>>>> main
 
         if(quantity > availableStock){
             Swal.fire({
                 icon: 'error',
+<<<<<<< HEAD
                 title: 'Error',
                 text: `Only ${availableStock} is left,Please Try again!!`,
+=======
+                title: 'Stock Exceeded',
+                text: `Only ${availableStock} left in stock.`,
+>>>>>>> main
             });
            
         }
@@ -426,6 +493,7 @@ function updateCartUI(data) {
             });
 
             const data = await response.json();
+            console.log('Response from server:', data);
 
             if (response.ok) {
                 updateCartUI(data); // Update the cart UI with new totals
@@ -446,6 +514,7 @@ function updateCartUI(data) {
     }
 });
 
+<<<<<<< HEAD
 function updateCartUI(data) {
     document.querySelector('#cartTotal').textContent = `₹${data.cartTotal}`;
     document.querySelector('#discount').textContent = `-₹${data.discount}`;
@@ -453,9 +522,15 @@ function updateCartUI(data) {
     document.querySelector('#netAmount').textContent = `₹${data.netAmount}`;
 }
 
+=======
+>>>>>>> main
 </script>
 
 
 
 
+<<<<<<< HEAD
 <%- include('../../views/partials/user/footer') %>
+=======
+<%- include('../../views/partials/user/footer') %>
+>>>>>>> main
