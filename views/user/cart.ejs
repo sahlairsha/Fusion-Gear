@@ -239,23 +239,20 @@ display: flex;
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-4">
-                    <div class="cart__discount">
-                        <h6>Discount codes</h6>
-                        <form action="#">
-                            <input type="text" placeholder="Coupon code">
-                            <button type="submit">Apply</button>
-                        </form>
-                    </div>
-                    <div class="cart__total">
-                        <h6>Cart total</h6>
-                        <ul>
-                            <li>SubTotal<span id="cartTotal"><%=cartTotal%></span></li>
-                            <li>Discount<span id="discount"><%=discount%></span></li>
-                            <li>shipping fee <span id="shippingCharges"><%=shippingCharges%></span></li>
-                            <li>Total <span id="netAmount"><%= netAmount%></span></li>
-                        </ul>
-                        <a href="/checkout" class="primary-btn">Proceed to checkout</a>
+            </div>
+
+            <!-- Cart Summary -->
+            <div class="col-lg-4">
+                <div class="shopping__cart__summary">
+                    <h5>Cart totals</h5>
+                    <ul>
+                        <li>Subtotal <span id="cartTotal">₹<%= cartTotal %></span></li>
+                        <li>Discount <span id="discount">-₹<%= discount %></span></li>
+                        <li>Shipping <span id="shippingCharges">₹<%= shippingCharges %></span></li>
+                        <li>Total <span id="netAmount">₹<%= netAmount %></span></li>
+                    </ul>
+                    <div class="checkout-btn">
+                        <a href="/checkout" class="primary-btn">Proceed to Checkout</a>
                     </div>
                 </div>
             </div>
