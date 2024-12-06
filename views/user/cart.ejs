@@ -191,11 +191,9 @@ display: flex;
                                     </td>
                                     <td class="quantity__item ">
                                         <div class="quantity">
-                                            <div class="pro-qty-2 d-flex align-items-center">
-                                                <button id="button-decrement" class="btn btn-sm btn-outline-secondary btn-decrement me-2" data-product-id="<%= item.product_id._id %>" data-available-stock="<%= item.product_id.quantity %>">-</button>
-                                                <input type="text" value="<%= item.quantity %>" data-product-id="<%= item.product_id._id %>" readonly style="width: 40px; text-align: center;">
-                                                <button id="button-increment" class="btn btn-sm btn-outline-secondary btn-increment ms-2" data-product-id="<%= item.product_id._id %>" data-available-stock="<%= item.product_id.quantity %>">+</button>
-                                            </div>
+                                            <button class="btn-decrement" data-available-stock="<%= item.product_id.quantity  %>" data-product-id="<%= item.product_id._id %>">-</button>
+                                            <input type="number" value="<%= item.quantity %>" min="1" data-product-id="<%= item.product_id._id %>" class="quantity-input">
+                                            <button class="btn-increment" data-available-stock="<%= item.product_id.quantity  %>" data-product-id="<%= item.product_id._id %>">+</button>
                                         </div>
                                     </td>
                              <td class="cart__close remove-item" data-product-id="<%= item.product_id._id %>">
@@ -235,10 +233,8 @@ display: flex;
                 </div>
             </div>
         </div>
-
-    </section>
-
-
+    </div>
+</section>
 
 <script>
     document.getElementById('showFormBtn').addEventListener('click',function(){
@@ -320,16 +316,17 @@ document.addEventListener('click', async (event) => {
             quantity--;
         }
 
-        const availableStock = parseInt(isIncrement ? isIncrement.getAttribute('data-available-stock') : isDecrement.getAttribute('data-available-stock'), 10);
+        // Update quantity input value
+        quantityInput.value = quantity;
+        const availableStock = event.target.closest('button').getAttribute('data-available-stock');
 
-        // Check if the updated quantity exceeds available stock
-        if (quantity > availableStock) {
+        if(quantity > availableStock){
             Swal.fire({
                 icon: 'error',
-                title: 'Stock Exceeded',
-                text: `Only ${availableStock} left in stock.`,
+                title: 'Error',
+                text: `Only ${availableStock} is left,Please Try again!!`,
             });
-            return;
+           
         }
 
         try {
