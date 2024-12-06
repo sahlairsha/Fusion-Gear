@@ -46,9 +46,29 @@
     text-decoration: none;
 }
 
-/* Add to your existing CSS */
+.continue__btn{
+    margin-top: 30px;
+    width: 280px;
+    height: 50px;
+    background-color: #fff;
+    transition: 0.3s ease-in;
+    border: 1px solid #000;
+    border-radius: 3px;
+}
+.continue__btn a{
+    color: #000;
+    font-weight: 500;
+    text-transform: uppercase;
+    padding: 5px 5px 5px 5px ;
+    transition: 0.3s ease-in;
+}
 
-/* Align the cart summary properly */
+.continue__btn:hover{
+    background-color: #000;
+}
+.continue__btn a:hover{
+    color: #fff;
+}
 .shopping__cart__summary {
     background-color: #ffff;
     border: 1px solid #ddd;
@@ -141,25 +161,6 @@ input[type="number"]::-webkit-inner-spin-button {
     margin: 0;
 }
 
-
-.coupon-field{
-    width: 250px;
-    padding-left: 20px;
-    height: 45px;
-    border-radius: 4px;
-    border: 1px dotted #000;
-    background-color: #fff;
-}
-
-.apply-button{
-    width: 80px;
-    height: 45px;
-    background-color: #000;
-    color: #fff;
-    border-radius: 4px;
-    border: none;
-
-}
 .product__cart__item__pic{
     width:80px;
     height: 40px;
@@ -304,9 +305,12 @@ input[type="number"]::-webkit-inner-spin-button {
                             <% }) %>
                         </tbody>
                     </table>
-                </div>
-            </div>
 
+
+                </div>
+                    <button class="continue__btn"><a class="continue__link" href="/products">Continue to shopping</a></button>
+
+            </div>
             <!-- Cart Summary -->
             <div class="col-lg-4">
                 <div class="shopping__cart__summary">
@@ -317,6 +321,7 @@ input[type="number"]::-webkit-inner-spin-button {
                         <li>Shipping <span id="shippingCharges">₹<%= shippingCharges %></span></li>
                         <li>Total <span id="netAmount">₹<%= netAmount %></span></li>
                     </ul>
+                    
                     <div class="checkout-btn">
                         <a href="/checkout" class="primary-btn">Proceed to Checkout</a>
                     </div>
