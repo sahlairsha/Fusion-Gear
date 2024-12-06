@@ -1,10 +1,7 @@
 <%- include('../../views/partials/user/header') %>
 
-<<<<<<< HEAD
-=======
 
  <%-include('../../views/partials/user/header') %>
->>>>>>> main
 <style>
 /* Your custom styles */
 .address-box {
@@ -305,20 +302,6 @@ display: flex;
                                             <h5>Price: ₹<%= item.product_id.salePrice %></h5>
                                         </div>
                                     </td>
-<<<<<<< HEAD
-                                    <td class="quantity__item">
-                                        <div class="quantity">
-                                            <button class="btn-decrement" data-available-stock="<%= item.product_id.quantity  %>" data-product-id="<%= item.product_id._id %>">-</button>
-                                            <input type="number" value="<%= item.quantity %>" min="1" data-product-id="<%= item.product_id._id %>" class="quantity-input">
-                                            <button class="btn-increment" data-available-stock="<%= item.product_id.quantity  %>" data-product-id="<%= item.product_id._id %>">+</button>
-                                        </div>
-                                    </td>
-                                    <td class="cart__close">
-                                        <a href="#" class="remove-item" data-product-id="<%= item.product_id._id %>"><i class="fa fa-close"></i></a>
-                                    </td>
-                                </tr>
-                            <% }) %>
-=======
                                     <td class="quantity__item ">
                                         <div class="quantity">
                                             <div class="pro-qty-2 d-flex align-items-center">
@@ -333,23 +316,9 @@ display: flex;
                             </td>
                          </tr>
   <% }); %>
->>>>>>> main
                         </tbody>
                     </table>
                 </div>
-<<<<<<< HEAD
-            </div>
-            <div class="col-lg-4">
-                <div class="cart__total">
-                    <h6>Cart total</h6>
-                    <ul>
-                        <li>SubTotal<span><%=cartTotal%></span></li>
-                        <li>Discount<span><%=discount%></span></li>
-                        <li>shipping fee <span><%=shippingCharges%></span></li>
-                        <li>Total <span><%= netAmount%></span></li>
-                    </ul>
-                    <a href="/checkout" class="primary-btn">Proceed to checkout</a>
-=======
                 <div class="col-lg-4">
                     <div class="cart__discount">
                         <h6>Discount codes</h6>
@@ -368,7 +337,6 @@ display: flex;
                         </ul>
                         <a href="/checkout" class="primary-btn">Proceed to checkout</a>
                     </div>
->>>>>>> main
                 </div>
             </div>
         </div>
@@ -442,14 +410,9 @@ function updateCartUI(data) {
     if (event.target.closest('.btn-increment') || event.target.closest('.btn-decrement')) {
         event.preventDefault(); // Prevent default behavior
 
-<<<<<<< HEAD
-        const isIncrement = event.target.closest('.btn-increment') ? true : false;
-        const productId = event.target.closest('button').getAttribute('data-product-id');
-=======
         const isIncrement = event.target.closest('.btn-increment');
         const isDecrement = event.target.closest('.btn-decrement');
         const productId = isIncrement ? isIncrement.getAttribute('data-product-id') : isDecrement.getAttribute('data-product-id');
->>>>>>> main
         const quantityInput = document.querySelector(`input[data-product-id="${productId}"]`);
         let quantity = parseInt(quantityInput.value);
 
@@ -460,26 +423,14 @@ function updateCartUI(data) {
             quantity--;
         }
 
-<<<<<<< HEAD
-        // Update quantity input value
-        quantityInput.value = quantity;
-        const availableStock = event.target.closest('button').getAttribute('data-available-stock');
-=======
         const availableStock = parseInt(isIncrement ? isIncrement.getAttribute('data-available-stock') : isDecrement.getAttribute('data-available-stock'), 10);
->>>>>>> main
 
         if(quantity > availableStock){
             Swal.fire({
                 icon: 'error',
-<<<<<<< HEAD
-                title: 'Error',
-                text: `Only ${availableStock} is left,Please Try again!!`,
-=======
                 title: 'Stock Exceeded',
                 text: `Only ${availableStock} left in stock.`,
->>>>>>> main
             });
-           
         }
 
         // Send AJAX request to update quantity in the cart
@@ -514,23 +465,9 @@ function updateCartUI(data) {
     }
 });
 
-<<<<<<< HEAD
-function updateCartUI(data) {
-    document.querySelector('#cartTotal').textContent = `₹${data.cartTotal}`;
-    document.querySelector('#discount').textContent = `-₹${data.discount}`;
-    document.querySelector('#shippingCharges').textContent = `₹${data.shippingCharges}`;
-    document.querySelector('#netAmount').textContent = `₹${data.netAmount}`;
-}
-
-=======
->>>>>>> main
 </script>
 
 
 
 
-<<<<<<< HEAD
 <%- include('../../views/partials/user/footer') %>
-=======
-<%- include('../../views/partials/user/footer') %>
->>>>>>> main
