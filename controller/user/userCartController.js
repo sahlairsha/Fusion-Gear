@@ -110,7 +110,7 @@ async function calculateCartTotals(userId) {
         return total + (item.product_id.salePrice * item.quantity);
     }, 0);
 
-    const shippingCharges = cartTotal > 500 ? 0 : 5;
+    const shippingCharges = cartTotal > 500 ? 0 : 50;
     const netAmount = cartTotal + shippingCharges;
 
     // Return the updated values
@@ -169,7 +169,6 @@ const updateQuantity = async (req, res) => {
             });
         }
 
-        // Find the cart item and update its quantity
         const user = await User.findOneAndUpdate(
             { _id: userId, "cart.product_id": productId },
             { $set: { "cart.$.quantity": quantity } },
@@ -180,7 +179,7 @@ const updateQuantity = async (req, res) => {
             return res.status(404).json({ success: false, message: 'Product not found in cart' });
         }
 
-        // Recalculate cart totals after updating quantity
+        
         const updatedCartTotals = await calculateCartTotals(userId);
 
         res.json({
