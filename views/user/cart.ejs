@@ -306,20 +306,16 @@ input[type="number"]::-webkit-inner-spin-button {
                     </table>
                 </div>
             </div>
-
-            <!-- Cart Summary -->
             <div class="col-lg-4">
-                <div class="shopping__cart__summary">
-                    <h5>Cart totals</h5>
+                <div class="cart__total">
+                    <h6>Cart total</h6>
                     <ul>
-                        <li>Subtotal <span id="cartTotal">₹<%= cartTotal %></span></li>
-                        <li>Discount <span id="discount">-₹<%= discount %></span></li>
-                        <li>Shipping <span id="shippingCharges">₹<%= shippingCharges %></span></li>
-                        <li>Total <span id="netAmount">₹<%= netAmount %></span></li>
+                        <li>SubTotal<span><%=cartTotal%></span></li>
+                        <li>Discount<span><%=discount%></span></li>
+                        <li>shipping fee <span><%=shippingCharges%></span></li>
+                        <li>Total <span><%= netAmount%></span></li>
                     </ul>
-                    <div class="checkout-btn">
-                        <a href="/checkout" class="primary-btn">Proceed to Checkout</a>
-                    </div>
+                    <a href="/checkout" class="primary-btn">Proceed to checkout</a>
                 </div>
             </div>
         </div>
