@@ -123,49 +123,45 @@ async function calculateCartTotals(userId) {
 }
 
 
-// Remove product from cart
+
 const removeFromCart = async (req, res) => {
-    const  userId  = req.session.user; // Get the user from the session or token
-    const { productId } = req.params; // Get product ID from the URL
+    const  userId  = req.session.user;
+    const { productId } = req.params;
     try {
 
-      const updateData =  await User.updateOne(
+        const user = await User.findOneAndUpdate(
             { _id: userId },
-            { $pull: { cart: { product_id: productId } } }
+            { $pull: { cart: { product_id: productId } } },
+            { new: true }
         );
 
-              // Check if the update was successful
-              if (updateData.modifiedCount > 0) {
-                // Recalculate the cart totals
-                const updatedCartTotals = await calculateCartTotals(userId);
-    
-                // Send both success message and updated totals
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User or product not found in cart' });
+        }
+
+              const updatedCartTotals = await calculateCartTotals(userId);
+
                 res.json({
                     success: true,
                     message: 'Product removed successfully',
                     ...updatedCartTotals
                 });
-            } else {
-                res.status(404).json({ success: false, message: 'Product not found in cart' });
-            }
     } catch (error) {
         res.status(500).json({ success: false, message: 'Failed to remove product from cart' });
     }
 };
 
 const updateQuantity = async (req, res) => {
+
+    try {
     const { productId } = req.params;
     const { quantity } = req.body;
     const userId = req.session.user;
-
-    try {
-       
         const product = await Product.findById(productId);
         if (!product) {
             return res.status(404).json({ success: false, message: 'Product not found' });
         }
 
-        
         if (quantity > product.quantity) {
             return res.json({
                 success: false,
@@ -187,8 +183,10 @@ const updateQuantity = async (req, res) => {
         // Recalculate cart totals after updating quantity
         const updatedCartTotals = await calculateCartTotals(userId);
 
-        
-        res.json(updatedCartTotals);
+        res.json({
+            sucess : true,
+            ...updatedCartTotals
+        });
     } catch (error) {
         console.error('Error updating quantity:', error);
         res.status(500).json({ success: false, message: 'Failed to update product quantity' });
