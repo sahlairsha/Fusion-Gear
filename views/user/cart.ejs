@@ -185,6 +185,9 @@ display: flex;
                                             <img src="/uploads/public-image/<%=item.product_id.productImage[0]  %>" alt="<%= item.product_id.productName %>">
                                         </div>
                                         <div class="product__cart__item__text">
+                                            <h6><%=item.product_id.productName%></h6>
+                                            <h5>&#8377;<%= item.product_id.salePrice%></h5>
+                                        </div>
                                     </td>
                                     <td class="quantity__item ">
                                         <div class="quantity">
