@@ -1,233 +1,326 @@
+<%- include('../../views/partials/user/header') %>
 
- <%-include('../../views/partials/user/header') %>
 <style>
-
+/* Your custom styles */
 .address-box {
-    background-color: #f9f9f9; 
+    background-color: #fff; 
     padding: 20px; 
     border-radius: 10px; 
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     margin-bottom: 20px;
     width: 90%; 
     max-width: 700px; 
     position: relative; 
-    margin-bottom: 40px;
+    margin-bottom: 50px;
+    border: 1px dotted #000;
+    align-items: center;
 }
-
-
 .address-box h6 {
     font-size: 1.2rem;
     font-weight: 600; 
     color: #333; 
-    margin-bottom: 10px; 
+    margin-bottom: 5px; 
 }
-
-
 .address-box p {
     font-size: 1rem;
     color: #555; 
     margin: 5px 0;
 }
-
-
 .address-box button {
-    background-color: #000; 
+    background-color:#000 ; 
     color: white;
     border: none; 
     padding: 8px 20px; 
     border-radius: 5px;
-    font-size: 1rem; 
-    cursor: pointer; 
-    transition: background-color 0.3s; 
-    position: absolute;
-    right: 20px; 
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    position: absolute; 
+    top: 18px; 
+    right: 20px;
 }
-
-/* Hover effect for the change button */
 .address-box button:hover {
-    background-color: #45a049;
+    background-color: #00000079;
 }
-
-
 .address-box button a {
     color: white;
-    text-decoration: none; 
+    text-decoration: none;
 }
 
-/* Adding some responsiveness for mobile view */
+/* Add to your existing CSS */
+
+/* Align the cart summary properly */
+.shopping__cart__summary {
+    background-color: #ffff;
+    border: 1px solid #ddd;
+    padding: 20px;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: space-between;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Adjust cart totals item list */
+.shopping__cart__summary ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+}
+
+.shopping__cart__summary ul li {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px dotted #ccc;
+    font-size: 1.1rem;
+}
+
+.shopping__cart__summary ul li span {
+    font-weight: bold;
+}
+
+/* Adjust checkout button */
+.checkout-btn {
+    width: 100%;
+    margin-top: 20px;
+}
+
+.checkout-btn .primary-btn {
+    width: 100%;
+    padding: 12px 0;
+    background-color: #000;
+    color: white;
+    border: none;
+    font-size: 14px;
+    border-radius: 6px;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.checkout-btn .primary-btn:hover {
+    background-color: #787877;
+}
+
+@media (max-width: 768px) {
+    /* Make cart summary more compact on smaller screens */
+    .shopping__cart__summary {
+        padding: 15px;
+    }
+
+    .shopping__cart__summary ul li {
+        font-size: 1rem;
+    }
+
+    .checkout-btn .primary-btn {
+        font-size: 1rem;
+        padding: 10px 0;
+    }
+}
+
+
 @media (max-width: 768px) {
     .address-box {
         padding: 15px;
-        width: 95%; 
+        width: 95%;
     }
-
     .address-box h6 {
-        font-size: 1.1rem; 
+        font-size: 1.1rem;
     }
-
     .address-box p {
-        font-size: 0.9rem; 
+        font-size: 0.9rem;
     }
 }
-.continue_btn{
-    width: 200px;
-    height: 50px;
+
+/* Hides the default increment and decrement buttons in number input fields */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+
+.coupon-field{
+    width: 250px;
+    padding-left: 20px;
+    height: 45px;
     border-radius: 4px;
-    border:1px solid #000;
-    text-align: center;
-    padding-top: 10px;
+    border: 1px dotted #000;
     background-color: #fff;
-    transition: 0.5s ease-in-out;
 }
-.continue_btn a{
-    color: #000;
-    text-transform: uppercase;
-    font-weight : 500;
-    transition: 0.5s ease-in-out;
 
-}
-.continue_btn:hover{
-background-color: #000;
+.apply-button{
+    width: 80px;
+    height: 45px;
+    background-color: #000;
+    color: #fff;
+    border-radius: 4px;
+    border: none;
 
-}
-.continue_btn a:hover{
-    color:#fff;
 }
 .product__cart__item__pic{
-    width: 80px;
-    height: 30px;
+    width:80px;
+    height: 40px;
+    
 }
+
+.quantity-input{
+    border: none;
+    background-color: #ffff;
+}
+
+.remove-item{
+    margin-left: 20px;
+}
+
+.quantity {
+    display: flex;
+    align-items: center;
+}
+
+.quantity button {
+    background-color: #fff;
+    border: none;
+    font-weight: 600;
+    font-size: 1.2rem;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+.quantity input {
+    width: 50px;
+    text-align: center;
+    font-size: 1.2rem;
+    margin: 0 10px;
+    padding: 5px;
+    border:none;
+}
+
+.quantity button:hover {
+    background-color: #ccc;
+}
+
+.quantity button:focus {
+    outline: none;
+}
+
 
 </style>
 
-
-   <!-- Breadcrumb Section Begin -->
-    <section class="breadcrumb-option">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="breadcrumb__text">
-                        <h4>Shopping Cart</h4>
-                        <div class="breadcrumb__links">
-                            <a href="/">Home</a>
-                            <a href="/products">Products</a>
-                            <span>Shopping Cart</span>
-                        </div>
+<!-- Breadcrumb Section Begin -->
+<section class="breadcrumb-option">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="breadcrumb__text">
+                    <h4>Shopping Cart</h4>
+                    <div class="breadcrumb__links">
+                        <a href="/">Home</a>
+                        <a href="/products">Products</a>
+                        <span>Cart</span>
                     </div>
                 </div>
             </div>
         </div>
-    </section>
-    <!-- Breadcrumb Section End -->
+    </div>
+</section>
+<!-- Breadcrumb Section End -->
 
-    <!-- Shopping Cart Section Begin -->
-    <section class="shopping-cart spad">
-        <div class="container">
-            <div class="row">
-                <div class="address-box">
-    <% if (address.length === 0 || !address.some(doc => doc.address.length > 0)) { %>
-        <div class="text-center">
-            <p class="fs-4">There is no address available. <br> <button class="btn btn-primary mt-3" id="showFormBtn">Add New Address</button></p>
-        </div>
-    <% } else { %>
-        <!-- Display existing addresses -->
-        <h3 class="mb-4">Your Addresses</h3>
-        <ul class="list-group mb-4">
-            <% address.forEach(function(doc) { %>
-                <% doc.address.forEach(function(addr) { %>
-                    <li class="list-group-item">
-                        <h6><%= addr.recipient_name %>
-                            <% if (addr.addressType) { %>
-                                <span class="badge mb-2"><%=addr.addressType%></span>
+<!-- Shopping Cart Section Begin -->
+<section class="shopping-cart spad">
+    <div class="container">
+        <!-- Address Section -->
+        <div class="row">
+            <div class="address-box">
+                <% if (address.length === 0 || !address.some(doc => doc.address.length > 0)) { %>
+                    <div class="text-center">
+                        <p class="fs-4">There is no address available. <br> <button class="btn btn-primary" id="showFormBtn">Add New Address</button></p>
+                    </div>
+                <% } else { %>
+                    <h3 class="mb-4">Your Address</h3>
+                    <ul class="list-group mb-4">
+                        <% let foundAddress = null; %>
+                        <% address.some(function(doc) { %>
+                            <% if (doc.address.length > 0) { %>
+                                <% foundAddress = doc.address[0]; %> 
+                               <% return true; %>
                             <% } %>
-                        </h4>
-                        <strong><%= addr.streetAddress %>, <%= addr.city %>, <%= addr.state %></strong><br>
-                        Pincode: <%= addr.pincode %> <br>
-                        Landmark: <%= addr.landMark || 'N/A' %><br>
-                        <span class="text-muted">Phone: <%= addr.phone || 'N/A' %></span>
-                    </li>
-                <% }); %>
-            <% }); %>
-        </ul>
-        <!-- Button to show the form -->
-        <button class="btn btn-primary" id="showFormBtn">Change</button>
-    <% } %>
-
-                </div>
+                        <% }); %>
+                        <% if (foundAddress) { %>
+                            <li class="list-group-item">
+                                <h6><%= foundAddress.recipient_name %>
+                                    <% if (foundAddress.addressType) { %>
+                                        <span class="badge badge-secondary mb-2"><%= foundAddress.addressType %></span>
+                                    <% } %>
+                                </h6>
+                                <strong><%= foundAddress.streetAddress %>, <%= foundAddress.city %>, <%= foundAddress.state %></strong><br>
+                                Pincode: <%= foundAddress.pincode %> <br>
+                                Landmark: <%= foundAddress.landMark || 'N/A' %><br>
+                                <span class="text-muted">Phone: <%= foundAddress.phone || 'N/A' %></span>
+                            </li>
+                        <% } %>
+                    </ul>
+                <% } %>
             </div>
-            <div class="row">
-                <div class="col-lg-8">
-                    <div class="shopping__cart__table">
-                        <table>
-                            <thead>
+        </div>
+
+        <!-- Cart Table -->
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="shopping__cart__table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Quantity</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% cartItems.forEach(item => { %>
                                 <tr>
-                                    <th>Product</th>
-                                    <th>Quantity</th>
-                                    <th></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <% cartItems.forEach(item => { %>
-                                <tr class="remove-item" data-product-id ="<%=item.product_id%>">
                                     <td class="product__cart__item">
                                         <div class="product__cart__item__pic">
-                                            <img src="/uploads/public-image/<%=item.product_id.productImage[0]  %>" alt="<%= item.product_id.productName %>">
+                                           <a href="/product/view?id=<%= item.product_id._id%>"><img src="/uploads/public-image/<%= item.product_id.productImage[0] %>" alt="<%= item.product_id.productName %>"></a> 
                                         </div>
                                         <div class="product__cart__item__text">
-                                            <h6><%=item.product_id.productName%></h6>
-                                            <h5>&#8377;<%= item.product_id.salePrice%></h5>
+                                            <h6><%= item.product_id.productName %></h6>
+                                            <h5>Price: ₹<%= item.product_id.salePrice %></h5>
                                         </div>
                                     </td>
-
                                     <td class="quantity__item">
                                         <div class="quantity">
-                                            <div class="pro-qty-2 d-flex align-items-center">
-                                                <button class="btn btn-sm btn-outline-secondary btn-decrement me-2" data-product-id="<%= item.product_id._id %>" data-available-stock="<%= item.product_id.quantity %>">-</button>
-                                                <input type="text" value="<%= item.quantity %>" data-product-id="<%= item.product_id._id %>" readonly style="width: 40px; text-align: center;">
-                                                <button class="btn btn-sm btn-outline-secondary btn-increment ms-2" data-product-id="<%= item.product_id._id %>" data-available-stock="<%= item.product_id.quantity %>">+</button>
-                                            </div>
+                                            <button class="btn-decrement" data-available-stock="<%= item.product_id.quantity  %>" data-product-id="<%= item.product_id._id %>">-</button>
+                                            <input type="number" value="<%= item.quantity %>" min="1" data-product-id="<%= item.product_id._id %>" class="quantity-input">
+                                            <button class="btn-increment" data-available-stock="<%= item.product_id.quantity  %>" data-product-id="<%= item.product_id._id %>">+</button>
                                         </div>
-                                        </div>
-                        
-                             <td><i class="fa fa-close"></i></td>
+                                    </td>
+                                    <td class="cart__close">
+                                        <a href="#" class="remove-item" data-product-id="<%= item.product_id._id %>"><i class="fa fa-close"></i></a>
+                                    </td>
                                 </tr>
-                                <% }); %>
+                            <% }) %>
                         </tbody>
-                        </table>
-                    </div>
-                    <div class="row">
-                        <div class="col-lg-6 col-md-6 col-sm-6">
-                            <div class="continue_btn">
-                                <a  href="/products">Continue Shopping</a>
-                            </div>
-                        </div>
-                    </div>
+                    </table>
                 </div>
-                <div class="col-lg-4">
-                    <div class="cart__discount">
-                        <h6>Discount codes</h6>
-                        <form action="#">
-                            <input type="text" placeholder="Coupon code">
-                            <button type="submit">Apply</button>
-                        </form>
-                    </div>
-                    <div class="cart__total">
-                        <h6>Cart total</h6>
-                        <ul>
-                            <li>SubTotal<span><%=cartTotal%></span></li>
-                            <li>Discount<span><%=discount%></span></li>
-                            <li>shipping fee <span><%=shippingCharges%></span></li>
-                            <li>Total <span><%= netAmount%></span></li>
-                        </ul>
-                        <a href="/checkout" class="primary-btn">Proceed to checkout</a>
-                    </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="cart__total">
+                    <h6>Cart total</h6>
+                    <ul>
+                        <li>SubTotal<span><%=cartTotal%></span></li>
+                        <li>Discount<span><%=discount%></span></li>
+                        <li>shipping fee <span><%=shippingCharges%></span></li>
+                        <li>Total <span><%= netAmount%></span></li>
+                    </ul>
+                    <a href="/checkout" class="primary-btn">Proceed to checkout</a>
                 </div>
             </div>
         </div>
-
-    </section>
-
-
+    </div>
+</section>
 
 <script>
     document.getElementById('showFormBtn').addEventListener('click',function(){
@@ -293,13 +386,12 @@ function updateCartUI(data) {
 
 
 <script>
-document.addEventListener('click', async (event) => {
+    document.addEventListener('click', async (event) => {
     if (event.target.closest('.btn-increment') || event.target.closest('.btn-decrement')) {
-        event.preventDefault();
+        event.preventDefault(); // Prevent default behavior
 
-        const button = event.target.closest('button');
-        const isIncrement = button.classList.contains('btn-increment');
-        const productId = button.getAttribute('data-product-id');
+        const isIncrement = event.target.closest('.btn-increment') ? true : false;
+        const productId = event.target.closest('button').getAttribute('data-product-id');
         const quantityInput = document.querySelector(`input[data-product-id="${productId}"]`);
         let quantity = parseInt(quantityInput.value);
 
@@ -310,18 +402,20 @@ document.addEventListener('click', async (event) => {
             quantity--;
         }
 
-        const availableStock = parseInt(button.getAttribute('data-available-stock'));
+        // Update quantity input value
+        quantityInput.value = quantity;
+        const availableStock = event.target.closest('button').getAttribute('data-available-stock');
 
-        // Check if the updated quantity exceeds available stock
-        if (quantity > availableStock) {
+        if(quantity > availableStock){
             Swal.fire({
                 icon: 'error',
-                title: 'Stock Exceeded',
-                text: `Only ${availableStock} items are available in stock.`,
+                title: 'Error',
+                text: `Only ${availableStock} is left,Please Try again!!`,
             });
-            return;
+           
         }
 
+        // Send AJAX request to update quantity in the cart
         try {
             const response = await fetch(`/cart/update-quantity/${productId}`, {
                 method: 'POST',
@@ -333,39 +427,35 @@ document.addEventListener('click', async (event) => {
 
             const data = await response.json();
 
-            if (response.ok && data.success) {
-                quantityInput.value = quantity;
-                updateCartUI(data);
+            if (response.ok) {
+                updateCartUI(data); // Update the cart UI with new totals
             } else {
-                throw new Error(data.message || 'Failed to update product quantity');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Failed',
+                    text: 'Failed to update product quantity',
+                });
             }
         } catch (error) {
-            console.error('Error updating quantity:', error);
             Swal.fire({
                 icon: 'error',
                 title: 'Error',
-                text: error.message || 'Error updating quantity. Please try again.',
+                text: 'Error updating quantity',
             });
         }
     }
 });
 
 function updateCartUI(data) {
-    // Make sure these elements exist in your HTML
-    const cartTotalElement = document.querySelector('#cartTotal');
-    const discountElement = document.querySelector('#discount');
-    const shippingChargesElement = document.querySelector('#shippingCharges');
-    const netAmountElement = document.querySelector('#netAmount');
-
-    if (cartTotalElement) cartTotalElement.textContent = `₹${data.cartTotal}`;
-    if (discountElement) discountElement.textContent = `-₹${data.discount}`;
-    if (shippingChargesElement) shippingChargesElement.textContent = `₹${data.shippingCharges}`;
-    if (netAmountElement) netAmountElement.textContent = `₹${data.netAmount}`;
+    document.querySelector('#cartTotal').textContent = `₹${data.cartTotal}`;
+    document.querySelector('#discount').textContent = `-₹${data.discount}`;
+    document.querySelector('#shippingCharges').textContent = `₹${data.shippingCharges}`;
+    document.querySelector('#netAmount').textContent = `₹${data.netAmount}`;
 }
+
 </script>
 
 
 
 
 <%- include('../../views/partials/user/footer') %>
-
