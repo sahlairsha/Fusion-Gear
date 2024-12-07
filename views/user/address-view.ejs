@@ -311,7 +311,6 @@ document.querySelectorAll('.edit-address').forEach((editLink) => {
  
 
       if (response.ok) {
-        // Pre-fill the form with existing data
         document.getElementById('recipient_name').value = addressData.recipient_name;
         document.getElementById('streetAddress').value = addressData.streetAddress;
         document.getElementById('city').value = addressData.city;
@@ -320,7 +319,7 @@ document.querySelectorAll('.edit-address').forEach((editLink) => {
         document.getElementById('pincode').value = addressData.pincode;
         document.getElementById('phone').value = addressData.phone;
         document.getElementById('altPhone').value = addressData.altPhone || '';
-        
+
         // Set the address type (radio button)
         document.querySelectorAll('input[name="addressType"]').forEach((input) => {
           input.checked = input.value === addressData.addressType;
@@ -343,7 +342,6 @@ document.querySelectorAll('.edit-address').forEach((editLink) => {
              icon: 'error',
          confirmButtonText: 'OK'
         })
-       
       }
     } catch (error) {
       console.error('Error:', error);

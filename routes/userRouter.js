@@ -100,9 +100,11 @@ router.post('/cart/add/:productId',userAuth,userCartController.addToCart)
 router.post('/cart/update-quantity/:productId', userAuth, userCartController.updateQuantity);
 router.delete("/cart/delete/:productId",userAuth,userCartController.removeFromCart)
 
+//Check out page for more information.....
 
 router.get('/checkout',userAuth,userCartController.getCheckout)
 router.post('/save-address',userAuth,userCartController.saveAddress)
+router.put('/edit-address/:id',userAuth,userCartController.editAddress)
 
 
 router.get("/payment",userAuth,userPaymentController.getPayment)

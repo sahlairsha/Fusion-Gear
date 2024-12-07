@@ -268,11 +268,45 @@ const saveAddress = async (req, res) => {
     }
 };
 
+const editAddress = async(req,res)=>{
+
+    try {
+        const userId = req.session.user // Assuming user info is in the session
+        const { recipient_name, streetAddress, city, state, pincode, phone, altPhone, addressType } = req.body;
+
+        const result = await Address.updateOne(
+            { user_id: userId, "address._id": req.params.id },
+            {
+                $set: {
+                    "address.$.recipient_name": recipient_name,
+                    "address.$.streetAddress": streetAddress,
+                    "address.$.city": city,
+                    "address.$.state": state,
+                    "address.$.pincode": pincode,
+                    "address.$.phone": phone,
+                    "address.$.altPhone": altPhone,
+                    "address.$.addressType": addressType
+                }
+            }
+        );
+
+        if (result.nModified === 0) {
+            return res.status(404).json({ success: false, message: 'Address not updated' });
+        }
+
+        res.json({ success: true, message: 'Address updated successfully' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+}
+
 module.exports = {
     getCartPage,
     addToCart,
     removeFromCart,
     updateQuantity,
     getCheckout,
-    saveAddress
+    saveAddress,
+    editAddress
 };
