@@ -59,10 +59,6 @@ const userSchema = new Schema({
         type : Number,
        }
     }],
-    address:[{
-        type:mongoose.Schema.Types.ObjectId,
-        ref : "Address"
-    }],
     wallet : {
         type : Number,
         default : 0,

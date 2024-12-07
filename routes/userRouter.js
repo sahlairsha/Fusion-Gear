@@ -9,7 +9,7 @@ const userController = require('../controller/user/userController')
 const userproductController = require('../controller/user/userproductController');
 const userprofileController = require('../controller/user/userprofileController')
 const userCartController = require('../controller/user/userCartController');
-const userPaymentController = require("../controller/user/userPaymentController");
+const userOrderController = require("../controller/user/userOrderController");
 
 
 const userAuth = require('../middleware/auth')
@@ -102,14 +102,12 @@ router.delete("/cart/delete/:productId",userAuth,userCartController.removeFromCa
 
 //Check out page for more information.....
 
-router.get('/checkout',userAuth,userCartController.getCheckout)
-router.post('/save-address',userAuth,userCartController.saveAddress)
-router.get('/edit-address',userAuth,userCartController.getEditPage)
-router.put('/edit-address/:id',userAuth,userCartController.editAddress)
-
-
-router.get("/payment",userAuth,userPaymentController.getPayment)
-router.get("/order-confirm",userAuth,userPaymentController.getOrderConfirmation)
+router.get('/checkout',userAuth,userOrderController.getCheckout)
+router.post('/save-address',userAuth,userOrderController.saveAddress)
+router.get('/edit-address',userAuth,userOrderController.getEditPage)
+router.put('/edit-address/:id',userAuth,userOrderController.editAddress)
+router.get("/payment",userAuth,userOrderController.getPayment)
+router.get("/order-confirm",userAuth,userOrderController.getOrderConfirmation)
 
 
 
