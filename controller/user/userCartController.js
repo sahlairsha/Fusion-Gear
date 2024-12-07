@@ -268,6 +268,18 @@ const saveAddress = async (req, res) => {
     }
 };
 
+const getEditPage = async(req,res)=>{
+    try{
+
+        res.render('edit-save-address')
+
+    }catch(error){
+
+        res.redirect('/pagenotfound')
+    }
+}
+
+
 const editAddress = async(req,res)=>{
 
     try {
@@ -308,5 +320,6 @@ module.exports = {
     updateQuantity,
     getCheckout,
     saveAddress,
+    getEditPage,
     editAddress
 };

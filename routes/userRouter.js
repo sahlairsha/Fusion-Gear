@@ -104,6 +104,7 @@ router.delete("/cart/delete/:productId",userAuth,userCartController.removeFromCa
 
 router.get('/checkout',userAuth,userCartController.getCheckout)
 router.post('/save-address',userAuth,userCartController.saveAddress)
+router.get('/edit-address',userAuth,userCartController.getEditPage)
 router.put('/edit-address/:id',userAuth,userCartController.editAddress)
 
 
