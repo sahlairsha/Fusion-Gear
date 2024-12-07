@@ -35,7 +35,7 @@ const orderSchema = new mongoose.Schema({
         type: Date,
          default: Date.now
          },
-         shippingAddress: [{
+         shippingAddress: {
             recipient_name: { type: String, required: true },
             streetAddress: { type: String, required: true },
             city: { type: String, required: true },
@@ -43,7 +43,7 @@ const orderSchema = new mongoose.Schema({
             pincode: { type: String, required: true },
             phone: { type: String, required: true },
             addressType: { type: String, enum: ['Home', 'Work'], required: true },
-        }],
+        },
 });
 
 const Order = mongoose.model('Order', orderSchema);
