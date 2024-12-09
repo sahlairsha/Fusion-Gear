@@ -33,17 +33,47 @@ const orderSchema = new mongoose.Schema({
     },  
     order_date: {
         type: Date,
-         default: Date.now
+        default: Date.now
          },
-         shippingAddress: {
-            recipient_name: { type: String, required: true },
-            streetAddress: { type: String, required: true },
-            city: { type: String, required: true },
-            state: { type: String, required: true },
-            pincode: { type: String, required: true },
-            phone: { type: String, required: true },
-            addressType: { type: String, enum: ['Home', 'Work'], required: true },
-        },
+         shippingAddress: 
+         [{
+
+            recipient_name:{
+                type : String,
+                required : true
+            },
+            streetAddress:{
+                type : String,
+                required : true
+            },
+            city : {
+                type : String,
+                required: true
+            },
+            state:{
+                type:String,
+                required : true
+            },
+            pincode:{
+                type : String,
+                required : true
+            },
+            addressType:{
+                type : String,
+                enum : ['Home','Work'],
+                required : true
+            },
+            phone:{
+    
+                type : String,
+                required : true
+    
+            },
+            altPhone : {
+                type : String,
+                required : false
+            }
+        }]
 });
 
 const Order = mongoose.model('Order', orderSchema);

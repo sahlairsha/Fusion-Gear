@@ -1,49 +1,6 @@
 <%- include('../../views/partials/user/header') %>
 
 <style>
-    .checkout__form {
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
-}
-/* Left section: Billing details */
-.col-lg-8 {
-    flex: 0 0 65%; 
-    max-width: 65%;
-    margin-bottom: 30px; 
-}
-
-
-.col-lg-4 {
-    flex: 0 0 30%; 
-    max-width: 30%;
-    margin-left: auto; 
-    padding-left: 20px;
-}
-    .order-details-box {
-        margin-top: -100px;
-        border: 1px solid #ccc;
-        padding: 20px;
-        border-radius: 4px;
-        background-color: #f9f9f9;
-        position: relative;
-    }
-
-    .order-details-box h6 {
-        font-size: 18px;
-        font-weight: bold;
-        margin-bottom: 20px;
-    }
-
-    .order-summary-item {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 10px;
-    }
-
-    .order-summary-item p {
-        margin: 0;
-    }
 
 
     input[type="text"] {
@@ -68,121 +25,129 @@
         font-weight: 600;
     }
 
+/* Checkout page layout */
+.checkout__form {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    margin-top: 30px;
+}
 
-    .save-address {
-        border: none;
-        background-color: black;
-        color: white;
-        width: 100%;
-        padding: 15px;
-        border-radius: 4px;
-        cursor: pointer;
-        margin-top: 20px;
-    }
+/* Left section for addresses */
+.col-lg-8 {
+    flex: 0 0 65%;
+    max-width: 65%;
+    margin-bottom: 30px;
+}
 
-    
-    .col-lg-4 {
-        padding-left: 30px; 
-    }
+/* Right section for order summary */
+.col-lg-4 {
+    flex: 0 0 30%;
+    max-width: 30%;
+    margin-left: 30px; /* Adjust space between left and right columns */
+    padding-left: 20px;
+    margin-top: 30px;
+}
 
- 
-    @media (max-width: 768px) {
-        .checkout__form {
-        flex-direction: column; 
+
+.order-details-box {
+    margin-top: -100px;
+    border: 1px solid #ccc;
+    padding: 20px;
+    border-radius: 4px;
+    background-color: #f9f9f9;
+    position: relative;
+}
+
+.order-details-box h6 {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.order-summary-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.order-summary-item p {
+    margin: 0;
+}
+/* Button for adding new address */
+.save-address {
+    border: none;
+    background-color: black;
+    color: white;
+    width: 100%;
+    padding: 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 20px;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .checkout__form {
+        flex-direction: column;
     }
 
     .col-lg-8,
     .col-lg-4 {
-        flex: 0 0 100%; 
+        flex: 0 0 100%;
         max-width: 100%;
     }
 
     .col-lg-4 {
-        margin-left: 0; 
+        margin-left: 0;
         padding-left: 0;
     }
-
-        .order-details-box {
-            width: 100%;
-            margin-top: 20px;
-        }
-    }
-    
-    /* Adjust the dropdown list alignment */
-.dropdown-container {
-    position: relative;
-    width: 500px;
 }
 
-.dropdown-button {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    background-color: #fff;
-    cursor: pointer;
-    text-align: left;
-    width: 100%; /* Full width to align with the container */
-    box-sizing: border-box; /* Ensure padding doesn't affect the width */
-}
-
-.arrow-icon {
-    font-size: 16px;
-    transition: transform 0.3s ease;
-}
-
-.arrow-icon.up {
-    transform: rotate(180deg); /* Rotate the arrow to point up */
-}
-
-.dropdown-list {
-    position: absolute; /* Position relative to the container */
-    top: 100%; /* Place it just below the dropdown button */
-    left: 0;
-    right: 0;
-    z-index: 1000;
-    width: 100%; /* Match the width of the dropdown button */
-    background-color: #fff;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1); /* Add subtle shadow for better visibility */
-    max-height: 200px; /* Add scrolling for overflow */
-    overflow-y: auto;
-}
-
-.dropdown-list li {
-    padding: 10px;
-    cursor: pointer;
-}
-
-.dropdown-list li:hover {
-    background-color: #f0f0f0;
-}
-
-/* Adjust margins for neighboring buttons */
-.edit-address-btn {
-    margin-left: 10px;
-    border: none;
-        background-color: black;
-        color: white;
-        padding: 10px;
-        border-radius: 4px;
-        font-weight: 500;
-}
-
-.address-container{
+/* Styles for address box */
+.address-box {
     border: 1px solid #000;
-    width : 500px;
-    height : 100px;
+    width: 100%;
     padding: 20px;
-    text-align: center;
     border-radius: 4px;
+    position: relative;
+    padding-right: 40px;
 }
+
+/* Dropdown icon styling */
+.more-options {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: none;
+}
+
+.address-box:hover .more-options {
+    display: block;
+}
+
+/* Address list styling */
+.list-group-item {
+    border: 1px solid #ccc;
+    margin-bottom: 10px;
+    padding: 15px;
+}
+
+/* More options button */
+.more-options .btn {
+    padding: 0;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+
+/* Save button for order */
+.save-address a {
+    color: white;
+    text-decoration: none;
+}
+
 
 </style>
 
@@ -206,29 +171,37 @@
 <section class="checkout spad">
     <div class="container">
         <div class="checkout__form">
-            <form action="#">
-
-                    <h6>Billing Details</h6>
-<br><br>
-                    <div class="address-container">
-                        <% if (shippingAddress && shippingAddress.length > 0) { %>
-                            <% shippingAddress.forEach(function(address) { %>
-                                <h6><%= address.recipient_name %></h6>
-                                <div class="badge badge-secondary"><%= address.addressType %></div>
-                                <p><%= address.streetAddress %>, <%= address.city %>, <%= address.state %>, <%= address.pincode %></p>
-                                <p><%= address.phone %></p>
-                            <% }); %>
-                        <% } else { %>
-                            <p>No shipping address found. Please add one.</p>
-                        <% } %>
-                    </div>
-                    <br><br>
-                            <button class="save-address" type="button" id="addNewAddressBtn">Add New Address</button>
-                        </div>
-
+            <!-- Left Column: Addresses -->
+            <div class="col-lg-8">
+                <h3 class="mb-4">Your Addresses</h3>
+                <ul class="list-group mb-4">
+                    <% shippingAddresses.forEach(address => { %>
+                        <li class="list-group-item">
+                            <h6><%= address.recipient_name %>
+                                <% if (address.addressType) { %>
+                                    <span class="badge mb-2"><%= address.addressType %></span>
+                                <% } %>
+                            </h6>
+                            <strong><%= address.streetAddress %>, <%= address.city %>, <%= address.state %></strong><br>
+                            Pincode: <%= address.pincode %> <br>
+                            <span class="text-muted">Phone: <%= address.phone || 'N/A' %></span>
+                            <div class="more-options">
+                                <button class="btn btn-link"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+                                <div class="dropdown-list">
+                                    <ul>
+                                        <li><a href="#" class="dropdown-item edit-address" data-id="<%= address._id %>">Edit</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </li>
+                    <% }); %>
+                </ul>
+                <button class="save-address" id="addNewAddressBtn">Add New Address</button>
+            </div>
                         <!-- Modal form to add or edit address -->
                         <div class="model-form" id="newAddressModal" style="display:none;">
                             <h6 id="modalTitle">Add New Address</h6>
+                            <form id="shippingForm" action="/checkout" method="POST">
                             <label for="newRecipient">Name<span class="text-danger">*</span></label><br>
                             <input type="text" id="newRecipient" placeholder="Recipient Name">
                             <div id="error1" class="error-message"></div>
@@ -268,38 +241,32 @@
 
                             <button class="save-address" type="button" id="saveAddressBtn">Save Address</button>
                         </div>
+                    </form>
                     </div>
 
-                    <!-- Order Details Box on the right side -->
-                    <div class="col-lg-4 col-md-12">
+                    <div class="col-lg-4">
                         <div class="order-details-box">
                             <h6>Order Summary</h6>
                             <div class="order-summary-item">
                                 <p>Items:</p>
-                                <p> <%=cartCount%> items</p>
+                                <p><%= cartCount %> items</p>
                             </div>
                             <div class="order-summary-item">
                                 <p>Subtotal:</p>
-                                <p><%=cartTotal%></p>
+                                <p><%= cartTotal %></p>
                             </div>
                             <div class="order-summary-item">
                                 <p>Shipping:</p>
-                                <p><%=shippingCharges%></p>
+                                <p><%= shippingCharges %></p>
                             </div>
                             <div class="order-summary-item">
                                 <p>Total:</p>
-                                <p><%=netAmount%></p>
+                                <p><%= netAmount %></p>
                             </div>
-
-<button class="save-address" type="submit"><a class="text-decoration-none text-white" href="/payment">Proceed to Payment</a></button>
-
-
+                            <button class="save-address" type="submit"><a href="/payment">Proceed to Payment</a></button>
                         </div>
                     </div>
-
-            </form>
-        </div>
-    </div>
+ 
 </section>
 
 <script>
@@ -445,67 +412,63 @@ document.getElementById('saveAddressBtn').addEventListener('click', function(e) 
     .catch(err => console.error('Error saving address:', err));
 });
 
-const dropdownButton = document.getElementById('dropdownButton');
-const dropdownList = document.getElementById('dropdownList');
-const dropdownIcon = document.getElementById('dropdownIcon');
-const hiddenInput = document.getElementById('selectedAddressValue');
-const editAddressBtn = document.getElementById('editAddressBtn');
-
-// Initially hide the edit button
-editAddressBtn.style.display = 'none';
-
-// Toggle the dropdown visibility and arrow direction
-dropdownButton.addEventListener('click', () => {
-    const isDropdownOpen = dropdownList.style.display === 'block';
-    dropdownList.style.display = isDropdownOpen ? 'none' : 'block';
-    dropdownIcon.classList.toggle('up', !isDropdownOpen);
-});
-
-// Select an address
-dropdownList.addEventListener('click', (event) => {
-    event.preventDefault()
-    if (event.target.tagName === 'LI' && event.target.getAttribute('data-value')) {
-        const selectedValue = event.target.getAttribute('data-value');
-        const selectedText = event.target.textContent;
-
-        // Update button text and hidden input
-        dropdownButton.firstChild.textContent = selectedText;
-        hiddenInput.value = selectedValue;
-
-        // Show the edit button
-        editAddressBtn.style.display = 'inline-block';
-
-        // Hide the dropdown and reset the arrow
-        dropdownList.style.display = 'none';
-        dropdownIcon.classList.remove('up');
-    }
-});
-
-// Close dropdown if clicking outside
-document.addEventListener('click', (event) => {
-    event.preventDefault()
-    if (!dropdownButton.contains(event.target) && !dropdownList.contains(event.target)) {
-        dropdownList.style.display = 'none';
-        dropdownIcon.classList.remove('up');
-    }
-});
-
-// Hide the edit button if no valid address is selected
-hiddenInput.addEventListener('change', () => {
-    if (!hiddenInput.value) {
-        editAddressBtn.style.display = 'none';
-    }
-});
-
-editAddressBtn.addEventListner('click',function(){
-    window.location.href = '/edit-address'
-})
-
-
-
 </script>
 
+<script>
+    document.querySelectorAll('.edit-address').forEach((editLink) => {
+  editLink.addEventListener('click', async (e) => {
+    e.preventDefault();
+    const addressId = e.target.getAttribute('data-id');
 
+
+    try {
+      // Fetch the existing address data
+      const response = await fetch(`/edit-address/${addressId}`);
+      const addressData = await response.json();
+
+ 
+
+      if (response.ok) {
+        document.getElementById('newRecipient').value = addressData.recipient_name;
+        document.getElementById('newStreet').value = addressData.streetAddress;
+        document.getElementById('newCity').value = addressData.city;
+        document.getElementById('newState').value = addressData.state;
+        document.getElementById('newPincode').value = addressData.pincode;
+        document.getElementById('newPhone').value = addressData.phone;
+        document.getElementById('newAltPhone').value = addressData.altPhone || '';
+        document.getElementById('newAddressType').value = addressData.altPhone || '';
+
+     
+        // Show the form
+        document.getElementById('newAddressModal').style.display = 'block';
+        document.getElementById('addNewAddressBtn').style.display = "none"
+        document.getElementById('saveAddressBtn').innerText = "Update"
+
+        // Update form action to include the address ID
+        const form = document.getElementById('shippingForm');
+        form.action = `/update-address/${addressId}`;
+        form.method = 'POST';
+      } else {
+
+        Swal.fire({
+            title: "Error!",
+            text:'Failed to fetch address data. Please try again.',
+             icon: 'error',
+         confirmButtonText: 'OK'
+        })
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      Swal.fire({
+            title: "Error!",
+            text:'Something went wrong. Please try again later.',
+             icon: 'error',
+         confirmButtonText: 'OK'
+        })
+    }
+  });
+});
+</script>
 
 
 

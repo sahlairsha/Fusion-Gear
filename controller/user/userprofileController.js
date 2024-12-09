@@ -12,10 +12,9 @@ const getProfile = async (req, res) => {
 
     const userData = await User.findById(userId);
     if (!userData) {
-      return res.status(404).send("User not found");
+      req.flash('error',"User not found")
+      return res.redirect('/userProfile')
     }
-
-
     res.render("user-profile", { user : userData , activePage : "profile"});
   } catch (error) {
     console.error(error);

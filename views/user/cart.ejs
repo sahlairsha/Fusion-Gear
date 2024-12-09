@@ -233,39 +233,7 @@ input[type="number"]::-webkit-inner-spin-button {
 <section class="shopping-cart spad">
     <div class="container">
         <!-- Address Section -->
-        <div class="row">
-            <div class="address-box">
-                <% if (address.length === 0 || !address.some(doc => doc.address.length > 0)) { %>
-                    <div class="text-center">
-                        <p class="fs-4">There is no address available. <br> <button class="btn btn-primary" id="showFormBtn">Add New Address</button></p>
-                    </div>
-                <% } else { %>
-                    <h3 class="mb-4">Your Address</h3>
-                    <ul class="list-group mb-4">
-                        <% let foundAddress = null; %>
-                        <% address.some(function(doc) { %>
-                            <% if (doc.address.length > 0) { %>
-                                <% foundAddress = doc.address[0]; %> 
-                               <% return true; %>
-                            <% } %>
-                        <% }); %>
-                        <% if (foundAddress) { %>
-                            <li class="list-group-item">
-                                <h6><%= foundAddress.recipient_name %>
-                                    <% if (foundAddress.addressType) { %>
-                                        <span class="badge badge-secondary mb-2"><%= foundAddress.addressType %></span>
-                                    <% } %>
-                                </h6>
-                                <strong><%= foundAddress.streetAddress %>, <%= foundAddress.city %>, <%= foundAddress.state %></strong><br>
-                                Pincode: <%= foundAddress.pincode %> <br>
-                                Landmark: <%= foundAddress.landMark || 'N/A' %><br>
-                                <span class="text-muted">Phone: <%= foundAddress.phone || 'N/A' %></span>
-                            </li>
-                        <% } %>
-                    </ul>
-                <% } %>
-            </div>
-        </div>
+        
 
         <!-- Cart Table -->
         <div class="row">
@@ -329,6 +297,7 @@ input[type="number"]::-webkit-inner-spin-button {
             </div>
         </div>
     </div>
+</div>
 </section>
 
 <script>

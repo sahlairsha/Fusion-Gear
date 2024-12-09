@@ -27,12 +27,10 @@ async function calculateCartTotals(userId) {
 }
 
 
-
 const getCheckout = async (req, res) => {
     try {
-        // Fetch the user and their saved addresses
+        // Fetch the user and their cart
         const userId = req.session.user;
-
 
         const user = await User.findById(userId).populate('cart.product_id');
         const cartItems = user.cart.filter(item => item.product_id);
@@ -40,25 +38,28 @@ const getCheckout = async (req, res) => {
         const countItems = cartItems.length;
         req.session.cartCount = countItems;
 
-        const order = await Order.findOne({ user_id: userId, order_status: 'Pending' }).lean();
-        const shippingAddress = order?.shippingAddress ? [order.shippingAddress] : [];
+        // Fetch all orders for the user and only select the shippingAddress field
+        const orders = await Order.find({ user_id: userId }).select('shippingAddress');
 
-        console.log(shippingAddress)
+        // Extract all the shipping addresses
+        const shippingAddresses = orders.flatMap(order => order.shippingAddress);
 
-        const updateCartTotal = await calculateCartTotals(userId)
-        // Pass addresses to the checkout page
+        console.log(shippingAddresses)
+
+        const updateCartTotal = await calculateCartTotals(userId);
+
+        // Render the checkout page with all necessary data
         res.render('checkout', {
-            shippingAddress,
-            cartCount : req.session.cartCount,
+            shippingAddresses,
+            cartCount: req.session.cartCount,
             cartItems,
-            ...updateCartTotal
-        }
-        );
+            ...updateCartTotal,
+        });
     } catch (error) {
-        console.log("Error in Loading checkout page", error);
+        console.error("Error in Loading checkout page", error);
         res.redirect('/pagenotfound');
     }
-}
+};
 
 
 
@@ -75,7 +76,6 @@ const saveAddress = async (req, res) => {
         const userId = req.session.user; // Assuming session middleware is used
         if (!userId) return res.status(401).json({ success: false, message: 'Unauthorized access.' });
 
-        // Construct the address object
         const shippingAddress = {
             recipient_name,
             streetAddress,
@@ -87,14 +87,14 @@ const saveAddress = async (req, res) => {
             addressType,
         };
 
-        req.session.shippingAddress = shippingAddress;
+        req.session.shippingAddress = shippingAddress
 
+        // Find the existing pending order, or create a new one if none exists
         const currentOrder = await Order.findOneAndUpdate(
             { user_id: userId, order_status: 'Pending' }, 
-            { $set: { shippingAddress } },
+            { $push: { shippingAddress } },
             { new: true, upsert: true }
         );
-
         res.json({
             success: true,
             message: 'Shipping address saved successfully.',
@@ -105,40 +105,42 @@ const saveAddress = async (req, res) => {
         res.status(500).json({ success: false, message: 'Failed to save shipping address.' });
     }
 };
-const getEditPage = async(req,res)=>{
-    try{
 
-        res.render('edit-save-address')
 
-    }catch(error){
+const getAddress = async(req,res)=>{
+    try {
 
-        res.redirect('/pagenotfound')
+    const address = await Order.findOne({ 'shippingAddress._id': req.params.id }, { 'shippingAddress.$': 1 });
+    if (!address) return res.status(404).json({ message: 'Address not found' });
+    res.json(address.address[0]);
+        
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' }); 
     }
 }
-
 
 const editAddress = async(req,res)=>{
 
     try {
-        const userId = req.session.user // Assuming user info is in the session
+        const userId = req.session.user 
         const { recipient_name, streetAddress, city, state, pincode, phone, altPhone, addressType } = req.body;
+  
 
-        const result = await Address.updateOne(
-            { user_id: userId, "address._id": req.params.id },
-            {
-                $set: {
-                    "address.$.recipient_name": recipient_name,
-                    "address.$.streetAddress": streetAddress,
-                    "address.$.city": city,
-                    "address.$.state": state,
-                    "address.$.pincode": pincode,
-                    "address.$.phone": phone,
-                    "address.$.altPhone": altPhone,
-                    "address.$.addressType": addressType
-                }
-            }
-        );
-
+  const result = await Order.updateOne(
+    { user_id: userId, "shippingAddress.addressType": req.params.addressType },
+    {
+        $set: {
+            "shippingAddress.$.recipient_name": recipient_name,
+            "shippingAddress.$.streetAddress": streetAddress,
+            "shippingAddress.$.city": city,
+            "shippingAddress.$.state": state,
+            "shippingAddress.$.pincode": pincode,
+            "shippingAddress.$.phone": phone,
+            "shippingAddress.$.altPhone": altPhone,
+            "shippingAddress.$.addressType": addressType
+        }
+    }
+);
         if (result.nModified === 0) {
             return res.status(404).json({ success: false, message: 'Address not updated' });
         }
@@ -179,9 +181,8 @@ const getOrderConfirmation = async(req,res)=>{
 module.exports = {
     getCheckout,
     saveAddress,
-    getEditPage,
     editAddress,
     getPayment,
-    getOrderConfirmation
-
+    getOrderConfirmation,
+    getAddress
 }

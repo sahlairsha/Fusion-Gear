@@ -87,28 +87,32 @@ const validateAvatar = async (avatarUrl) => {
 
 const signup = async (req, res) => {
     try {
-        const { full_name, username, phone, email, password, confirm_password,googleId,profile_pic } = req.body;
-
-let avatarUrl;
-
-if (googleId) {
-    avatarUrl = `https://www.gravatar.com/avatar/${crypto.createHash('md5').update(email.trim().toLowerCase()).digest('hex')}?d=robohash&r=g&s=200`; 
-} else {
-    avatarUrl = profile_pic || `https://www.gravatar.com/avatar/${crypto.createHash('md5').update(email.trim().toLowerCase()).digest('hex')}?d=robohash&r=g&s=200`;
-}
-// Handle password validation only if user is not using Google
-if (!googleId && password !== confirm_password) {
-    return res.render("signup", { message: "Passwords do not match" });
-}
-        if (password !== confirm_password) {
-            return res.render("signup", { message: "Passwords do not match" });
-        }
+        const { full_name, username, phone, email, password, confirm_password } = req.body;
 
         const findUser = await User.findOne({ email });
         if (findUser) {
             req.flash('error', 'User already exists');
             return res.redirect('/signup');
         }
+
+let avatarUrl;
+
+if (findUser.googleId) {
+    avatarUrl = `https://www.gravatar.com/avatar/${crypto.createHash('md5').update(email.trim().toLowerCase()).digest('hex')}?d=robohash&r=g&s=200`; 
+} else {
+    avatarUrl = `https://www.gravatar.com/avatar/${crypto.createHash('md5').update(email.trim().toLowerCase()).digest('hex')}?d=robohash&r=g&s=200`;
+}
+
+console.log(findUser.googleId)
+// Handle password validation only if user is not using Google
+if (!findUser.googleId && password !== confirm_password) {
+    return res.render("signup", { message: "Passwords do not match" });
+}
+        if (password !== confirm_password) {
+            return res.render("signup", { message: "Passwords do not match" });
+        }
+
+     
 
         const otp = generateOtp();
         const emailSent = await sendVerificationEmail(email, otp);
@@ -118,7 +122,7 @@ if (!googleId && password !== confirm_password) {
         }
 
         req.session.userOtp = { otp, expires: Date.now() + 10 * 60 * 1000 };
-        req.session.userData = { full_name, username, phone, email, password ,profile_pic: avatarUrl , googleId };
+        req.session.userData = { full_name, username, phone, email, password ,profile_pic: avatarUrl};
 
         res.render("verification-otp");
     } catch (error) {

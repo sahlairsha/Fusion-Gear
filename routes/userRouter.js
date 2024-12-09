@@ -104,8 +104,8 @@ router.delete("/cart/delete/:productId",userAuth,userCartController.removeFromCa
 
 router.get('/checkout',userAuth,userOrderController.getCheckout)
 router.post('/save-address',userAuth,userOrderController.saveAddress)
-router.get('/edit-address',userAuth,userOrderController.getEditPage)
-router.put('/edit-address/:id',userAuth,userOrderController.editAddress)
+router.get('/edit-address/:id',userAuth,userOrderController.getAddress)
+router.post('/update-address/:id',userAuth,userOrderController.editAddress)
 router.get("/payment",userAuth,userOrderController.getPayment)
 router.get("/order-confirm",userAuth,userOrderController.getOrderConfirmation)
 
