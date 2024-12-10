@@ -62,8 +62,6 @@ const getCheckout = async (req, res) => {
 };
 
 
-
-// Save address for current order as shipping address
 const saveAddress = async (req, res) => {
     try {
         const { recipient_name, streetAddress, city, state, pincode, phone, altPhone, addressType } = req.body;
@@ -87,9 +85,26 @@ const saveAddress = async (req, res) => {
             addressType,
         };
 
-        req.session.shippingAddress = shippingAddress
+        // Check if the address already exists in the user's shipping addresses
+        const user = await User.findById(userId);
+        const existingAddress = user.shippingAddress.find(address => 
+            address.recipient_name === recipient_name &&
+            address.streetAddress === streetAddress &&
+            address.city === city &&
+            address.state === state &&
+            address.pincode === pincode &&
+            address.phone === phone &&
+            address.altPhone === altPhone &&
+            address.addressType === addressType
+        );
 
-        // Find the existing pending order, or create a new one if none exists
+        if (existingAddress) {
+            return res.status(400).json({ success: false, message: 'This address already exists.' });
+        }
+
+        // If address does not exist, save the new address
+        req.session.shippingAddress = shippingAddress;
+
         const currentOrder = await Order.findOneAndUpdate(
             { user_id: userId, order_status: 'Pending' }, 
             { $push: { shippingAddress } },
@@ -98,7 +113,6 @@ const saveAddress = async (req, res) => {
         res.json({
             success: true,
             message: 'Shipping address saved successfully.',
-            shippingAddress: currentOrder.shippingAddress
         });
     } catch (error) {
         console.error('Error saving shipping address:', error);
@@ -107,40 +121,48 @@ const saveAddress = async (req, res) => {
 };
 
 
-const getAddress = async(req,res)=>{
+const getAddress = async (req, res) => {
     try {
+        const address = await Order.findOne(
+            { 'shippingAddress._id': req.params.id },
+            { 'shippingAddress.$': 1 } 
+        );
 
-    const address = await Order.findOne({ 'shippingAddress._id': req.params.id }, { 'shippingAddress.$': 1 });
-    if (!address) return res.status(404).json({ message: 'Address not found' });
-    res.json(address.address[0]);
-        
-    } catch (error) {
-        res.status(500).json({ message: 'Server error' }); 
-    }
-}
+        console.log('Fetching address for ID:', req.params.id);
 
-const editAddress = async(req,res)=>{
-
-    try {
-        const userId = req.session.user 
-        const { recipient_name, streetAddress, city, state, pincode, phone, altPhone, addressType } = req.body;
-  
-
-  const result = await Order.updateOne(
-    { user_id: userId, "shippingAddress.addressType": req.params.addressType },
-    {
-        $set: {
-            "shippingAddress.$.recipient_name": recipient_name,
-            "shippingAddress.$.streetAddress": streetAddress,
-            "shippingAddress.$.city": city,
-            "shippingAddress.$.state": state,
-            "shippingAddress.$.pincode": pincode,
-            "shippingAddress.$.phone": phone,
-            "shippingAddress.$.altPhone": altPhone,
-            "shippingAddress.$.addressType": addressType
+        if (!address || !address.shippingAddress || address.shippingAddress.length === 0) {
+            return res.status(404).json({ message: 'Address not found' });
         }
+
+        res.json(address.shippingAddress[0]);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server error' });
     }
-);
+};
+
+const editAddress = async (req, res) => {
+    try {
+        const userId = req.session.user;
+        const addressId = req.params.id;
+        const { recipient_name, streetAddress, city, state, pincode, phone, altPhone, addressType } = req.body;
+
+        const result = await Order.updateOne(
+            { user_id: userId, "shippingAddress._id": addressId },
+            {
+                $set: {
+                    "shippingAddress.$.recipient_name": recipient_name,
+                    "shippingAddress.$.streetAddress": streetAddress,
+                    "shippingAddress.$.city": city,
+                    "shippingAddress.$.state": state,
+                    "shippingAddress.$.pincode": pincode,
+                    "shippingAddress.$.phone": phone,
+                    "shippingAddress.$.altPhone": altPhone,
+                    "shippingAddress.$.addressType": addressType,
+                },
+            }
+        );
+
         if (result.nModified === 0) {
             return res.status(404).json({ success: false, message: 'Address not updated' });
         }
@@ -150,7 +172,7 @@ const editAddress = async(req,res)=>{
         console.error(error);
         res.status(500).json({ success: false, message: 'Server error' });
     }
-}
+};
 
 
 

@@ -80,38 +80,40 @@ const viewAddress = async(req,res)=>{
 }
 
 
-const addAddress = async(req,res)=>{
-  try{
+const addAddress = async (req, res) => {
+  try {
+    const { recipient_name, streetAddress, city, state, landMark, pincode, phone, altPhone, addressType } = req.body;
 
-    const {recipient_name,streetAddress, city, state, landMark, pincode,phone,altPhone,addressType } = req.body;
+    if (!req.session.user) {
+      return res.status(401).json({ message: 'User not logged in' });
+    }
 
     // Create a new address
     const newAddress = new Address({
       user_id: req.session.user,
       address: {
         recipient_name,
-          streetAddress,
-          city,
-          state,
-          landMark,
-          pincode,
-          phone,
-          altPhone,
-          addressType
+        streetAddress,
+        city,
+        state,
+        landMark,
+        pincode,
+        phone,
+        altPhone,
+        addressType
       }
-  });
+    });
 
+    await newAddress.save();
 
-  await newAddress.save();
-
-  req.flash('success_msg', 'Address added successfully!');
-  res.redirect('/address-view');
-
-  }catch(error){
-    console.error(error);
-    res.redirect('/pagenotfound');
+    req.flash('success_msg', 'Address added successfully!');
+    res.status(200).json({ _id: newAddress._id, message: 'Address added successfully!' });
+  } catch (error) {
+    console.error('Error adding address:', error);
+    res.status(500).json({ message: 'Failed to add address', error: error.message });
   }
-}
+};
+
 
 
 const deleteAddress = async(req,res)=>{
@@ -160,10 +162,10 @@ const updateAddress = async(req,res)=>{
         },
       }
     );
-    res.redirect('/address-view');
+    res.status(200).json({message : "Address Updated Successfully" })
   } catch (error) {
     console.error(error);
-    res.status(500).send('Failed to update address');
+    res.status(500).json({message:'Failed to update address'});
   }
 
 }
