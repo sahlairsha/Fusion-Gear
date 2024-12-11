@@ -4,16 +4,14 @@
     <h2 class="mb-4">Add New Category</h2>
 
     <% if (flash.error) { %>
-        <div class="alert alert-danger w-25 alert-dismissible fade show" role="alert">
+        <div class="alert alert-danger w-50 text-center alert-dismissible fade show" role="alert">
             <%= flash.error %>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     <% } %>
 
     <% if (flash.success) { %>
-        <div class="alert alert-success w-25 alert-dismissible fade show" role="alert">
+        <div class="alert alert-success w-50 text-center alert-dismissible fade show" role="alert">
             <%= flash.success %>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     <% } %>
 
@@ -59,7 +57,7 @@
         } else {
             descriptionError.innerText = "";
         }
-        return isValid;  // Return true if valid, false if not
+        return isValid;
     }
 
     formSubmit.addEventListener('submit', (e) => {

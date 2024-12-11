@@ -53,13 +53,13 @@ const addCategories = async (req, res) => {
         req.flash('success', 'Category added successfully!');
         res.redirect('/admin/addCategory');
     } catch (error) {
-        if (error.code === 11000) {
-            req.flash("error",'Category name must be unique.')
-            return res.redirect("/admin/addCategory")
+        if (error.name === 'ValidationError') {
+            // If a validation error occurs, send the error to the frontend
+            req.flash('error', error.message);
         } else {
-            console.error("Error creating category:", error);
-            res.status(500).redirect('/pageerror');
+            req.flash('error', 'An unexpected error occurred.');
         }
+        res.redirect('/admin/addcategory');
     }
 };
 

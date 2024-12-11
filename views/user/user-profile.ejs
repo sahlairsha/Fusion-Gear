@@ -29,9 +29,9 @@
             <div id="error3" class="error-message"></div>
         </div>
 
-        <!-- Submit Button -->
-        <div class="form-group">
-            <button type="button" id="update-btn" class="save-btn" style="display: none;" onclick="updateProfile(event)">Save Changes</button>
+        <!-- Save Changes Button -->
+        <div class="form-group" id="save-update-profile" style="display: none;">
+            <button type="button" class="save-btn" onclick="updateProfile(event)">Save Changes</button>
         </div>
     </form>
 
@@ -40,7 +40,6 @@
         <button type="button" id="create-btn" class="edit-btn" onclick="enablePasswordFields()">Reset Password?</button>
 
         <form action="/update-password" method="POST">
-
             <h6 class="password-heading mb-4 mt-5" id="create-password-head" style="display: none;">Create New Password</h6>
 
             <div class="form-group" id="newpassword-group" style="display: none;">
@@ -53,7 +52,7 @@
                 </div>
                 <div id="error4" class="error-message"></div>
             </div>
-            
+
             <div class="form-group" id="confirm_password-group" style="display: none;">
                 <label for="cpassword">Confirm Password:</label>
                 <div class="input-wrapper">
@@ -64,12 +63,10 @@
                 </div>
                 <div id="error5" class="error-message"></div>
             </div>
-            
 
             <div class="form-group" id="password-update-btn-group" style="display: none;">
                 <button type="submit" class="update-btn" onclick="updatePassword(event)">Update</button>
             </div>
-
         </form>
     <% } %>
 </div>
@@ -77,47 +74,45 @@
 <script>
 document.addEventListener("DOMContentLoaded", () => {
     const isGoogleSignup = !!document.getElementById('edit-form').getAttribute('data-google-signup');
+
     if (isGoogleSignup) {
         console.log("Google signup detected. Hiding password fields.");
-
-        const newPasswordGroup = document.getElementById('newpassword-group');
-        const confirmPasswordGroup = document.getElementById('confirm_password-group');
-
-        if (newPasswordGroup) {
-            newPasswordGroup.style.display = 'none';
-        }
-
-        if (confirmPasswordGroup) {
-            confirmPasswordGroup.style.display = 'none';
-        }
+        document.getElementById("newpassword-group").style.display = 'none';
+        document.getElementById("confirm_password-group").style.display = 'none';
+        document.getElementById("password-update-btn-group").style.display = 'none';
+        document.getElementById("create-password-head").style.display = 'none';
     }
 });
-
 
 // Enable Edit Mode
 function enableEdit() {
     console.log("Enable edit triggered.");
     const formInputs = document.querySelectorAll("#edit-form input");
-    const isGoogleSignup = !!document.getElementById('edit-form').getAttribute('data-google-signup');
+    const saveButton = document.getElementById("save-update-profile");
 
+    if (!saveButton) {
+        console.error("Save button element not found!");
+        return; // Exit if the element is not found
+    }
+
+    // Enable all profile-related inputs
     formInputs.forEach(input => {
-        if (!(isGoogleSignup && (input.id === 'password' || input.id === 'cpassword'))) {
+        if (input.id !== 'newpassword' && input.id !== 'cpassword') {
             input.removeAttribute("readonly");
         }
     });
 
-    document.getElementById("newpassword-group").style.display = isGoogleSignup ? 'none' : 'block';
-    document.getElementById("confirm_password-group").style.display = isGoogleSignup ? 'none' : 'block';
+    // Show the Save Changes button
+    saveButton.style.display = "block";
 
-    document.getElementById("update-btn").style.display = "inline-block";
+    // Hide the Edit Profile button
     document.getElementById("edit-btn").style.display = "none";
 }
 
 // Update Profile
 function updateProfile(event) {
     console.log("Update button is triggered");
-    const isGoogleSignup = !!document.getElementById('edit-form').getAttribute('data-google-signup');
-    event.preventDefault(); // Prevent default form submission
+    event.preventDefault();
 
     const nameVal = document.getElementById('full_name').value.trim();
     const err1 = document.getElementById('error1');
@@ -213,172 +208,171 @@ function showAlert(message, type) {
 
     if (type === 'success') {
         alertBox.className = 'alert success';
-        alertBox.style.backgroundColor = "#c7f9cc";
-        alertBox.style.color = "green";
     } else {
         alertBox.className = 'alert error';
-        alertBox.style.backgroundColor = "#f8d7da";
-        alertBox.style.color = "red";
     }
 
     setTimeout(() => alertBox.style.display = 'none', 2000);
 }
 
-// Toggle password visibility
-const togglePasswordButton = document.getElementById('togglePassword');
-const toggleconfirmPasswordButton = document.getElementById('toggleCpassword');
-const passwordInput = document.getElementById('newpassword');
-const confirmPasswordInput = document.getElementById('cpassword');
-const eyeIcon1 = document.getElementById('eyeIcon1');
-const eyeIcon2 = document.getElementById('eyeIcon2');
-
-togglePasswordButton.addEventListener('click', function () {
-    // Toggle password visibility for both fields
-    const type = passwordInput.type === 'password' ? 'text' : 'password';
-    passwordInput.type = type
-
-
-    // Toggle eye icon
-    if (type === 'password') {
-        eyeIcon1.classList.remove('fa-eye-slash');
-        eyeIcon1.classList.add('fa-eye');
-    } else {
-        eyeIcon1.classList.remove('fa-eye');
-        eyeIcon1.classList.add('fa-eye-slash');
-    }
-});
-
-toggleconfirmPasswordButton.addEventListener('click', function () {
-    const type =  confirmPasswordInput.type === 'password' ? 'text' : 'password';
-    confirmPasswordInput.type = type
-
-    if (type === 'password') {
-        eyeIcon2.classList.remove('fa-eye-slash');
-        eyeIcon2.classList.add('fa-eye');
-    } else {
-        eyeIcon2.classList.remove('fa-eye');
-        eyeIcon2.classList.add('fa-eye-slash');
-    }
-});
-
-
-// Enable Password Fields for Reset
-function enablePasswordFields() {
-    document.getElementById("newpassword-group").style.display = "block";
-    document.getElementById("confirm_password-group").style.display = "block";
-    document.getElementById("password-update-btn-group").style.display = "block";
-    document.getElementById("create-password-head").style.display = "block";
-
-    // Enable the password fields
-    document.getElementById('newpassword').removeAttribute("readonly");
-    document.getElementById('cpassword').removeAttribute("readonly");
-
-    // Clear any existing errors
-    document.getElementById('error4').innerText = "";
-    document.getElementById('error5').innerText = "";
-}
-
-
-
-
-// Password Validation
-function passwordValidation() {
-    const password = document.getElementById('newpassword').value.trim();
-    const err4 = document.getElementById('error4');
-    const passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-
-    if (password === "") {
-        err4.innerText = "Please enter a valid password";
-    } else if (!passwordPattern.test(password)) {
-        err4.innerText = "Password must be at least 8 characters, including one letter, one number, and one special character.";
-    } else {
-        err4.innerText = "";
-    }
-}
-
-// Confirm Password Validation
-function confirmPasswordValidation() {
-    const password = document.getElementById('newpassword').value.trim();
-    const confirmPassword = document.getElementById('cpassword').value.trim();
-    const err5 = document.getElementById('error5');
-
-    if (confirmPassword === "") {
-        err5.innerText = "Please confirm your password.";
-    } else if (password !== confirmPassword) {
-        err5.innerText = "Passwords do not match.";
-    } else {
-        err5.innerText = "";
-    }
-}
-
-// Handle Password Update
-function updatePassword(event) {
-    event.preventDefault();
-
-    // Show Alert
-function showAlert(message, type) {
-    const alertBox = document.getElementById('alert-message');
-    alertBox.innerText = message;
-    alertBox.style.display = 'block';
-
-    if (type === 'success') {
-        alertBox.className = 'alert success';
-        alertBox.style.backgroundColor = "#c7f9cc";
-        alertBox.style.color = "green";
-    } else {
-        alertBox.className = 'alert error';
-        alertBox.style.backgroundColor = "#f8d7da";
-        alertBox.style.color = "red";
-    }
-
-    setTimeout(() => alertBox.style.display = 'none', 2000);
-}
-
-
-    // Validate the password fields
-    passwordValidation();
-    confirmPasswordValidation();
-
-    // Check if there are any validation errors
-    const err4 = document.getElementById('error4');
-    const err5 = document.getElementById('error5');
-    const errors = [err4, err5].some((err) => err.innerText !== "");
-
-    if (errors) {
-        return;
-    }
-
-    // Submit the form via fetch
-    const formData = new FormData(document.querySelector('form[action="/update-password"]'));
-    const data = {};
-    formData.forEach((value, key) => {
-        data[key] = value;
-    });
-
-    fetch('/update-password', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-    })
-    .then(response => {
-        if (!response.ok)
-         throw new Error("Network response was not ok");
-        return response.json();
-    })
-    .then(data => {
-        if (data.success) {
-            showAlert("Password updated successfully!", "success");
-            setTimeout(() => location.reload(), 1000);
+    
+    // Toggle password visibility
+    const togglePasswordButton = document.getElementById('togglePassword');
+    const toggleconfirmPasswordButton = document.getElementById('toggleCpassword');
+    const passwordInput = document.getElementById('newpassword');
+    const confirmPasswordInput = document.getElementById('cpassword');
+    const eyeIcon1 = document.getElementById('eyeIcon1');
+    const eyeIcon2 = document.getElementById('eyeIcon2');
+    
+    togglePasswordButton.addEventListener('click', function () {
+        const type = passwordInput.type === 'password' ? 'text' : 'password';
+        passwordInput.type = type
+    
+    
+        // Toggle eye icon
+        if (type === 'password') {
+            eyeIcon1.classList.remove('fa-eye-slash');
+            eyeIcon1.classList.add('fa-eye');
         } else {
-            showAlert(data.message || "Error updating password.", "error");
+            eyeIcon1.classList.remove('fa-eye');
+            eyeIcon1.classList.add('fa-eye-slash');
         }
-    })
-    .catch(error => {
-        console.error("Fetch error:", error);
-        showAlert("An error occurred while updating your password.", "error");
     });
-}
-
-</script>
+    
+    toggleconfirmPasswordButton.addEventListener('click', function () {
+        const type =  confirmPasswordInput.type === 'password' ? 'text' : 'password';
+        confirmPasswordInput.type = type
+    
+        if (type === 'password') {
+            eyeIcon2.classList.remove('fa-eye-slash');
+            eyeIcon2.classList.add('fa-eye');
+        } else {
+            eyeIcon2.classList.remove('fa-eye');
+            eyeIcon2.classList.add('fa-eye-slash');
+        }
+    });
+    
+    
+    // Enable Password Fields for Reset
+    function enablePasswordFields() {
+        document.getElementById("newpassword-group").style.display = "block";
+        document.getElementById("confirm_password-group").style.display = "block";
+        document.getElementById("password-update-btn-group").style.display = "block";
+        document.getElementById("create-password-head").style.display = "block";
+    
+        // Enable the password fields
+        document.getElementById('newpassword').removeAttribute("readonly");
+        document.getElementById('cpassword').removeAttribute("readonly");
+    
+        // Clear any existing errors
+        document.getElementById('error4').innerText = "";
+        document.getElementById('error5').innerText = "";
+    }
+    
+    
+    
+    
+    // Password Validation
+    function passwordValidation() {
+        const password = document.getElementById('newpassword').value.trim();
+        const err4 = document.getElementById('error4');
+        const passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    
+        if (password === "") {
+            err4.innerText = "Please enter a valid password";
+        } else if (!passwordPattern.test(password)) {
+            err4.innerText = "Password must be at least 8 characters, including one letter, one number, and one special character.";
+        } else {
+            err4.innerText = "";
+        }
+    }
+    
+    // Confirm Password Validation
+    function confirmPasswordValidation() {
+        const password = document.getElementById('newpassword').value.trim();
+        const confirmPassword = document.getElementById('cpassword').value.trim();
+        const err5 = document.getElementById('error5');
+    
+        if (confirmPassword === "") {
+            err5.innerText = "Please confirm your password.";
+        } else if (password !== confirmPassword) {
+            err5.innerText = "Passwords do not match.";
+        } else {
+            err5.innerText = "";
+        }
+    }
+    
+    // Handle Password Update
+    function updatePassword(event) {
+        event.preventDefault();
+    
+        // Show Alert
+    function showAlert(message, type) {
+        const alertBox = document.getElementById('alert-message');
+        alertBox.innerText = message;
+        alertBox.style.display = 'block';
+    
+        if (type === 'success') {
+            alertBox.className = 'alert success';
+            alertBox.style.backgroundColor = "#c7f9cc";
+            alertBox.style.color = "green";
+        } else {
+            alertBox.className = 'alert error';
+            alertBox.style.backgroundColor = "#f8d7da";
+            alertBox.style.color = "red";
+        }
+    
+        setTimeout(() => alertBox.style.display = 'none', 2000);
+    }
+    
+    
+        // Validate the password fields
+        passwordValidation();
+        confirmPasswordValidation();
+    
+        // Check if there are any validation errors
+        const err4 = document.getElementById('error4');
+        const err5 = document.getElementById('error5');
+        const errors = [err4, err5].some((err) => err.innerText !== "");
+    
+        if (errors) {
+            return;
+        }
+    
+        // Submit the form via fetch
+        const formData = new FormData(document.querySelector('form[action="/update-password"]'));
+        const data = {};
+        formData.forEach((value, key) => {
+            data[key] = value;
+        });
+    
+        fetch('/update-password', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        })
+        .then(response => {
+            if (!response.ok)
+             throw new Error("Network response was not ok");
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                showAlert("Password updated successfully!", "success");
+                setTimeout(() => location.reload(), 1000);
+            } else {
+                showAlert(data.message || "Error updating password.", "error");
+            }
+        })
+        .catch(error => {
+            console.error("Fetch error:", error);
+            showAlert("An error occurred while updating your password.", "error");
+        });
+    }
+    </script>
+    
 
 <%-include('../../views/partials/user/footer') %>
+
+
+
