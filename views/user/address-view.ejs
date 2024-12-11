@@ -37,7 +37,6 @@
                 <% }); %>
             <% }); %>
         </ul>
-        <!-- Button to show the form -->
         <button class="btn btn-primary" id="showFormBtn">Add New Address</button>
     <% } %>
 
@@ -218,7 +217,7 @@ document.getElementById('addressForm').addEventListener('submit', async (e) => {
 
   const hasError = [err1, err2, err3, err4, err5, err6, err7].some(err => err.innerText !== "");
   if (hasError) {
-    return; // Stop if there are validation errors
+    return;
   }
 
   const actionType = document.getElementById('actionType').value;

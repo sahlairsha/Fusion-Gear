@@ -69,12 +69,7 @@ const saveAddress = async (req, res) => {
     try {
         const { recipient_name, streetAddress, city, state, pincode, phone, altPhone, addressType } = req.body;
 
-        // Validate required fields
-        if (!recipient_name || !streetAddress || !city || !state || !pincode || !phone || !addressType) {
-            return res.status(400).json({ success: false, message: 'Please fill in all required fields.' });
-        }
-
-        const userId = req.session.user; // Assuming session middleware is used
+        const userId = req.session.user;
         if (!userId) return res.status(401).json({ success: false, message: 'Unauthorized access.' });
 
         const shippingAddress = {
@@ -90,7 +85,7 @@ const saveAddress = async (req, res) => {
 
         // Check if the address already exists in the user's shipping addresses
         const user = await User.findById(userId);
-        const existingAddress = user.shippingAddress.find(address => 
+        const existingAddress = user.shippingAddress && user.shippingAddress.find(address => 
             address.recipient_name === recipient_name &&
             address.streetAddress === streetAddress &&
             address.city === city &&
@@ -105,7 +100,6 @@ const saveAddress = async (req, res) => {
             return res.status(400).json({ success: false, message: 'This address already exists.' });
         }
 
-        // If address does not exist, save the new address
         req.session.shippingAddress = shippingAddress;
 
         const currentOrder = await Order.findOneAndUpdate(
@@ -113,6 +107,7 @@ const saveAddress = async (req, res) => {
             { $push: { shippingAddress } },
             { new: true, upsert: true }
         );
+
         res.json({
             success: true,
             message: 'Shipping address saved successfully.',

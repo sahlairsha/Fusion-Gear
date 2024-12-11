@@ -77,8 +77,6 @@ router.get('/ratings/:product_id', userproductController.getProductRatings);
 router.get("/coupon",userproductController.getCoupon)
 
 
-
-
 //user profile
 
 router.get('/userProfile',userAuth,userprofileController.getProfile)   
@@ -104,7 +102,7 @@ router.delete("/cart/delete/:productId",userAuth,userCartController.removeFromCa
 //Check out page for more information.....
 
 router.get('/checkout',userAuth,userOrderController.getCheckout)
-router.post('/save-address',userAuth,userOrderController.saveAddress)
+router.post('/checkout',userAuth,userOrderController.saveAddress)
 router.get('/edit-address/:id',userAuth,userOrderController.getAddress)
 router.post('/update-address/:id',userAuth,userOrderController.editAddress)
 router.get("/payment",userAuth,userOrderController.getPayment)
