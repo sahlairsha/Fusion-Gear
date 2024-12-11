@@ -42,10 +42,6 @@ const editProfile = async (req, res) => {
 };
 
 
-if (password && password.trim() !== "") {
-  updateData.password = await bcrypt.hash(password, 10);
-}
-
 
 const updatedUser = await User.findByIdAndUpdate(
   userId,
@@ -56,7 +52,7 @@ const updatedUser = await User.findByIdAndUpdate(
 if (!updatedUser) {
   return res.status(404).json({ success: false, message: 'User not found' });
 }
-    // Update session with new user data
+
     req.session.user = updatedUser;
 
     res.json({ success: true, user: updatedUser });
@@ -65,6 +61,36 @@ if (!updatedUser) {
     res.status(500).json({ success: false, message: 'Server error' });
   }
 };
+
+const resetPassword =  async(req,res)=>{
+
+const { password, confirm_password } = req.body;
+    
+
+try {
+    // Hash the new password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Update the user's password
+    const user = await User.findById(req.session.user);
+    if (!user) {
+        return res.status(404).json({ success: false, message: "User not found." });
+    }
+
+
+    user.password = hashedPassword;
+    await user.save();
+res.status(200).json({ success: true, message: "Password updated successfully." });
+} catch (error) {
+    console.error("Error updating password:", error);
+    res.status(500).json({ success: false, message: "An error occurred while updating the password." });
+}
+
+
+
+}
+
+
 
 
 
@@ -178,5 +204,6 @@ module.exports = {
     addAddress,
     deleteAddress,
     editAddress,
-    updateAddress
+    updateAddress,
+    resetPassword
 }

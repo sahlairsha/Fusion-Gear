@@ -47,7 +47,7 @@ const login = async (req, res) => {
 
         if (!findAdmin) {
             req.flash("error", "Admin not found. Please try again ")
-            return res.redirect('admin-login');
+            return res.redirect('/admin/login');
         }
 
         const passwordMatch = await bcrypt.compare(password, findAdmin.password);

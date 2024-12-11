@@ -81,8 +81,9 @@ router.get("/coupon",userproductController.getCoupon)
 
 //user profile
 
-router.get('/userProfile',userAuth,userprofileController.getProfile)
+router.get('/userProfile',userAuth,userprofileController.getProfile)   
 router.put('/update-profile',userAuth,userprofileController.editProfile)
+router.post('/update-password',userAuth,userprofileController.resetPassword)
 
 
 //address view
@@ -108,6 +109,7 @@ router.get('/edit-address/:id',userAuth,userOrderController.getAddress)
 router.post('/update-address/:id',userAuth,userOrderController.editAddress)
 router.get("/payment",userAuth,userOrderController.getPayment)
 router.get("/order-confirm",userAuth,userOrderController.getOrderConfirmation)
+router.post('/confirm-order',userAuth,userOrderController.confirmOrder)
 
 
 

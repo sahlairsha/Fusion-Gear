@@ -1,102 +1,191 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Payment Page</title>
-    <style>
-        .container {
-            width: 50%;
-            margin: 50px auto;
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        h2 {
-            text-align: center;
-            color: #333;
-        }
-        .payment-methods {
-            margin: 20px 0;
-        }
-        .payment-option {
-            display: flex;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-        .payment-option input {
-            margin-right: 10px;
-        }
-        .proceed-btn {
-            width: 100%;
-            padding: 10px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
-            cursor: pointer;
-        }
-        .proceed-btn:hover {
-            background-color: #45a049;
-        }
+<%- include('../../views/partials/user/header') %>
 
-        .place-order{
-            text-decoration: none;
-            color: white;
-        }
+<style>
+    .payment-container {
+        width: 100%;
+        max-width: 400px;
+        background-color: #fff;
+        border: 1px dotted #00000062;
+        padding: 30px;
+        border-radius: 5px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        margin: 30px auto; /* Centers the container */
+        text-align: center;
+    }
+    .payment-container:hover{
+        border: 1px solid #000;
+    }
 
-        .error-message{
-            color: red;
-            font-size: 14px;
-            margin-bottom: 2px;
-        }
-    </style>
-</head>
-<body>
+    h2 {
+        margin-bottom: 20px;
+        font-size: 24px;
+        color: #333;
+    }
 
-<div class="container">
-    <h2>Payment Options</h2>
+    .payment-methods {
+        margin: 20px 0;
+    }
+
+    .payment-option {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background-color: #f9f9f9;
+        border: 1px solid #ddd;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 15px;
+        transition: box-shadow 0.3s ease;
+        cursor: pointer;
+    }
+
+    .payment-option:hover {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .payment-option input[type="radio"] {
+        appearance: none;
+        width: 22px;
+        height: 22px;
+        border: 2px solid #000;
+        border-radius: 50%;
+        outline: none;
+        margin-right: 15px;
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+
+    .payment-option input[type="radio"]:checked {
+        background-color: #000;
+        border-color: #000;
+    }
+
+    .payment-option input[type="radio"]:checked::before {
+        content: '';
+        width: 10px;
+        height: 10px;
+        background-color: #fff;
+        border-radius: 50%;
+        display: block;
+    }
+
+    .payment-option label {
+        font-size: 16px;
+        color: #333;
+        cursor: pointer;
+        flex: 1;
+        text-align: left;
+    }
+
+    .proceed-btn {
+        display: none;
+        width: 100%;
+        padding: 15px;
+        background-color: #000;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        margin-top: 20px;
+        text-transform: uppercase;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    .proceed-btn:hover {
+        background-color: #333;
+        transform: scale(1.02);
+    }
+
+    .error-message {
+        color: red;
+        font-size: 14px;
+        margin-top: 10px;
+    }
+</style>
+
+<div class="payment-container">
+    <h2>Choose Payment Method</h2>
     <form id="payment-form">
         <div class="payment-methods">
-            <div class="payment-option">
+            <div class="payment-option" onclick="selectPaymentOption('upi')">
                 <input type="radio" id="upi" name="payment_method" value="UPI">
                 <label for="upi">UPI</label>
             </div>
-            <div class="payment-option">
+            <div class="payment-option" onclick="selectPaymentOption('net_banking')">
                 <input type="radio" id="net_banking" name="payment_method" value="Net Banking">
                 <label for="net_banking">Net Banking</label>
             </div>
-            <div class="payment-option">
+            <div class="payment-option" onclick="selectPaymentOption('cod')">
                 <input type="radio" id="cod" name="payment_method" value="COD">
                 <label for="cod">Cash on Delivery (COD)</label>
             </div>
-
-           
         </div>
         <div id="error-message" class="error-message"></div>
-        <button type="submit" class="proceed-btn"><a class="place-order" href="/order-confirm">Proceed</a></button>
+        <button type="submit" id="proceed-button" class="proceed-btn">Proceed</button>
     </form>
 </div>
 
-
-
 <script>
- document.getElementById('payment-form').addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        const paymentMethod = document.querySelector('input[name="payment_method"]:checked');
-        const errorMessage = document.getElementById('error-message');
+    const proceedButton = document.getElementById('proceed-button');
+    const paymentForm = document.getElementById('payment-form');
 
-        if (!paymentMethod) {
-            errorMessage.textContent = 'Please select a payment method.';
+// Show the proceed button when a payment option is selected
+function selectPaymentOption(optionId) {
+    document.getElementById(optionId).checked = true;
+    proceedButton.style.display = 'block';
+}
+
+// Handle form submission
+paymentForm.addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const paymentMethod = document.querySelector('input[name="payment_method"]:checked');
+    const errorMessage = document.getElementById('error-message');
+
+    if (!paymentMethod) {
+        errorMessage.textContent = 'Please select a payment method.';
+        return;
+    }
+
+    errorMessage.textContent = '';
+
+    try {
+        const response = await fetch('/confirm-order', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                payment_method: paymentMethod.value,
+            }),
+        });
+
+        const result = await response.json();
+        if (response.ok) {
+            Swal.fire({
+                title: 'Payment Successful!',
+                text: 'You have selected ' + paymentMethod.value + ' as your payment method.',
+                icon: 'success',
+                timer: 3000,
+                timerProgressBar: true,
+                showConfirmButton: false,
+            }).then(() => {
+                window.location.href = '/order-confirmation';
+            });
         } else {
-            errorMessage.textContent = '';  // Clear any previous error message
-            alert('You have selected ' + paymentMethod.value + ' as your payment method.');
+            errorMessage.textContent = result.message || 'Failed to confirm the order.';
         }
-    });
+    } catch (error) {
+        console.error('Error:', error.message);
+        errorMessage.textContent = 'An error occurred while confirming the order. Please try again.';
+    }
+});
+
+
 </script>
 
-</body>
-</html>
+<%- include('../../views/partials/user/footer') %>

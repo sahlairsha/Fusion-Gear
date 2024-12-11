@@ -62,6 +62,9 @@ const getCheckout = async (req, res) => {
 };
 
 
+
+
+
 const saveAddress = async (req, res) => {
     try {
         const { recipient_name, streetAddress, city, state, pincode, phone, altPhone, addressType } = req.body;
@@ -188,6 +191,53 @@ const getPayment = async(req,res)=>{
 }
 
 
+const confirmOrder = async (req, res) => {
+    try {
+        const userId = req.session.user; 
+        const { payment_method } = req.body;
+
+        if (!payment_method) {
+            return res.status(400).json({ success: false, message: 'Payment method is required.' });
+        }
+
+        // Fetch the user's cart
+        const user = await User.findById(userId).populate('cart.product_id');
+
+        if (!user || user.cart.length === 0) {
+            return res.status(400).json({ success: false, message: 'Cart is empty.' });
+        }
+
+        const updateCartTotal = await calculateCartTotals(userId);
+        // Create the order with products from the cart
+        const newOrder = new Order({
+            user_id: userId,
+            products_id: cartItems.map(item => item.product_id._id),
+            total_price,
+            payment_method,
+            payment_status: payment_method === 'COD' ? 'Pending' : 'Completed',
+            order_status: payment_method === 'COD' ? 'Pending' : 'Shipped',
+            shippingAddress: user.shippingAddress || [],
+        });
+
+        await newOrder.save();
+
+        // Clear the user's cart after the order is created
+        user.cart = [];
+        await user.save();
+
+        res.status(200).json({
+            success: true,
+            message: 'Order confirmed successfully.',
+            order: newOrder,
+        });
+    } catch (error) {
+        console.error('Error confirming order:', error);
+        res.status(500).json({ success: false, message: 'Failed to confirm order.' });
+    }
+};
+
+
+
 const getOrderConfirmation = async(req,res)=>{
     try{
 
@@ -206,5 +256,6 @@ module.exports = {
     editAddress,
     getPayment,
     getOrderConfirmation,
-    getAddress
+    getAddress,
+    confirmOrder,
 }

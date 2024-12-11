@@ -50,4 +50,52 @@
     color:#fff;
     width: 150px;
     height: 50px;
+    font-weight: 600;
+}
+/* Wrapper for input and button */
+.input-wrapper {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+}
+
+/* Style the input field */
+.input-wrapper input {
+    width: 100%;
+    padding-right: 40px; /* Space for the button */
+    padding-left: 10px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+/* Style the button */
+.toggle-password {
+    position: absolute;
+    top: 40%;
+    right: 10px;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+/* Style for the icon (eye) */
+.toggle-password i {
+    font-size: 18px;
+    color: #aaa;
+}
+.toggle-password:hover {
+    background: none; /* Removes any background color on hover */
+    cursor: pointer; /* Ensures the cursor remains a pointer */
+}
+
+/* Optionally, if you want to ensure no style is applied on the icon itself when hovered */
+.toggle-password i:hover {
+    color: #000;
+}
+
+.password-heading{
+    font-weight: 800;
 }

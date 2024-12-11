@@ -97,15 +97,17 @@ const signup = async (req, res) => {
 
 let avatarUrl;
 
-if (findUser.googleId) {
+if (email) {
     avatarUrl = `https://www.gravatar.com/avatar/${crypto.createHash('md5').update(email.trim().toLowerCase()).digest('hex')}?d=robohash&r=g&s=200`; 
-} else {
-    avatarUrl = `https://www.gravatar.com/avatar/${crypto.createHash('md5').update(email.trim().toLowerCase()).digest('hex')}?d=robohash&r=g&s=200`;
 }
 
-console.log(findUser.googleId)
-// Handle password validation only if user is not using Google
-if (!findUser.googleId && password !== confirm_password) {
+const isAvatarValid = await validateAvatar(avatarUrl);
+if (!isAvatarValid) {
+    return res.render("signup", { message: "Invalid avatar. Please try again." });
+}
+
+
+if ( password !== confirm_password) {
     return res.render("signup", { message: "Passwords do not match" });
 }
         if (password !== confirm_password) {
@@ -162,11 +164,8 @@ const verifyOtp = async (req, res) => {
 
         // Save user as intended if OTP is correct
         const user = req.session.userData;
-          // Validate the avatar URL before proceeding
-          const isAvatarValid = await validateAvatar(avatarUrl);
-          if (!isAvatarValid) {
-              return res.render("signup", { message: "Invalid avatar. Please try again." });
-          }
+
+        
 
         const passwordHash = await securePassword(user.password);
         const saveUser = new User({
