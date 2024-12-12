@@ -3,34 +3,49 @@ const User = require("../../models/userSchema");
 const Address = require('../../models/addressSchema')
 
 
+// Helper function to calculate the cart totals
+async function calculateCartTotals(userId) {
+    const user = await User.findById(userId).populate('cart.product_id');
+    const cartItems = user.cart.filter(item => item.product_id);
+
+    // Calculate cart total
+    const cartTotal = cartItems.reduce((total, item) => {
+        return total + (item.product_id.salePrice * item.quantity);
+    }, 0);
+
+    const shippingCharges = cartTotal > 500 ? 0 : 50;
+    const netAmount = cartTotal + shippingCharges;
+
+    // Return the updated values
+    return {
+        cartTotal: cartTotal.toFixed(2),
+        discount: '0.00',
+        shippingCharges: shippingCharges.toFixed(2),
+        netAmount: netAmount.toFixed(2),
+    };
+}
+
+
+
+
+
 const getCartPage = async (req, res) => {
     const userId = req.session.user;
     try {
         const user = await User.findById(userId).populate('cart.product_id');
         const cartItems = user.cart.filter(item => item.product_id);
 
-        const addressData = await Address.find({user_id : userId});
 
         const countItems = cartItems.length;
         req.session.cartCount = countItems;
 
 
-        const totalAmount = cartItems.reduce((total, item) => {
-                return total + (item.product_id.salePrice * item.quantity);
-        }, 0);
-
-        const shippingCharges = totalAmount > 500 ? 0 : 5;
-        const netAmount = totalAmount + shippingCharges;
-
+        const updatedCartTotals = await calculateCartTotals(userId); 
         res.render('cart', {
             user,
             cartItems,
-            cartTotal: totalAmount.toFixed(2),
-            discount: '0.00',
-            shippingCharges: shippingCharges.toFixed(2),
-            netAmount: netAmount.toFixed(2),
+            ...updatedCartTotals,
             couponMessage: '',
-            address :  addressData,
             cartCount : req.session.cartCount
         });
 
@@ -100,27 +115,6 @@ const addToCart = async (req, res) => {
     }
 };
 
-// Helper function to calculate the cart totals
-async function calculateCartTotals(userId) {
-    const user = await User.findById(userId).populate('cart.product_id');
-    const cartItems = user.cart.filter(item => item.product_id);
-
-    // Calculate cart total
-    const cartTotal = cartItems.reduce((total, item) => {
-        return total + (item.product_id.salePrice * item.quantity);
-    }, 0);
-
-    const shippingCharges = cartTotal > 500 ? 0 : 50;
-    const netAmount = cartTotal + shippingCharges;
-
-    // Return the updated values
-    return {
-        cartTotal: cartTotal.toFixed(2),
-        discount: '0.00',
-        shippingCharges: shippingCharges.toFixed(2),
-        netAmount: netAmount.toFixed(2),
-    };
-}
 
 
 

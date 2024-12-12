@@ -212,7 +212,7 @@
                         <input type="hidden" id="actionType" name="actionType" value="add">
 
                         <label for="newRecipient">Name<span class="text-danger">*</span></label><br>
-                        <input type="text" id="newRecipient" placeholder="Recipient Name">
+                        <input type="text"name newRecipient" placeholder="Recipient Name">
                         <div id="error1" class="error-message"></div>
 
                         <label for="newStreet">Street Address<span class="text-danger">*</span></label><br>
@@ -308,6 +308,69 @@
         }
     }
 
+    
+    function addressValidation() {
+        let valid = true;
+        const street = document.getElementById('newStreet').value.trim();
+        const city = document.getElementById('newCity').value.trim();
+        const state = document.getElementById('newState').value.trim();
+        const pincode = document.getElementById('newPincode').value.trim();
+        const phone = document.getElementById('newPhone').value.trim();
+        const addressType = document.getElementById('newAddressType').value.trim();
+
+const phonePattern = /^(\+\d{1,3}[- ]?)?\d{10}$/;
+const pincodePattern = /^\d{6}$/;
+const allZero = /^0+$/;
+
+const err2 = document.getElementById('error2')
+const err3= document.getElementById('error3')
+const err4= document.getElementById('error4')
+const err5= document.getElementById('error5')
+const err6= document.getElementById('error6')
+
+if (street === "") {
+    err2.innerText = "Please enter street address";
+} else {
+    err2.innerText = "";
+}
+
+if (city === "") {
+    err3.innerText = "Please enter city";
+} else {
+    err3.innerText = "";
+}
+
+if (state === "") {
+    err4.innerText = "Please enter state";
+} else {
+    err4.innerText = "";
+}
+
+if (pincode === ''){
+    err5.innerText = "Enter a the pincode"
+} else if(allZero.test(pincode)){
+    err5.innerText = "Pincode cannot be all zeros!";
+}else if(!pincodePattern.test(pincode)){
+    err5.innerText = "Enter the pincode"
+}
+else {
+    err5.innerText = "";
+}
+
+if (phone === ''){
+    err6.innerText = "Phone number cannot be all zeros!";
+} else if (!phonePattern.test(phone)) {
+    err6.innerText = "Enter a valid phone number";
+}else if(allZero.test(phone)) {
+    err6.innerText = "Enter the phone number"
+}else{
+    err6.innerText = "";
+}
+
+
+        return valid;
+    }
+
     function addressTypeValidation() {
             const addressType = document.getElementById('newAddressType').value.trim();
             const errorElement = document.getElementById('error7');
@@ -321,17 +384,6 @@
             }
         }
 
-    function addressValidation() {
-        let valid = true;
-        const street = document.getElementById('newStreet').value.trim();
-        const city = document.getElementById('newCity').value.trim();
-        const state = document.getElementById('newState').value.trim();
-        const pincode = document.getElementById('newPincode').value.trim();
-        const phone = document.getElementById('newPhone').value.trim();
-        const addressType = document.getElementById('newAddressType').value.trim();
-
-        return valid;
-    }
 // Show modal for adding or editing address
 document.getElementById('addNewAddressBtn').addEventListener('click', function () {
     const formContainer = document.getElementById('newAddressModal');
@@ -401,9 +453,15 @@ document.querySelectorAll('.edit-address').forEach((editLink) => {
 
 // Save or update address handler
 document.getElementById("saveAddressBtn").onclick = async function () {
-    const isValid = nameValidation() && addressValidation() && addressTypeValidation();
+    const isNameValid = nameValidation()
+    const isAddressValid = addressValidation()
+    const isTypeValid = addressTypeValidation()
 
-    if (isValid) {
+    if (!isNameValid||!isAddressValid ||!isTypeValid){
+
+        return;
+
+    }else{
         const addressData = {
             recipient_name: document.getElementById('newRecipient').value.trim(),
             streetAddress: document.getElementById('newStreet').value.trim(),
@@ -453,7 +511,9 @@ document.getElementById("saveAddressBtn").onclick = async function () {
                 confirmButtonText: 'OK'
             });
         }
+
     }
+    
 };
 
 

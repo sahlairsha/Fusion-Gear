@@ -10,7 +10,9 @@ const flash = require('connect-flash');
 const { cacheControl } = require("./middleware/cache-control")
 const {flashMessage} = require("./middleware/flash")
 const {setUserInfo} = require("./middleware/userInfo")
+
 const methodOverride = require("method-override");
+
 
 const cors = require("cors")
 
@@ -56,6 +58,9 @@ app.use(flashMessage);
 app.set('view engine', 'ejs');
 app.set('views', [path.join(__dirname, 'views/user'), path.join(__dirname, 'views/admin')]);
 app.use(express.static(path.join(__dirname, 'Public')));
+
+
+
 
 //Routes for the User and Admin
 app.use(require('./routes/userRouter'));
