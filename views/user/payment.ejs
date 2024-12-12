@@ -174,7 +174,7 @@ paymentForm.addEventListener('submit', async function (e) {
                 timerProgressBar: true,
                 showConfirmButton: false,
             }).then(() => {
-                window.location.href = '/order-confirmation';
+                window.location.href = '/order-confirm';
             });
         } else {
             errorMessage.textContent = result.message || 'Failed to confirm the order.';

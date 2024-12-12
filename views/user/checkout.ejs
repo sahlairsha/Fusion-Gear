@@ -170,9 +170,10 @@
             <div class="col-lg-8">
                 <h3 class="mb-4">Your Addresses</h3>
                 <ul class="list-group mb-4">
-                    <% if(shippingAddresses){%>
+                    <% if(shippingAddresses && shippingAddresses.length > 0){%>
                     <% shippingAddresses.forEach(address=> { %>
                         <li class="list-group-item">
+                            <input type="radio" name="selectedAddress" value="<%= address._id %>" id="address_<%= address._id %>">
                             <h6>
                                 <%= address.recipient_name %>
                                 <% if (address.addressType) { %>
@@ -195,7 +196,9 @@
                                 </div>
                             </div>
                         </li>
+                        <button id="continueWithAddress" class="btn btn-primary mt-3">Continue</button>
                     <% }); %>
+
                     <% } else { %>
                         <p>No addresses found. Please add a new address.</p>
                     <% } %>
@@ -243,7 +246,7 @@
                         </select><br>
                         <div id="error7" class="error-message"></div>
                         <br>
-                        <button class="btn save-address" id="saveAddressBtn" type="button">Save Address</button>
+                        <button class="btn save-address" id="saveAddressBtn" type="button">Save And Deliver Here</button>
                     </form>
                 </div>
             </div>
@@ -285,11 +288,7 @@
 </section>
 
 <script>
-        document.getElementById('addNewAddressBtn').addEventListener('click', function() {
-        const formContainer = document.getElementById('newAddressModal');
-        formContainer.style.display = (formContainer.style.display === 'none' || formContainer.style.display === '') ? 'block' : 'none';
-        document.getElementById('addNewAddressBtn').style.display = 'none'
-    });
+
 
     // Validation functions
     function nameValidation() {
@@ -333,112 +332,177 @@
 
         return valid;
     }
+// Show modal for adding or editing address
+document.getElementById('addNewAddressBtn').addEventListener('click', function () {
+    const formContainer = document.getElementById('newAddressModal');
+    formContainer.style.display = (formContainer.style.display === 'none' || formContainer.style.display === '') ? 'block' : 'none';
+    document.getElementById('modalTitle').innerText = "Add New Address";
+    document.getElementById('saveAddressBtn').innerText = "Save Address";
 
-    // Save address handler
-    document.getElementById("saveAddressBtn").onclick = async function () {
-        const isValid = nameValidation() && addressValidation() && addressTypeValidation()
+    // Clear form inputs
+    document.getElementById('shippingForm').reset();
+    document.getElementById('actionType').value = "add";
+    document.getElementById('shippingForm').action = "/checkout";
+    document.getElementById('addNewAddressBtn').innerText = "Cancel";
+});
 
-        if (isValid) {
-            const addressData = {
-                recipient_name: document.getElementById('newRecipient').value.trim(),
-                streetAddress: document.getElementById('newStreet').value.trim(),
-                city: document.getElementById('newCity').value.trim(),
-                state: document.getElementById('newState').value.trim(),
-                pincode: document.getElementById('newPincode').value.trim(),
-                phone: document.getElementById('newPhone').value.trim(),
-                altPhone: document.getElementById('newAltPhone').value.trim(),
-                addressType: document.getElementById('newAddressType').value.trim(),
-            };
 
-            try {
-                const response = await fetch('/checkout', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(addressData)
-                });
+// Fetch existing address for editing
+document.querySelectorAll('.edit-address').forEach((editLink) => {
+    editLink.addEventListener('click', async (e) => {
+        e.preventDefault();
+        const addressId = e.target.getAttribute('data-id');
+        try {
+            const response = await fetch(`/edit-address/${addressId}`);
+            const addressData = await response.json();
 
-                const responseData = await response.json();
-                if (response.ok) {
-                    Swal.fire({
-                        title: 'Success!',
-                        text: responseData.message,
-                        icon: 'success',
-                        confirmButtonText: 'OK'
-                    }).then(() => {
-                        location.reload();
-                    });
-                } else {
-                    Swal.fire({
-                        title: 'Error!',
-                        text: responseData.message || 'Failed to save address. Try again.',
-                        icon: 'error',
-                        confirmButtonText: 'OK'
-                    });
-                }
-            } catch (error) {
-                console.error("Error:", error);
+            if (response.ok) {
+                // Populate form fields
+                document.getElementById('newRecipient').value = addressData.recipient_name;
+                document.getElementById('newStreet').value = addressData.streetAddress;
+                document.getElementById('newCity').value = addressData.city;
+                document.getElementById('newState').value = addressData.state;
+                document.getElementById('newPincode').value = addressData.pincode;
+                document.getElementById('newPhone').value = addressData.phone;
+                document.getElementById('newAltPhone').value = addressData.altPhone || '';
+                document.getElementById('newAddressType').value = addressData.addressType;
+
+                // Update modal for editing
+                document.getElementById('modalTitle').innerText = "Edit Address";
+                document.getElementById('saveAddressBtn').innerText = "Update Address";
+
+                // Set action type and update form action
+                document.getElementById('actionType').value = "edit";
+                const form = document.getElementById('shippingForm');
+                form.action = `/update-address/${addressId}`;
+
+                // Show modal
+                document.getElementById('newAddressModal').style.display = 'block';
+                document.getElementById('addNewAddressBtn').style.display = "none";
+            } else {
                 Swal.fire({
-                    title: 'Error!',
-                    text: 'Something went wrong. Please try again later.',
+                    title: "Error!",
+                    text: 'Failed to fetch address data. Please try again.',
                     icon: 'error',
                     confirmButtonText: 'OK'
                 });
             }
+        } catch (error) {
+            console.error('Error fetching address:', error);
+            Swal.fire({
+                title: "Error!",
+                text: 'Something went wrong. Please try again later.',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
         }
-    };
-    document.querySelectorAll('.edit-address').forEach((editLink) => {
-  editLink.addEventListener('click', async (e) => {
-    e.preventDefault();
-    const addressId = e.target.getAttribute('data-id');
-    try {
-      const response = await fetch(`/edit-address/${addressId}`);
-      console.log('Response Status:', response.status);
-      const addressData = await response.json();
-      console.log('Address Data:', addressData);
-
-      if (response.ok) {
-        // Fill the form fields with the existing address data
-        document.getElementById('newRecipient').value = addressData.recipient_name;
-        document.getElementById('newStreet').value = addressData.streetAddress;
-        document.getElementById('newCity').value = addressData.city;
-        document.getElementById('newState').value = addressData.state;
-        document.getElementById('newPincode').value = addressData.pincode;
-        document.getElementById('newPhone').value = addressData.phone;
-        document.getElementById('newAltPhone').value = addressData.altPhone || '';
-        document.getElementById('newAddressType').value = addressData.addressType;
-
-        // Show the modal for editing
-        document.getElementById('newAddressModal').style.display = 'block';
-        document.getElementById('addNewAddressBtn').style.display = "none";
-        document.getElementById('saveAddressBtn').innerText = "Update"; // Change button text
-
-        // Update the form action for updating the address
-        const form = document.getElementById('shippingForm');
-        if (form) {
-          form.action = `/update-address/${addressId}`; // Set action to update
-          form.method = 'POST'; // Ensure POST method is used
-        } else {
-          console.error('Form not found');
-        }
-      } else {
-        Swal.fire({
-          title: "Error!",
-          text: 'Failed to fetch address data. Please try again.',
-          icon: 'error',
-          confirmButtonText: 'OK'
-        });
-      }
-    } catch (error) {
-      console.error('Error:', error);
-      Swal.fire({
-        title: "Error!",
-        text: 'Something went wrong. Please try again later.',
-        icon: 'error',
-        confirmButtonText: 'OK'
-      });
-    }
-  });
+    });
 });
+
+// Save or update address handler
+document.getElementById("saveAddressBtn").onclick = async function () {
+    const isValid = nameValidation() && addressValidation() && addressTypeValidation();
+
+    if (isValid) {
+        const addressData = {
+            recipient_name: document.getElementById('newRecipient').value.trim(),
+            streetAddress: document.getElementById('newStreet').value.trim(),
+            city: document.getElementById('newCity').value.trim(),
+            state: document.getElementById('newState').value.trim(),
+            pincode: document.getElementById('newPincode').value.trim(),
+            phone: document.getElementById('newPhone').value.trim(),
+            altPhone: document.getElementById('newAltPhone').value.trim(),
+            addressType: document.getElementById('newAddressType').value.trim(),
+        };
+
+        const form = document.getElementById('shippingForm');
+        const actionType = document.getElementById('actionType').value;
+        const url = actionType === "edit" ? form.action : '/checkout';
+
+        try {
+            const response = await fetch(url, {
+                method: form.method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(addressData),
+            });
+
+            const responseData = await response.json();
+            if (response.ok) {
+                Swal.fire({
+                    title: 'Success!',
+                    text: responseData.message,
+                    icon: 'success',
+                    confirmButtonText: 'OK'
+                }).then(() => {
+                    location.reload();
+                });
+            } else {
+                Swal.fire({
+                    title: 'Error!',
+                    text: responseData.message || 'Failed to save address. Try again.',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+            }
+        } catch (error) {
+            console.error("Error:", error);
+            Swal.fire({
+                title: 'Error!',
+                text: 'Something went wrong. Please try again later.',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+        }
+    }
+};
+
+
+
+document.getElementById('continueWithAddress').addEventListener('click', async function () {
+    const selectedAddress = document.querySelector('input[name="selectedAddress"]:checked');
+    
+    if (!selectedAddress) {
+        Swal.fire({
+            title: 'Error!',
+            text: 'Please select an address before proceeding.',
+            icon: 'error',
+            confirmButtonText: 'OK'
+        });
+        return;
+    }
+
+    const addressId = selectedAddress.value;
+
+    try {
+        // Send the selected address to the server or navigate to the payment page
+        const response = await fetch('/set-selected-address', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ addressId }),
+        });
+
+        const responseData = await response.json();
+        if (response.ok) {
+            window.location.href = '/payment';
+        } else {
+            Swal.fire({
+                title: 'Error!',
+                text: responseData.message || 'Failed to select address. Try again.',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+        }
+    } catch (error) {
+        console.error('Error selecting address:', error);
+        Swal.fire({
+            title: 'Error!',
+            text: 'Something went wrong. Please try again later.',
+            icon: 'error',
+            confirmButtonText: 'OK'
+        });
+    }
+});
+
 
 </script>
 
