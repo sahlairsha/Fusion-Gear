@@ -75,7 +75,7 @@ productSchema.virtual('status').get(function () {
     if (this.quantity > 0) {
         return "Available";
     } else if (this.quantity === 0) {
-        return "Sold out";
+        return "Sold out" || "Out of stock";
     } else {
         return "Unavailable";
     }

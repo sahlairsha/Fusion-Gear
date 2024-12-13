@@ -1,6 +1,22 @@
 <%-include('../../views/partials/user/header') %>
 
 <style>
+
+    .stock-left{
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 4px;
+    position: absolute;
+    top: 120px;
+    right: 50px;
+    background-color: #ff6b6b8c;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    }
     .product__item{
         border-radius: 2px;
         border : 1px solid #0000;
@@ -296,7 +312,9 @@
                             <div class="product-image">
                               <img src="/uploads/public-image/<%= product.productImage[0] %>" alt="<%= product.productName %>">
 
-
+                              <% if(product.quantity < 5) {%>
+                                <p class="stock-left">Only <%= product.quantity%> left, Please hurry up!!!</span>
+                                <% } %>
                                <!-- Stock Status Badge -->
                                <div class="product-badge 
                                <%= product.status ? product.status.toLowerCase().replace(/ /g, '-') : 'available' %> ">
@@ -321,7 +339,7 @@
                                         <i class="fa <%= i <= product.rating ? 'fa-star' : 'fa-star-o' %>"></i>
                                     <% } %>
                                 </div> -->
-
+                              
 
                                 <button class="add-cart-btn"><a href="#" onclick="addToCart('<%= product._id %>')" class="add-cart-link">+ Add to Cart</a>
                                 </button>

@@ -1,19 +1,17 @@
 <%- include('../../views/partials/admin/header') %>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
 <div class="container mt-4">
-
-
     <h2 class="mb-4">Category Details</h2>
 
-    <% if (locals.error) { %>
+    <% if (flash.error) { %>
         <div class="alert alert-danger">
-            <%= locals.error %>
+            <%= flash.error %>
         </div>
     <% } %>
 
-    <% if (locals.success) { %>
+    <% if (flash.success) { %>
         <div class="alert alert-success">
-            <%= locals.success %>
+            <%= flash.success %>
         </div>
     <% } %>
     <div class="mb-3">
@@ -29,7 +27,6 @@
                 <th scope="col">#</th>
                 <th scope="col">Name</th>
                 <th scope="col">Description</th>
-                <!-- <th scope="col">Status</th> -->
                 <th scope="col">Actions</th>
             </tr>
         </thead>
@@ -160,6 +157,6 @@
 
 
 
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 
 <%- include('../../views/partials/admin/footer') %>

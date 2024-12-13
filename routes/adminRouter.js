@@ -8,6 +8,8 @@ const customerController = require('../controller/admin/customerController');
 const categoryController = require('../controller/admin/categoryController');
 const productController = require('../controller/admin/productController');
 const orderController = require('../controller/admin/orderController')
+const stockController = require('../controller/admin/stockController')
+
 
 const multer = require('multer');
 const { storage, editedStorage } = require("../helper/multer");
@@ -56,12 +58,16 @@ router.get('/admin/unblockedproduct', adminAuth, productController.unblockProduc
 // Order Management 
 
 router.get('/admin/orders', adminAuth ,orderController.getOrders)
-
 router.post('/admin/orders/:id/status', adminAuth, orderController.changeOrderStatus);
+router.put("/stock/add/:productId",adminAuth,stockController.addStock);
+router.put("/stock/reduce/:productId",adminAuth,stockController.reduceStock);
+router.get('/admin/blockStock', adminAuth, stockController.blockedStock);
+router.get('/admin/unblockStock', adminAuth, stockController.unblockedStock)
 
 
 
-
+//Stock Management
+router.get('/admin/stock',adminAuth, stockController.getStocks)
 
 
 

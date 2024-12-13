@@ -1,0 +1,368 @@
+<%- include('../../views/partials/admin/header') %>
+    <style>
+      .search-bar {
+            margin: 20px 0;
+            display: flex;
+            justify-content: space-between;
+        }
+        .search-bar input, .search-bar select {
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .stock-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 50px;
+        }
+        .stock-table th, .stock-table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: center;
+        }
+        .stock-table th {
+            background-color: #000000bd;
+            color: white;
+        }
+        .actions button {
+            padding: 8px 12px;
+            font-size: 14px;
+            margin: 2px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .actions .add-stock {
+            background-color: #28a745;
+            color: white;
+        }
+        .actions .reduce-stock {
+            background-color: #dc3545;
+            color: white;
+        }
+        .actions .block-product {
+            background-color: #ffc107;
+            color: white;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            width: 400px;
+            height: 250px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            border-radius: 8px;
+            z-index: 1000;
+        }
+        .modal.active {
+            display: block;
+        }
+        .modal-header {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+        .modal input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        .modal-actions button {
+            padding: 10px 20px;
+            font-size: 16px;
+        }
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+        .overlay.active {
+            display: block;
+        }
+
+        .cancel-btn{
+            background-color:#000;
+            color:#fff;
+            border:1px solid #000;
+            border-radius: 4px;
+        }
+        .cancel-btn:hover{
+            background-color: #fff;
+            color:#000
+        }
+        .submit-btn{
+            background-color: #fff;
+            color: #000;
+            border: 1px dotted #000;
+            border-radius: 4px;
+        }
+        .submit-btn:hover{
+            border: none;
+            background-color: #000;
+            color:#fff;
+        }
+
+
+        .product-badge {
+
+    background-color: #ff6b6b;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.product-badge.available {
+    background-color: #28a745;
+}
+
+.product-badge.sold-out {
+    background-color: #dc3545;
+}
+
+.product-badge.unavailable {
+    background-color: #ffc107;
+}
+
+.product-badge.out-of-stock {
+    background-color: #6c757d;
+}
+
+    </style>
+
+    
+    <div class="container">
+        <!-- Stock Table -->
+        <table class="stock-table">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Category</th>
+                    <th>Quantity</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                    <th>Block/Unblock</th>
+                </tr>
+            </thead>
+            <tbody id="productTable">
+                <!-- Dynamic Rows -->
+                <% products.forEach((items) =>{ %>
+                <tr data-product-id="<%=items._id%>">
+                    <td><%= items.productName  %></td>
+                    <td><%=items.category?items.category.name :'No Category' %></td>
+                    <td><%= items.quantity%></td>
+                    <td>  <div class="product-badge 
+                        <%= items.status ? items.status.toLowerCase().replace(/ /g, '-') : 'available' %> ">
+                        <%= items.status %>
+                    </div></td>
+                    <td class="actions">
+                        <button class="add-stock" onclick="openModal('add', this)">Add Stock</button>
+                        <button class="reduce-stock" onclick="openModal('reduce', this)">Reduce Stock</button>
+                    </td>
+                    <td>
+                        <% if(items.isBlocked === false) { %>
+                        <button class="btn btn-warning btn-sm">
+                            <a href="/admin/blockStock?id=<%=items._id%>" class="text-white" style="text-decoration: none;">Block</a>
+                        </button>
+                        <% }else{ %>
+                        <button class="btn btn-success btn-sm">
+                            <a href="/admin/unblockStock?id=<%=items._id%>" class="text-white" style="text-decoration: none;">Unblock</a>
+                        </button>
+                        <% } %>
+                </td>
+
+                </tr>
+                <% }) %>
+            </tbody>
+            
+        </table>
+
+
+        
+    <div class="pagination-container d-flex align-items-center justify-content-center mt-5">
+        <% if (currentPage > 1) { %>
+            <a class="page-link" href="?page=<%= currentPage - 1 %>">&laquo; Previous</a>
+        <% } %>
+        <% for (let i = 1; i <= totalPages; i++) { %>
+            <% if (i === currentPage) { %>
+                <span class="current-page"><%= i %></span>
+            <% } else { %>
+                <a class="page-link" href="?page=<%= i %>"><%= i %></a>
+            <% } %>
+        <% } %>
+        <% if (currentPage < totalPages) { %>
+            <a class="page-link" href="?page=<%= currentPage + 1 %>">Next &raquo;</a>
+        <% } %>
+    </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="overlay" id="overlay"></div>
+    <div class="modal" id="modal">
+        <div class="modal-header" id="modalHeader">Add Stock</div>
+        <input type="number" id="stockInput" name="quantity" placeholder="Enter quantity">
+        <div class="modal-actions">
+            <button class="cancel-btn" onclick="closeModal()">Cancel</button>
+            <button class="submit-btn" onclick="submitStockChange()">Submit</button>
+        </div>
+
+    </div>
+
+
+
+    <script>
+const modal = document.getElementById('modal');
+const overlay = document.getElementById('overlay');
+const modalHeader = document.getElementById('modalHeader');
+const stockInput = document.getElementById('stockInput');
+let productId = '';  // Initially empty
+
+console.log(productId);
+
+
+let actionType = '';
+
+// Open modal with action type (add/reduce)
+function openModal(type, button) {
+    actionType = type;
+    modalHeader.innerText = type === 'add' ? 'Add Stock' : 'Reduce Stock';
+
+    productId = button.closest('tr').getAttribute('data-product-id');
+    
+    console.log('Product ID:', productId);  
+    modal.classList.add('active');
+    overlay.classList.add('active');
+}
+
+// Close modal
+function closeModal() {
+    modal.classList.remove('active');
+    overlay.classList.remove('active');
+}
+
+// Submit stock change (Add or Reduce stock)
+async function submitStockChange() {
+    const quantity = parseInt(stockInput.value, 10);
+    if (isNaN(quantity) || quantity <= 0) {
+        Swal.fire({
+            title : 'Error',
+            text : 'Please enter a valid quantity.',
+            icon :'warning',
+            confirmButtonText: 'Okay'
+           }) 
+        return;
+    }
+
+    if(actionType === 'add'){
+
+        try {
+        const response = await fetch(`/stock/add/${productId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ quantity })
+        });
+
+        const data = await response.json();
+        if (response.ok) {
+           Swal.fire({
+            title : 'Success',
+            text : `${data.message}`||'Stock Added Successfully',
+            icon :'success',
+            confirmButtonText: 'Okay'
+           })   
+            closeModal();
+      setTimeout(()=>{
+        location.reload()
+       }, 2000)
+        } else {
+            Swal.fire({
+            title : 'Error',
+            text : `${data.error}`||"Failed to add quantity",
+            icon :'error',
+            confirmButtonText: 'Okay'
+           })  
+          
+        }
+    } catch (error) {
+        Swal.fire({
+            title : 'Error',
+            text : `${data.error}`||"Failed to add quantity",
+            icon :'error',
+            confirmButtonText: 'Okay'
+           })        
+        console.error('Error:', error);
+    }
+}else{
+    try {
+        const response = await fetch(`/stock/reduce/${productId} `, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ quantity })
+        });
+
+        const data = await response.json();
+        if (response.ok) {
+            Swal.fire({
+            title : 'Success',
+            text : `${data.message}`||'Stock Added Successfully',
+            icon :'success',
+            confirmButtonText: 'Okay'
+           })         
+            closeModal();
+            setTimeout(()=>{
+        location.reload()
+       }, 2000)
+        } else {
+            Swal.fire({
+            title : 'Error',
+            text : `${data.error}`||"Failed to add quantity",
+            icon :'error',
+            confirmButtonText: 'Okay'
+           })  
+        }
+    } catch (error) {
+        Swal.fire({
+            title : 'Error',
+            text : `${data.error}`||"Failed to add quantity",
+            icon :'error',
+            confirmButtonText: 'Okay'
+           })  
+        console.error('Error:', error);
+    }
+
+}
+    }
+
+  
+
+function blockProduct() {
+    alert('Product blocked successfully!');
+}
+
+    </script>
+    
+
+    <%- include('../../views/partials/admin/footer') %>

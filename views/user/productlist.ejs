@@ -60,8 +60,11 @@
                                     <span id="averageRating">Average Rating: 0 / 5</span>
                                     <span id="totalRatings">(0 Reviews)</span>
                                 </div>
-
+                                
                                 <h3>&#8377;<%= product.salePrice %> <span>&#8377;<%= product.regularPrice %></span></h3>
+                                <% if(product.quantity < 5) {%>
+                                    <p class="stock-left text-danger">Only <%= product.quantity%> left,Please hurry up</span>
+                                    <% } %>
                                 <p><%= product.description %></p>
                                 <div class="product__details__option">
                                     <div class="product__details__option__size">
@@ -87,7 +90,7 @@
                                             <input type="text" value="1">
                                         </div>
                                     </div>
-                                    <a href="/cart" class="primary-btn">Go To Cart</a>
+                                    <button class="add-cart-btn"><a href="#" onclick="addToCart('<%= product._id %>')" class="add-cart-link">+ Add to Cart</a>
                                 </div>
                                 <div class="product__details__btns__option">
                                     <a href="#"><i class="fa fa-heart"></i> add to wishlist</a>
@@ -465,5 +468,30 @@ function copyCouponCode(button, code) {
 
 </script>
 
+<script>
+    function addToCart(productId) {
+    $.ajax({
+        url: '/cart/add/' + productId,  
+        method: 'POST',
+        contentType: 'application/json',
+        success: function(response) {
+            Swal.fire({
+                title: "Success",
+                icon: "success",
+                text: "Product Added Successfully",
+                showConfirmButton: true,
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = '/cart';
+                }
+            });
+            
+        },
+        error: function() {
+            alert('Failed to add product to cart!');
+        }
+    });
+}
+</script>
 
 <%-include('../../views/partials/user/footer') %>
