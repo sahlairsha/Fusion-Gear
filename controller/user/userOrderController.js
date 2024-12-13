@@ -33,9 +33,12 @@ const getCheckout = async (req, res) => {
       const savedAddress = await Address.find({user_id : userId})
 
         const user = await User.findById(userId).populate('cart.product_id');
-        const cartItems = user.cart;
+        const orderProducts = user.cart.map(item => ({
+            product_id: item.product_id._id,
+            quantity: item.quantity,
+        }));
 
-        if (cartItems.length === 0) {
+        if (orderProducts.length === 0) {
             req.flash('error', "Cart is empty! Please add a product.");
             return res.redirect('/cart');
         }
@@ -45,7 +48,7 @@ const getCheckout = async (req, res) => {
 
         res.render('checkout', {
             address: savedAddress,
-            cartCount : cartItems.length,
+            cartCount : orderProducts.length,
             ...updatedCartTotals
         });
     } catch (error) {

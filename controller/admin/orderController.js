@@ -6,7 +6,7 @@ const Order = require('../../models/orderSchema');
 const getOrders = async(req,res)=>{
     try {
         const orders = await Order.find()
-        .populate('user_id', 'name email')
+        .populate('user_id', 'full_name')
         .populate('products.product_id', 'productName description salePrice category productImage')  
         .populate('shippingAddress.address_id', 'street city postalCode');  
     
