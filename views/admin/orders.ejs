@@ -1,0 +1,155 @@
+<%- include('../../views/partials/admin/header')  %>
+<style>
+    table {
+        table-layout: fixed;
+        width: 100%;
+        text-align: center;
+    }
+    .product_image{
+        border-radius: 10px;
+    }
+    .actions{
+        width: 200px;
+        align-items: center;
+    }
+
+</style>
+
+
+
+<div class="container mt-4">
+    <h2 class="mb-4">Order Details </h2>
+  
+    <div class="mb-3">
+        <input type="text" class="form-control" id="searchBar" placeholder="Search product by name or category">
+    </div>
+
+    <table class="table table-light">
+        <thead class="table-secondary">
+            <tr>
+                <th scope="col">User Name</th>
+                <th scope="col">Product Image</th>
+                <th scope="col">Product Name</th>
+                <th scope="col">Qty</th>               
+                <th scope="col">Total Price</th>
+                <th scope="col">Shipping Address</th>
+                <th scope="col">Payment Status</th>
+                <th scope="col">Order Status</th>
+                <th scope="col" class="actions">Actions</th>
+            </tr>
+        </thead>
+        <tbody id="tableBody">
+            <% orders.forEach((order, index) => { %>
+                <tr data-order-id="<%= order._id %>">
+                    <td><%= order.user_id.full_name %></td>
+                    <td>
+                        <% order.products.forEach(product => { %>
+                            <img class="product_image" src="/uploads/public-image/<%= product.product_id.productImage[0] %>" alt="<%= product.product_id.productName %>" width="50" height="50">
+                        <% }); %>
+                    </td>
+                    <td>
+                        <%= order.products.map(product => product.product_id.productName).join(', ') %>
+                    </td>
+                    <td><%=order.products.map(product => product.product_id.quantity).join(', ') %></td>
+                    
+                    <td><%= order.total_price %></td>
+                    <td><%= order.shippingAddress.map(address => address.address_id.streetAddress)  %></td>
+                    <td><%= order.payment_status %></td> 
+                        <td class="order-status-display text-center bg-<%= order.order_status === 'Pending' ? 'warning' : order.order_status === 'Shipped' ? 'info' : order.order_status === 'Delivered' ? 'success' : 'danger' %>">
+                            <%= order.order_status %>
+                        </td>
+                        <td>
+                            <!-- Dropdown for changing order status -->
+                            <select class="form-select order-status-dropdown" data-order-id="<%= order._id %>" style="width: 150px;">
+                                <option value="Pending" class="bg-warning" <%= order.order_status === 'Pending' ? 'selected' : '' %>>Pending</option>
+                                <option value="Shipped" class="bg-info text-white" <%= order.order_status === 'Shipped' ? 'selected' : '' %>>Shipped</option>
+                                <option value="Delivered" class="bg-success text-white" <%= order.order_status === 'Delivered' ? 'selected' : '' %>>Delivered</option>
+                                <option value="Canceled" class="bg-danger text-white" <%= order.order_status === 'Canceled' ? 'selected' : '' %>>Canceled</option>
+                            </select>
+                        </td>
+                    
+                    
+                </tr>
+            <% }); %>
+        </tbody>        
+    </table>
+</div>
+
+<script src="/js/admin/customer-search.js"></script>
+
+<script>
+  document.addEventListener('change', function (event) {
+    if (event.target.classList.contains('order-status-dropdown')) {
+        const orderId = event.target.getAttribute('data-order-id');
+        const newStatus = event.target.value;
+
+        // Update order status via AJAX
+        fetch(`/admin/orders/${orderId}/status`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ status: newStatus }),
+        })
+            .then((response) => {
+                if (response.ok) {
+                    // Update the status in the row dynamically
+                    const statusCell = event.target.closest('tr').querySelector('.order-status-display');
+                    statusCell.textContent = newStatus;
+
+                    // Add a class to reflect the status color
+                    statusCell.className = `order-status-display text-center bg-${getStatusColor(newStatus)}`;
+
+                    // Notify the user of the successful update
+                    toastr.success(`Order status changed to ${newStatus}`);
+                } else {
+                    toastr.error('Failed to update order status');
+                }
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                toastr.error('Something went wrong');
+            });
+    }
+});
+
+// Helper function to get the color class for each status
+function getStatusColor(status) {
+    switch (status) {
+        case 'Pending':
+            return 'warning';
+        case 'Shipped':
+            return 'info'; 
+        case 'Delivered':
+            return 'success';
+        case 'Canceled':
+            return 'danger'; 
+        default:
+            return 'secondary';
+    }
+}
+
+
+document.getElementById('searchBar').addEventListener('input', function() {
+    const query = this.value.toLowerCase();
+    const rows = document.querySelectorAll('#tableBody tr');
+
+    rows.forEach(row => {
+        const productName = row.querySelector('td:nth-child(3)').textContent.toLowerCase();
+        const category = row.querySelector('td:nth-child(5)').textContent.toLowerCase();
+
+        if (productName.includes(query) || category.includes(query)) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+});
+
+
+</script>
+
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
