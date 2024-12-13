@@ -21,6 +21,33 @@
     font-weight: 600;
     text-transform: uppercase;
     }
+    .payment-badge{
+     
+      
+        padding: 5px 10px;
+        border-radius: 5px;
+        font-size: 10px;
+        font-weight: 600;
+        text-transform: uppercase;
+       
+    }
+    .payment-badge.pending{
+        background-color:#ffc10770;
+        border: 1px solid #FFC107;
+        color: #443a3a;
+      
+    }
+    .payment-badge.completed{
+        background-color: #2ecc7013;
+        border: 1px solid  #2ecc7044;
+        color: #132a13;
+    }
+
+    .payment-badge.failed{
+        background-color: #ff6b6b60;
+        color: white;
+        border:1px solid #ff6b6b;
+    }
 
 </style>
 
@@ -63,19 +90,25 @@
                     
                     <td><%= order.total_price %></td>
                     <td><%= order.shippingAddress.map(address => address.address_id.streetAddress)  %></td>
-                    <td><%= order.payment_status %></td> 
+                    <%if(order.payment_status === 'Pending'){%>
+                    <td><div class="payment-badge pending"> <%= order.payment_status %> </div></td> 
+                    <% } else if(order.payment_status === 'Completed') {%>
+                        <td><div class="payment-badge completed"> <%= order.payment_status %> </div>
+                    </td>
+                    <% } else{%>
+                        <td><div class="payment-badge failed"> <%= order.payment_status %> </div></td>
+                        <% } %>
                         <td>
                             <div class="order-status-display text-center bg-<%= order.order_status === 'Pending' ? 'warning' : order.order_status === 'Shipped' ? 'info' : order.order_status === 'Delivered' ? 'success' : 'danger' %>"><%= order.order_status %></div>
                         </td> 
-                           
-                       
+
                         <td>
                             <!-- Dropdown for changing order status -->
                             <select class="form-select order-status-dropdown" data-order-id="<%= order._id %>" style="width: 150px;">
-                                <option value="Pending" class="bg-warning" <%= order.order_status === 'Pending' ? 'selected' : '' %>>Pending</option>
-                                <option value="Shipped" class="bg-info text-white" <%= order.order_status === 'Shipped' ? 'selected' : '' %>>Shipped</option>
-                                <option value="Delivered" class="bg-success text-white" <%= order.order_status === 'Delivered' ? 'selected' : '' %>>Delivered</option>
-                                <option value="Canceled" class="bg-danger text-white" <%= order.order_status === 'Canceled' ? 'selected' : '' %>>Canceled</option>
+                                <option value="Pending"  <%= order.order_status === 'Pending' ? 'selected' : '' %>>Pending</option>
+                                <option value="Shipped" <%= order.order_status === 'Shipped' ? 'selected' : '' %>>Shipped</option>
+                                <option value="Delivered" <%= order.order_status === 'Delivered' ? 'selected' : '' %>>Delivered</option>
+                                <option value="Canceled" <%= order.order_status === 'Canceled' ? 'selected' : '' %>>Canceled</option>
                             </select>
                         </td>
                     
@@ -84,6 +117,22 @@
             <% }); %>
         </tbody>        
     </table>
+
+    <div class="pagination-container d-flex align-items-center justify-content-center mt-5">
+        <% if (currentPage > 1) { %>
+            <a class="page-link" href="?page=<%= currentPage - 1 %>">&laquo; Previous</a>
+        <% } %>
+        <% for (let i = 1; i <= totalPages; i++) { %>
+            <% if (i === currentPage) { %>
+                <span class="current-page"><%= i %></span>
+            <% } else { %>
+                <a class="page-link" href="?page=<%= i %>"><%= i %></a>
+            <% } %>
+        <% } %>
+        <% if (currentPage < totalPages) { %>
+            <a class="page-link" href="?page=<%= currentPage + 1 %>">Next &raquo;</a>
+        <% } %>
+    </div>
 </div>
 
 <script src="/js/admin/customer-search.js"></script>
