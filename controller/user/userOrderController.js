@@ -30,32 +30,28 @@ async function calculateCartTotals(userId) {
 const getCheckout = async (req, res) => {
     try {
         const userId = req.session.user;
+      const savedAddress = await Address.find({user_id : userId})
 
         const user = await User.findById(userId).populate('cart.product_id');
-        const cartItems = user.cart.filter(item => item.product_id);
+        const cartItems = user.cart;
 
         if (cartItems.length === 0) {
             req.flash('error', "Cart is empty! Please add a product.");
             return res.redirect('/cart');
         }
 
-        // Fetch all orders and populate shipping addresses
-        const orders = await Order.find({ user_id: userId }).populate('shippingAddress.address_id');
 
-        const shippingAddresses = orders.shippingAddress.filter((order => order.address_id))
-
-
-        const updateCartTotal = await calculateCartTotals(userId);
+        const updatedCartTotals = await calculateCartTotals(userId)
 
         res.render('checkout', {
-            shippingAddresses,
-            cartCount: cartItems.length,
-            cartItems,
-            ...updateCartTotal,
+            address: savedAddress,
+            cartCount : cartItems.length,
+            ...updatedCartTotals
         });
     } catch (error) {
-        console.error("Error in Loading checkout page", error);
-        res.redirect('/pagenotfound');
+        console.error("Error loading checkout page:", error);
+        req.flash('error', "An error occurred. Please try again.");
+        res.redirect('/cart');
     }
 };
 
@@ -67,31 +63,53 @@ const saveAddress = async (req, res) => {
 
         if (!userId) return res.status(401).json({ success: false, message: 'Unauthorized access.' });
 
-        // Save the address in the Address model
-        const newAddress = new Address({
-            user_id: userId,
-            recipient_name,
-            streetAddress,
-            city,
-            state,
-            pincode,
-            phone,
-            altPhone,
-            addressType,
-        });
-        const savedAddress = await newAddress.save();
+        // Find the user by ID and push the new address to the address array
+        const userAddress = await Address.findOne({ user_id: userId });
 
-        // Update the current order with the new address reference
-        await Order.findOneAndUpdate(
-            { user_id: userId, order_status: 'Pending' },
-            { $push: { shippingAddress: savedAddress._id } },
-            { new: true, upsert: true }
-        );
+        if (!userAddress) {
+            // If no address record exists for the user, create one
+            const newAddress = new Address({
+                user_id: userId,
+                address: [{
+                    recipient_name,
+                    streetAddress,
+                    city,
+                    state,
+                    pincode,
+                    phone,
+                    altPhone,
+                    addressType
+                }]
+            });
+            await newAddress.save();
+        } else {
+            // If address record exists, push the new address to the address array
+            userAddress.address.push({
+                recipient_name,
+                streetAddress,
+                city,
+                state,
+                pincode,
+                phone,
+                altPhone,
+                addressType
+            });
+            await userAddress.save();
+        }
 
         res.json({
             success: true,
             message: 'Shipping address saved successfully.',
-            address: savedAddress,
+            address: {
+                recipient_name,
+                streetAddress,
+                city,
+                state,
+                pincode,
+                phone,
+                altPhone,
+                addressType
+            },
         });
     } catch (error) {
         console.error('Error saving shipping address:', error);
@@ -100,26 +118,26 @@ const saveAddress = async (req, res) => {
 };
 
 
-
 const getAddress = async (req, res) => {
     try {
-        const address = await Order.findOne(
-            { 'shippingAddress._id': req.params.id },
-            { 'shippingAddress.$': 1 } 
-        );
+        const addressId = req.params.id;
 
-        console.log('Fetching address for ID:', req.params.id);
+        const address = await Address.findById(addressId);
 
-        if (!address || !address.shippingAddress || address.shippingAddress.length === 0) {
+        console.log('Fetching address for ID:', addressId);
+
+        if (!address) {
             return res.status(404).json({ message: 'Address not found' });
         }
 
-        res.json(address.shippingAddress[0]);
+        res.json(address);
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Server error' });
     }
 };
+
+
 
 const editAddress = async (req, res) => {
     try {
@@ -179,6 +197,7 @@ const selectAddress = async (req, res) => {
 const getPayment = async(req,res)=>{
 
     const selectedAddressId = req.session.selectedAddress;
+    console.log(selectedAddressId);
 
     if (!selectedAddressId) {
         return res.redirect('/checkout');
@@ -191,63 +210,46 @@ const getPayment = async(req,res)=>{
 
 const confirmOrder = async (req, res) => {
     try {
-        const userId = req.session.user; 
-        const { payment_method } = req.body;
+        const userId = req.session.user;
+        const { address_id, payment_method } = req.body;
 
-        if (!payment_method) {
-            return res.status(400).json({ success: false, message: 'Payment method is required.' });
-        }
-
-        // Fetch the user's cart
+        // Fetch user cart items
         const user = await User.findById(userId).populate('cart.product_id');
+        const cartItems = user.cart;
 
-        if (!user || user.cart.length === 0) {
-            return res.status(400).json({ success: false, message: 'Cart is empty.' });
+        if (cartItems.length === 0) {
+            req.flash('error', "Cart is empty! Please add products.");
+            return res.redirect('/cart');
         }
 
-        const cartItems = user.cart.filter(item => item.product_id);
+        // Calculate total price
+        const totalPrice = cartItems.reduce((total, item) => {
+            return total + item.product_id.salePrice * item.quantity;
+        }, 0);
 
-        const updateCartTotal = await calculateCartTotals(userId);
+        // Create order
+        const newOrder = new Order({
+            user_id: userId,
+            products: cartItems.map(item => ({
+                product_id: item.product_id._id,
+                quantity: item.quantity
+            })),
+            total_price: totalPrice,
+            payment_method,
+            shippingAddress: [{ address_id }] 
+        });
 
-        // Check if there's an existing "Pending" order
-        let order = await Order.findOne({ user_id: userId, order_status: 'Pending' });
+        await newOrder.save();
 
-        const shippingAddress = req.session.shippingAddress || user.shippingAddress;
-
-        if (order) {
-            // Update the existing pending order
-            order.products_id = cartItems;
-            order.total_price = updateCartTotal.cartTotal;
-            order.payment_method = payment_method;
-            order.payment_status = payment_method === 'COD' ? 'Completed' : 'Pending';
-            order.order_status = payment_method === 'COD' ? 'Shipped' : 'Pending';
-            order.shippingAddress = shippingAddress || [];
-        } else {
-            order = new Order({
-                user_id: userId,
-                products_id: cartItems,
-                total_price: updateCartTotal.cartTotal,
-                payment_method,
-                payment_status: payment_method === 'COD' ? 'Completed' : 'Pending',
-                order_status: payment_method === 'COD' ? 'Shipped' : 'Pending',
-                shippingAddress: shippingAddress || [],
-            });
-        }
-
-        await order.save();
-
-        // Clear the user's cart after the order is created/updated
         user.cart = [];
         await user.save();
 
-        res.status(200).json({
-            success: true,
-            message: 'Order confirmed successfully.',
-            order,
-        });
+        req.flash('success', "Order placed successfully!");
+        res.redirect('/orders');
     } catch (error) {
-        console.error('Error confirming order:', error);
-        res.status(500).json({ success: false, message: 'Failed to confirm order.' });
+        console.error("Error in Placing Order", error);
+        req.flash('error', "Failed to place the order. Please try again.");
+        res.redirect('/checkout');
     }
 };
 
@@ -255,20 +257,26 @@ const confirmOrder = async (req, res) => {
 
 
 
-const getOrderConfirmation = async(req,res,next)=>{
-    try{
-        const userId = req.session.user;
-        const orders = await Order.find({ user_id: userId })
-            .populate('products_id')
-            .exec();
+const getOrderConfirmation = async(req,res)=>{
+        try {
+            const userId = req.session.user;
+    
+            // Fetch orders and populate product and address details
+            const orders = await Order.find({ user_id: userId })
+                .populate('products.product_id')
+                .populate('shippingAddress.address_id');
+    
+            res.render('orders', {
+                orders
+            });
+        } catch (error) {
+            console.error("Error in Loading Orders Page", error);
+            res.redirect('/pagenotfound');
+        }
+    };
+    
 
-        res.render('order-confirmation',{orders})
 
-    }catch(error){
-        res.redirect('/pagenotfound')
-    }
-
-}
 
 
 module.exports = {

@@ -101,8 +101,8 @@ router.delete("/cart/delete/:productId",userAuth,userCartController.removeFromCa
 
 //Check out page for more information.....
 
-router.get('/checkout',userAuth,userOrderController.getCheckout)
-router.post('/checkout',userAuth,userOrderController.saveAddress)
+router.get('/checkout',userAuth,userOrderController.getCheckout);
+router.post('/save-address',userAuth,userOrderController.saveAddress)
 router.get('/edit-address/:id',userAuth,userOrderController.getAddress)
 router.post('/update-address/:id',userAuth,userOrderController.editAddress)
 router.post('/set-selected-address',userAuth,userOrderController.selectAddress)

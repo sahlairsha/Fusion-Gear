@@ -1,7 +1,6 @@
 const Product = require("../../models/productSchema");
 const User = require("../../models/userSchema");
-const Address = require('../../models/addressSchema')
-
+const Order = require('../../models/orderSchema');
 
 // Helper function to calculate the cart totals
 async function calculateCartTotals(userId) {
@@ -188,9 +187,57 @@ const updateQuantity = async (req, res) => {
 
 
 
+// const proceedToCheckout = async (req, res) => {
+//     try {
+//         const userId = req.session.user;
+
+//         // Fetch the user's cart
+//         const user = await User.findById(userId).populate('cart.product_id');
+//         const cartItems = user.cart;
+
+//         if (cartItems.length === 0) {
+//             req.flash('error', "Cart is empty! Please add a product.");
+//             return res.redirect('/cart');
+//         }
+
+//         // Calculate total price
+//         const totalPrice = cartItems.reduce((total, item) => {
+//             return total + item.product_id.salePrice * item.quantity;
+//         }, 0);
+
+//         // Create a new order
+//         const order = new Order({
+//             user_id: userId,
+//             products: cartItems.map(item => ({
+//                 product_id: item.product_id._id,
+//                 quantity: item.quantity,
+//             })),
+//             total_price: totalPrice,
+//             payment_method: 'COD',
+//             order_status: 'Pending',
+//             shippingAddress: []
+//         });
+
+//         await order.save();
+
+//         // Clear the user's cart
+//         user.cart = [];
+//         await user.save();
+
+//         // Redirect to the checkout page with order ID
+//         res.redirect(`/checkout?orderId=${order._id}`);
+//     } catch (error) {
+//         console.error("Error in proceeding to checkout:", error);
+//         req.flash('error', "An error occurred. Please try again.");
+//         res.redirect('/cart');
+//     }
+// };
+
+
 module.exports = {
     getCartPage,
     addToCart,
     removeFromCart,
     updateQuantity,
+
 };
