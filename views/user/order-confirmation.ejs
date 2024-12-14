@@ -198,8 +198,7 @@
                     </p>
                     <p>Order Date : <%= new Date(order.order_date).toLocaleDateString()%></p>
                     <p>Delivered On : <%= new Date(order.delivery_date).toLocaleDateString()%></p>
-                   
-                    <p><%= order.order_status === 'Refund Completed' ? 'Your return request was completed.' : 'Your item has been delivered.' %></p>
+                
                     <h6>Total: ₹<%= order.total_price %></h4>
                 </div>
             </div>

@@ -26,8 +26,9 @@
 
             <!-- Navigation Links -->
             <ul class="nav-list">
+               
               <li><a href="/userProfile?id=<%=user._id%>" class="<%= activePage === 'profile' ? 'active' : '' %>">My Profile</a></li>
-              <li><a href="#" class="<%= activePage === 'orders' ? 'active' : '' %>">My Orders</a></li>
+              <li><a href="/order-confirm" class="<%= activePage === 'orders' ? 'active' : '' %>">My Orders</a></li>
               <li><a href="/address-view" class="<%= activePage === 'address' ? 'active' : '' %>">Address</a></li>
               <li><a href="/cart">Cart</a></li>
               <li><a href="#" class="<%= activePage === 'wishlist' ? 'active' : '' %>">Wishlist</a></li>

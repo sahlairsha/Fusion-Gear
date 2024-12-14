@@ -76,6 +76,7 @@
         </thead>
         <tbody id="tableBody">
             <% orders.forEach((order, index) => { %>
+                
                 <tr data-order-id="<%= order._id %>">
                     <td><%= order.user_id.full_name %></td>
                     <td>
@@ -86,9 +87,16 @@
                     <td>
                         <%= order.products.map(product => product.product_id.productName).join(', ') %>
                     </td>
-                    <td><%=order.products.map(product => product.product_id.quantity).join(', ') %></td>
-                    
+                    <td><%= order.products.quantity || 1 %></td> 
                     <td><%= order.total_price %></td>
+                    <td>
+                        <% if (order.shippingAddress && order.shippingAddress.address_id) { %>
+                            <%= `${order.shippingAddress.address_id.streetAddress}, ${order.shippingAddress.address_id.city}, ${order.shippingAddress.address_id.state}` %>
+                        <% } else { %>
+                            Not Provided
+                        <% } %>
+                    </td>
+                    
                     <%if(order.payment_status === 'Pending'){%>
                     <td><div class="payment-badge pending"> <%= order.payment_status %> </div></td> 
                     <% } else if(order.payment_status === 'Completed') {%>

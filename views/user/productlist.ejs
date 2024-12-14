@@ -48,19 +48,7 @@
                         <div class="col-lg-8">
                             <div class="product__details__text">
                                 <h4><%= product.productName %></h4>
-                                <div class="rating">
-                                    <!-- Display interactive stars for rating -->
-                                    <div id="userRating" class="stars">
-                                        <span class="star" onclick="submitRating(1)" onmouseover="highlightStars(1)" onmouseout="resetStars()"></span>
-                                        <span class="star" onclick="submitRating(2)" onmouseover="highlightStars(2)" onmouseout="resetStars()"></span>
-                                        <span class="star" onclick="submitRating(3)" onmouseover="highlightStars(3)" onmouseout="resetStars()"></span>
-                                        <span class="star" onclick="submitRating(4)" onmouseover="highlightStars(4)" onmouseout="resetStars()"></span>
-                                        <span class="star" onclick="submitRating(5)" onmouseover="highlightStars(5)" onmouseout="resetStars()"></span>
-                                    </div>
-                                    <span id="averageRating">Average Rating: 0 / 5</span>
-                                    <span id="totalRatings">(0 Reviews)</span>
-                                </div>
-                                
+                               
                                 <h3>&#8377;<%= product.salePrice %> <span>&#8377;<%= product.regularPrice %></span></h3>
                                 <% if(product.quantity < 5) {%>
                                     <p class="stock-left text-danger">Only <%= product.quantity%> left,Please hurry up</span>

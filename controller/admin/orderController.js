@@ -7,22 +7,21 @@ const getOrders = async(req,res)=>{
     try {
 
         let page = req.query.page || 1;
-        let limit = 5;
-
-        const orders = await Order.find()
-        .limit(limit * 1)
-        .skip((page - 1) * limit)
-        .populate('user_id', 'full_name')
-        .populate('products.product_id', 'productName description salePrice category productImage')  
-        .populate('shippingAddress.address_id', 'street city postalCode')
-        .exec()
-
-        const count = await Order.find().countDocuments();
+        let limit= 5
+        
+        const orders = await Order.find({})
+         .limit(limit * 1)
+            .skip((page - 1) * limit)
+            .populate('user_id', 'full_name') 
+            .populate('products.product_id') 
+            .populate('shippingAddress.address_id')
+            .exec();
+          const count = await Order.find().countDocuments()
     
         res.render('orders', {
             orders,
             totalPages : Math.ceil(count/limit),
-            currentPage: page
+            currentPage:page,
         })
     } catch (error) {
         console.error(error);

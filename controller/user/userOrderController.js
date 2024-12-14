@@ -296,16 +296,17 @@ const getOrderConfirmation = async (req, res) => {
     try {
         const userId = req.session.user;
 
-        // Fetch all orders for the user and populate product and address details
+       
         const orders = await Order.find({ user_id: userId })
             .populate('products.product_id')
-            .populate('shippingAddress.address_id') // Ensure the population is correct
+            .populate('shippingAddress.address_id') 
             .exec();
 
-        console.log(orders); // Debugging: Verify orders structure
+        console.log(orders);
 
         res.render('order-confirmation', {
-            orders
+            orders,
+            activePage: 'orders'
         });
     } catch (error) {
         console.error("Error in Loading Orders Page", error);

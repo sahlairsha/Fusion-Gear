@@ -208,8 +208,12 @@ function showAlert(message, type) {
 
     if (type === 'success') {
         alertBox.className = 'alert success';
+        alertBox.style.backgroundColor = "green"
+        alertBox.style.color = "white"
     } else {
         alertBox.className = 'alert error';
+         alertBox.style.backgroundColor = "red"
+        alertBox.style.color = "white"
     }
 
     setTimeout(() => alertBox.style.display = 'none', 2000);
