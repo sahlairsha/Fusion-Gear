@@ -41,17 +41,19 @@ const orderSchema = new mongoose.Schema({
         type: Date,
         default: Date.now
     },
-    shippingAddress: [
+    shippingAddress: 
         {
-            address_id: {
-
+            address_id:{
              type: mongoose.Schema.Types.ObjectId, 
              ref: 'Address' 
-
-             }
-             
             }
-    ],
+             
+        },
+        delivery_date: {
+            type: Date,
+            default: null
+        }
+
 });
 
 const Order = mongoose.model('Order', orderSchema);

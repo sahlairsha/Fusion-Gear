@@ -89,7 +89,6 @@
                     <td><%=order.products.map(product => product.product_id.quantity).join(', ') %></td>
                     
                     <td><%= order.total_price %></td>
-                    <td><%= order.shippingAddress.map(address => address.address_id.streetAddress)  %></td>
                     <%if(order.payment_status === 'Pending'){%>
                     <td><div class="payment-badge pending"> <%= order.payment_status %> </div></td> 
                     <% } else if(order.payment_status === 'Completed') {%>

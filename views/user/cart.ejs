@@ -375,12 +375,14 @@ function updateCartUI(data) {
 <script>
     document.addEventListener('click', async (event) => {
     if (event.target.closest('.btn-increment') || event.target.closest('.btn-decrement')) {
-        event.preventDefault(); // Prevent default behavior
+        event.preventDefault();
 
         const isIncrement = event.target.closest('.btn-increment') ? true : false;
         const productId = event.target.closest('button').getAttribute('data-product-id');
         const quantityInput = document.querySelector(`input[data-product-id="${productId}"]`);
         let quantity = parseInt(quantityInput.value);
+
+        let cartLimit = 10;
 
         // Increment or decrement quantity
         if (isIncrement) {
@@ -415,7 +417,7 @@ function updateCartUI(data) {
             const data = await response.json();
 
             if (response.ok) {
-                updateCartUI(data); // Update the cart UI with new totals
+                updateCartUI(data); 
             } else {
                 Swal.fire({
                     icon: 'error',

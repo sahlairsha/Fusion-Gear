@@ -17,7 +17,7 @@
                     <li class="list-group-item">
                         <h6><%= addr.recipient_name %>
                             <% if (addr.addressType) { %>
-                                <span class="badge mb-2"><%=addr.addressType%></span>
+                                <span class="badge badge-danger mb-2"><%=addr.addressType%></span>
                             <% } %>
                         </h4>
                         <strong><%= addr.streetAddress %>, <%= addr.city %>, <%= addr.state %></strong><br>
@@ -89,11 +89,11 @@
             <div class="mb-3">
                 <label class="form-label">Address Type</label><br>
                 <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="addressType" id="home" value="Home">
+                    <input class="form-check-input mt-3" type="radio" name="addressType" id="home" value="Home">
                     <label class="form-check-label" for="home">Home</label>
                 </div>
                 <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="addressType" id="work" value="Work">
+                    <input class="form-check-input mt-3" type="radio" name="addressType" id="work" value="Work">
                     <label class="form-check-label" for="work">Work</label>
                 </div>
                 <div id="error7" class="error-message"></div>

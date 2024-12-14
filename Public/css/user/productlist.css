@@ -124,7 +124,7 @@
 }
 
 .product__details__pic__item {
-	width: 400px; /* Set a fixed width */
+	width: 400px;
     height: 400px; /* Set the same height as width for a square shape */
     display: flex; /* Center the image */
     justify-content: center; /* Center horizontally */

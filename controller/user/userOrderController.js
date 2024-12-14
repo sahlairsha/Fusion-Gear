@@ -127,8 +127,6 @@ const getAddress = async (req, res) => {
 
         const address = await Address.findById(addressId);
 
-        console.log('Fetching address for ID:', addressId);
-
         if (!address) {
             return res.status(404).json({ message: 'Address not found' });
         }
@@ -182,20 +180,33 @@ const selectAddress = async (req, res) => {
     }
 
     try {
-        const selectedAddress = await Address.findById(addressId);
+        // Fetch the parent address document
+        const addressDoc = await Address.findOne({ "address._id": addressId });
 
-        if (!selectedAddress) {
+        console.log('Fetched address document:', addressDoc);
+
+        if (!addressDoc) {
             return res.status(404).json({ message: 'Address not found.' });
         }
 
+        // Find the address inside the array based on the addressId
+        const selectedAddress = addressDoc.address.find(addr => addr._id.toString() === addressId);
+
+        console.log('Selected address:', selectedAddress);
+
+        if (!selectedAddress) {
+            return res.status(404).json({ message: 'Address not found in the address list.' });
+        }
+
+        // Store the selected address ID in session
         req.session.selectedAddress = selectedAddress._id;
+
         res.json({ message: 'Address selected successfully.', address: selectedAddress });
     } catch (error) {
         console.error('Error selecting address:', error);
         res.status(500).json({ message: 'Internal server error.' });
     }
 };
-
 
 const getPayment = async(req,res)=>{
 
@@ -211,24 +222,47 @@ const getPayment = async(req,res)=>{
 }
 
 
+function getRandomDeliveryDate() {
+    // Get the current date
+    const currentDate = new Date();
+  
+    // Generate a random number of days between 1 and 4
+    const randomDays = Math.floor(Math.random() * 4) + 1;
+  
+    // Add the random number of days to the current date
+    currentDate.setDate(currentDate.getDate() + randomDays);
+  
+    // Format the delivery date (optional)
+    const deliveryDate = currentDate.toLocaleString();
+  
+    return deliveryDate;
+  }
+  
+
 const confirmOrder = async (req, res) => {
     try {
         const userId = req.session.user;
-        const { address_id, payment_method } = req.body;
+        const address_id = req.session.selectedAddress;
+        const {payment_method } = req.body;
 
         // Fetch user cart items
         const user = await User.findById(userId).populate('cart.product_id');
         const cartItems = user.cart;
 
         if (cartItems.length === 0) {
-            req.flash('error', "Cart is empty! Please add products.");
-            return res.redirect('/cart');
+            return res.status(500).json({ message: "Cart is empty! Please add products." });
         }
+
+        console.log("ShippingAddress id:", address_id)
 
         // Calculate total price
         const totalPrice = cartItems.reduce((total, item) => {
             return total + item.product_id.salePrice * item.quantity;
         }, 0);
+
+        const deliveryDate = getRandomDeliveryDate();
+
+        console.log("Delivery Date:",deliveryDate)
 
         // Create order
         const newOrder = new Order({
@@ -239,47 +273,45 @@ const confirmOrder = async (req, res) => {
             })),
             total_price: totalPrice,
             payment_method,
-            shippingAddress: [{ address_id }] 
+            payment_status : 'Completed',
+            shippingAddress: { address_id },
+            delivery_date:deliveryDate
         });
 
         await newOrder.save();
-
         user.cart = [];
         await user.save();
 
-        req.flash('success', "Order placed successfully!");
-        res.redirect('/orders');
+        res.json({ message: 'Order confirmed successfully.' });
     } catch (error) {
         console.error("Error in Placing Order", error);
-        req.flash('error', "Failed to place the order. Please try again.");
-        res.redirect('/checkout');
+        return res.status(500).json({ message: "Failed to place the order. Please try again." });
     }
 };
 
 
 
 
+const getOrderConfirmation = async (req, res) => {
+    try {
+        const userId = req.session.user;
 
-const getOrderConfirmation = async(req,res)=>{
-        try {
-            const userId = req.session.user;
-    
-            // Fetch orders and populate product and address details
-            const orders = await Order.find({ user_id: userId })
-                .populate('products.product_id')
-                .populate('shippingAddress.address_id');
-    
-            res.render('orders', {
-                orders
-            });
-        } catch (error) {
-            console.error("Error in Loading Orders Page", error);
-            res.redirect('/pagenotfound');
-        }
-    };
-    
+        // Fetch all orders for the user and populate product and address details
+        const orders = await Order.find({ user_id: userId })
+            .populate('products.product_id')
+            .populate('shippingAddress.address_id') // Ensure the population is correct
+            .exec();
 
+        console.log(orders); // Debugging: Verify orders structure
 
+        res.render('order-confirmation', {
+            orders
+        });
+    } catch (error) {
+        console.error("Error in Loading Orders Page", error);
+        res.redirect('/pagenotfound');
+    }
+};
 
 
 module.exports = {

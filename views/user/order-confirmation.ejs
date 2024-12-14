@@ -1,146 +1,218 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Order Confirmation</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f8f8f8;
-            margin: 0;
-            padding: 0;
-        }
-        .container {
-            width: 80%;
-            max-width: 1200px;
-            margin: 50px auto;
-            background-color: #fff;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            animation: fadeIn 1s ease-in-out;
-        }
-        h2 {
-            color: #333;
-            font-size: 28px;
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        .order-summary {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-            margin-bottom: 30px;
-        }
-        .order-summary h3 {
-            color: #4CAF50;
-            font-size: 22px;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-        .order-card {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 15px;
-            margin: 15px 0;
-            border-radius: 8px;
-            background-color: #fafafa;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease-in-out;
-        }
-        .order-card:hover {
-            transform: scale(1.05);
-        }
-        .product-image {
-            width: 80px;
-            height: 80px;
-            object-fit: cover;
-            border-radius: 8px;
-            margin-right: 20px;
-        }
-        .order-info {
-            flex: 1;
-        }
-        .order-info h4 {
-            font-size: 18px;
-            margin: 5px 0;
-            color: #333;
-        }
-        .order-info p {
-            color: #777;
-            margin: 5px 0;
-        }
-        .order-info .price {
-            font-weight: bold;
-            font-size: 16px;
-            color: #000;
-        }
-        .order-status {
-            padding: 8px 15px;
-            border-radius: 20px;
-            background-color: #ddd;
-            color: #333;
-            text-align: center;
-            font-weight: bold;
-        }
-        .order-status.shipped {
-            background-color: #FF8C00;
-            color: #fff;
-        }
-        .order-status.delivered {
-            background-color: #4CAF50;
-            color: #fff;
-        }
-        .order-status.pending {
-            background-color: #FF5733;
-            color: #fff;
-        }
-        .delivery-date {
-            color: #777;
-            font-size: 14px;
-        }
-        .go-to-shop-btn {
-            display: block;
-            margin: 30px auto;
-            padding: 10px 20px;
-            background-color: #4CAF50;
-            color: white;
-            font-size: 16px;
-            font-weight: bold;
-            text-decoration: none;
-            border-radius: 5px;
-            text-align: center;
-            width: 200px;
-        }
-        .go-to-shop-btn:hover {
-            background-color: #45a049;
-        }
-        @keyframes fadeIn {
-            0% {
-                opacity: 0;
-            }
-            100% {
-                opacity: 1;
-            }
-        }
-        @media (max-width: 768px) {
-            .order-card {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h2>Order Confirmation</h2>
-        
-        <div class="order-summary">
-            <h3>Thank you! Your order has been confirmed.</h3>
-    
-    
-</body>
-</html>
+<%- include('../../views/partials/user/header') %>
+<style>
+.order-container {
+    padding: 20px;
+    max-width: 800px;
+    margin: auto;
+    font-family: Arial, sans-serif;
+}
+
+.search-container {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.search-bar {
+    flex: 1;
+    padding: 10px;
+    margin-right: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.search-button {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.order-card {
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 20px;
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.shared-info {
+    background-color: #f9f9f9;
+    padding: 10px;
+    font-style: italic;
+    border-left: 3px solid #007bff;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.order-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    align-items: start;
+}
+
+.product-info {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.product-info img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+}
+
+.product-details {
+    font-size: 14px;
+    line-height: 1.5;
+    color: #555;
+}
+
+.order-status {
+    text-align: left;
+}
+
+.order-status h4 {
+    font-size: 18px;
+    margin-top: 10px;
+    margin-left: 30px;
+    color: #333;
+}
+
+.order-status .status-icon {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-right: 5px;
+}
+
+.status-icon.delivered {
+    background-color: green;
+}
+
+.status-icon.refund-completed {
+    background-color: orange;
+}
+
+.order-actions {
+    text-align: left;
+    margin-top: 10px;
+}
+
+.rate-button {
+    background-color: #ffc107;
+    color: black;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 15px;
+    font-size: 14px;
+    cursor: pointer;
+    text-align: center;
+}
+
+.go-to-shop-btn{
+    background-color: #000;
+    color: #fff;
+    text-transform: uppercase;
+}
+.go-to-shop-btn:hover{
+    border: 1px solid #000;
+    background-color: #fff;
+    color: #000;
+}
+
+/* Responsive Fix */
+@media screen and (max-width: 768px) {
+    .order-content {
+        grid-template-columns: 1fr;
+    }
+
+    .search-container {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .search-button {
+        width: 100%;
+    }
+
+    .product-info img {
+        width: 80px;
+        height: 80px;
+    }
+
+    .order-status h4 {
+        font-size: 16px;
+    }
+
+    .rate-button {
+        width: 100%;
+    }
+}
+
+
+    @keyframes fadeIn {
+        0% { opacity: 0; }
+        100% { opacity: 1; }
+    }
+</style>
+
+<div class="order-container">
+    <h2>Your Orders</h2>
+
+    <div class="search-container">
+        <input type="text" class="search-bar" placeholder="Search your orders here">
+        <button class="search-button">Search Orders</button>
+    </div>
+
+    <% orders.forEach(order => { %>
+        <div class="order-card">
+            <div class="order-content">
+                <div class="product-info">
+                    <% order.products.forEach((product)=>{ %>
+                    <img src="/uploads/public-image/<%=product.product_id.productImage[0] %>" alt="<%= order.products[0].product_id.productName %>">
+                    <% }) %>
+                    <div class="product-details">
+                        <h3><%= order.products[0].product_id.productName %></h3>
+                        <p>Color: <%= order.products[0].product_id.color %></p>
+                        <p>Size: <%= order.products[0].product_id.size %></p>
+                    </div>
+                </div>
+
+                <div class="order-status">
+                  
+                    <p>
+                        <span class="status-icon <%= order.order_status.toLowerCase().replace(' ', '-') %>">
+                            <%= order.order_status %> 
+                        </span> 
+                    </p>
+                    <p>Order Date : <%= new Date(order.order_date).toLocaleDateString()%></p>
+                    <p>Delivered On : <%= new Date(order.delivery_date).toLocaleDateString()%></p>
+                   
+                    <p><%= order.order_status === 'Refund Completed' ? 'Your return request was completed.' : 'Your item has been delivered.' %></p>
+                    <h6>Total: ₹<%= order.total_price %></h4>
+                </div>
+            </div>
+
+            <div class="order-actions">
+                <% if (order.order_status === 'Delivered') { %>
+                    <button class="rate-button">Rate & Review Product</button>
+                <% } %>
+            </div>
+        </div>
+    <% }) %>
+    <a href="/products" class="btn go-to-shop-btn">Continue Shopping</a>
+</div>
+
+
+<%- include('../../views/partials/user/footer') %>

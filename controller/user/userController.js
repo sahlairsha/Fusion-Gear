@@ -5,6 +5,7 @@ const env = require('dotenv').config()
 const bcrypt = require('bcrypt')
 
 const User = require('../../models/userSchema')
+const Product = require('../../models/productSchema')
 
 
 
@@ -25,7 +26,8 @@ const loadHomePage = async (req, res) => {
         res.render('home', { user: null });
     } else {
         const userData = await User.findById(req.session.user);
-        res.render('home', { user: userData });
+        const productData = await Product.find().populate('category')
+        res.render('home', { user: userData,products : productData });
     }
 };
 const loadSignup = async(req,res)=>{
