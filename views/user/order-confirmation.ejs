@@ -3,7 +3,7 @@
 
 <% if (showOverlay) { %>
     <!-- Loading Overlay -->
-    <div id="loading-overlay" class="preloder order-status">
+    <div id="loading-overlay" class="preloder">
         <div class="loading-spinner">
             <video loop muted autoplay>
                 <source src="https://cdn.dribbble.com/users/414694/screenshots/7112021/media/ed719d3b43ce6e1e02ecde45e3d7cdff.mp4" type="video/mp4">
@@ -126,7 +126,7 @@
     font-weight: 800;
 }
 
-.preloder.order-status{
+.preloder{
     position: fixed;
         top: 0;
         left: 0;
@@ -213,10 +213,6 @@
     margin-left: 10px;
 }
 
-.order-card:hover{
-    width: 100%;
-   transform: scale(1);
-}
 
 /* Responsive Fix */
 @media screen and (max-width: 768px) {

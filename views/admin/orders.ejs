@@ -84,7 +84,7 @@
         <tbody id="tableBody">
             <% orders.forEach((order, index) => { %>
                 
-                <tr data-order-id="<%= order._id %>">
+                <tr data-order-id="<%= order._id %>" class="table-row">
                     <td><%= order.user_id.full_name %></td>
                     <td>
                         <% order.products.forEach(product => { %>
@@ -223,6 +223,27 @@ document.getElementById('searchBar').addEventListener('input', function() {
     });
 });
 
+
+document.addEventListener("DOMContentLoaded", () => {
+        const orderCards = document.querySelectorAll(".table-row")
+
+        orderCards.forEach(card => {
+            card.addEventListener("click", () => {
+                const orderId = card.getAttribute("data-order-id");
+                window.location.href = `/admin/order-details/${orderId}`;
+            });
+        });
+
+        const images = document.querySelectorAll(".product_image");
+
+        images.forEach(image => {
+            image.addEventListener("click", (e) => {
+                e.stopPropagation();
+                const orderId = image.closest(".table-row").getAttribute("data-order-id");
+                window.location.href = `/admin/order-details/${orderId}`;
+            });
+        });
+    });
 
 
 

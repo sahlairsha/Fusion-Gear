@@ -71,7 +71,107 @@ const changeOrderStatus = async (req, res) => {
 };
 
 
+const getDetails = async(req,res)=>{
+    try{
+
+        const orderId = req.params.id;
+
+        const orders = await Order.findById(orderId)
+        .populate('products.product_id')
+        .populate('shippingAddress.addressDocId')
+        .exec()
+
+    const specificAddress = orders.shippingAddress.addressDocId.address[orders.shippingAddress.addressIndex];
+    console.log("Order with specific address:", specificAddress);
+
+
+        res.render("admin-order-details",{
+            orders,
+            shippingAddress : specificAddress
+        })
+
+    }catch(error){
+
+        console.error(error);
+        res.status(500).send('Server Error');
+
+    }
+}
+
+
+const updateOrderStatus = async (req, res) => {
+    const orderId = req.params.id;
+    const { status } = req.body;
+
+    try {
+        const order = await Order.findById(orderId);
+        if (!order) {
+            return res.status(404).send('Order not found');
+        }
+
+        // Update order status
+        order.order_status = status;
+
+        // If the order is marked as delivered, record the delivery date
+        if (status === 'Delivered') {
+            order.delivery_date = new Date();
+        }
+
+        // Save the updated order
+        await order.save();
+
+        res.redirect(`/admin/order-details/${orderId}`);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Server Error');
+    }
+};
+
+const cancelOrderAdmin = async (req, res) => {
+    const orderId = req.params.id;
+
+    try {
+        // Find the order by ID
+        const order = await Order.findById(orderId).populate('products.product_id');
+
+        if (!order) {
+            return res.status(404).send('Order not found');
+        }
+
+        // Check if the order is already canceled
+        if (order.order_status === 'Canceled') {
+            return res.status(400).send('Order is already canceled.');
+        }
+
+        // Update order status and add cancellation timestamp
+        order.order_status = 'Canceled';
+        order.canceled_at = new Date();
+
+        // Restore product stock if needed
+        for (const item of order.products) {
+            const product = item.product_id;
+            product.quantity += item.quantity;
+            await product.save();
+        }
+
+        // Save the updated order
+        await order.save();
+
+        // Redirect or respond to the admin
+        res.redirect(`/admin/order-details/${orderId}`);
+    } catch (error) {
+        console.error('Error canceling order:', error);
+        res.status(500).send('Internal Server Error');
+    }
+};
+
+
+
 module.exports = {
     getOrders,
-    changeOrderStatus 
+    changeOrderStatus ,
+    getDetails,
+    updateOrderStatus,
+    cancelOrderAdmin
+
 }
