@@ -10,6 +10,7 @@ const flash = require('connect-flash');
 const { cacheControl } = require("./middleware/cache-control")
 const {flashMessage} = require("./middleware/flash")
 const {setUserInfo} = require("./middleware/userInfo")
+const {disablePreloader} = require("./middleware/disablePreloader")
 
 const methodOverride = require("method-override");
 
@@ -51,6 +52,8 @@ app.use(cacheControl)
 
 app.use(flash());
 app.use(flashMessage);
+
+app.use(disablePreloader);
 
 
 

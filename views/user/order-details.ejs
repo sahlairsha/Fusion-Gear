@@ -1,0 +1,255 @@
+<%- include('../../views/partials/user/header') %>
+
+<style>
+/* Container Styling */
+.details-container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 20px auto;
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Delivery Address Section */
+.order-details {
+    border: 1px solid #ddd;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 20px; /* Space below delivery address */
+    background-color: #fff;
+}
+
+/* Product Details Section */
+.product-details {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    background-color: #fff;
+  
+}
+
+.product-card {
+    display: flex;
+    align-items: center;
+    padding: 20px;
+    width: 100%;
+}
+
+.product-img {
+    width: 120px;
+    height: auto;
+    margin-right: 20px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.product-info {
+    flex: 1; /* Allows the product-info to take up the remaining space */
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+.product-info h4 {
+    margin-bottom: 10px;
+    color: #333;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.product-info p {
+    font-size: 14px;
+    color: #555;
+    margin-right: 20px;
+    display: inline-block;
+}
+
+.product-info h3 {
+    margin-top: 10px;
+    color: #2874f0;
+    font-size: 16px;
+}
+
+/* Order Status */
+.order-status {
+    flex: 0 0 30%;
+    margin-left: 20px;
+}
+/* Timeline Container */
+.timeline {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    width: 100%;
+    margin: 20px auto;
+    padding: 10px 0;
+}
+
+/* Step Container */
+.timeline-step {
+    text-align: center;
+    position: relative;
+    flex: 1;
+}
+
+/* Step Circle */
+.step-circle {
+    width:15px;
+    height:15px;
+    background-color: #ddd;
+    border-radius: 50%;
+    margin: 3px auto;
+    position: relative;
+    z-index: 2; 
+}
+
+/* Step Text */
+.step-text {
+    margin-top: 8px;
+    font-size: 14px;
+    color: #777;
+    font-weight: 300;
+}
+
+/* Line Between Steps */
+.timeline-step::after {
+    content: '';
+    position: absolute;
+    top: 9px;
+    left: 50%;
+    width: 100%;
+    height: 4px;
+    background-color: #ddd;
+    z-index: 1;
+}
+
+/* Hide the line for the last step */
+.timeline-step:last-child::after {
+    display: none;
+}
+
+/* Completed Step */
+.timeline-step.completed .step-circle {
+    background-color: green;
+}
+
+
+
+.timeline-step.completed .step-text {
+    color: green;
+    font-weight: bold;
+}
+
+.timeline-step.completed::after {
+    background-color: green;
+}
+
+/* Active Step */
+.timeline-step.active .step-circle {
+    background-color: orange;
+}
+
+.timeline-step.active .step-text {
+    color: orange;
+    font-weight: bold;
+}
+
+/* Responsive Alignment */
+@media (max-width: 768px) {
+    .timeline {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .timeline-step {
+        margin-bottom: 20px;
+    }
+
+    .timeline-step::after {
+        display: none;
+    }
+}
+
+.shipping-address{
+    font-weight: 800;
+    margin-bottom: 30px;
+}
+
+.delivery-address{
+    margin-bottom: 20px;
+}
+.delivery-address p{
+    margin: 0;
+}
+
+</style>
+<div class="details-container">
+    <div class="order-details">
+
+        <div class="delivery-address">
+            <h3>Order Details</h3>
+  <br>
+            <h5 class="shipping-address">Shipping Address</h4>
+            <p><strong>Recipient Name:</strong> <%=  shippingAddress.recipient_name %></p>
+            <p><strong>Street Address:</strong> <%=  shippingAddress.streetAddress %>, <%=shippingAddress.city%>,<%= shippingAddress.state%>,<%= shippingAddress.pincode%></p>
+            </p>
+            <p>Phone:<%=shippingAddress.phone  %></p>
+          
+            
+        </div>
+
+        
+    <!-- Product Details Section BELOW the Address -->
+    <div class="product-details">
+        <% orders.products.forEach(item => { %>
+        <div class="product-card">
+         
+            <img src="/uploads/public-image/<%= item.product_id.productImage[0] %>" 
+            alt="<%= item.product_id.productName %>" class="product-img">
+           
+            <!-- Product Info -->
+            <div class="product-info">
+                <h4><%= item.product_id.productName %></h4>
+                <p><strong>Color:</strong> <%= item.product_id.color %></p>
+                <p><strong>Size:</strong> <%= item.product_id.size %></p>
+                <p><strong>Qty:</strong> <%= item.quantity %></p>
+                <p><strong>Price:</strong> ₹<%= item.product_id.salePrice %></p>
+            </div>
+
+            <% }) %>
+            <h5>Total: ₹<%= orders.total_price %></h3>
+            <!-- Order Status -->
+            <div class="order-status">
+                <h4>Order Status</h4>
+                <% const orderStatuses = ['Pending', 'Shipped', 'Delivered', 'Canceled']; %>
+
+                <div class="timeline">
+                    <% orderStatuses.forEach((status, index) => { %>
+                        <% 
+                            // Determine the class for each step
+                            let stepClass = '';
+                            if (orders.order_status === status) {
+                                stepClass = 'active'; 
+                            } else if (orderStatuses.indexOf(orders.order_status) > index) {
+                                stepClass = 'completed'; 
+                            }
+                        %>
+                        <div class="timeline-step <%= stepClass %>">
+                            <div class="step-circle"></div>
+                            <div class="step-text"><%= status %></div>
+                        </div>
+                    <% }); %>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+ 
+</div>
+
+</div>
+
+<%- include('../../views/partials/user/footer') %>

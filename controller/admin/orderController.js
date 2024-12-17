@@ -13,8 +13,7 @@ const getOrders = async(req,res)=>{
          .limit(limit * 1)
             .skip((page - 1) * limit)
             .populate('user_id', 'full_name') 
-            .populate('products.product_id') 
-            .populate('shippingAddress.address_id')
+            .populate('products.product_id')
             .exec();
           const count = await Order.find().countDocuments()
     

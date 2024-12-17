@@ -432,6 +432,7 @@ document.getElementById('addressForm').addEventListener('submit', async (e) => {
   const addressTypeElement = document.querySelector('input[name="addressType"]:checked');
   const addressType = addressTypeElement ? addressTypeElement.value : null;
 
+  console.log(addressId)
   const addressData = {
     recipient_name: document.getElementById('recipient_name').value.trim(),
     streetAddress: document.getElementById('streetAddress').value.trim(),

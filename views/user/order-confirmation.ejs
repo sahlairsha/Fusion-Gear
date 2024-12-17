@@ -1,16 +1,32 @@
 <%- include('../../views/partials/user/header') %>
+
+
+<% if (showOverlay) { %>
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="preloder order-status">
+        <div class="loading-spinner">
+            <video loop muted autoplay>
+                <source src="https://cdn.dribbble.com/users/414694/screenshots/7112021/media/ed719d3b43ce6e1e02ecde45e3d7cdff.mp4" type="video/mp4">
+            </video>
+        </div>
+    </div>
+<% } %>
+
+
+
 <style>
 .order-container {
-    padding: 20px;
     max-width: 800px;
     margin: auto;
+    padding: 10px;
     font-family: Arial, sans-serif;
 }
 
 .search-container {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 20px;
+    margin-bottom: 40px;
+    margin-top: 20px;
 }
 
 .search-bar {
@@ -33,52 +49,58 @@
 .order-card {
     border: 1px solid #ddd;
     border-radius: 5px;
-    padding: 20px;
-    margin-bottom: 20px;
-    display: flex;
-    flex-direction: column;
+    padding: 10px;
+    margin-bottom: 15px;
     background: #fff;
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    transform: translateY(50px);
+    transition: none; 
+    cursor: pointer;
 }
 
-.shared-info {
-    background-color: #f9f9f9;
-    padding: 10px;
-    font-style: italic;
-    border-left: 3px solid #007bff;
-    margin-bottom: 10px;
-    color: #333;
-}
 
+.status-text{
+    font-weight: 700;
+    font-size: 14px;
+}
 .order-content {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-    align-items: start;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 10px;
+    width: 100%;
 }
 
 .product-info {
     display: flex;
-    align-items: center;
-    gap: 20px;
+    align-items: flex-start;
+    gap: 10px;
+    flex: 1;
 }
-
 .product-info img {
-    width: 100px;
-    height: 100px;
+    width: 80px;
+    height: 80px;
     object-fit: cover;
     border-radius: 5px;
     border: 1px solid #ddd;
+    margin-top: 40px;
+    margin-left: 20px;
 }
 
 .product-details {
     font-size: 14px;
-    line-height: 1.5;
-    color: #555;
+    color: #555; 
+    margin-top: 40px;   
+    width: 400px;
+    margin-left: 10px;
 }
-
 .order-status {
-    text-align: left;
+    text-align: right;
+    flex: 1;
+    font-size: 14px;
+    color: #555;
+    margin-right: 40px;  
+    margin-top: 30px;
 }
 
 .order-status h4 {
@@ -88,16 +110,45 @@
     color: #333;
 }
 
+.order-status h6 {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #333;
+}
+
+
 .order-status .status-icon {
     display: inline-block;
     width: 10px;
     height: 10px;
     border-radius: 50%;
     margin-right: 5px;
+    font-weight: 800;
+}
+
+.preloder.order-status{
+    position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;    
+}
+
+.status-icon.pending{
+    background-color: #FFC107;
 }
 
 .status-icon.delivered {
     background-color: green;
+}
+
+.status-icon.canceled {
+    background-color: red;
 }
 
 .status-icon.refund-completed {
@@ -118,23 +169,66 @@
     font-size: 14px;
     cursor: pointer;
     text-align: center;
+    margin-left: 10px;
+    margin-bottom: 5px;
 }
 
 .go-to-shop-btn{
     background-color: #000;
     color: #fff;
+    margin-top: 20px;
+    margin-bottom: 20px;
     text-transform: uppercase;
+    font-weight: 600;
 }
 .go-to-shop-btn:hover{
     border: 1px solid #000;
     background-color: #fff;
     color: #000;
 }
+.product-details,h6{
+
+    font-size: 16px;
+    font-weight: 600;
+
+}
+
+.product-details p {
+    display: inline;
+    margin-right: 10px; 
+    font-size: 14px;
+    color: #555;
+}
+
+.order-summary {
+    text-align: left;
+    margin-top: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    margin-left: 10px;
+}
+.order-summary h6{
+    margin-bottom: 15px;
+    margin-top: 10px;
+    margin-left: 10px;
+}
+
+.order-card:hover{
+    width: 100%;
+   transform: scale(1);
+}
 
 /* Responsive Fix */
 @media screen and (max-width: 768px) {
     .order-content {
-        grid-template-columns: 1fr;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .product-info img {
+        width: 70px;
+        height: 70px;
     }
 
     .search-container {
@@ -145,27 +239,70 @@
     .search-button {
         width: 100%;
     }
-
-    .product-info img {
-        width: 80px;
-        height: 80px;
-    }
-
-    .order-status h4 {
-        font-size: 16px;
-    }
-
-    .rate-button {
-        width: 100%;
-    }
 }
 
 
     @keyframes fadeIn {
         0% { opacity: 0; }
         100% { opacity: 1; }
+
+
     }
+
+    /* Slide-in animation */
+@keyframes slideIn {
+    0% {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+    100% {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Fade-in animation */
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+  
+@keyframes bottomToTop {
+    0% {
+        transform: translateY(50px); 
+        opacity: 0; 
+    }
+    100% {
+        transform: translateY(0);
+        opacity: 1; 
+    }
+}
+
+
 </style>
+
+<section class="breadcrumb-option">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="breadcrumb__text">
+                    <h4>Check Out</h4>
+                    <div class="breadcrumb__links">
+                        <a href="/">Home</a>
+                        <a href="/products">Product</a>
+                        <span>Orders</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
 
 <div class="order-container">
     <h2>Your Orders</h2>
@@ -176,42 +313,101 @@
     </div>
 
     <% orders.forEach(order => { %>
-        <div class="order-card">
-            <div class="order-content">
-                <div class="product-info">
-                    <% order.products.forEach((product)=>{ %>
-                    <img src="/uploads/public-image/<%=product.product_id.productImage[0] %>" alt="<%= order.products[0].product_id.productName %>">
-                    <% }) %>
-                    <div class="product-details">
-                        <h3><%= order.products[0].product_id.productName %></h3>
-                        <p>Color: <%= order.products[0].product_id.color %></p>
-                        <p>Size: <%= order.products[0].product_id.size %></p>
+        <div class="order-card"  data-order-id="<%= order._id %>">
+            <% order.products.forEach(product => { %>
+                <div class="order-content">
+                    <div class="product-info">
+                        <img src="/uploads/public-image/<%= product.product_id.productImage[0] %>" 
+                             alt="<%= product.product_id.productName %>">
+                        <div class="product-details">
+                            <h6><%= product.product_id.productName %></h6>
+                            <p>Color: <%= product.product_id.color %></p>
+                            <p>Size: <%= product.product_id.size %></p>
+                            <p>Quantity: <%= product.quantity %></p>
+                        </div>
+                    </div>
+
+                    <div class="order-status">
+                        <p>
+                            <span class="status-icon <%= order.order_status.toLowerCase().replace(' ', '-') %>"></span>
+                            <span class="status-text"><%= order.order_status %></span>
+                        </p>
+                        <p>Order Date: <%= new Date(order.order_date).toLocaleDateString() %></p>
+                        <% if (order.delivery_date) { %>
+                            <p>Delivered On: <%= new Date(order.delivery_date).toLocaleDateString() %></p>
+                        <% } %>
+                        <h6>Price: ₹<%= product.product_id.salePrice || product.product_id.regularPrice %></h6>
                     </div>
                 </div>
+            <% }) %>
 
-                <div class="order-status">
-                  
-                    <p>
-                        <span class="status-icon <%= order.order_status.toLowerCase().replace(' ', '-') %>">
-                            <%= order.order_status %> 
-                        </span> 
-                    </p>
-                    <p>Order Date : <%= new Date(order.order_date).toLocaleDateString()%></p>
-                    <p>Delivered On : <%= new Date(order.delivery_date).toLocaleDateString()%></p>
-                
-                    <h6>Total: ₹<%= order.total_price %></h4>
-                </div>
-            </div>
-
-            <div class="order-actions">
+            <div class="order-summary">
+                <h6>Total Price: ₹<%= order.total_price %></h4>
                 <% if (order.order_status === 'Delivered') { %>
-                    <button class="rate-button">Rate & Review Product</button>
+                    <button class="rate-button">Rate & Review Products</button>
                 <% } %>
             </div>
         </div>
     <% }) %>
     <a href="/products" class="btn go-to-shop-btn">Continue Shopping</a>
 </div>
+
+<script>
+ document.addEventListener("DOMContentLoaded", function () {
+    const loadingOverlay = document.getElementById("loading-overlay");
+    const orderCards = document.querySelectorAll(".order-card");
+
+    // Show loading overlay
+    if (loadingOverlay) {
+        loadingOverlay.style.display = "flex";
+
+        // Hide overlay after delay
+        setTimeout(() => {
+            loadingOverlay.style.display = "none";
+
+            // Add bottom-to-top animation for each order-card
+            orderCards.forEach((card, index) => {
+                card.style.opacity = "0";
+                card.style.transform = "translateY(50px)";
+
+                // Add animation with delay
+                setTimeout(() => {
+                    card.style.opacity = "1";
+                    card.style.transform = "translateY(0)";
+                    card.style.transition = "transform 0.8s cubic-bezier(0.25, 0.1, 0.25, 1), opacity 0.8s cubic-bezier(0.25, 0.1, 0.25, 1)";
+                }, index * 200); 
+            });
+        }, 10000);
+    }
+});
+
+
+
+document.addEventListener("DOMContentLoaded", () => {
+        const orderCards = document.querySelectorAll(".order-card");
+
+        orderCards.forEach(card => {
+            card.addEventListener("click", () => {
+                const orderId = card.getAttribute("data-order-id");
+                window.location.href = `/order-details/${orderId}`;
+            });
+        });
+
+        const images = document.querySelectorAll(".product-image");
+
+        images.forEach(image => {
+            image.addEventListener("click", (e) => {
+                e.stopPropagation();
+                const orderId = image.closest(".order-card").getAttribute("data-order-id");
+                window.location.href = `/order-details/${orderId}`;
+            });
+        });
+    });
+
+</script>
+
+
+
 
 
 <%- include('../../views/partials/user/footer') %>

@@ -22,13 +22,19 @@ const pageNotFound = async(req,res) =>{
 
 
 const loadHomePage = async (req, res) => {
+    try{
+    const productData = await Product.find().populate('category')
     if (!req.session.user) {
-        res.render('home', { user: null });
+        res.render('home', { user: null , products : productData});
     } else {
         const userData = await User.findById(req.session.user);
-        const productData = await Product.find().populate('category')
-        res.render('home', { user: userData,products : productData });
+      
+        res.render('home', { user: userData,products : productData})
     }
+}catch(error){
+    console.log("Home page is not loading", error.message);
+    res.redirect('/pagenotfound')
+}
 };
 const loadSignup = async(req,res)=>{
     try {
@@ -177,7 +183,6 @@ const verifyOtp = async (req, res) => {
             password: passwordHash,
             phone: user.phone,
             profile_pic: user.profile_pic,
-            googleId: user.googleId || null
         });
 
          if (!user.googleId) {

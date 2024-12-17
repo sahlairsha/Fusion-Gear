@@ -62,6 +62,7 @@ const addToCart = async (req, res) => {
         const { productId } = req.params;
         const userId = req.session.user;
 
+        
         // Find the product by ID
         const product = await Product.findById(productId);
         if (!product) {

@@ -90,11 +90,7 @@
                     <td><%= order.products.quantity || 1 %></td> 
                     <td><%= order.total_price %></td>
                     <td>
-                        <% if (order.shippingAddress && order.shippingAddress.address_id) { %>
-                            <%= `${order.shippingAddress.address_id.streetAddress}, ${order.shippingAddress.address_id.city}, ${order.shippingAddress.address_id.state}` %>
-                        <% } else { %>
-                            Not Provided
-                        <% } %>
+                   
                     </td>
                     
                     <%if(order.payment_status === 'Pending'){%>

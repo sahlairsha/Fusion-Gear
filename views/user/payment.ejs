@@ -152,6 +152,8 @@ paymentForm.addEventListener('submit', async function (e) {
     }
 
     errorMessage.textContent = '';
+    proceedButton.textContent = 'Processing...';
+    proceedButton.disabled = true;
 
     try {
         const response = await fetch('/confirm-order', {
@@ -174,7 +176,9 @@ paymentForm.addEventListener('submit', async function (e) {
                 timerProgressBar: true,
                 showConfirmButton: false,
             }).then(() => {
-                window.location.href = '/order-confirm';
+                
+            window.location.href = "/order-confirm?status=confirmed";
+
             });
         } else {
             errorMessage.textContent = result.message || 'Failed to confirm the order.';

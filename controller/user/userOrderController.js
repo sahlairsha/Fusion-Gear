@@ -1,5 +1,4 @@
 const Order = require('../../models/orderSchema');
-
 const Address = require('../../models/addressSchema')
 
 const User = require('../../models/userSchema')
@@ -183,7 +182,6 @@ const selectAddress = async (req, res) => {
         // Fetch the parent address document
         const addressDoc = await Address.findOne({ "address._id": addressId });
 
-        console.log('Fetched address document:', addressDoc);
 
         if (!addressDoc) {
             return res.status(404).json({ message: 'Address not found.' });
@@ -192,14 +190,13 @@ const selectAddress = async (req, res) => {
         // Find the address inside the array based on the addressId
         const selectedAddress = addressDoc.address.find(addr => addr._id.toString() === addressId);
 
-        console.log('Selected address:', selectedAddress);
-
         if (!selectedAddress) {
             return res.status(404).json({ message: 'Address not found in the address list.' });
         }
 
         // Store the selected address ID in session
         req.session.selectedAddress = selectedAddress._id;
+
 
         res.json({ message: 'Address selected successfully.', address: selectedAddress });
     } catch (error) {
@@ -211,14 +208,12 @@ const selectAddress = async (req, res) => {
 const getPayment = async(req,res)=>{
 
     const selectedAddressId = req.session.selectedAddress;
-    console.log(selectedAddressId);
 
     if (!selectedAddressId) {
         return res.redirect('/checkout');
     }
 
-    const selectedAddress = await Order.findById(selectedAddressId);
-    res.render('payment', { selectedAddress });
+    res.render('payment');
 }
 
 
@@ -237,57 +232,51 @@ function getRandomDeliveryDate() {
   
     return deliveryDate;
   }
-  
 
-const confirmOrder = async (req, res) => {
-    try {
-        const userId = req.session.user;
-        const address_id = req.session.selectedAddress;
-        const {payment_method } = req.body;
+  const confirmOrder = async (req, res) => {
+    const userId = req.session.user;
+    const addressId = req.session.selectedAddress; // Get selected address ID
+    const { payment_method } = req.body;
 
-        // Fetch user cart items
-        const user = await User.findById(userId).populate('cart.product_id');
-        const cartItems = user.cart;
+    const user = await User.findById(userId).populate('cart.product_id');
+    const cartItems = user.cart;
 
-        if (cartItems.length === 0) {
-            return res.status(500).json({ message: "Cart is empty! Please add products." });
-        }
+    const addressDoc = await Address.findOne({ user_id: userId });
+    const selectedIndex = addressDoc.address.findIndex(addr => addr._id.equals(addressId));
 
-        console.log("ShippingAddress id:", address_id)
-
-        // Calculate total price
-        const totalPrice = cartItems.reduce((total, item) => {
-            return total + item.product_id.salePrice * item.quantity;
-        }, 0);
-
-        const deliveryDate = getRandomDeliveryDate();
-
-        console.log("Delivery Date:",deliveryDate)
-
-        // Create order
-        const newOrder = new Order({
-            user_id: userId,
-            products: cartItems.map(item => ({
-                product_id: item.product_id._id,
-                quantity: item.quantity
-            })),
-            total_price: totalPrice,
-            payment_method,
-            payment_status : 'Completed',
-            shippingAddress: { address_id },
-            delivery_date:deliveryDate
-        });
-
-        await newOrder.save();
-        user.cart = [];
-        await user.save();
-
-        res.json({ message: 'Order confirmed successfully.' });
-    } catch (error) {
-        console.error("Error in Placing Order", error);
-        return res.status(500).json({ message: "Failed to place the order. Please try again." });
+    if (selectedIndex === -1) {
+        return res.status(404).json({ message: "Address not found" });
     }
+
+    const totalPrice = cartItems.reduce((total, item) => {
+        return total + item.product_id.salePrice * item.quantity;
+    }, 0);
+
+    const  deliveryDate = getRandomDeliveryDate()
+
+    const newOrder = new Order({
+        user_id: userId,
+        products: cartItems.map(item => ({
+            product_id: item.product_id._id,
+            quantity: item.quantity,
+        })),
+        total_price: totalPrice,
+        payment_method,
+        payment_status: 'Completed',
+        shippingAddress: {
+            addressDocId: addressDoc._id,
+            addressIndex: selectedIndex,
+        },
+        delivery_date :  deliveryDate 
+    });
+
+    await newOrder.save();
+    user.cart = [];
+    await user.save();
+
+    res.json({ message: 'Order confirmed successfully.' });
 };
+
 
 
 
@@ -295,23 +284,47 @@ const confirmOrder = async (req, res) => {
 const getOrderConfirmation = async (req, res) => {
     try {
         const userId = req.session.user;
+        const showOverlay = req.query.status === 'confirmed';
 
-       
         const orders = await Order.find({ user_id: userId })
             .populate('products.product_id')
-            .populate('shippingAddress.address_id') 
             .exec();
 
-        console.log(orders);
 
         res.render('order-confirmation', {
             orders,
-            activePage: 'orders'
+            activePage: 'orders',
+            disablePreloader: true,
+            showOverlay,
         });
     } catch (error) {
         console.error("Error in Loading Orders Page", error);
         res.redirect('/pagenotfound');
     }
+};
+
+const orderDetails = async (req, res) => {
+    const orderId = req.params.id;
+
+    const orders = await Order.findById(orderId)
+        .populate({
+            path: 'products.product_id', 
+            select: 'productName color size productImage salePrice regularPrice' 
+        })
+        .populate('shippingAddress.addressDocId')
+        .exec();
+
+    const specificAddress =
+    orders.shippingAddress.addressDocId.address[orders.shippingAddress.addressIndex];
+    console.log("Order with specific address:", specificAddress);
+
+    console.log("Order details :",orders)
+
+    res.render('order-details', { 
+        orders, 
+        shippingAddress: specificAddress, 
+        activePage: 'orders' 
+    });
 };
 
 
@@ -323,5 +336,6 @@ module.exports = {
     getOrderConfirmation,
     getAddress,
     confirmOrder,
-    selectAddress
+    selectAddress,
+    orderDetails
 }

@@ -72,6 +72,10 @@
 
     </style>
     <link rel="stylesheet" href="/css/user/product-display.css">
+
+    <% if(flash.error){ %>
+        <div class="alert alert-danger" role="alert"><%= flash.error  %></div>
+        <% } %>
     <section class="hero">
         <div class="hero__slider owl-carousel">
             <div class="hero__items set-bg" data-setbg="img/hero/hero-1.jpg">
@@ -209,6 +213,10 @@
                                                 <i class="fa <%= i <= product.rating ? 'fa-star' : 'fa-star-o' %>"></i>
                                             <% } %>
                                         </div> -->
+
+                                        <button class="add-cart-btn"><a href="#" onclick="addToCart('<%= product._id %>')" class="add-cart-link">+ Add to Cart</a>
+                                        </button>
+                                        <button class="buy-now-btn ">Buy Now</button>
                                       
                                     </div>
                                 </div>
@@ -216,6 +224,9 @@
                             <% }) %>
                         </div>        
                         <%}%>
+
+                        
+      
        </div>    
     </section>
     <!-- Product Section End -->
@@ -267,5 +278,49 @@
         </div>
     </section>
     <!-- Categories Section End -->
+
+
+<script>
+function addToCart(productId) {
+    $.ajax({
+        url: '/cart/add/' + productId,
+        method: 'POST',
+        contentType: 'application/json',
+        success: function(response) {
+            Swal.fire({
+                title: "Success",
+                icon: "success",
+                text: "Product Added Successfully",
+                showConfirmButton: true,
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = '/cart';
+                }
+            });
+        },
+        error: function(xhr) {
+            if (xhr.status === 401) {
+                Swal.fire({
+                    title: "Error",
+                    icon: "error",
+                    text: "You need to log in to add products to the cart.",
+                    showConfirmButton: true,
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = '/login';
+                    }
+                });
+            } else {
+                alert('Failed to add product to cart!');
+            }
+        }
+    });
+}
+
+
+
+    </script>
+
+
 
 <%-include('../../views/partials/user/footer') %>
