@@ -49,6 +49,13 @@
         border:1px solid #ff6b6b;
     }
 
+    .shipping{
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        width: 30%;
+    }
+
 </style>
 
 
@@ -87,10 +94,17 @@
                     <td>
                         <%= order.products.map(product => product.product_id.productName).join(', ') %>
                     </td>
-                    <td><%= order.products.quantity || 1 %></td> 
+                    <td><%= order.products.map(product => product.quantity).join(',') %></td> 
                     <td><%= order.total_price %></td>
-                    <td>
-                   
+                    <td class="shipping">
+                       
+                        <% if (order.specificAddress) { %>
+                            <p> <%= order.specificAddress.recipient_name %></p>
+                            <p> <%= order.specificAddress.streetAddress %>, <%= order.specificAddress.city %>, <%= order.specificAddress.state %>, <%= order.specificAddress.pincode %></p>
+                            <p> <%= order.specificAddress.phone %></p>
+                        <% } else { %>
+                            <p>No shipping address available</p>
+                        <% } %>
                     </td>
                     
                     <%if(order.payment_status === 'Pending'){%>
@@ -208,6 +222,8 @@ document.getElementById('searchBar').addEventListener('input', function() {
         }
     });
 });
+
+
 
 
 </script>
