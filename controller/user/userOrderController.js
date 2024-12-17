@@ -1,5 +1,6 @@
 const Order = require('../../models/orderSchema');
 const Address = require('../../models/addressSchema')
+const Product = require('../../models/productSchema')
 
 const User = require('../../models/userSchema')
 
@@ -233,13 +234,17 @@ function getRandomDeliveryDate() {
     return deliveryDate;
   }
 
+
+
   const confirmOrder = async (req, res) => {
     const userId = req.session.user;
-    const addressId = req.session.selectedAddress; // Get selected address ID
+    const addressId = req.session.selectedAddress;
     const { payment_method } = req.body;
 
     const user = await User.findById(userId).populate('cart.product_id');
-    const cartItems = user.cart;
+    const cartItems = user.cart
+
+
 
     const addressDoc = await Address.findOne({ user_id: userId });
     const selectedIndex = addressDoc.address.findIndex(addr => addr._id.equals(addressId));
@@ -247,6 +252,8 @@ function getRandomDeliveryDate() {
     if (selectedIndex === -1) {
         return res.status(404).json({ message: "Address not found" });
     }
+
+
 
     const totalPrice = cartItems.reduce((total, item) => {
         return total + item.product_id.salePrice * item.quantity;
@@ -271,8 +278,20 @@ function getRandomDeliveryDate() {
     });
 
     await newOrder.save();
+
+    for (const item of cartItems) {
+        await Product.findByIdAndUpdate(
+            item.product_id._id,
+            { $inc: { quantity: -item.quantity } },
+            { new: true }
+        );
+    }
+
+ 
     user.cart = [];
     await user.save();
+
+ 
 
     res.json({ message: 'Order confirmed successfully.' });
 };
@@ -314,8 +333,8 @@ const orderDetails = async (req, res) => {
         .populate('shippingAddress.addressDocId')
         .exec();
 
-    const specificAddress =
-    orders.shippingAddress.addressDocId.address[orders.shippingAddress.addressIndex];
+    const specificAddress = orders.shippingAddress.addressDocId.address[orders.shippingAddress.addressIndex];
+   
     console.log("Order with specific address:", specificAddress);
 
     console.log("Order details :",orders)
@@ -351,6 +370,15 @@ const cancelOrder = async (req, res) => {
 
         
         await order.save();
+
+
+        for (const item of order.products) {
+            await Product.findByIdAndUpdate(
+                item.product_id,
+                { $inc: { quantity: item.quantity } },
+                { new: true }
+            );
+        }
 
         res.redirect(`/order-details/${orderId}`);
 

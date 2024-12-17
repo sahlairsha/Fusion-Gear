@@ -312,8 +312,8 @@
                             <div class="product-image">
                               <img src="/uploads/public-image/<%= product.productImage[0] %>" alt="<%= product.productName %>">
 
-                              <% if(product.quantity < 5) {%>
-                                <p class="stock-left">Only <%= product.quantity%> left, Please hurry up!!!</span>
+                              <% if(product.quantity > 0 && product.quantity < 5 ) {%>
+                                <p class="stock-left">Only <%= product.quantity %> left, Please hurry up!!!</span>
                                 <% } %>
                                <!-- Stock Status Badge -->
                                <div class="product-badge 
@@ -343,7 +343,7 @@
 
                                 <button class="add-cart-btn"><a href="#" onclick="addToCart('<%= product._id %>')" class="add-cart-link">+ Add to Cart</a>
                                 </button>
-                                <button class="buy-now-btn ">Buy Now</button>
+                                <button class="buy-now-btn">Buy Now</button>
                             </div>
                         </div>
                     </div>
