@@ -243,11 +243,17 @@
                         </div>
                     <% }); %>
                 </div>
-                
+                 <!-- Cancel Order Button -->
+<% if (orders.order_status === 'Pending') { %>
+    <form action="/orders/cancel/<%= orders._id %>" method="POST">
+        <button type="submit" class="btn btn-danger">Cancel Order</button>
+    </form>
+<% } %>
+
             </div>
         </div>
     </div>
- 
+
 </div>
 
 </div>

@@ -328,6 +328,40 @@ const orderDetails = async (req, res) => {
 };
 
 
+
+const cancelOrder = async (req, res) => {
+    const orderId = req.params.id;
+
+    try {
+       
+        const order = await Order.findById(orderId);
+
+        if (!order) {
+            return res.status(404).send('Order not found');
+        }
+
+      
+        if (order.order_status === 'Canceled' || order.order_status === 'Delivered') {
+            return res.status(400).send('Order cannot be canceled');
+        }
+
+       
+        order.order_status = 'Canceled';
+        order.canceled_at = new Date();
+
+        
+        await order.save();
+
+        res.redirect(`/order-details/${orderId}`);
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Server Error');
+    }
+};
+
+
+
 module.exports = {
     getCheckout,
     saveAddress,
@@ -337,5 +371,6 @@ module.exports = {
     getAddress,
     confirmOrder,
     selectAddress,
-    orderDetails
+    orderDetails,
+    cancelOrder
 }

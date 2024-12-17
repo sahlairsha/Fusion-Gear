@@ -62,7 +62,11 @@ const orderSchema = new mongoose.Schema({
     delivery_date: {
         type: Date,
         default: null
-    }
+    },
+    canceled_at: { 
+        type: Date, 
+        default: null,
+    },
 
 });
 
