@@ -160,7 +160,7 @@
     margin-top: 10px;
 }
 
-.rate-button {
+.rate-btn {
     background-color: #ffc107;
     color: black;
     border: none;
@@ -313,7 +313,7 @@
             <% order.products.forEach(product => { %>
                 <div class="order-content">
                     <div class="product-info">
-                        <img src="/uploads/public-image/<%= product.product_id.productImage[0] %>" 
+                        <img class="product-image" src="/uploads/public-image/<%= product.product_id.productImage[0] %>" 
                              alt="<%= product.product_id.productName %>">
                         <div class="product-details">
                             <h6><%= product.product_id.productName %></h6>
@@ -333,14 +333,19 @@
                             <p>Delivered On: <%= new Date(order.delivery_date).toLocaleDateString() %></p>
                         <% } %>
                         <h6>Price: ₹<%= product.product_id.salePrice || product.product_id.regularPrice %></h6>
+                       
                     </div>
                 </div>
             <% }) %>
 
             <div class="order-summary">
-                <h6>Total Price: ₹<%= order.total_price %></h4>
+                <h6>Total Price: ₹<%= order.total_price %></h6>
                 <% if (order.order_status === 'Delivered') { %>
-                    <button class="rate-button">Rate & Review Products</button>
+                    <% order.products.forEach(product => { %>
+                        <a href="/ratings/?id=<%= product.product_id._id %>" class="rate-btn text-dark">
+                            Rate & Review <%= product.product_id.productName %>
+                        </a>
+                        <% }) %>
                 <% } %>
             </div>
         </div>
@@ -349,6 +354,7 @@
 </div>
 
 <script>
+    
  document.addEventListener("DOMContentLoaded", function () {
     const loadingOverlay = document.getElementById("loading-overlay");
     const orderCards = document.querySelectorAll(".order-card");
@@ -381,14 +387,6 @@
 
 document.addEventListener("DOMContentLoaded", () => {
         const orderCards = document.querySelectorAll(".order-card");
-
-        orderCards.forEach(card => {
-            card.addEventListener("click", () => {
-                const orderId = card.getAttribute("data-order-id");
-                window.location.href = `/order-details/${orderId}`;
-            });
-        });
-
         const images = document.querySelectorAll(".product-image");
 
         images.forEach(image => {

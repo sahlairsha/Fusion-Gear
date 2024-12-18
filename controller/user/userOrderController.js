@@ -58,77 +58,59 @@ const getCheckout = async (req, res) => {
     }
 };
 
-
 const saveAddress = async (req, res) => {
+    const userId = req.session.user;
+    const { recipient_name, streetAddress, city, state, landmark, pincode, addressType, phone, altPhone } = req.body;
+
     try {
-        const { recipient_name, streetAddress, city, state, pincode, phone, altPhone, addressType } = req.body;
-        const userId = req.session.user;
+        // Create new address object
+        const newAddress = {
+            recipient_name,
+            streetAddress,
+            city,
+            state,
+            landmark,
+            pincode,
+            addressType,
+            phone,
+            altPhone
+        };
 
-        if (!userId) return res.status(401).json({ success: false, message: 'Unauthorized access.' });
+        // Assuming Address schema has a user_id field referencing User
+        const updatedAddress = await Address.findOneAndUpdate(
+           {user_id : userId},
+            { $push: { address: newAddress } }, // Push new address to address array
+            { new: true } // Return the updated user document
+        );
 
-        // Find the user by ID and push the new address to the address array
-        const userAddress = await Address.findOne({ user_id: userId });
-
-        if (!userAddress) {
-            // If no address record exists for the user, create one
-            const newAddress = new Address({
-                user_id: userId,
-                address: [{
-                    recipient_name,
-                    streetAddress,
-                    city,
-                    state,
-                    pincode,
-                    phone,
-                    altPhone,
-                    addressType
-                }]
-            });
-            await newAddress.save();
-        } else {
-            // If address record exists, push the new address to the address array
-            userAddress.address.push({
-                recipient_name,
-                streetAddress,
-                city,
-                state,
-                pincode,
-                phone,
-                altPhone,
-                addressType
-            });
-            await userAddress.save();
+        if (!updatedAddress) {
+            return res.status(404).json({ message: 'Address is not added.' });
         }
 
-        res.json({
-            success: true,
-            message: 'Shipping address saved successfully.',
-            address: {
-                recipient_name,
-                streetAddress,
-                city,
-                state,
-                pincode,
-                phone,
-                altPhone,
-                addressType
-            },
-        });
+        res.json({ message: 'Address added successfully!',updatedAddress });
     } catch (error) {
-        console.error('Error saving shipping address:', error);
-        res.status(500).json({ success: false, message: 'Failed to save shipping address.' });
+        console.error('Error adding address:', error);
+        res.status(500).json({ message: 'Internal server error.' });
     }
 };
+
 
 
 const getAddress = async (req, res) => {
     try {
         const addressId = req.params.id;
 
-        const address = await Address.findById(addressId);
+        const addressDoc = await Address.findOne({ "address._id" : addressId});
+
+        if (!addressDoc) {
+            return res.status(404).json({ message: 'Address not found' });
+        }
+
+        // Extract the specific address object
+        const address = addressDoc.address.find(addr => addr._id.toString() === addressId);
 
         if (!address) {
-            return res.status(404).json({ message: 'Address not found' });
+            return res.status(404).json({ message: 'Address not found in the address list.' });
         }
 
         res.json(address);
@@ -145,17 +127,19 @@ const editAddress = async (req, res) => {
         const addressId = req.params.id;
         const { recipient_name, streetAddress, city, state, pincode, phone, altPhone, addressType } = req.body;
 
-        const updatedAddress = await Address.findByIdAndUpdate(
-            addressId,
+        const updatedAddress = await Address.findOneAndUpdate(
+            { "address._id": addressId },
             {
-                recipient_name,
-                streetAddress,
-                city,
-                state,
-                pincode,
-                phone,
-                altPhone,
-                addressType,
+                $set: {
+                    "address.$.recipient_name": recipient_name,
+                    "address.$.streetAddress": streetAddress,
+                    "address.$.city": city,
+                    "address.$.state": state,
+                    "address.$.pincode": pincode,
+                    "address.$.phone": phone,
+                    "address.$.altPhone": altPhone,
+                    "address.$.addressType": addressType,
+                },
             },
             { new: true }
         );
@@ -174,6 +158,8 @@ const editAddress = async (req, res) => {
 
 const selectAddress = async (req, res) => {
     const { addressId } = req.body;
+
+    console.log("selected address:",addressId)
 
     if (!addressId) {
         return res.status(400).json({ message: 'Address ID is required.' });
@@ -195,7 +181,7 @@ const selectAddress = async (req, res) => {
             return res.status(404).json({ message: 'Address not found in the address list.' });
         }
 
-        // Store the selected address ID in session
+
         req.session.selectedAddress = selectedAddress._id;
 
 
@@ -389,6 +375,133 @@ const cancelOrder = async (req, res) => {
 };
 
 
+const getRating = async(req,res)=>{
+    try{
+
+        const productId = req.query.id;
+        const userId = req.session.user;
+
+        const product = await Product.findById(productId);
+
+        const user = await User.findById(userId)
+        if (!product) {
+            return res.status(404).send('Product not found');
+        }
+
+        res.render('rating-review',{
+            product,
+            user
+        })
+
+    }catch(error){
+        console.error(error);
+        res.status(500).send('Server Error');
+    }
+}
+
+const submitRating = async (req, res) => {
+
+    const { productId, userId, rating } = req.body;
+
+    try {
+        // Verify if the productId exists
+        console.log("Received productId:", productId);
+        // Find the product and check if it exists
+        const product = await Product.findOne({_id : productId});
+        if (!product) {
+            return res.status(404).json({ message: 'Product not found' });
+        }
+
+        // Find if the user has already rated the product
+        const existingRating = product.reviews.find(review => review.user_id.toString() === userId);
+
+        if (existingRating) {
+            // If the user has already rated the product, update their rating and description
+            existingRating.rating = rating;
+        } else {
+            // If it's a new rating, add the review and rating to the product's reviews array
+            product.reviews.push({ user_id: userId, rating: rating });
+        }
+
+        // Recalculate average rating and total ratings
+        const totalRatings = product.reviews.length;
+        const averageRating = totalRatings > 0 
+            ? product.reviews.reduce((acc, curr) => acc + curr.rating, 0) / totalRatings 
+            : 0;
+
+        product.ratings.average = averageRating;
+        product.ratings.count = totalRatings;
+
+        await product.save();
+
+        res.status(200).json({
+            message: 'Rating submitted successfully',
+            updatedRating: averageRating,
+            totalRatings: totalRatings
+        });
+    } catch (error) {
+        console.error('Error submitting rating:', error);
+        res.status(500).json({ message: 'Server error', error });
+    }
+};
+
+
+
+const submitReviews = async(req, res) => {
+    const { productId, userId, description, title  } = req.body;
+
+    try {
+        // Find the product
+        const product = await Product.findById(productId);
+        if (!product) {
+            return res.status(404).json({ message: 'Product not found' });
+        }
+
+        // Add review to product
+        const review = {
+            user_id: userId,
+            description,
+            title,
+        
+        };
+
+        product.reviews.push(review);
+        
+
+        await product.save();
+        
+        res.status(200).json({ message: 'Review submitted successfully'});
+    } catch (error) {
+        console.error('Error submitting review:', error);
+        res.status(500).json({ message: 'Server error', error });
+    }
+}
+
+const getProductRatings = async (req, res) => {
+    const { product_id } = req.params;
+
+    try {
+        // Find the product by ID
+        const product = await Product.findById(product_id);
+
+        if (!product) {
+            return res.status(404).json({ message: 'Product not found' });
+        }
+
+        // Handle case where ratings object might not be initialized
+        const averageRating = product.ratings && product.ratings.average ? product.ratings.average : 0;
+        const totalRatings = product.ratings && product.ratings.count ? product.ratings.count : 0;
+
+        res.status(200).json({
+            averageRating,
+            totalRatings
+        });
+    } catch (error) {
+        console.error("Error fetching ratings:", error);
+        res.status(500).json({ message: 'Error fetching ratings', error });
+    }
+};
+
 
 module.exports = {
     getCheckout,
@@ -400,5 +513,10 @@ module.exports = {
     confirmOrder,
     selectAddress,
     orderDetails,
-    cancelOrder
+    cancelOrder,
+    getRating,
+    submitRating,
+    getProductRatings,
+    submitReviews
+
 }

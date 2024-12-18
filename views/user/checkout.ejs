@@ -33,7 +33,12 @@
 
     .list-group {
         border-radius: 4px;
+        margin-left: 20px;
+        padding-left: 20px;
+        
     }
+
+    
 
     .model-form {
         margin-top: 50px;
@@ -46,6 +51,7 @@
     .checkout__form {
         display: flex;
         justify-content: space-between;
+
     }
 
     .col-lg-8 {
@@ -146,6 +152,14 @@
         background-color: #fff;
         color: #000;
     }
+
+    .radio-btn{
+        position:absolute;
+        top: 15px;
+        right: 97.5%;
+    }
+
+   
 </style>
 
 <section class="breadcrumb-option">
@@ -180,8 +194,12 @@
                     <ul class="list-group mb-4">
                         <% address.forEach(function(doc) { %>
                             <% doc.address.forEach(function(addr) { %>
-                                <li class="list-group-item">
-                                    <input type="radio" name="selectedAddress" value="<%= addr._id %>">
+                                
+                                <li class="list-group-item pl-4">
+                                    <div class="address-option">
+                                        <input class="radio-btn "  type="radio" name="selectedAddress" value="<%= addr._id %>"> 
+                                    </div>
+                                    
                                     <h6><%= addr.recipient_name %>
                                         <% if (addr.addressType) { %>
                                             <span class="badge badge-warning mb-2"><%=addr.addressType%></span>
@@ -213,7 +231,7 @@
                 <!-- Address Form (Initially Hidden) -->
                 <div class="mt-5" id="addressFormContainer" style="display: none;">
                     <h2 class="mb-4">Add New Address</h2>
-                    <form id="addressForm" action="/address-view" method="post">
+                    <form id="addressForm" action="/save-address" method="post">
                       <input type="hidden" id="actionType" name="actionType" value="add">
             
                         <div class="mb-3">
@@ -446,7 +464,7 @@ document.getElementById('addressForm').addEventListener('submit', async (e) => {
   };
 
   const url = actionType === 'update'
-    ? `/address-view/update/${addressId}`
+    ? `/update-address/${addressId}`
     : document.getElementById('addressForm').action;
 
   try {
@@ -499,51 +517,7 @@ document.getElementById('addressForm').addEventListener('submit', async (e) => {
         formContainer.style.display = (formContainer.style.display === 'none' || formContainer.style.display === '') ? 'block' : 'none';
     });
 
-document.querySelectorAll('.delete-address').forEach((deleteLink) => {
-  deleteLink.addEventListener('click', async (e) => {
-    e.preventDefault();
-    const addressId = e.target.getAttribute('data-id');
 
-    // Show SweetAlert2 confirmation dialog
-    const { isConfirmed } = await Swal.fire({
-      title: 'Are you sure?',
-      text: "You won't be able to revert this!",
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Yes, delete it!',
-      cancelButtonText: 'No, cancel'
-    });
-
-    if (isConfirmed) {
-      try {
-        const response = await fetch(`/address-view/delete/${addressId}`, {
-          method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-
-        if (response.ok) {
-         
-          localStorage.setItem('deleteSuccess', 'Address deleted successfully.');
-
-          location.reload(); 
-        } else {
-         
-          localStorage.setItem('deleteError', 'Failed to delete the address. Please try again.');
-          location.reload();
-        }
-      } catch (error) {
-    
-        console.error("Error:", error);
-        localStorage.setItem('deleteError', 'Something went wrong. Please try again later.');
-        location.reload();
-      }
-    }
-  });
-});
-
-// After page reload, check for success or error message
 window.addEventListener('load', () => {
   const successMessage = localStorage.getItem('deleteSuccess');
   const errorMessage = localStorage.getItem('deleteError');
@@ -573,8 +547,7 @@ document.querySelectorAll('.edit-address').forEach((editLink) => {
     const addressId = e.target.getAttribute('data-id');
     try {
 
-        // Fetch the existing address data
-  const response = await fetch(`/address-view/edit/${addressId}`);
+  const response = await fetch(`/edit-address/${addressId}`);
   console.log('Response Status:', response.status);
   const addressData = await response.json();
   console.log('Address Data:', addressData); 
@@ -594,14 +567,14 @@ document.querySelectorAll('.edit-address').forEach((editLink) => {
       input.checked = input.value === addressData.addressType;
     });
 
-    document.getElementById('addressFormContainer').style.display = 'block';
+  document.getElementById('addressFormContainer').style.display = 'block';
   document.getElementById('showFormBtn').style.display = "none";
   document.getElementById('submit-btn').innerText = "Update";
 
   // Ensure the form exists before trying to modify it
   const form = document.getElementById('addressForm');
   if (form) {
-    form.action = `/address-view/update/${addressId}`;
+    form.action = `/update-address/${addressId}`;
     form.method = 'POST';
   } else {
     console.error('Form not found');
@@ -609,7 +582,7 @@ document.querySelectorAll('.edit-address').forEach((editLink) => {
   } else {
     Swal.fire({
       title: "Error!",
-      text: 'Failed to fetch address data. Please try again.',
+      text: response.message || 'Failed to fetch address data. Please try again.',
       icon: 'error',
       confirmButtonText: 'OK'
     });
@@ -623,7 +596,6 @@ document.querySelectorAll('.edit-address').forEach((editLink) => {
     confirmButtonText: 'OK'
   });
 }
-
   });
 });
 
@@ -645,7 +617,7 @@ document.getElementById('continueWithAddress').addEventListener('click', async f
     const addressId = selectedAddress.value;
 
     try {
-        // Send the selected address to the server or navigate to the payment page
+        
         const response = await fetch('/set-selected-address', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },

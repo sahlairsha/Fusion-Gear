@@ -227,13 +227,6 @@ document.getElementById('searchBar').addEventListener('input', function() {
 document.addEventListener("DOMContentLoaded", () => {
         const orderCards = document.querySelectorAll(".table-row")
 
-        orderCards.forEach(card => {
-            card.addEventListener("click", () => {
-                const orderId = card.getAttribute("data-order-id");
-                window.location.href = `/admin/order-details/${orderId}`;
-            });
-        });
-
         const images = document.querySelectorAll(".product_image");
 
         images.forEach(image => {

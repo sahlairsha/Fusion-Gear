@@ -98,10 +98,13 @@ const userSchema = new Schema({
             default : Date.now
         }
     }],
-    ratedProducts: [{
-        product_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Product' },
-        rating: { type: Number, required: true }
-    }],
+    ratedProducts: [
+        {
+            product_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Product' },
+            rating: { type: Number, required: true },
+            review: { type: String, required: false },
+        }
+    ],
     resetToken:{
         type : String,
         default : ''

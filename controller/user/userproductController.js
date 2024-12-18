@@ -128,84 +128,7 @@ const loadProductsDetails = async (req, res) => {
 
 
 
-const submitRating = async (req, res) => {
-    const { rating } = req.body;
-    const product_id = req.query.id;
-    const user_id = req.session.user; // Assuming session stores the user ID
 
-    try {
-        // Find the user and product
-        const user = await User.findById(user_id);
-        const product = await Product.findById(product_id);
-
-        if (!user || !product) {
-            return res.status(404).json({ message: 'User or Product not found' });
-        }
-
-        // Check if the user already rated this product
-        const existingRating = user.ratedProducts.find(r => r.product_id.toString() === product_id);
-
-        if (existingRating) {
-            // Update existing rating
-            const oldRating = existingRating.rating;
-            existingRating.rating = rating;
-
-            // Adjust product ratings
-            const totalRatingValue = product.ratings.average * product.ratings.count;
-            product.ratings.average = (totalRatingValue - oldRating + rating) / product.ratings.count;
-        } else {
-            // Add new rating
-            user.ratedProducts.push({ product_id, rating });
-            product.ratings.count += 1;
-
-            const totalRatingValue = product.ratings.average * (product.ratings.count - 1) + rating;
-            product.ratings.average = totalRatingValue / product.ratings.count;
-        }
-
-        // Save changes
-        await user.save();
-        await product.save();
-
-
-        // Send the updated data back to the front-end
-        return res.status(200).json({
-            message: 'Rating submitted successfully',
-            updatedRating: product.ratings.average,
-            totalRatings: product.ratings.count
-        });
-    } catch (error) {
-        console.error("Error submitting rating:", error);
-        return res.status(500).json({ message: 'Error submitting rating', error });
-    }
-};
-
-
-const getProductRatings = async (req, res) => {
-    const { product_id } = req.params;
-
-    try {
-        // Find the product by ID
-        const product = await Product.findById(product_id);
-
-        if (!product) {
-            return res.status(404).json({ message: 'Product not found' });
-        }
-        const averageRating = product.ratings.average || 0;
-        const totalRatings = product.ratings.count || 0;
-
-        res.status(200).json({
-            averageRating,
-            totalRatings
-        });
-    } catch (error) {
-        console.error("Error fetching ratings:", error);
-        res.status(500).json({ message: 'Error fetching ratings', error });
-    }
-};
-// Routes for rating
-const rateProduct = (req, res) => {
-    submitRating(req, res);
-};
 
 const coupons = [
     {
@@ -254,7 +177,5 @@ const getCoupon = async(req,res)=>{
 module.exports = {
     loadProducts,
     loadProductsDetails,
-    rateProduct,
-    getProductRatings,
     getCoupon
 }

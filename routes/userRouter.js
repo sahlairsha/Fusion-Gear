@@ -66,10 +66,7 @@ router.get("/product/view",userAuth,userproductController.loadProductsDetails)
 
 
 
-// Product Rating
 
-router.post('/rate', userproductController.rateProduct);
-router.get('/ratings/:product_id', userproductController.getProductRatings);
 
 
 
@@ -112,9 +109,13 @@ router.post('/confirm-order',userAuth,userOrderController.confirmOrder)
 router.get('/order-details/:id',userAuth,userOrderController.orderDetails)
 router.post('/orders/cancel/:id',userAuth,userOrderController.cancelOrder)
 
+//ratings and reviews
+router.get('/ratings',userAuth,userOrderController.getRating)
+router.post('/ratings',userAuth, userOrderController.submitRating);
+router.get('/ratings/:product_id',userAuth,userOrderController.getProductRatings);
 
-
-
+router.post('/reviews',userAuth,userOrderController.submitReviews);
+                     
 router.get('/pagenotfound', userController.pageNotFound)
 
 
