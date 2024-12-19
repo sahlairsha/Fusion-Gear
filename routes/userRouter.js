@@ -70,6 +70,7 @@ router.get("/product/view",userAuth,userproductController.loadProductsDetails)
 
 
 
+
 //Coupon
 router.get("/coupon",userproductController.getCoupon)
 
@@ -111,7 +112,7 @@ router.post('/orders/cancel/:id',userAuth,userOrderController.cancelOrder)
 
 //ratings and reviews
 router.get('/ratings',userAuth,userOrderController.getRating)
-router.post('/ratings',userAuth, userOrderController.submitRating);
+router.post('/ratings/submit',userAuth, userOrderController.submitRating);
 router.get('/ratings/:product_id',userAuth,userOrderController.getProductRatings);
 
 router.post('/reviews',userAuth,userOrderController.submitReviews);

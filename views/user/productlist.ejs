@@ -50,9 +50,13 @@
                                 <h4><%= product.productName %></h4>
                                
                                 <h3>&#8377;<%= product.salePrice %> <span>&#8377;<%= product.regularPrice %></span></h3>
-                                <% if(product.quantity < 5) {%>
-                                    <p class="stock-left text-danger">Only <%= product.quantity%> left,Please hurry up</span>
-                                    <% } %>
+                               
+                                    
+                                    <% if(product.quantity < 5 && product.quantity > 0) {%>
+                                        <p class="stock-left text-danger">Only <%= product.quantity%> left, Please hurry up!!</span>
+                                        <% }else { %>
+                                        <p class="stock-left text-danger">Stock out</span>
+                                        <% } %>
                                 <p><%= product.description %></p>
                                 <div class="product__details__option">
                                     <div class="product__details__option__size">

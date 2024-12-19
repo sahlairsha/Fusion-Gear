@@ -230,6 +230,9 @@ function getRandomDeliveryDate() {
     const user = await User.findById(userId).populate('cart.product_id');
     const cartItems = user.cart
 
+    if(cartItems.length === 0 ){
+        return res.status(400).json({ message: 'Your cart is empty.' });
+    }
 
 
     const addressDoc = await Address.findOne({ user_id: userId });
@@ -289,7 +292,6 @@ function getRandomDeliveryDate() {
 const getOrderConfirmation = async (req, res) => {
     try {
         const userId = req.session.user;
-        const showOverlay = req.query.status === 'confirmed';
 
         const orders = await Order.find({ user_id: userId })
             .populate('products.product_id')
@@ -299,8 +301,6 @@ const getOrderConfirmation = async (req, res) => {
         res.render('order-confirmation', {
             orders,
             activePage: 'orders',
-            disablePreloader: true,
-            showOverlay,
         });
     } catch (error) {
         console.error("Error in Loading Orders Page", error);
@@ -400,14 +400,12 @@ const getRating = async(req,res)=>{
 }
 
 const submitRating = async (req, res) => {
-
     const { productId, userId, rating } = req.body;
 
     try {
         // Verify if the productId exists
         console.log("Received productId:", productId);
-        // Find the product and check if it exists
-        const product = await Product.findOne({_id : productId});
+        const product = await Product.findOne({ _id: productId });
         if (!product) {
             return res.status(404).json({ message: 'Product not found' });
         }
@@ -416,35 +414,37 @@ const submitRating = async (req, res) => {
         const existingRating = product.reviews.find(review => review.user_id.toString() === userId);
 
         if (existingRating) {
-            // If the user has already rated the product, update their rating and description
-            existingRating.rating = rating;
+            existingRating.rating = rating; // Update existing rating
         } else {
-            // If it's a new rating, add the review and rating to the product's reviews array
+            // Add a new review
             product.reviews.push({ user_id: userId, rating: rating });
         }
 
         // Recalculate average rating and total ratings
         const totalRatings = product.reviews.length;
-        const averageRating = totalRatings > 0 
-            ? product.reviews.reduce((acc, curr) => acc + curr.rating, 0) / totalRatings 
-            : 0;
 
-        product.ratings.average = averageRating;
+        const totalSum = product.reviews.reduce((acc, curr) => {
+            return acc + (curr.rating || 0); // Default to 0 if rating is undefined
+        }, 0);
+
+        const averageRating = totalRatings > 0 ? totalSum / totalRatings : 0;
+
+        // Update product ratings
+        product.ratings.average = parseFloat(averageRating.toFixed(2)); 
         product.ratings.count = totalRatings;
 
         await product.save();
 
         res.status(200).json({
             message: 'Rating submitted successfully',
-            updatedRating: averageRating,
-            totalRatings: totalRatings
+            updatedRating: product.ratings.average,
+            totalRatings: product.ratings.count
         });
     } catch (error) {
         console.error('Error submitting rating:', error);
         res.status(500).json({ message: 'Server error', error });
     }
 };
-
 
 
 const submitReviews = async(req, res) => {

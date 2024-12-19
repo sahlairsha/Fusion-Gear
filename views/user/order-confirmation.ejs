@@ -1,25 +1,13 @@
 <%- include('../../views/partials/user/header') %>
 
 
-<% if (showOverlay) { %>
-    <!-- Loading Overlay -->
-    <div id="loading-overlay" class="preloder">
-        <div class="loading-spinner">
-            <video loop muted autoplay>
-                <source src="https://cdn.dribbble.com/users/414694/screenshots/7112021/media/ed719d3b43ce6e1e02ecde45e3d7cdff.mp4" type="video/mp4">
-            </video>
-        </div>
-    </div>
-<% } %>
-
-
-
 <style>
 .order-container {
     max-width: 800px;
     margin: auto;
     padding: 10px;
     font-family: Arial, sans-serif;
+    margin-bottom: 50px;
 }
 
 .search-container {
@@ -50,12 +38,12 @@
     border: 1px solid #ddd;
     border-radius: 5px;
     padding: 10px;
-    margin-bottom: 15px;
     background: #fff;
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
     transform: translateY(50px);
     transition: none; 
     cursor: pointer;
+    margin-bottom: 20px;
 }
 
 
@@ -126,19 +114,6 @@
     font-weight: 800;
 }
 
-.preloder{
-    position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
-        display: none;
-        align-items: center;
-        justify-content: center;
-        z-index: 9999;    
-}
-
 .status-icon.pending{
     background-color: #FFC107;
 }
@@ -170,13 +145,14 @@
     cursor: pointer;
     text-align: center;
     margin-left: 10px;
-    margin-bottom: 5px;
+    transition: background-color 0.3s ease;
+    margin-top: 10px;
+    display: inline-block; 
 }
-
 .go-to-shop-btn{
     background-color: #000;
     color: #fff;
-    margin-top: 20px;
+    margin-top: 50px;
     margin-bottom: 20px;
     text-transform: uppercase;
     font-weight: 600;
@@ -206,9 +182,10 @@
     font-size: 14px;
     font-weight: 700;
     margin-left: 10px;
+    margin-bottom: 10px;
 }
 .order-summary h6{
-    margin-bottom: 15px;
+    margin-bottom: 5px;
     margin-top: 10px;
     margin-left: 10px;
 }
@@ -333,16 +310,16 @@
                             <p>Delivered On: <%= new Date(order.delivery_date).toLocaleDateString() %></p>
                         <% } %>
                         <h6>Price: ₹<%= product.product_id.salePrice || product.product_id.regularPrice %></h6>
-                       
+                        <h5 class="mt-2 ml-2">Total Price: ₹<%= order.total_price %></h5>     
                     </div>
                 </div>
             <% }) %>
-
+           
             <div class="order-summary">
-                <h6>Total Price: ₹<%= order.total_price %></h6>
+           
                 <% if (order.order_status === 'Delivered') { %>
                     <% order.products.forEach(product => { %>
-                        <a href="/ratings/?id=<%= product.product_id._id %>" class="rate-btn text-dark">
+                        <a href="/ratings/?id=<%= product.product_id._id %>" class="rate-btn mb-5">
                             Rate & Review <%= product.product_id.productName %>
                         </a>
                         <% }) %>
@@ -354,20 +331,10 @@
 </div>
 
 <script>
-    
  document.addEventListener("DOMContentLoaded", function () {
     const loadingOverlay = document.getElementById("loading-overlay");
     const orderCards = document.querySelectorAll(".order-card");
 
-    // Show loading overlay
-    if (loadingOverlay) {
-        loadingOverlay.style.display = "flex";
-
-        // Hide overlay after delay
-        setTimeout(() => {
-            loadingOverlay.style.display = "none";
-
-            // Add bottom-to-top animation for each order-card
             orderCards.forEach((card, index) => {
                 card.style.opacity = "0";
                 card.style.transform = "translateY(50px)";
@@ -380,8 +347,7 @@
                 }, index * 200); 
             });
         }, 10000);
-    }
-});
+
 
 
 

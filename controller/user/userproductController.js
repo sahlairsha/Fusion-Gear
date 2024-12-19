@@ -1,26 +1,66 @@
 
 const Product = require("../../models/productSchema");
 const User = require("../../models/userSchema");
+const Category = require('../../models/categorySchema');
+
 
 const loadProducts = async (req, res) => {
     try {
+        let category = decodeURIComponent(req.query.category || '').trim();
+        let { priceRange, size, color } = req.query; 
         let search = req.query.search ? req.query.search.trim() : "";
         let page = parseInt(req.query.page) || 1;
         const limit = 9;
-        const sort = req.query.sort || "productName"; // Default sort by productName
+        const sort = req.query.sort || "productName";
+        const filters = {};
 
         let query = {
             isDeleted: false,
             isBlocked: false,
         };
-        
+
+        // Handle search query
         if (search) {
-            query.productName = { $regex: search, $options: 'i' };
+           
+            const matchingCategory = await Category.findOne({
+                name: { $regex: search, $options: 'i' },
+            });
+
+            query.$or = [
+                { productName: { $regex: search, $options: 'i' } }, 
+                { category: matchingCategory ? matchingCategory._id : null }, 
+            ];
+        }
+
+        // Handle category filter (if explicitly selected)
+        if (category) {
+            const categoryData = await Category.findOne({
+                name: { $regex: `^${category}$` , $options: 'i' }
+            });
+            if (categoryData) {
+                filters.category = categoryData._id;
+            }
+        }
+
+      
+        if (size) {
+            filters.size = size;
+        }
+
+      
+        if (color) {
+            filters.color = color;
+        }
+
+        
+        if (priceRange) {
+            const [minPrice, maxPrice] = priceRange.split('-').map(Number);
+            filters.salePrice = { $gte: minPrice, $lte: maxPrice };
         }
 
         let sortQuery = {};
-        
-        // Sorting logic based on selected option
+
+       
         switch (sort) {
             case 'popularity':
                 sortQuery = { views: -1 };
@@ -35,7 +75,7 @@ const loadProducts = async (req, res) => {
                 sortQuery = { 'ratings.average': -1 };
                 break;
             case 'featured':
-                sortQuery = { featured: -1 };
+                sortQuery = { featured: -1, createdAt: -1};
                 break;
             case 'newArrivals':
                 sortQuery = { createdAt: -1 };
@@ -51,12 +91,17 @@ const loadProducts = async (req, res) => {
                 break;
         }
 
+        // Combine all filters with the base query
+        Object.assign(query, filters);
+
+        // Query for products with the applied filters and sorting
         const productData = await Product.find(query)
             .limit(limit)
             .skip((page - 1) * limit)
             .sort(sortQuery)
             .exec();
 
+        // Get the total count of products for pagination
         const count = await Product.countDocuments(query);
         const totalPages = Math.ceil(count / limit);
 
@@ -67,24 +112,20 @@ const loadProducts = async (req, res) => {
             limit,
             currentPage: page,
             sort,
-            search
+            search,
+            category,
+            priceRange,
+            size,
+            color
         };
 
-        if (req.session.user) {
-            const userData = await User.findById(req.session.user);
-            data.user = userData;
-        } else {
-            data.user = null;
-        }
-
+        // Render the product page with the filtered and sorted data
         res.render("userproducts", data);
     } catch (error) {
         console.error("Error loading product page:", error);
         res.status(500).send("Server Error");
     }
 };
-
-
 
 const loadProductsDetails = async (req, res) => {
     try {
@@ -97,8 +138,12 @@ const loadProductsDetails = async (req, res) => {
             return res.redirect("/pagenotfound");
         }
 
+        await Product.findByIdAndUpdate(id, { $inc: { views: 1 } });
+
         // Fetch product details
         const productData = await Product.findById(id).populate('category').exec();
+
+
 
         if (!productData) {
             console.error(`Product not found with ID: ${id}`);
@@ -172,10 +217,9 @@ const getCoupon = async(req,res)=>{
 
 
 
-
-
 module.exports = {
     loadProducts,
     loadProductsDetails,
-    getCoupon
+    getCoupon,
+
 }

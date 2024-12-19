@@ -9,12 +9,12 @@ const categorySchema = new Schema({
         trim: true,
         validate: {
             validator: async function (value) {
-                // Use `this.constructor` to perform the case-insensitive check
+              
                 const existingCategory = await this.constructor.findOne({
                     name: { $regex: `^${value}$`, $options: 'i' },
                 });
 
-                // If a matching category exists and it's not the same document, throw an error
+            
                 if (existingCategory && existingCategory._id.toString() !== this._id.toString()) {
                     return false; 
                 }

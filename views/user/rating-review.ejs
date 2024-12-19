@@ -149,7 +149,7 @@
         <!-- Review Sidebar (optional for other reviews, product info, etc.) -->
         <div class="review-sidebar">
             <h3>Other Reviews</h3>
-           <p><%=product.reviews.description%></p>
+           <p class="description"><%=product.reviews.description%></p>
            <p>Average Rate: <strong><%=product.ratings.average%>/5</strong> </p>
            <p>Total Reviews : <strong><%= product.ratings.count  %></strong>  Review</p>
         </div>
@@ -227,7 +227,7 @@ async function submitRating(stars) {
         const productId = '<%= product._id %>'; 
         const userId = '<%= user._id %>';  
 
-        const response = await fetch(`http://localhost:3001/ratings`, {
+        const response = await fetch(`http://localhost:3001/ratings/submit`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
