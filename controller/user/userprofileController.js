@@ -97,8 +97,9 @@ res.status(200).json({ success: true, message: "Password updated successfully." 
 
 const viewAddress = async(req,res)=>{
   try{
+    const user = req.session.user ? await User.findById(req.session.user) : null
     const addressData = await Address.find({ user_id: req.session.user });
-    res.render('address-view',{address : addressData, addressType: addressData?.addressType, activePage : "address"})
+    res.render('address-view',{user, address : addressData, addressType: addressData?.addressType, activePage : "address"})
   }catch(error){
     console.log("Error in viewing address",error)
     res.redirect('/pageerror')
@@ -113,6 +114,7 @@ const addAddress = async (req, res) => {
     if (!req.session.user) {
       return res.status(401).json({ message: 'User not logged in' });
     }
+
 
     // Create a new address
     const newAddress = new Address({

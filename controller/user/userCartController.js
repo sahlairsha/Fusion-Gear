@@ -134,11 +134,14 @@ const removeFromCart = async (req, res) => {
         }
 
               const updatedCartTotals = await calculateCartTotals(userId);
+              
+              
 
                 res.json({
                     success: true,
                     message: 'Product removed successfully',
-                    ...updatedCartTotals
+                    ...updatedCartTotals,
+                   
                 });
     } catch (error) {
         res.status(500).json({ success: false, message: 'Failed to remove product from cart' });

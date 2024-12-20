@@ -6,6 +6,7 @@ const Category = require('../../models/categorySchema');
 
 const loadProducts = async (req, res) => {
     try {
+
         let category = decodeURIComponent(req.query.category || '').trim();
         let { priceRange, size, color } = req.query; 
         let search = req.query.search ? req.query.search.trim() : "";
@@ -105,6 +106,13 @@ const loadProducts = async (req, res) => {
         const count = await Product.countDocuments(query);
         const totalPages = Math.ceil(count / limit);
 
+        const user = req.session.user ? await User.findById(req.session.user).lean(): null;
+
+        if(!user){
+           req.flash("error","Please Login!!");
+           res.redirect('/')
+        }
+
         const data = {
             products: productData,
             totalPages,
@@ -116,10 +124,12 @@ const loadProducts = async (req, res) => {
             category,
             priceRange,
             size,
-            color
+            color,
+            user
         };
 
-        // Render the product page with the filtered and sorted data
+
+      
         res.render("userproducts", data);
     } catch (error) {
         console.error("Error loading product page:", error);

@@ -44,7 +44,7 @@ router.get('/forgot-password', (req, res) => {
     res.render('forgot-password');
 });
 
-router.post('/forgot-password', userController.forgotPassword);
+router.post('/forgot-password',userController.forgotPassword);
 
 router.get('/reset-password', (req, res) => {
     const { token } = req.query;

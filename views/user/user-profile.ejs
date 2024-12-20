@@ -37,10 +37,10 @@
 
     <!-- Reset Password Section (Visible only for non-Google signups) -->
     <% if (!user.googleId) { %>
-        <button type="button" id="create-btn" class="edit-btn" onclick="enablePasswordFields()">Reset Password?</button>
+        <button type="button" id="create-btn" class="edit-btn" onclick="enablePasswordFields()">Change Password?</button>
 
         <form action="/update-password" method="POST">
-            <h6 class="password-heading mb-4 mt-5" id="create-password-head" style="display: none;">Create New Password</h6>
+            <h6 class="password-heading mb-4 mt-5" id="create-password-head" style="display: none;">Change your password</h6>
 
             <div class="form-group" id="newpassword-group" style="display: none;">
                 <label for="password">New Password:</label>

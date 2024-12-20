@@ -63,7 +63,6 @@ const saveAddress = async (req, res) => {
     const { recipient_name, streetAddress, city, state, landmark, pincode, addressType, phone, altPhone } = req.body;
 
     try {
-        // Create new address object
         const newAddress = {
             recipient_name,
             streetAddress,
@@ -78,9 +77,9 @@ const saveAddress = async (req, res) => {
 
         // Assuming Address schema has a user_id field referencing User
         const updatedAddress = await Address.findOneAndUpdate(
-           {user_id : userId},
-            { $push: { address: newAddress } }, // Push new address to address array
-            { new: true } // Return the updated user document
+            { user_id: userId }, 
+            { $push: { address: newAddress } },
+            { new: true, upsert: true } 
         );
 
         if (!updatedAddress) {
@@ -100,7 +99,7 @@ const getAddress = async (req, res) => {
     try {
         const addressId = req.params.id;
 
-        const addressDoc = await Address.findOne({ "address._id" : addressId});
+        const addressDoc = await Address.findOne({"address._id" : addressId});
 
         if (!addressDoc) {
             return res.status(404).json({ message: 'Address not found' });
@@ -194,13 +193,16 @@ const selectAddress = async (req, res) => {
 
 const getPayment = async(req,res)=>{
 
+    const userId = req.session.user
+
     const selectedAddressId = req.session.selectedAddress;
+    const user = userId ? await User.findById(userId) : null;
 
     if (!selectedAddressId) {
         return res.redirect('/checkout');
     }
 
-    res.render('payment');
+    res.render('payment',{user});
 }
 
 
@@ -297,10 +299,11 @@ const getOrderConfirmation = async (req, res) => {
             .populate('products.product_id')
             .exec();
 
-
+            const user = userId ? await User.findById(userId) : null;
         res.render('order-confirmation', {
             orders,
             activePage: 'orders',
+            user
         });
     } catch (error) {
         console.error("Error in Loading Orders Page", error);
@@ -310,6 +313,8 @@ const getOrderConfirmation = async (req, res) => {
 
 const orderDetails = async (req, res) => {
     const orderId = req.params.id;
+
+    const user = req.session.user ? await User.findById(req.session.user) : null;
 
     const orders = await Order.findById(orderId)
         .populate({
@@ -328,7 +333,8 @@ const orderDetails = async (req, res) => {
     res.render('order-details', { 
         orders, 
         shippingAddress: specificAddress, 
-        activePage: 'orders' 
+        activePage: 'orders' ,
+        user
     });
 };
 
