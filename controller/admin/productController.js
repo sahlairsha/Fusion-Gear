@@ -155,6 +155,8 @@ const editProducts = async(req,res) =>{
         const id = req.params.id;
         const product = await Product.findOne({_id: id });
         const data = req.body;
+
+
         const existingProduct = await Product.findOne({
             productName : data.productName,
             _id : {$ne : id}
@@ -173,11 +175,12 @@ const editProducts = async(req,res) =>{
             }
         }
 
+       
 
         const updateFields = {
             productName : data.productName,
             description : data.description,
-            category : product.category,
+            category : data.category,
             regularPrice : data.regularPrice,
             salePrice : data.salePrice,
             color : data.color,
@@ -191,9 +194,10 @@ if(req.files.length > 0){
 }
 
 
-await Product.findByIdAndUpdate(id,updateFields,{new : true});
+  await Product.findByIdAndUpdate(id,updateFields,{new : true});
 
 res.redirect("/admin/products")
+
 
 
     } catch (error) {

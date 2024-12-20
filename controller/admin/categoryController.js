@@ -67,9 +67,14 @@ const addCategories = async (req, res) => {
 
 const editCategories = async(req,res) => {
     try {
-        const { id, name, description } = req.query;
+        const { id } = req.query;
+        const {name, description} = req.body;
 
-        const updatedCategory = await Category.findByIdAndUpdate(id, { name, description }, { new: true });
+        const updatedCategory = await Category.findByIdAndUpdate(
+            id,
+            { name, description },
+            { new: true }
+        );
 
         if (!updatedCategory) {
             return res.status(404).json({ error: "Category not found" });

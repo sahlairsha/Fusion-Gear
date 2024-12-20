@@ -10,6 +10,9 @@
         text-overflow: ellipsis;
         width: 30%;
     }
+    .product_image{
+        border-radius: 4px;
+    }
 </style>
 
 
@@ -27,6 +30,7 @@
                 <th scope="col"><input type="checkbox" id="selectAll" ></th>
                 <th scope="col">#</th>
                 <th scope="col">Name</th>
+                <th scope="col">Image</th>
                 <th scope="col">Description</th>
                 <th scope="col">Category</th>
                 <th scope="col">Sale Price</th>
@@ -43,6 +47,9 @@
                     <td><input type="checkbox" class="checkbox"></td>
                     <td><%= index + 1 %></td>
                     <td><%= data.productName %></td>
+                    <td>
+                        <img class="product_image" src="/uploads/public-image/<%= data.productImage[0] %>" alt="<%= data.productName %>" width="50" height="50">
+                    </td>
                     <td class="description"><%= data.description %></td>
                     <td>
                         <%= data.category ? data.category.name : 'No Category' %>
