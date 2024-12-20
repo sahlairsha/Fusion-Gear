@@ -380,84 +380,76 @@ const cancelOrder = async (req, res) => {
     }
 };
 
-
-const getRating = async(req,res)=>{
-    try{
-
+const getRating = async (req, res) => {
+    try {
         const productId = req.query.id;
         const userId = req.session.user;
 
         const product = await Product.findById(productId);
+        const user = await User.findById(userId);
 
-        const user = await User.findById(userId)
         if (!product) {
             return res.status(404).send('Product not found');
         }
 
-        res.render('rating-review',{
+        res.render('rating-review', {
             product,
             user
-        })
-
-    }catch(error){
+        });
+    } catch (error) {
         console.error(error);
         res.status(500).send('Server Error');
     }
-}
+};
 
 const submitRating = async (req, res) => {
     const { productId, userId, rating } = req.body;
 
     try {
-        // Verify if the productId exists
-        console.log("Received productId:", productId);
-        const product = await Product.findOne({ _id: productId });
+        // Find the product and user
+        const product = await Product.findById(productId);
+        const user = await User.findById(userId);
+
         if (!product) {
             return res.status(404).json({ message: 'Product not found' });
         }
-
-        // Find if the user has already rated the product
-        const existingRating = product.reviews.find(review => review.user_id.toString() === userId);
-
-        if (existingRating) {
-            existingRating.rating = rating; // Update existing rating
-        } else {
-            // Add a new review
-            product.reviews.push({ user_id: userId, rating: rating });
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
         }
 
-        // Recalculate average rating and total ratings
-        const totalRatings = product.reviews.length;
+        // Check if the user has already rated the product
+        const existingRating = user.ratedProducts.find((item) => item.product_id.toString() === productId);
 
-        const totalSum = product.reviews.reduce((acc, curr) => {
-            return acc + (curr.rating || 0); // Default to 0 if rating is undefined
-        }, 0);
+        if (existingRating) {
+            // Update the existing rating if the user has already rated this product
+            existingRating.rating = rating;
+        } else {
+            // Add a new rating to the user's rated products
+            user.ratedProducts.push({ product_id: productId, rating });
+        }
 
-        const averageRating = totalRatings > 0 ? totalSum / totalRatings : 0;
+        // Save the rating in the product's ratings array (we're only saving the rating, not the review)
+        product.reviews.push({ user_id: userId, rating, createdAt: new Date() });
 
-        // Update product ratings
-        product.ratings.average = parseFloat(averageRating.toFixed(2)); 
-        product.ratings.count = totalRatings;
-
+        // Save both user and product
+        await user.save();
         await product.save();
 
+        // Send success response
         res.status(200).json({
-            message: 'Rating submitted successfully',
-            updatedRating: product.ratings.average,
-            totalRatings: product.ratings.count
+            message: 'Rating submitted successfully!',
         });
     } catch (error) {
         console.error('Error submitting rating:', error);
-        res.status(500).json({ message: 'Server error', error });
+        res.status(500).json({ message: 'Error submitting rating', error });
     }
 };
 
 
-const submitReviews = async(req, res) => {
-    const { productId, userId, description, title  } = req.body;
+const submitReviews = async (req, res) => {
+    const { productId, userId, description, title } = req.body;
 
     try {
-        // Find the product
         const product = await Product.findById(productId);
         if (!product) {
             return res.status(404).json({ message: 'Product not found' });
@@ -468,45 +460,19 @@ const submitReviews = async(req, res) => {
             user_id: userId,
             description,
             title,
-        
         };
 
         product.reviews.push(review);
-        
 
         await product.save();
-        
-        res.status(200).json({ message: 'Review submitted successfully'});
+
+        res.status(200).json({ message: 'Review submitted successfully' });
     } catch (error) {
         console.error('Error submitting review:', error);
         res.status(500).json({ message: 'Server error', error });
     }
-}
-
-const getProductRatings = async (req, res) => {
-    const { product_id } = req.params;
-
-    try {
-        // Find the product by ID
-        const product = await Product.findById(product_id);
-
-        if (!product) {
-            return res.status(404).json({ message: 'Product not found' });
-        }
-
-        // Handle case where ratings object might not be initialized
-        const averageRating = product.ratings && product.ratings.average ? product.ratings.average : 0;
-        const totalRatings = product.ratings && product.ratings.count ? product.ratings.count : 0;
-
-        res.status(200).json({
-            averageRating,
-            totalRatings
-        });
-    } catch (error) {
-        console.error("Error fetching ratings:", error);
-        res.status(500).json({ message: 'Error fetching ratings', error });
-    }
 };
+
 
 
 module.exports = {
@@ -522,7 +488,6 @@ module.exports = {
     cancelOrder,
     getRating,
     submitRating,
-    getProductRatings,
     submitReviews
 
 }

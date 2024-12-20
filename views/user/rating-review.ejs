@@ -146,14 +146,6 @@
 
     <!-- Review and Rating Section -->
     <div class="review-container">
-        <!-- Review Sidebar (optional for other reviews, product info, etc.) -->
-        <div class="review-sidebar">
-            <h3>Other Reviews</h3>
-           <p class="description"><%=product.reviews.description%></p>
-           <p>Average Rate: <strong><%=product.ratings.average%>/5</strong> </p>
-           <p>Total Reviews : <strong><%= product.ratings.count  %></strong>  Review</p>
-        </div>
-
         <!-- Review Form -->
         <div class="review-form">
             <h3>Review this product</h3>
@@ -164,8 +156,6 @@
                 <span class="star" onclick="submitRating(4)" onmouseover="highlightStars(4)" onmouseout="resetStars()"></span>
                 <span class="star" onclick="submitRating(5)" onmouseover="highlightStars(5)" onmouseout="resetStars()"></span>
             </div>
-            <span id="averageRating">Average Rating: 0 / 5</span>
-            <span id="totalRatings">(0 Reviews)</span>
 
             <form id="ratingForm" action="/reviews" method="POST">
                 <input type="hidden" name="productId" value="<%= product._id %>">
@@ -212,29 +202,30 @@ function resetStars() {
 function fillStars(rating) {
     const stars = document.querySelectorAll('#userRating .star');
     stars.forEach((star, index) => {
-        if (index < rating) {
-            star.classList.add('filled'); // Add filled class to make it gold
+        if (index < Math.round(rating)) {
+            star.classList.add('filled');
         } else {
-            star.classList.remove('filled'); // Remove filled class to reset it
+            star.classList.remove('filled'); 
         }
     });
 }
 
 
-
 async function submitRating(stars) {
     try {
-        const productId = '<%= product._id %>'; 
-        const userId = '<%= user._id %>';  
+        const productId = '<%= product._id %>';
+        const userId = '<%= user._id %>';
+
+        // Update the UI immediately with the selected rating
+        fillStars(stars);
 
         const response = await fetch(`http://localhost:3001/ratings/submit`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                productId: productId,  
-                userId: userId, 
-                rating: stars,
-               
+                productId: productId,
+                userId: userId,
+                rating: stars
             })
         });
 
@@ -248,12 +239,6 @@ async function submitRating(stars) {
                 confirmButtonText: 'OK'
             });
 
-            // Update the UI with the new average rating and total ratings
-            document.getElementById('averageRating').innerText = `Average Rating: ${result.updatedRating} / 5`;
-            document.getElementById('totalRatings').innerText = `(${result.totalRatings} Reviews)`;
-
-            // Fill the stars based on the new rating
-            fillStars(result.updatedRating);
         } else {
             Swal.fire({
                 icon: 'error',
@@ -320,53 +305,6 @@ async function submitRating(stars) {
         }
     });
 
-
-
-
-
-// Fetch ratings function
-async function fetchRatings() {
-    try {
-        const productId = '<%= product._id %>';
-
-
-        const response = await fetch(`http://localhost:3001/ratings/${productId}`);
-        const data = await response.json();
-
-        if (response.ok) {
-            const averageRating = data.averageRating;
-            const totalRatings = data.totalRatings;
-
-            if (totalRatings === 0) {
-                document.getElementById('averageRating').innerText = 'No ratings yet.';
-                document.getElementById('totalRatings').innerText = '(No reviews)';
-            } else {
-                document.getElementById('averageRating').innerText = `Average Rating: ${averageRating} / 5`;
-                document.getElementById('totalRatings').innerText = `(${totalRatings} Reviews)`;
-            }
-
-            fillStars(averageRating); 
-        } else {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error!',
-                text: 'Could not fetch ratings. Please try again later.',
-                confirmButtonText: 'OK'
-            });
-        }
-    } catch (error) {
-        console.error('Error fetching ratings:', error);
-       
-        Swal.fire({
-            icon: 'error',
-            title: 'An Error Occurred',
-            text: 'There was an issue fetching the ratings.',
-            confirmButtonText: 'OK'
-        });
-    }
-}
-
-document.addEventListener('DOMContentLoaded', fetchRatings);
 
 
 </script>
