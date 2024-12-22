@@ -64,20 +64,18 @@ const productSchema = new Schema({
         type: Boolean,
         default: false
     },
+    reviews: [
+        {
+            user_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+            rating: { type: Number },
+            review: { type: String }, 
+            createdAt: { type: Date, default: Date.now },
+        },
+    ],
     ratings: {
         average: { type: Number, default: 0 },
-        count: { type: Number, default: 0 }
+        count: { type: Number, default: 0 },
     },
-    reviews:
-        [
-            {
-                user_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-                description: { type: String },
-                rating: { type: Number }, 
-                title: { type: String },
-                createdAt: { type: Date, default: Date.now },
-            },
-        ]
 },{timestamps : true})
 
 

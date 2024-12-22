@@ -109,6 +109,7 @@ if (email) {
     avatarUrl = `https://www.gravatar.com/avatar/${crypto.createHash('md5').update(email.trim().toLowerCase()).digest('hex')}?d=robohash&r=g&s=200`; 
 }
 
+
 const isAvatarValid = await validateAvatar(avatarUrl);
 if (!isAvatarValid) {
     return res.render("signup", { message: "Invalid avatar. Please try again." });

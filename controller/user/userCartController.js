@@ -34,6 +34,10 @@ const getCartPage = async (req, res) => {
         const user = await User.findById(userId).populate('cart.product_id');
         const cartItems = user.cart.filter(item => item.product_id);
 
+        if(!userId){
+            req.flash('error',"Please login!!!")
+            res.redirect('/')
+        }
 
         const countItems = cartItems.length;
         req.session.cartCount = countItems;

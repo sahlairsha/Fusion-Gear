@@ -131,6 +131,19 @@
         border: 1px solid #ddd;
         border-radius: 5px;
     }
+
+
+    .ratings-text{
+        font-size: 14px;
+        color: green;
+        margin-bottom: 20px;
+    }
+    .rating-status{
+        font-size: 14px;
+        font-weight: 600;
+        padding-left: 10px;
+        padding-top: 5px;
+    }
 </style>
 
 <div class="product-review-container">
@@ -155,8 +168,10 @@
                 <span class="star" onclick="submitRating(3)" onmouseover="highlightStars(3)" onmouseout="resetStars()"></span>
                 <span class="star" onclick="submitRating(4)" onmouseover="highlightStars(4)" onmouseout="resetStars()"></span>
                 <span class="star" onclick="submitRating(5)" onmouseover="highlightStars(5)" onmouseout="resetStars()"></span>
+                <div id="rating-status" class="rating-status"></div>
             </div>
-
+         
+   <div id="rating-text" class="ratings-text"></div>
             <form id="ratingForm" action="/reviews" method="POST">
                 <input type="hidden" name="productId" value="<%= product._id %>">
                 <input type="hidden" name="userId" value="<%= user._id %>">
@@ -180,9 +195,17 @@
 
 
 <script>
-// Star Rating Logic
-function highlightStars(starCount) {
+    document.addEventListener('DOMContentLoaded', () => {
+        const userRating = '<%= userRating %>' || 0; 
+        fillStars(userRating);
+    });
+
+    function highlightStars(starCount) {
     const stars = document.querySelectorAll('#userRating .star');
+    const ratingStatus = document.getElementById('rating-status');
+    const messages = ["Very Bad", "Bad", "Good", "Very Good", "Excellent"];
+    const colors = ["#780000", "#c1121f", "#ffb703", "#03045e", "#386641"];
+
     stars.forEach((star, index) => {
         if (index < starCount) {
             star.classList.add('highlight');
@@ -190,123 +213,91 @@ function highlightStars(starCount) {
             star.classList.remove('highlight');
         }
     });
+
+    if (starCount > 0) {
+        ratingStatus.innerText = messages[starCount - 1];
+        ratingStatus.style.color = colors[starCount - 1];
+    } else {
+        ratingStatus.innerText = '';
+        ratingStatus.style.color = '';
+    }
 }
 
-// Reset stars after hover ends
 function resetStars() {
     const stars = document.querySelectorAll('#userRating .star');
     stars.forEach(star => star.classList.remove('highlight'));
+    const ratingStatus = document.getElementById('rating-status');
+    ratingStatus.innerText = '';
+    ratingStatus.style.color = '';
 }
 
-// Fill the stars based on the rating
 function fillStars(rating) {
     const stars = document.querySelectorAll('#userRating .star');
+    const ratingStatus = document.getElementById('rating-status');
+    const messages = ["Very Bad", "Bad", "Good", "Very Good", "Excellent"];
+    const colors = ["red", "orangered", "orange", "green", "darkgreen"];
+
     stars.forEach((star, index) => {
         if (index < Math.round(rating)) {
             star.classList.add('filled');
         } else {
-            star.classList.remove('filled'); 
+            star.classList.remove('filled');
         }
     });
-}
 
-
-async function submitRating(stars) {
-    try {
-        const productId = '<%= product._id %>';
-        const userId = '<%= user._id %>';
-
-        // Update the UI immediately with the selected rating
-        fillStars(stars);
-
-        const response = await fetch(`http://localhost:3001/ratings/submit`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                productId: productId,
-                userId: userId,
-                rating: stars
-            })
-        });
-
-        const result = await response.json();
-
-        if (response.ok) {
-            Swal.fire({
-                icon: 'success',
-                title: 'Rating Submitted!',
-                text: result.message,
-                confirmButtonText: 'OK'
-            });
-
-        } else {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error!',
-                text: result.message,
-                confirmButtonText: 'OK'
-            });
-        }
-    } catch (error) {
-        console.error('Error submitting rating:', error);
-        Swal.fire({
-            icon: 'error',
-            title: 'An Error Occurred',
-            text: 'There was an issue submitting your rating.',
-            confirmButtonText: 'OK'
-        });
+    if (rating > 0) {
+        ratingStatus.innerText = messages[Math.round(rating) - 1];
+        ratingStatus.style.color = colors[Math.round(rating) - 1];
+    } else {
+        ratingStatus.innerText = '';
+        ratingStatus.style.color = '';
     }
 }
 
 
 
-    document.getElementById('ratingForm').addEventListener('submit', async function (e) {
-        e.preventDefault();
+    async function submitRating(stars) {
+        try {
+            const productId = '<%= product._id %>';
+            const userId = '<%= user._id %>';
 
-        const error = document.getElementById('error')
-        
-        const productId = '<%= product._id %>';  
-        const userId = '<%= user._id %>';        
-        
-        const description = document.getElementById('description').value.trim();
-        const title = document.getElementById('title').value.trim();
+            fillStars(stars);
 
-        if (!description || description.length < 5) {
-            error.innerText = 'Description must be at least 20 characters long.';
-            return;
-        }
-        
-        const data = { productId, userId, description, title };
-
-        const response = await fetch('/reviews', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-        });
-
-        const result = await response.json();
-        if (response.ok) {
-            Swal.fire({
-                icon: 'success',
-                title: 'Review Submitted!',
-                text: result.message,
-                confirmButtonText: 'OK'
+            const response = await fetch('/ratings/submit', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ productId, userId, rating: stars })
             });
-            setTimeout(()=> {
-                location.reload()
-            },3000)
-        } else {
+
+            const result = await response.json();
+
+            if (response.ok) {
+                document.getElementById('rating-text').innerText =  "Your rating has been saved successfully"
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Rating Submitted!',
+                    text: result.message,
+                    confirmButtonText: 'OK',
+                });
+            } else {
+                 document.getElementById('rating-text').innerText =  ""
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: result.message,
+                    confirmButtonText: 'OK',
+                });
+            }
+        } catch (error) {
+            console.error('Error submitting rating:', error);
             Swal.fire({
-            icon: 'error',
-            title: 'An Error Occurred',
-            text: 'There was an issue submitting your review.',
-            confirmButtonText: 'OK'
-        });
+                icon: 'error',
+                title: 'An Error Occurred',
+                text: 'There was an issue submitting your rating.',
+                confirmButtonText: 'OK',
+            });
         }
-    });
-
-
-
+    }
 </script>
 
 

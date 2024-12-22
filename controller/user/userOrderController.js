@@ -385,23 +385,49 @@ const getRating = async (req, res) => {
         const productId = req.query.id;
         const userId = req.session.user;
 
-        const product = await Product.findById(productId);
+
+        const product = await Product.findById(productId).lean();
         const user = await User.findById(userId);
 
         if (!product) {
             return res.status(404).send('Product not found');
         }
 
+        if (!user) {
+            return res.status(404).send('User not found');
+        }
+
+        // Check if the user has an order with the product that is delivered
+        const hasDeliveredOrder = await Order.findOne({
+            user_id: userId,
+            'products_id': productId, 
+            order_status: 'Delivered' 
+        });
+
+        if (!hasDeliveredOrder) {
+         req.flash('error',"You have to order the product first");
+         return res.redirect(`/product/view?id=${productId}`)
+        }
+
+        let userRating = 0; 
+        const ratingEntry = user.ratedProducts.find(
+            (item) => item.product_id.toString() === productId
+        );
+
+        if (ratingEntry) {
+            userRating = ratingEntry.rating;
+        }
+
         res.render('rating-review', {
             product,
-            user
+            user,
+            userRating
         });
     } catch (error) {
         console.error(error);
         res.status(500).send('Server Error');
     }
 };
-
 const submitRating = async (req, res) => {
     const { productId, userId, rating } = req.body;
 
@@ -417,21 +443,37 @@ const submitRating = async (req, res) => {
             return res.status(404).json({ message: 'User not found' });
         }
 
-        // Check if the user has already rated the product
-        const existingRating = user.ratedProducts.find((item) => item.product_id.toString() === productId);
+        // Check if the user has already rated the product in their profile
+        const existingUserRating = user.ratedProducts.find(
+            (item) => item.product_id.toString() === productId
+        );
 
-        if (existingRating) {
-            // Update the existing rating if the user has already rated this product
-            existingRating.rating = rating;
+        if (existingUserRating) {
+            existingUserRating.rating = rating; // Update the rating in user's profile
         } else {
-            // Add a new rating to the user's rated products
             user.ratedProducts.push({ product_id: productId, rating });
         }
 
-        // Save the rating in the product's ratings array (we're only saving the rating, not the review)
-        product.reviews.push({ user_id: userId, rating, createdAt: new Date() });
+        // Check if the user has already reviewed the product
+        const existingProductReviewIndex = product.reviews.findIndex(
+            (review) => review.user_id.toString() === userId
+        );
 
-        // Save both user and product
+        if (existingProductReviewIndex !== -1) {
+            // Update the existing review
+            product.reviews[existingProductReviewIndex].rating = rating;
+            product.reviews[existingProductReviewIndex].createdAt = new Date(); // Update timestamp
+        } else {
+            // Add a new review
+            product.reviews.push({ user_id: userId, rating, createdAt: new Date() });
+        }
+
+        // Recalculate average rating and count
+        const totalRatings = product.reviews.reduce((sum, review) => sum + review.rating, 0);
+        product.ratings.count = product.reviews.length;
+        product.ratings.average = product.ratings.count ? totalRatings / product.ratings.count : 0;
+
+
         await user.save();
         await product.save();
 
@@ -444,6 +486,7 @@ const submitRating = async (req, res) => {
         res.status(500).json({ message: 'Error submitting rating', error });
     }
 };
+
 
 
 const submitReviews = async (req, res) => {

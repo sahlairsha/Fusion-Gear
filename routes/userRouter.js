@@ -63,6 +63,7 @@ router.post('/reset-password', userController.resetPassword);
 //Product details and lists
 router.get("/products",userAuth,userproductController.loadProducts)
 router.get("/product/view",userAuth,userproductController.loadProductsDetails)
+router.get("/product-ratings",userAuth,userproductController.productRatings)
 
 
 

@@ -101,9 +101,9 @@ const userSchema = new Schema({
     ratedProducts: [
         {
             product_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Product' },
-            rating: { type: Number, required: true },
-            review: { type: String, required: false },
-        }
+            rating: { type: Number },
+            createdAt: { type: Date, default: Date.now },
+        },
     ],
     resetToken:{
         type : String,

@@ -71,7 +71,7 @@ function passwordValidation() {
     if (password === "") {
         err4.innerText = "Please enter a valid password";
     } else if (!passwordpattern.test(password)) {
-        err4.innerText = "Minimum 8 characters, at least one letter and one number";
+        err4.innerText = "Minimum 8 characters, at least one letter and one number and special character.";
     } else {
         err4.innerText = "";
     }

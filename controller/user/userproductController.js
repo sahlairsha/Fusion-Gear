@@ -151,17 +151,16 @@ const loadProductsDetails = async (req, res) => {
         await Product.findByIdAndUpdate(id, { $inc: { views: 1 } });
 
         // Fetch product details
-        const productData = await Product.findById(id).populate('category').exec();
+        const productData = await Product.findById(id).populate('category').populate('reviews.user_id').exec();
 
-
-
+        
         if (!productData) {
             console.error(`Product not found with ID: ${id}`);
             req.flash("error", "Product not found");
             return res.redirect("/product/view");
         }
 
-
+        
 
         const userData = req.session.user
             ? await User.findById(req.session.user).lean()
@@ -169,7 +168,7 @@ const loadProductsDetails = async (req, res) => {
         res.render("productlist", {
             user: userData,
             product: productData,
-            category: productData.category
+            category: productData.category,
         });
 
     } catch (error) {
@@ -180,6 +179,39 @@ const loadProductsDetails = async (req, res) => {
 };
 
 
+const productRatings = async(req,res)=>{
+    try{
+        const { productId } = req.query;
+
+        const productData = await Product.findById(productId).populate('category').populate('reviews.user_id').exec();
+
+
+        const ratingCounts = [0, 0, 0, 0, 0]; 
+
+         // Calculate the count for each star rating
+       productData.reviews.forEach(review => {
+        if (review.rating >= 1 && review.rating <= 5) {
+          ratingCounts[review.rating - 1] += 1; 
+        }
+      });
+
+      const totalRatings = productData.reviews.length;
+      const ratingPercentages = ratingCounts.map(count => (count / totalRatings) * 100);
+      const averageRating = productData.ratings.average;
+
+      res.json({
+        totalRatings,
+        ratingPercentages,
+        counts: ratingCounts,
+        averageRating
+      })
+    }catch(error){
+
+        console.error(error);
+        res.json({message : "There is a problem in fetching product ratings"})
+
+    }
+}
 
 
 
@@ -231,5 +263,6 @@ module.exports = {
     loadProducts,
     loadProductsDetails,
     getCoupon,
+    productRatings
 
 }
