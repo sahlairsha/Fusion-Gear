@@ -397,16 +397,15 @@ const getRating = async (req, res) => {
             return res.status(404).send('User not found');
         }
 
-        // Check if the user has an order with the product that is delivered
         const hasDeliveredOrder = await Order.findOne({
             user_id: userId,
-            'products_id': productId, 
+            'products.product_id': productId, 
             order_status: 'Delivered' 
         });
 
         if (!hasDeliveredOrder) {
          req.flash('error',"You have to order the product first");
-         return res.redirect(`/product/view?id=${productId}`)
+         return res.redirect('/products')
         }
 
         let userRating = 0; 

@@ -164,28 +164,28 @@
                                     <div class="card-body">
                                         <div class="shop__sidebar__size">
                                             <label for="xs">xs
-                                                <input type="radio" name="size" value="xs" id="xs">
+                                                <input type="radio" name="size" value="XS" id="xs">
                                             </label>
                                             <label for="sm">s
-                                                <input type="radio" name="size" value="s" id="sm">
+                                                <input type="radio" name="size" value="S" id="sm">
                                             </label>
                                             <label for="md">m
-                                                <input type="radio" name="size" value="m" id="md">
+                                                <input type="radio" name="size" value="M" id="md">
+                                            </label>
+                                            <label for="lg">l
+                                                <input type="radio" name="size" value="L" id="l">
                                             </label>
                                             <label for="xl">xl
                                                 <input type="radio" name="size" value="XL" id="xl">
                                             </label>
                                             <label for="2xl">2xl
-                                                <input type="radio" name="size" value="xxl" id="2xl">
-                                            </label>
-                                            <label for="xxl">xxl
-                                                <input type="radio" name="size" value="xxl" id="xxl">
+                                                <input type="radio" name="size" value="XXL" id="2xl">
                                             </label>
                                             <label for="3xl">3xl
-                                                <input type="radio" name="size" value="3xl" id="3xl">
+                                                <input type="radio" name="size" value="3XL" id="3xl">
                                             </label>
                                             <label for="4xl">4xl
-                                                <input type="radio" name="size" value="4xl" id="4xl">
+                                                <input type="radio" name="size" value="4XL" id="4xl">
                                             </label>
                                             <label for="5xl">5
                                                 <input type="radio" name="size" value="5" id="5xl">
@@ -251,7 +251,7 @@
                     <div class="row">
                         <div class="col-lg-6 col-md-6 col-sm-6">
                             <div class="shop__product__option__left">
-                                <p>Showing <%= currentPage%>– <%=limit%> of <%= totalProduct %> results</p>
+                                <p>Showing <%= currentPage%> – <%=limit%> of <%= totalProduct %> results</p>
                             </div>
                         </div>
                         <div class="col-lg-6 col-md-6 col-sm-6">
@@ -290,7 +290,7 @@
                                <div class="product-badge 
                                <%= product.status ? product.status.toLowerCase().replace(/ /g, '-') : 'available' %> ">
                                <%= product.status %>
-                           </div>
+                               </div>
                                 <div class="product-overlay">
                                     <a href="/product/view?id=<%=product._id%>" class="overlay-icon">View Product</a>
                                 </div>
@@ -303,14 +303,6 @@
 
                                 <div class="description">
                                     <p><%=product.description%></p>
-                                </div>
-                                <div class="rating">
-                                    <a href="/ratings?id=<%= product._id %>" style="text-decoration: none; color: inherit;">
-                                        <% for (let i = 1; i <= 5; i++) { %>
-                                            <i class="fa <%= i <= product.ratings.average ? 'fa-star' : 'fa-star-o' %>"></i>
-                                        <% } %>
-                                        <p><%= product.ratings.average %>/5</p>
-                                    </a>
                                 </div>
                                 
                               

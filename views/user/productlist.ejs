@@ -17,6 +17,36 @@
         z-index: 1000;
     }
 
+    .product-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: #ff6b6b;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.product-badge.available {
+    background-color: #28a745; /* Green for Available */
+}
+
+.product-badge.sold-out {
+    background-color: #dc3545; /* Red for Sold Out */
+}
+
+.product-badge.unavailable {
+    background-color: #ffc107;
+}
+
+.product-badge.out-of-stock {
+    background-color: #6c757d; /* Grey for Out of Stock */
+}
+
+
     .ratings-reviews h2 {
         font-size: 20px;
         margin-bottom: 10px;
@@ -172,10 +202,16 @@
                 <div class="col-lg-6 col-md-9">
                     <div class="tab-content">
                         <% for (let i = 0; i < product.productImage.length; i++) { %>
+                          
                         <div class="tab-pane <%= i === 0 ? 'active' : '' %>" id="tabs-<%= i + 1 %>" role="tabpanel">
                             <% if (product.productImage && product.productImage.length > 0) { %>
                             <div class="product__details__pic__item">
-                                <img  class="product-image zoom" src="/uploads/public-image/<%= product.productImage[i] %>"  data-zoom-image="/uploads/public-image/<%= product.productImage[i] %>"    alt="">
+                                  <div class="product-badge
+                                <%= product.status ? product.status.toLowerCase().replace(/ /g, '-') : 'available' %> ">
+                                <%= product.status %>
+                                </div>
+                                 <img  class="product-image zoom" src="/uploads/public-image/<%= product.productImage[i] %>"  data-zoom-image="/uploads/public-image/<%= product.productImage[i] %>"    alt="">
+                               
                             </div>
                             <% } else { %>
                                 <p>No images available for this product.</p>
@@ -221,10 +257,12 @@
                 <div class="container">
                     <div class="row d-flex justify-content-center">
                         <div class="col-lg-8">
+                            
                             <div class="product__details__text">
+                              
                                 <h4><%= product.productName %></h4>
-                               
-                                <h3>&#8377;<%= product.salePrice %> <span>&#8377;<%= product.regularPrice %></span></h3>
+                              
+                                <h3>&#8377;<%= product.salePrice %> <span>&#8377;<%= product.regularPrice %>  </span></h3>
                                
                                     
                                     <% if(product.quantity < 5 && product.quantity < 0) {%>
@@ -232,7 +270,10 @@
                                         <% }else { %>
                                         <p class="stock-left text-danger"></span>
                                         <% } %>
+
                                 <p><%= product.description %></p>
+                                
+
                                 <div class="product__details__option">
                                     <div class="product__details__option__size">
                                         <span>Size:</span>
@@ -257,6 +298,7 @@
 
 
                                 <div class="product__details__cart__option">
+                               
                                     <div class="quantity">
                                         <div class="pro-qty">
                                             <input type="text" value="1">
