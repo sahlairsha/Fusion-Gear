@@ -85,7 +85,7 @@
             <% orders.forEach((order, index) => { %>
                 
                 <tr data-order-id="<%= order._id %>" class="table-row">
-                    <td><%= order.user_id.full_name %></td>
+                    <td><%= order.user_id.full_name || order.user_id.username  %> </td>
                     <td>
                         <% order.products.forEach(product => { %>
                             <img class="product_image" src="/uploads/public-image/<%= product.product_id.productImage[0] %>" alt="<%= product.product_id.productName %>" width="50" height="50">

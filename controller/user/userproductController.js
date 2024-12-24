@@ -43,15 +43,14 @@ const loadProducts = async (req, res) => {
             }
         }
 
-      
         if (size) {
-            filters.size = size;
+            filters.size = { $regex: `^${size}$`, $options: 'i' };
         }
-
-      
+        
         if (color) {
-            filters.color = color;
+            filters.color = { $regex: `^${color}$`, $options: 'i' }; 
         }
+        
 
         
         if (priceRange) {

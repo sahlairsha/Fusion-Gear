@@ -32,7 +32,7 @@ const getCheckout = async (req, res) => {
         const userId = req.session.user;
       const savedAddress = await Address.find({user_id : userId})
 
-        const user = await User.findById(userId).populate('cart.product_id');
+        const user = userId ? await User.findById(userId).populate('cart.product_id') : null
         const orderProducts = user.cart.map(item => ({
             product_id: item.product_id._id,
             quantity: item.quantity,
@@ -47,6 +47,7 @@ const getCheckout = async (req, res) => {
         const updatedCartTotals = await calculateCartTotals(userId)
 
         res.render('checkout', {
+            user,
             address: savedAddress,
             cartCount : orderProducts.length,
             ...updatedCartTotals
@@ -497,14 +498,25 @@ const submitReviews = async (req, res) => {
             return res.status(404).json({ message: 'Product not found' });
         }
 
-        // Add review to product
-        const review = {
-            user_id: userId,
-            description,
-            title,
-        };
+        // Check if the user has already reviewed the product
+        const existingReviewIndex = product.reviews.findIndex(
+            (review) => review.user_id.toString() === userId
+        );
 
-        product.reviews.push(review);
+        if (existingReviewIndex !== -1) {
+            // Update the existing review
+            product.reviews[existingReviewIndex].description = description;
+            product.reviews[existingReviewIndex].title = title;
+            product.reviews[existingReviewIndex].updatedAt = new Date(); // Optional timestamp for updates
+        } else {
+            // Add a new review
+            const review = {
+                user_id: userId,
+                description,
+                title,
+            };
+            product.reviews.push(review);
+        }
 
         await product.save();
 

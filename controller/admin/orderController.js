@@ -2,6 +2,7 @@
 
 const Order = require('../../models/orderSchema');
 
+
 const getOrders = async (req, res) => {
     try {
         let page = req.query.page || 1;
@@ -10,7 +11,7 @@ const getOrders = async (req, res) => {
         const orders = await Order.find({})
             .limit(limit * 1)
             .skip((page - 1) * limit)
-            .populate('user_id', 'full_name')
+            .populate('user_id')
             .populate('products.product_id')
             .populate('shippingAddress.addressDocId')
             .exec();

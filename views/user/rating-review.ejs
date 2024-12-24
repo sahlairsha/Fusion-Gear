@@ -298,6 +298,74 @@ function fillStars(rating) {
             });
         }
     }
+
+    document.getElementById('ratingForm').addEventListener('submit', async function (e) {
+    e.preventDefault(); // Prevent default form submission
+
+    const error = document.getElementById('error');
+    const description = document.getElementById('description').value.trim();
+    const title = document.getElementById('title').value.trim();
+    const productId = '<%= product._id %>';
+    const userId = '<%= user._id %>';
+
+    // Check if the review description is empty
+    if (description === '') {
+        error.innerText = 'Please enter a review description.';
+        return;
+    } else {
+        error.innerText = ''; // Clear error if valid input
+    }
+
+    // Show loading SweetAlert
+    Swal.fire({
+        title: 'Submitting your review...',
+        text: 'Please wait while we save your review.',
+        allowOutsideClick: false,
+        didOpen: () => {
+            Swal.showLoading();
+        }
+    });
+
+    try {
+        // Submit review data to the server
+        const response = await fetch('/reviews', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ productId, userId, description, title })
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Review Submitted!',
+                text: 'Thank you for your feedback.',
+                confirmButtonText: 'OK'
+            });
+
+            // Optionally, reset the form fields
+            document.getElementById('ratingForm').reset();
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                text: result.message || 'There was an error submitting your review.',
+                confirmButtonText: 'OK'
+            });
+        }
+    } catch (error) {
+        console.error('Error submitting review:', error);
+
+        Swal.fire({
+            icon: 'error',
+            title: 'Server Error!',
+            text: 'Something went wrong while submitting your review. Please try again later.',
+            confirmButtonText: 'OK'
+        });
+    }
+});
+
 </script>
 
 

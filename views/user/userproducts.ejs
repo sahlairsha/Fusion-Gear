@@ -145,12 +145,12 @@
                                     <div class="card-body">
                                         <div class="shop__sidebar__price">
                                             <ul>
-                                                <li><a href="?page=1&priceRange=250-500&sort=<%= sort %>&search=<%= search %>">₹200.00- ₹500.00</a></li>
-                                                <li><a href="?page=1&priceRange=500-1000&sort=<%= sort %>&search=<%= search %>">₹500.00 - ₹1000.00</a></li>
-                                                <li><a href="?page=1&priceRange=1000-1500&sort=<%= sort %>&search=<%= search %>">₹1000.00 - ₹1500.00</a></li>
-                                                <li><a href="?page=1&priceRange=1500-2000&sort=<%= sort %>&search=<%= search %>">₹1500.00 - ₹2000.00</a></li>
-                                                <li><a href="?page=1&priceRange=2000-2500&sort=<%= sort %>&search=<%= search %>">₹2000.00 - ₹2500.00</a></li>
-                                                <li><a href="?page=1&priceRange=2500-999999&sort=<%= sort %>&search=<%= search %>">₹2500.00+</a></li>
+                                                <li><a href="#" class="price-filter" data-range="250-500">₹200.00- ₹500.00</a></li>
+                                                <li><a href="#" class="price-filter" data-range="500-1000">₹500.00 - ₹1000.00</a></li>
+                                                <li><a href="#" class="price-filter" data-range="1000-1500">₹1000.00 - ₹1500.00</a></li>
+                                                <li><a href="#" class="price-filter" data-range="1500-2000">₹1500.00 - ₹2000.00</a></li>
+                                                <li><a href="#" class="price-filter" data-range="2000-2500">₹2000.00 - ₹2500.00</a></li>
+                                                <li><a href="#" class="price-filter" data-range="2500-999999">₹2500.00+</a></li>
                                             </ul>
                                         </div>
                                     </div>
@@ -373,47 +373,63 @@
 </script>
 
 <script>
-    document.addEventListener('DOMContentLoaded', () => {
-    const filterForm = document.getElementById('filter-form'); // If you have a form to wrap the filters
-    
-    const sizeRadios = document.querySelectorAll('input[name="size"]');
-    const colorRadios = document.querySelectorAll('input[name="color"]');
+document.querySelectorAll('.price-filter').forEach(function (link) {
+    link.addEventListener('click', function (event) {
+        event.preventDefault();
 
-    let size = '';
-    let color = '';
+        // Get the selected price range from the data attribute
+        const priceRange = this.getAttribute('data-range');
 
-    sizeRadios.forEach((radio) => {
-        radio.addEventListener('change', () => {
-            size = radio.value;
-            updateFilters();
-        });
-    });
-
-    colorRadios.forEach((radio) => {
-        radio.addEventListener('change', () => {
-            color = radio.value;
-            updateFilters();
-        });
-    });
-
-    // Function to update the URL and reload the page with filters
-    function updateFilters() {
-        const queryParams = new URLSearchParams(window.location.search);
-        
-        // Add or update the filters in the query string
-        if (size) {
-            queryParams.set('size', size);
-        }
-        if (color) {
-            queryParams.set('color', color);
+        // Validate the price range format (e.g., "min-max")
+        if (!/^\d+-\d+$/.test(priceRange) && priceRange !== "2500-999999") {
+            console.error("Invalid price range format:", priceRange);
+            return;
         }
 
-        // Update the URL with the new parameters
-        window.location.search = queryParams.toString();
-    }
+        // Get current query parameters from the URL
+        const urlParams = new URLSearchParams(window.location.search);
+
+        // Add/Update the priceRange in the query parameters
+        urlParams.set('priceRange', priceRange);
+
+        // Always reset to the first page when a filter is applied
+        urlParams.set('page', 1);
+
+        // Construct the new URL with updated parameters
+        const newUrl = `${window.location.pathname}?${urlParams.toString()}`;
+
+        // Redirect to the new URL
+        window.location.href = newUrl;
+    });
 });
 
 
+
+
+
+   document.querySelectorAll('input[name="size"], input[name="color"]').forEach(input => {
+    input.addEventListener('change', function () {
+        updateFilters();
+    });
+});
+
+function updateFilters() {
+    const queryParams = new URLSearchParams(window.location.search);
+
+    // Get size and color values
+    const size = document.querySelector('input[name="size"]:checked')?.value;
+    const color = document.querySelector('input[name="color"]:checked')?.value;
+
+    // Add size and color to the URL query string
+    if (size) queryParams.set('size', size);
+    else queryParams.delete('size'); // Clear filter if no size is selected
+
+    if (color) queryParams.set('color', color);
+    else queryParams.delete('color'); // Clear filter if no color is selected
+
+    // Update the URL
+    window.location.search = queryParams.toString();
+}
 
 
 </script>

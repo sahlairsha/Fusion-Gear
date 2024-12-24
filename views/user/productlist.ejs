@@ -241,16 +241,19 @@
 
 
                     <h2>Reviews</h2>
+
     <ul class="reviews-list">
-        <% product.reviews.forEach(function(review) { %>
-            <li>
-                <p><%= review.user_id.full_name  %></p>
+     
+        <% product.reviews.forEach(function(review){ %>
+            <li>            
+                <p><strong><%= review.user_id.full_name  %></strong></p>
                 <p><%= review.review %></p> 
                 <p>Rating: <%= review.rating %>★</p> 
             </li>
         <% }); %>
+       
     </ul>
-                </div>
+</div>
      
             </div>
             <div class="product__details__content">
