@@ -155,9 +155,12 @@
 <script src="/js/admin/customer-search.js"></script>
 
 <script>
+  
   document.addEventListener('change', function (event) {
     if (event.target.classList.contains('order-status-dropdown')) {
+
         const orderId = event.target.getAttribute('data-order-id');
+        
         const newStatus = event.target.value;
 
         // Update order status via AJAX
@@ -170,7 +173,7 @@
         })
             .then((response) => {
                 if (response.ok) {
-                    // Update the status in the row dynamically
+                    
                     const statusCell = event.target.closest('tr').querySelector('.order-status-display');
                     statusCell.textContent = newStatus;
 
@@ -178,14 +181,22 @@
                     statusCell.className = `order-status-display text-center bg-${getStatusColor(newStatus)}`;
 
                     // Notify the user of the successful update
-                    toastr.success(`Order status changed to ${newStatus}`);
+                    console.log(`Order status changed to ${newStatus}`);
                 } else {
-                    toastr.error('Failed to update order status');
+                   Swal.fire({
+                    title:'Error',
+                    icon:"error",
+                    text: response.message || "You can't change order status after delivered the product.",
+                   })
                 }
             })
             .catch((error) => {
                 console.error('Error:', error);
-                toastr.error('Something went wrong');
+                Swal.fire({
+                    title:'Error',
+                    icon:"error",
+                    text:"Something went wrong!!!"
+                   })
             });
     }
 });
@@ -237,6 +248,9 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         });
     });
+
+
+
 
 
 

@@ -45,8 +45,6 @@ const categoryInfo = async(req,res)=>{
 const addCategories = async (req, res) => {
     try {
         const { name, description } = req.body;
-
-
         const newCategory = new Category({ name, description });
         await newCategory.save();
 
@@ -54,8 +52,7 @@ const addCategories = async (req, res) => {
         res.redirect('/admin/addCategory');
     } catch (error) {
         if (error.name === 'ValidationError') {
-            // If a validation error occurs, send the error to the frontend
-            req.flash('error', error.message);
+           req.flash('error', error.message);
         } else {
             req.flash('error', 'An unexpected error occurred.');
         }
@@ -127,10 +124,6 @@ const restoreCategories = async (req, res) => {
         res.status(500).redirect('/pageerror')
     }
 }
-
-
-
-
 
 
 

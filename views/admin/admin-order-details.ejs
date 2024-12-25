@@ -88,25 +88,15 @@
 
             <!-- Admin Controls -->
             <div class="admin-controls">
-                <form action="/admin/orders/update-status/<%= orders._id %>" method="POST">
-                    <select name="status" class="status-select">
-                        <option value="Pending" <% if (orders.order_status==='Pending' ) { %> selected <% } %> >Pending
-                        </option>
-                        <option value="Shipped" <% if (orders.order_status==='Shipped' ) { %> selected <% } %> >Shipped
-                        </option>
-                        <option value="Delivered" <% if (orders.order_status==='Delivered' ) { %> selected <% } %>
-                                >Delivered</option>
-                        <option value="Canceled" <% if (orders.order_status==='Canceled' ) { %> selected <% } %>
-                                >Canceled</option>
-                    </select>
-                    <button type="submit" class="update-btn">Update Status</button>
-                </form>
                 <!-- Cancel Order Button -->
                 <% if (orders.order_status !=='Canceled' ) { %>
                     <form id="cancelOrderForm" action="/admin/orders/cancel/<%= orders._id %>" method="POST">
-                        <button type="button" class="cancel-btn" onclick="confirmationMessage()">
-                            Cancel Order
-                        </button>
+                        <button 
+                        type="button" 
+                        class="btn btn-danger" 
+                        onclick="confirmationMessage(this.dataset.status)" 
+                        data-status="Delivered">Cancel Order
+                    </button>
                     </form>
                     <% } else { %>
                         <p class="cancel-message">Order has been canceled.</p>
@@ -117,24 +107,34 @@
     </div>
 
     <script>
-        function confirmationMessage() {
-            Swal.fire({
-                title: "Warning",
-                text: "Are you sure you want to cancel the order?",
-                icon: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#d33",
-                cancelButtonColor: "#3085d6",
-                confirmButtonText: "Yes, cancel it!",
-                cancelButtonText: "No, keep it"
-            }).then((result) => {
-                if (result.isConfirmed) {
-
-                    document.getElementById('cancelOrderForm').submit();
-                }
-            });
+        function confirmationMessage(orderStatus) {
+            if (orderStatus === "Delivered") {
+                Swal.fire({
+                    title: "Action Not Allowed",
+                    text: "This order has already been delivered and cannot be canceled.",
+                    icon: "error",
+                    confirmButtonColor: "#3085d6",
+                    confirmButtonText: "OK"
+                });
+            } else {
+                Swal.fire({
+                    title: "Warning",
+                    text: "Are you sure you want to cancel the order?",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#d33",
+                    cancelButtonColor: "#3085d6",
+                    confirmButtonText: "Yes, cancel it!",
+                    cancelButtonText: "No, keep it"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        document.getElementById('cancelOrderForm').submit();
+                    }
+                });
+            }
         }
     </script>
+    
 
 
 

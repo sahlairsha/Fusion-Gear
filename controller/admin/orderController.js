@@ -53,21 +53,26 @@ const changeOrderStatus = async (req, res) => {
 
         const validStatuses = ['Pending', 'Shipped', 'Delivered', 'Canceled'];
         if (!validStatuses.includes(status)) {
-            return res.status(400).send('Invalid status');
+            return res.status(400).json({ error: 'Invalid status' });
         }
 
         const order = await Order.findById(id);
         if (!order) {
-            return res.status(404).send('Order not found');
+            return res.status(404).json({ error: 'Order not found' });
+        }
+
+        // Prevent rollback if the current status is Delivered
+        if (order.order_status === 'Delivered' && status !== 'Delivered') {
+            return res.status(400).json({ message : 'Cannot rollback from Delivered status' });
         }
 
         order.order_status = status;
         await order.save();
 
-        res.status(200).send('Order status updated successfully');
+        return res.status(200).json({ message: 'Order status updated successfully' });
     } catch (error) {
         console.error(error);
-        res.status(500).send('Server Error');
+        return res.status(500).json({ error: 'Server Error' });
     }
 };
 
@@ -99,35 +104,6 @@ const getDetails = async(req,res)=>{
     }
 }
 
-
-const updateOrderStatus = async (req, res) => {
-    const orderId = req.params.id;
-    const { status } = req.body;
-
-    try {
-        const order = await Order.findById(orderId);
-        if (!order) {
-            return res.status(404).send('Order not found');
-        }
-
-        // Update order status
-        order.order_status = status;
-
-        // If the order is marked as delivered, record the delivery date
-        if (status === 'Delivered') {
-            order.delivery_date = new Date();
-        }
-
-        // Save the updated order
-        await order.save();
-
-        res.redirect(`/admin/order-details/${orderId}`);
-    } catch (error) {
-        console.error(error);
-        res.status(500).send('Server Error');
-    }
-};
-
 const cancelOrderAdmin = async (req, res) => {
     const orderId = req.params.id;
 
@@ -139,9 +115,15 @@ const cancelOrderAdmin = async (req, res) => {
             return res.status(404).send('Order not found');
         }
 
+
+        if (order.order_status === 'Delivered') {
+            return res.status(400).json({message :'Cannot cancel an order that has already been delivered.'});
+        }
+
+
         // Check if the order is already canceled
         if (order.order_status === 'Canceled') {
-            return res.status(400).send('Order is already canceled.');
+            return res.status(400).json({message: 'Order is already canceled.'});
         }
 
         // Update order status and add cancellation timestamp
@@ -172,7 +154,6 @@ module.exports = {
     getOrders,
     changeOrderStatus ,
     getDetails,
-    updateOrderStatus,
     cancelOrderAdmin
 
 }
