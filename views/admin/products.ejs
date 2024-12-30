@@ -27,7 +27,7 @@
     <table class="table table-light">
         <thead class="table-secondary">
             <tr>
-                <th scope="col"><input type="checkbox" id="selectAll" ></th>
+                <th scope="col"><input type="checkbox" id="selectAll"></th>
                 <th scope="col">#</th>
                 <th scope="col">Name</th>
                 <th scope="col">Image</th>
@@ -36,59 +36,63 @@
                 <th scope="col">Sale Price</th>
                 <th scope="col">Qty</th>
                 <th scope="col">Color</th>
-                <th scope="col">size</th>
-                <th scope="col">Block/Unblock</th>
+                <th scope="col">Size</th>
                 <th scope="col">Actions</th>
             </tr>
         </thead>
-        <tbody id="tableBody" >
-            <% data.forEach((data, index) => { %>
-                <tr data-product-id ="<%=data._id%>">
+        <tbody id="tableBody">
+            <% data.forEach((product, index) => { %>
+                <tr data-product-id="<%= product._id %>">
                     <td><input type="checkbox" class="checkbox"></td>
                     <td><%= index + 1 %></td>
-                    <td><%= data.productName %></td>
                     <td>
-                        <img class="product_image" src="/uploads/public-image/<%= data.productImage[0] %>" alt="<%= data.productName %>" width="50" height="50">
+                       <%= product.productName %>
                     </td>
-                    <td class="description"><%= data.description %></td>
                     <td>
-                        <%= data.category ? data.category.name : 'No Category' %>
+                        <a href="/admin/product-details/<%= product._id %>"><img class="product_image" src="/uploads/public-image/<%= product.productImage[0] %>" alt="<%= product.productName %>" width="50" height="50"></a>
                     </td>
-                    <td><%= data.salePrice%></td>
-                    <td><%= data.quantity%></td>
-                    <td><%= data.color%></td>
-                    <td><%= data.size%></td>
-                    <td>
-                        <% if(data.isBlocked === false) { %>
-                        <button class="btn btn-warning btn-sm">
-                            <a href="/admin/blockedproduct?id=<%=data._id%>" class="text-white" style="text-decoration: none;">Block</a>
-                        </button>
-                        <% }else{ %>
-                        <button class="btn btn-success btn-sm">
-                            <a href="/admin/unblockedproduct?id=<%=data._id%>" class="text-white" style="text-decoration: none;">Unblock</a>
-                        </button>
-                        <% } %>
-                </td>
-
-                <td>
-                    <button class="btn btn-primary btn-sm edit-button mb-2">
-                        <a class="text-white" href="/admin/editproducts?id=<%= data._id %>">Edit</a>
-                    </button>
-                    <% if (data.isDeleted === false) { %>
-                        <button class="btn btn-info btn-sm">
-                            <a href="/admin/deleteproducts?id=<%= data._id %>" class="text-white" style="text-decoration: none;">Delete</a>
-                        </button>
+                    <td class="description"><%= product.description %></td>
+                    <td><%= product.category ? product.category.name : 'No Category' %></td>
+                 
+                   <% if (product.variants && product.variants.length > 0) { %>
+                 <% product.variants.forEach((variant, variantIndex) => { %>
+                     <% if (variantIndex !== -1) { %>
+                                <td><%= variant.salePrice %></td>
+                                <td><%= variant.stock %></td>
+                                <td><%= variant.color %></td>
+                                <td><%= variant.size %></td>
+                                <% } %>
+                             
+                        <% }); %>
                     <% } else { %>
-                        <button class="btn btn-success btn-sm">
-                            <a href="/admin/restoreproducts?id=<%= data._id %>" class="text-white" style="text-decoration: none;">Restore</a>
-                        </button>
+                            <td class="text-center" colspan="4">No Variants Available</td>
+                       
                     <% } %>
-                </td>
 
+                    <td>
+                        <button class="btn btn-primary btn-sm edit-button mb-2">
+                            <a class="text-white" href="/admin/editproducts?id=<%= product._id %>">Edit</a>
+                        </button>
+                        <% if (product.isDeleted === false) { %>
+                            <button class="btn btn-info btn-sm">
+                                <a href="/admin/deleteproducts?id=<%= product._id %>" class="text-white" style="text-decoration: none;">Delete</a>
+                            </button>
+                        <% } else { %>
+                            <button class="btn btn-success btn-sm">
+                                <a href="/admin/restoreproducts?id=<%= product._id %>" class="text-white" style="text-decoration: none;">Restore</a>
+                            </button>
+                        <% } %>
+                    </td>
+                
                 </tr>
             <% }); %>
         </tbody>
     </table>
+    
+
+
+
+  
 
 
     <div class="pagination-container d-flex align-items-center justify-content-center mt-5">

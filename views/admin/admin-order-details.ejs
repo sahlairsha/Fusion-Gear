@@ -64,15 +64,15 @@
 
             </div>
 
-            <!-- Order Status -->
             <div class="order-status">
                 <h4>Order Status</h4>
                 <% const orderStatuses=['Pending', 'Shipped' , 'Delivered' , 'Canceled' ]; %>
 
                     <div class="timeline">
                         <% orderStatuses.forEach((status, index)=> { %>
-                            <% let stepClass='' ; if (orders.order_status===status) { stepClass='active' ; } else if
-                                (orderStatuses.indexOf(orders.order_status)> index) {
+                            <% let stepClass='' ; if (orders.order_status===status) { stepClass='active' ; 
+
+                            }else if(orderStatuses.indexOf(orders.order_status)> index) {
                                 stepClass = 'completed';
                                 }
                                 %>
@@ -86,12 +86,11 @@
                     </div>
             </div>
 
-            <!-- Admin Controls -->
+        
             <div class="admin-controls">
-                <!-- Cancel Order Button -->
                 <% if (orders.order_status !=='Canceled' ) { %>
                     <form id="cancelOrderForm" action="/admin/orders/cancel/<%= orders._id %>" method="POST">
-                        <button 
+                    <button 
                         type="button" 
                         class="btn btn-danger" 
                         onclick="confirmationMessage(this.dataset.status)" 
@@ -101,10 +100,8 @@
                     <% } else { %>
                         <p class="cancel-message">Order has been canceled.</p>
                         <% } %>
-
-            </div>
         </div>
-    </div>
+
 
     <script>
         function confirmationMessage(orderStatus) {

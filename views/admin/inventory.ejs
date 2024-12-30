@@ -120,7 +120,7 @@
         }
 
 
-        .product-badge {
+ .product-badge {
 
     background-color: #ff6b6b;
     color: white;
@@ -169,10 +169,10 @@
                 <tr data-product-id="<%=items._id%>">
                     <td><%= items.productName  %></td>
                     <td><%=items.category?items.category.name :'No Category' %></td>
-                    <td><%= items.quantity%></td>
+                    <td><%= items.variants.stock %></td>
                     <td>  <div class="product-badge 
-                        <%= items.status ? items.status.toLowerCase().replace(/ /g, '-') : 'available' %> ">
-                        <%= items.status %>
+                        <%= items.variants.status ? items.variants.status.toLowerCase().replace(/ /g, '-') : 'available' %> ">
+                        <%=items.variants.status %>
                     </div></td>
                     <td class="actions">
                         <button class="add-stock" onclick="openModal('add', this)">Add Stock</button>
@@ -219,7 +219,7 @@
     <div class="overlay" id="overlay"></div>
     <div class="modal" id="modal">
         <div class="modal-header" id="modalHeader">Add Stock</div>
-        <input type="number" id="stockInput" name="quantity" placeholder="Enter quantity">
+        <input type="number" id="stockInput" name="stock" placeholder="Enter stock">
         <div class="modal-actions">
             <button class="cancel-btn" onclick="closeModal()">Cancel</button>
             <button class="submit-btn" onclick="submitStockChange()">Submit</button>
@@ -261,8 +261,8 @@ function closeModal() {
 
 // Submit stock change (Add or Reduce stock)
 async function submitStockChange() {
-    const quantity = parseInt(stockInput.value, 10);
-    if (isNaN(quantity) || quantity <= 0) {
+    const stock = parseInt(stockInput.value, 10);
+    if (isNaN(stock) || stock<= 0) {
         Swal.fire({
             title : 'Error',
             text : 'Please enter a valid quantity.',
@@ -280,7 +280,7 @@ async function submitStockChange() {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ quantity })
+            body: JSON.stringify({ stock })
         });
 
         const data = await response.json();
@@ -320,7 +320,7 @@ async function submitStockChange() {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ quantity })
+            body: JSON.stringify({ stock })
         });
 
         const data = await response.json();
@@ -357,10 +357,6 @@ async function submitStockChange() {
     }
 
   
-
-function blockProduct() {
-    alert('Product blocked successfully!');
-}
 
     </script>
     

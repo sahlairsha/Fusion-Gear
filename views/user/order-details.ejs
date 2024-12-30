@@ -184,7 +184,9 @@
 .delivery-address p{
     margin: 0;
 }
-
+.cancel{
+    color: #fff;
+}
 </style>
 <div class="details-container">
     <div class="order-details">
@@ -245,9 +247,7 @@
                 </div>
                  <!-- Cancel Order Button -->
 <% if (orders.order_status === 'Pending') { %>
-    <form action="/orders/cancel/<%= orders._id %>" method="POST">
-        <button type="submit" class="btn btn-danger">Cancel Order</button>
-    </form>
+        <button type="submit" class="btn btn-danger"><a  class="cancel" href="/orders/cancel/confirm?id=<%= orders._id  %>">Cancel Order</a></button>
 <% } %>
 
             </div>

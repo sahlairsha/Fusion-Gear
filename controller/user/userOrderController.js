@@ -341,8 +341,26 @@ const orderDetails = async (req, res) => {
 
 
 
+const getCancelConfirmation = async(req,res)=>{
+    try{
+        const orderId = req.query.id;
+        const orders = await Order.findById(orderId)
+        .populate('user_id')
+        .populate('products.product_id')
+        .populate('shippingAddress.addressDocId')
+        .exec()
+        res.render('cancel-confirm',{orders})
+    }catch(error){
+        console.error("Error in Loading Cancel Confirm Page", error);
+        res.redirect('/pagenotfound');
+    }
+}
+
+
+
 const cancelOrder = async (req, res) => {
     const orderId = req.params.id;
+    const { reason, customReason } = req.body;
 
     try {
        
@@ -360,7 +378,10 @@ const cancelOrder = async (req, res) => {
        
         order.order_status = 'Canceled';
         order.canceled_at = new Date();
-
+        order.cancellation_reason = {
+            predefined: reason,
+            custom: customReason,
+        };
         
         await order.save();
 
@@ -542,6 +563,7 @@ module.exports = {
     cancelOrder,
     getRating,
     submitRating,
-    submitReviews
+    submitReviews,
+    getCancelConfirmation
 
 }

@@ -109,6 +109,7 @@ router.get("/payment",userAuth,userOrderController.getPayment)
 router.get("/order-confirm",userAuth,userOrderController.getOrderConfirmation)
 router.post('/confirm-order',userAuth,userOrderController.confirmOrder)
 router.get('/order-details/:id',userAuth,userOrderController.orderDetails)
+router.get('/orders/cancel/confirm',userAuth,userOrderController.getCancelConfirmation)
 router.post('/orders/cancel/:id',userAuth,userOrderController.cancelOrder)
 
 //ratings and reviews

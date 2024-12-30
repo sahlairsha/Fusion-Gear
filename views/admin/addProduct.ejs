@@ -1,8 +1,7 @@
 <%- include("../../views/partials/admin/header") %>
 
-    <head>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs/dist/cropper.min.css">
-    </head>
+
     <style>
  .thumbnails-container {
         display: flex;
@@ -62,6 +61,21 @@
             margin-top: 30px;
         }
 
+        .variant-table {
+        width: 100%;
+        margin-top: 20px;
+        border-collapse: collapse;
+    }
+
+    .variant-table th, .variant-table td {
+        border: 1px solid #ddd;
+        padding: 10px;
+        text-align: center;
+    }
+
+    .variant-table th {
+        background-color: #f1f1f1;
+    }
  
 
     </style>
@@ -87,48 +101,6 @@
                                 <textarea placeholder="Type here" id="descriptionid" name="description" class="form-control border" rows="4"></textarea>
                                 <div id="description-error" class="error-message"></div>
                             </div>
-                            <div class="row">
-                                <div class="col-lg-4">
-                                    <div class="mb-4">
-                                        <label class="form-label">Regular price</label>
-                                        <input placeholder="$" name="regularPrice" type="text" class="form-control border">
-                                        <div id="regularPrice-error" class="error-message"></div>
-                                    </div>
-                                </div>
-                                <div class="col-lg-4">
-                                    <div class="mb-4">
-                                        <label class="form-label">Sale price</label>
-                                        <input placeholder="$" name="salePrice" type="text" class="form-control border">
-
-                                    </div>
-                                    <div id="salePrice-error" class="error-message"></div>
-                                </div>
-                                <div class="col-lg-4">
-                                    <div class="mb-4">
-                                        <label class="form-label">Quantity</label>
-                                        <input placeholder="0" name="quantity" type="text" class="form-control border">
-                                        <div id="quantity-error" class="error-message"></div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-
-                                <div class="col-lg-4">
-                                    <div class="mb-4">
-                                        <label class="form-label">Colors (comma-separated)</label>
-                                        <input name="color" type="text" class="form-control border" placeholder="e.g., red, green, blue">
-                                    </div>
-                                    <div id="color-error" class="error-message"></div>
-                                </div>
-
-                                <div class="col-lg-4">
-                                    <div class="mb-4">
-                                        <label class="form-label">Sizes (comma-separated)</label>
-                                        <input name="size" type="text" class="form-control border" placeholder="e.g., S, M, L, XL">
-                                    </div>
-                                    <div id="size-error" class="error-message"></div>
-                                </div>
-                            </div>
                             <div class="card mb-4">
                                 <div class="card-body">
                                     <div class="row gx-2">
@@ -146,6 +118,72 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="mb-4">
+                                <label class="form-label">Add Variants</label>
+                                <div class="row gx-3 mb-3">
+                                    <!-- Color -->
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label for="variantColor">Color:</label>
+                                            <input type="text" id="variantColor" class="form-control" placeholder="Enter color" />
+                                            <div id="color-error" class="error-message"></div>
+                                        </div>
+                                    </div>
+                                    <!-- Size -->
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label for="variantSize">Size:</label>
+                                            <input type="text" id="variantSize" class="form-control" placeholder="Enter size" />
+                                            <div id="size-error" class="error-message"></div>
+                                        </div>
+                                    </div>
+                                    <!-- Stock -->
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label for="variantStock">Stock:</label>
+                                            <input type="number" id="variantStock" class="form-control" placeholder="Enter stock" />
+                                            <div id="stock-error" class="error-message"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row gx-3 mb-3">
+                                    <!-- Regular Price -->
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label for="variantRegularPrice">Regular Price:</label>
+                                            <input type="text" name="regularPrice" id="variantRegularPrice" class="form-control" placeholder="Enter regular price" />
+                                            <div id="regularPrice-error" class="error-message"></div>
+                                        </div>
+                                    </div>
+                                    <!-- Sale Price -->
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label for="variantSalePrice">Sale Price:</label>
+                                            <input type="text" id="variantSalePrice" class="form-control" placeholder="Enter sale price" />
+                                            <div id="salePrice-error" class="error-message"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-end">
+                                    <button type="button" class="btn btn-primary" onclick="addVariant()">Add Variant</button>
+                                </div>
+                                <table class="variant-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Color</th>
+                                            <th>Size</th>
+                                            <th>Stock</th>
+                                            <th>Regular Price</th>
+                                            <th>Sale Price</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="variantTableBody"></tbody>
+                                </table>
+                                <input type="hidden" name="variants" id="variantData">
+                                <div id="variant-error" class="error-message"></div>
+                            </div>
+                            
                             <div class="card mb-2">
                                 <div class="card-header">
                                     <h4>Choose image</h4>
@@ -239,6 +277,77 @@
             }
         }
 
+        let variants = [];  // Declare variants globally
+
+function addVariant() {
+    const color = document.getElementById("variantColor").value.trim();
+    const size = document.getElementById("variantSize").value.trim();
+    const stock = document.getElementById("variantStock").value.trim();
+    const regularPrice = document.getElementById("variantRegularPrice").value.trim();
+    const salePrice = document.getElementById("variantSalePrice").value.trim();
+
+    if (!color || !size || stock <= 0 || !regularPrice || !salePrice) {
+        Swal.fire({
+            title: "Error!",
+            text: "Please fill in all variant details.",
+            icon: "error",
+            confirmButtonText: "Okay"
+        })
+        return;
+    }
+
+    // Add the variant to the array
+    variants.push({ color, size, stock, regularPrice, salePrice });
+    document.getElementById("variantData").value = JSON.stringify(variants); // Update the hidden input
+
+    // Add the variant to the table
+    const tableBody = document.getElementById("variantTableBody");
+    const row = document.createElement("tr");
+
+    row.innerHTML = `
+        <td>${color}</td>
+        <td>${size}</td>
+        <td>${stock}</td>
+        <td>${regularPrice}</td>
+        <td>${salePrice}</td>
+        <td>
+            <button type="button" class="btn btn-danger btn-sm" onclick="removeVariant(${variants.length - 1})">Remove</button>
+        </td>
+    `;
+
+    tableBody.appendChild(row);
+
+    // Clear the input fields
+    document.getElementById("variantColor").value = "";
+    document.getElementById("variantSize").value = "";
+    document.getElementById("variantStock").value = "";
+    document.getElementById("variantRegularPrice").value = "";
+    document.getElementById("variantSalePrice").value = "";
+}
+
+function removeVariant(index) {
+    variants.splice(index, 1); // Remove the variant from the array
+    document.getElementById("variantData").value = JSON.stringify(variants); 
+
+    // Re-render the table to reflect the changes
+    const tableBody = document.getElementById("variantTableBody");
+    tableBody.innerHTML = "";  // Clear existing rows
+    variants.forEach((variant, i) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+            <td>${variant.color}</td>
+            <td>${variant.size}</td>
+            <td>${variant.stock}</td>
+            <td>${variant.regularPrice}</td>
+            <td>${variant.salePrice}</td>
+            <td>
+                <button type="button" class="btn btn-danger btn-sm" onclick="removeVariant(${i})">Remove</button>
+            </td>
+        `;
+        tableBody.appendChild(row);
+    });
+}
+
 
 
         function viewImage1(event) {
@@ -306,11 +415,11 @@ function validateForm() {
     clearErrorMessages();
     const name = document.getElementsByName('productName')[0].value;
     const description = document.getElementById('descriptionid').value;
-    const price = document.getElementsByName('regularPrice')[0].value;
-    const salePrice = document.getElementsByName('salePrice')[0].value;
-    const quantity = document.getElementsByName('quantity')[0].value;
-    const color = document.getElementsByName('color')[0].value;
-    const size = document.getElementsByName('size')[0].value;
+    const color = document.getElementById("variantColor").value.trim();
+    const size = document.getElementById("variantSize").value.trim();
+    const stock = document.getElementById("variantStock").value.trim();
+    const price = document.getElementById("variantRegularPrice").value.trim();
+    const salePrice = document.getElementById("variantSalePrice").value.trim();
     const category = document.getElementsByName('category')[0].value;
     let isValid = true;
 
@@ -329,23 +438,29 @@ function validateForm() {
         isValid = false;
     }
 
-    if (!/^\d+(\.\d{1,2})?$/.test(salePrice) || parseFloat(salePrice) < 0 || parseFloat(salePrice) >= parseFloat(price)) {
-        displayErrorMessage('salePrice-error', 'Sale price should be less than the regular price.');
+    if (!/^\d+(\.\d{1,2})?$/.test(salePrice) ) {
+        displayErrorMessage('salePrice-error', "Please Enter this field");
+        isValid = false;
+    }else if(parseFloat(salePrice) < 0 ){
+        displayErrorMessage('salePrice-error', 'Please enter a non-negative price.');
+        isValid = false;
+    }else if( parseFloat(salePrice) >= parseFloat(price)){
+        displayErrorMessage('salePrice-error', 'Sale price should be less than regular price')
         isValid = false;
     }
 
-    if (parseInt(quantity) < 0 ) {
-        displayErrorMessage('quantity-error', 'Please enter a valid non-negative quantity.');
+    if (parseInt(stock) < 0 ) {
+        displayErrorMessage('stock-error', 'Please enter a valid non-negative stock.');
         isValid = false;
     }
 
-    if(parseInt(quantity) == 0){
-        displayErrorMessage('quantity-error', 'Please enter a the quantity of the product.');
+    if(parseInt(stock) == 0){
+        displayErrorMessage('stock-error', 'Please enter a the stock of the product.');
         isValid = false;
     }
 
-    if(quantity == ""){
-        displayErrorMessage('quantity-error', 'Please enter a this Field.');
+    if(stock == ""){
+        displayErrorMessage('stock-error', 'Please enter a this Field.');
         isValid = false;
     }
 
@@ -374,13 +489,9 @@ description.addEventListener('blur',validateForm)
 price.addEventListener('blur',validateForm)
 salePrice.addEventListener('blur',validateForm)
 color.addEventListener('blur',validateForm)
-quantity.addEventListener('blur',validateForm)
+stock.addEventListener('blur',validateForm)
 
 }
-
-
-
-
 
 
 
@@ -391,22 +502,23 @@ function handleFileSelect(event) {
     files.forEach(file => {
         if (!selectedImages.includes(file)) {
             selectedImages.push(file);
+
+            // Create thumbnail element
             const thumbnail = document.createElement("div");
             thumbnail.classList.add("thumbnail");
 
+            // Create image element
             const img = document.createElement("img");
             img.src = URL.createObjectURL(file);
             img.alt = "thumbnail";
+
+            // Create remove icon
             const removeIcon = document.createElement("span");
             removeIcon.classList.add("remove-icon");
-            removeIcon.innerHTML = "&times;";
-            removeIcon.addEventListener('click', function () {
-                const index = selectedImages.indexOf(file);
-                if (index !== -1) {
-                    selectedImages.splice(index, 1);
-                    thumbnail.remove();
-                }
-            });
+            removeIcon.textContent = "×";
+            removeIcon.onclick = function() {
+                removeThumbnail(thumbnail, file);
+            };
 
             thumbnail.appendChild(img);
             thumbnail.appendChild(removeIcon);
@@ -415,9 +527,17 @@ function handleFileSelect(event) {
     });
 }
 
+function removeThumbnail(thumbnail, file) {
+    const index = selectedImages.indexOf(file);
+    if (index > -1) {
+        selectedImages.splice(index, 1);
+        thumbnail.remove();
+    }
+}
+
 
         function displayErrorMessage(elementId, message) {
-            var errorElement = document.getElementById(elementId);
+            let errorElement = document.getElementById(elementId);
             errorElement.innerText = message;
             errorElement.style.display = "block";
         }

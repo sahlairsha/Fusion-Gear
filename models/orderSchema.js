@@ -66,6 +66,10 @@ const orderSchema = new mongoose.Schema({
         type: Date, 
         default: null,
     },
+    cancellation_reason: { 
+        predefined: { type: String }, 
+        custom: { type: String } 
+    }
 
 });
 

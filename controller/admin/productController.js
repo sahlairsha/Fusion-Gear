@@ -1,6 +1,7 @@
 const Product = require('../../models/productSchema')
 const Category = require("../../models/categorySchema")
 const User = require('../../models/userSchema')
+const ProductVariant = require('../../models/productVariantSchema')
 
 const fs = require('fs');
 const path = require('path');
@@ -25,7 +26,7 @@ const addProducts = async (req, res) => {
     try {
         const product = req.body;
 
-        // Check if product already exists
+        // Check if the product already exists
         const productExists = await Product.findOne({ productName: product.productName });
         if (productExists) {
             req.flash("error", "Product already exists");
@@ -35,12 +36,12 @@ const addProducts = async (req, res) => {
         // Process images
         const images = [];
         if (req.files && req.files.length > 0) {
-            for (let i = 0; i < req.files.length; i++) {
+            for (const file of req.files) {
                 try {
-                    const originalImagePath = req.files[i].path;
-                    const resizedImagePath = path.join(__dirname, '../../Public/uploads/public-image', req.files[i].filename);
+                    const originalImagePath = file.path;
+                    const resizedImagePath = path.join(__dirname, '../../Public/uploads/public-image', file.filename);
                     await sharp(originalImagePath).toFile(resizedImagePath);
-                    images.push(req.files[i].filename)
+                    images.push(file.filename);
                 } catch (error) {
                     console.error("Image processing error:", error);
                     req.flash("error", "Error processing images");
@@ -52,77 +53,126 @@ const addProducts = async (req, res) => {
             return res.status(400).redirect('/admin/add-products');
         }
 
-        // Find the category by ID
-        const categoryId = product.category;  // Now we expect categoryId as the form value
+        // Validate the category
+        const categoryId = product.category;
         if (!categoryId) {
             req.flash("error", "Category is required");
             return res.status(400).redirect('/admin/add-products');
         }
 
-        // Create the new product
+        // Create the product
         const newProduct = new Product({
             productName: product.productName,
             description: product.description,
             category: categoryId,
-            regularPrice: product.regularPrice,
-            salePrice: product.salePrice,
-            createdOn: new Date(),
-            quantity: product.quantity,
-            size: product.size,
-            color: product.color,
             productImage: images,
-            status: 'Available'
+            isBlocked: false,
+            isDeleted: false,
+            ratings: { average: 0, count: 0 },
         });
 
-        await newProduct.save();
-        res.status(201).redirect("/admin/add-products");
+        const savedProduct = await newProduct.save();
 
+        // Parse and validate variants
+        let variants = [];
+        if (product.variants) {
+            try {
+                variants = JSON.parse(product.variants); // Parse the variants data
+            } catch (error) {
+                req.flash("error", "Invalid variants data");
+                return res.status(400).redirect('/admin/add-products');
+            }
+
+            if (!Array.isArray(variants) || variants.length === 0) {
+                req.flash("error", "At least one product variant is required");
+                return res.status(400).redirect('/admin/add-products');
+            }
+        } else {
+            req.flash("error", "Product variants are required");
+            return res.status(400).redirect('/admin/add-products');
+        }
+
+        // Create ProductVariant document
+        const productVariant = new ProductVariant({
+            product_id: savedProduct._id,
+            variant: variants.map((variant) => ({
+                color: variant.color,
+                size: variant.size,
+                stock: variant.stock,
+                regularPrice: variant.regularPrice,
+                salePrice: variant.salePrice || 0,
+                status: "Active",
+            })),
+        });
+
+        await productVariant.save();
+
+        req.flash("success", "Product and variants added successfully");
+        res.status(201).redirect("/admin/add-products");
     } catch (error) {
-        console.error("Error saving product:", error);
-        res.status(500).redirect('/pageerror');
+        console.error("Error adding product:", error);
+        req.flash("error", "Something went wrong. Please try again.");
+        res.status(500).redirect('/admin/add-products');
     }
 };
 
-const getAllProducts = async(req,res)=>{
+
+
+const getAllProducts = async (req, res) => {
     try {
         let search = req.query.search || "";
-        let page = parseInt(req.query.page , 10) || 1
+        let page = parseInt(req.query.page, 10) || 1;
 
         const limit = 4;
-        const productData = await Product.find(
-            {
-                $or : [
-                    { productName : { $regex : new RegExp(".*" + search + ".*")}}
-                ],
-            })
-            .limit(limit * 1)
+
+        // Fetch products
+        const productData = await Product.find({
+            $or: [
+                { productName: { $regex: new RegExp(".*" + search + ".*"), $options: "i" } },
+            ],
+        })
+            .limit(limit)
             .skip((page - 1) * limit)
             .populate('category')
             .exec();
-            const count = await Product.find({
-                $or : [
-                    { productName: { $regex: new RegExp(".*" + search + ".*") } }
-                ]
-            }).countDocuments();
 
-            const category = await Category.find({isListed : true});
+        // Fetch total product count
+        const count = await Product.countDocuments({
+            $or: [
+                { productName: { $regex: new RegExp(".*" + search + ".*"), $options: "i" } },
+            ],
+        });
 
-            if(category){
-                res.render("products",{
-                    data : productData,
-                    category : category,
-                    totalPages : Math.ceil(count/limit),
-                    currentPage: page
-                })
-            }else{
-                req.flash("error","Category not found,Please try again");
-                req.redirect("/admin/products")
-            }
+        // Fetch categories
+        const category = await Category.find({ isListed: true });
 
+        // Attach variants to each product
+        const productsWithVariants = await Promise.all(
+            productData.map(async (product) => {
+                const productVariants = await ProductVariant.findOne({ product_id: product._id });
+                return {
+                    ...product.toObject(),
+                    variants: productVariants ? productVariants.variant : [],
+                };
+            })
+        );
+
+        if (category) {
+            res.render("products", {
+                data: productsWithVariants,
+                category: category,
+                totalPages: Math.ceil(count / limit),
+                currentPage: page,
+            });
+        } else {
+            req.flash("error", "Category not found. Please try again.");
+            res.redirect("/admin/products");
+        }
     } catch (error) {
-        res.redirect("/pageerror")
+        console.error("Error fetching products:", error);
+        res.redirect("/pageerror");
     }
-}
+};
 
 
 
@@ -302,6 +352,149 @@ const unblockProducts = async(req,res)=>{
 }
 
 
+
+
+
+const getProductDetails = async (req, res) => {
+    try {
+        const productId = req.params.id;
+        const product = await Product.findById(productId)
+            .populate("category")
+            .exec()
+
+         // Fetch the variants for the product
+         const productVariant = await ProductVariant.findOne({ product_id: productId });
+
+         // Extract the variants array
+         const variants = productVariant ? productVariant.variant : [];
+
+        if (!product) {
+            req.flash("error", "Product not found");
+            return res.redirect("/products");
+        }
+
+        res.render("admin-product-details", { product,variants });
+    } catch (error) {
+        console.error(error);
+        res.redirect("/pageerror");
+    }
+};
+
+const getEditVariant = async (req, res) => {
+    try {
+        const variantId = req.params.id;
+
+        // Find the document containing the specific variant ID
+        const productVariant = await ProductVariant.findOne({ "variant._id": variantId });
+
+        if (!productVariant) {
+            return res.status(404).send('Variant not found');
+        }
+
+        // Find the specific variant inside the array
+        const targetVariant = productVariant.variant.find(v => v._id.toString() === variantId);
+        if (!targetVariant) {
+            return res.status(404).send('Variant not found');
+        }
+
+        const product = await Product.findById(productVariant.product_id);
+
+        res.render('edit-variant', {
+            variant: targetVariant,
+            product,
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Server Error');
+    }
+};
+
+
+const editVariant = async (req, res) => {
+    try {
+        const variantId = req.params.id;
+        const { color, size, stock, regularPrice, salePrice, status } = req.body;
+
+        // Find the document containing the variant
+        const productVariant = await ProductVariant.findOne({ "variant._id": variantId });
+
+        if (!productVariant) {
+            return res.status(404).send('Variant not found');
+        }
+
+        // Find the specific variant within the array
+        const targetVariant = productVariant.variant.find(v => v._id.toString() === variantId);
+        if (targetVariant) {
+            // Update the fields of the variant
+            targetVariant.color = color;
+            targetVariant.size = size;
+            targetVariant.stock = stock;
+            targetVariant.regularPrice = regularPrice;
+            targetVariant.salePrice = salePrice;
+            targetVariant.status = status;
+
+            // Save the updated document
+            await productVariant.save();
+        } else {
+            return res.status(404).send('Variant not found');
+        }
+
+        res.redirect(`/admin/product-details/${productVariant.product_id}`);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Server Error');
+    }
+};
+
+const addVariant = async (req, res) => {
+    try {
+        const { color, size, regularPrice, salePrice, stock } = req.body;
+        const productId = req.params.id;
+
+        const variant = {
+            color,
+            size,
+            regularPrice,
+            salePrice,
+            stock
+        };
+
+        await ProductVariant.updateOne(
+            { product_id: productId },
+            { $push: { variant } },
+            { upsert: true }
+        );
+
+        res.redirect(`/admin/product-details/${productId}`);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Server Error');
+    }
+};
+
+const deleteVariant = async (req, res) => {
+    try {
+        const variantId = req.params.id;
+
+        const variantDoc = await ProductVariant.findOneAndUpdate(
+            { "variant._id": variantId },
+            { $pull: { variant: { _id: variantId } } }
+        );
+
+        if (!variantDoc) {
+            return res.status(404).send('Variant not found');
+        }
+
+        res.redirect(`/admin/product-details/${variantDoc.product_id}`);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Server Error');
+    }
+};
+
+
+
+
 module.exports = {
     getProduct,
     addProducts,
@@ -312,5 +505,10 @@ module.exports = {
     deleteImage,
     restoreProduct,
     blockProducts,
-    unblockProducts
+    unblockProducts,
+    getProductDetails,
+    getEditVariant,
+    editVariant,
+    addVariant,
+    deleteVariant
 }

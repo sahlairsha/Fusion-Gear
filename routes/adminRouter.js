@@ -50,10 +50,17 @@ router.post("/admin/editproducts/:id", adminAuth, editUploads.array("image", 4),
 router.post("/deleteImage", adminAuth, productController.deleteImage);
 router.get("/admin/deleteproducts", adminAuth, productController.deleteProducts);
 router.get("/admin/restoreproducts", adminAuth, productController.restoreProduct);
+router.get('/admin/product-details/:id',adminAuth,productController.getProductDetails)
 
 router.get('/admin/blockedproduct', adminAuth, productController.blockProducts);
 router.get('/admin/unblockedproduct', adminAuth, productController.unblockProducts);
 
+
+//edit product variants:
+router.get('/admin/editvariant/:id',adminAuth,productController.getEditVariant)
+router.post('/admin/editvariant/:id',adminAuth,productController.editVariant)
+router.post('/admin/addvariant/:id', adminAuth,productController.addVariant);
+router.post('/admin/deletevariant/:id', adminAuth,productController.deleteVariant);
 
 // Order Management 
 

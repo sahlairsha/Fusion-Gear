@@ -1,0 +1,212 @@
+<%- include('../../views/partials/user/header') %>
+
+
+<style>
+    .cancel-confirm-container {
+        width: 90%;
+        max-width: 600px;
+        margin: 50px auto;
+        background: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        text-align: center;
+    }
+
+    .cancel-confirm-container h3 {
+        color: #333;
+        margin-bottom: 20px;
+    }
+
+    .cancel-confirm-container p {
+        color: #555;
+        margin-bottom: 20px;
+    }
+
+    .cancel-confirm-container .btn {
+        padding: 10px 20px;
+        font-size: 16px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        margin: 5px;
+    }
+
+    .btn-confirm {
+        background-color: #d33;
+        color: #fff;
+    }
+
+    .btn-confirm:hover {
+        background-color: #a00;
+    }
+
+    .btn-cancel {
+        background-color: #3085d6;
+        color: #fff;
+    }
+
+    .btn-cancel:hover {
+        background-color: #1a73e8;
+    }
+
+    .order-summary {
+        margin-bottom: 20px;
+        text-align: left;
+    }
+
+    .order-summary h5 {
+        color: #333;
+        margin-bottom: 10px;
+    }
+
+    .order-summary p {
+        color: #555;
+    }
+
+    .product-img {
+        max-width: 100px;
+        margin: 5px 0;
+        display: block;
+        border-radius: 5px;
+    }
+
+    /* Form styles */
+    form {
+        text-align: left;
+        margin-top: 20px;
+    }
+
+    form p {
+        font-weight: bold;
+        color: #333;
+    }
+
+    .radio-group {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-bottom: 15px;
+    }
+
+    .radio-group label {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: #555;
+        font-size: 14px;
+    }
+
+    .radio-group input[type="radio"] {
+        accent-color: #3085d6;
+        transform: scale(1.2);
+        margin-right: 5px;
+    }
+
+    textarea {
+        width: 100%;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        padding: 10px;
+        font-size: 14px;
+        resize: none;
+        margin-top: 10px;
+    }
+
+    textarea:focus {
+        border-color: #3085d6;
+        outline: none;
+        box-shadow: 0 0 5px rgba(48, 133, 214, 0.5);
+    }
+
+</style>
+
+<div class="cancel-confirm-container">
+    <h3>Confirm Order Cancellation</h3>
+    <p>Are you sure you want to cancel this order?</p>
+
+    <!-- Order Summary -->
+    <div class="order-summary">
+        <p><strong>Order ID:</strong> <%= orders._id %></p>  
+        <% orders.products.forEach(item => { %>
+        <img src="/uploads/public-image/<%= item.product_id.productImage[0] %>" 
+             alt="<%= item.product_id.productName %>" class="product-img">
+        <% }) %>
+        <p><strong>Total Price:</strong> ₹<%= orders.total_price %></p>
+        <p><strong>Current Status:</strong> <%= orders.order_status %></p>
+    </div>
+
+    <!-- Confirmation Form -->
+    <form id="reason-form" action="/orders/cancel/<%= orders._id %>" method="POST">
+        <p>Select a reason for cancellation:</p>
+        <div class="radio-group">
+            <label>
+                <input type="radio" name="reason" value="Ordered by mistake">
+                Ordered by mistake
+            </label>
+            <label>
+                <input type="radio" name="reason" value="Found a better price">
+                Found a better price 
+            </label>
+            <label>
+                <input type="radio" name="reason" value="Delivery is taking too long" >
+                Delivery is taking too long
+            </label>
+            <label>
+                <input type="radio" name="reason" value=" Item is no longer needed">
+                Item is no longer needed
+            </label>
+            <label>
+                <input type="radio" name="reason" value=" Wrong item ordered">
+                Wrong item ordered
+            </label>
+            <label>
+                <input type="radio" name="reason" value="Other">
+                Other
+            </label>
+            <div id="error" class="error-message"></div>
+        </div>
+
+        <textarea id="customReason" name="customReason" placeholder="Provide details (optional)" rows="3"></textarea>
+
+    
+        <button type="submit" class="btn btn-confirm">Yes, Cancel Order</button>
+    </form>
+    <a href="/order-details/<%= orders._id %>" class="btn btn-cancel">No, Go Back</a>
+</div>
+
+
+
+<script>
+
+document.getElementById('reason-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    const reason = document.querySelector('input[name="reason"]:checked');
+    const customReason = document.getElementById('customReason').value.trim();
+    const errorElement = document.getElementById('error');
+
+    // Clear any previous error messages
+    errorElement.innerText = '';
+
+    // Check if a reason is selected
+    if (!reason) {
+        errorElement.innerText = 'Please select a reason for cancellation.';
+        return;
+    }
+
+    // Check if "Other" is selected and customReason is empty
+    if (reason.value === 'Other' && customReason === '') {
+        errorElement.innerText = 'Please provide the other reason for cancellation.';
+        return;
+    }
+
+    // Submit the form if validation passes
+    this.submit();
+});
+
+</script>
+
+
+
+<%- include('../../views/partials/user/footer') %>

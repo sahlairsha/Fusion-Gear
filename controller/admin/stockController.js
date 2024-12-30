@@ -19,12 +19,27 @@ const getStocks = async(req,res)=>{
             .limit(limit * 1)
             .skip((page - 1) * limit)
             .populate('category','name')
+            .populate('variants')
             .exec();
             const count = await Product.find({
                 $or : [
                     { productName: { $regex: new RegExp(".*" + search + ".*") } }
                 ]
             }).countDocuments();
+
+
+            // Add status manually to variants
+productData.forEach(product => {
+    if (product.variants && product.variants.length) {
+        product.variants.forEach(variant => {
+            if (variant.stock > 0) {
+                variant.status = "Available";
+            } else {
+                variant.status = "Out of stock";
+            }
+        });
+    }
+});
 
         res.render('inventory',{
             products : productData,
@@ -38,9 +53,9 @@ const getStocks = async(req,res)=>{
 
 const addStock = async (req, res) => {
     const { productId } = req.params;
-    const { quantity } = req.body;
+    const { stock } = req.body;
 
-    if (quantity <= 0) {
+    if (stock <= 0) {
         return res.status(400).json({ error: "Quantity must be greater than zero." });
     }
 
@@ -50,7 +65,7 @@ const addStock = async (req, res) => {
             return res.status(404).json({ error: "Product not found." });
         }
 
-        product.quantity += quantity;
+        product.stock += stock;
         await product.save();
 
         res.status(200).json({ message: "Stock added successfully.", product });
@@ -61,9 +76,9 @@ const addStock = async (req, res) => {
 
 const reduceStock = async (req, res) => {
     const { productId } = req.params;
-    const { quantity } = req.body; // Quantity to reduce
+    const { stock } = req.body; // Quantity to reduce
 
-    if (quantity <= 0) {
+    if (stock <= 0) {
         return res.status(400).json({ error: "Quantity must be greater than zero." });
     }
 
@@ -73,11 +88,11 @@ const reduceStock = async (req, res) => {
             return res.status(404).json({ error: "Product not found." });
         }
 
-        if (product.quantity < quantity) {
+        if (product.stock < stock) {
             return res.status(400).json({ error: "Insufficient stock." });
         }
 
-        product.quantity -= quantity;
+        product.stock -= stock;
         await product.save();
 
         res.status(200).json({ message: "Stock reduced successfully.", product });
@@ -91,7 +106,7 @@ const getLowStockProducts = async (req, res) => {
     const stockThreshold = threshold ? parseInt(threshold, 10) : 10;
 
     try {
-        const products = await Product.find({ quantity: { $lt: stockThreshold }, isDeleted: false });
+        const products = await Product.find({ 'variants.stock': { $lt: stockThreshold }, isDeleted: false });
         res.status(200).json({ message: "Low stock products retrieved.", products });
     } catch (err) {
         res.status(500).json({ error: "Internal server error.", details: err.message });
