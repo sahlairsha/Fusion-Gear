@@ -415,11 +415,7 @@ function validateForm() {
     clearErrorMessages();
     const name = document.getElementsByName('productName')[0].value;
     const description = document.getElementById('descriptionid').value;
-    const color = document.getElementById("variantColor").value.trim();
-    const size = document.getElementById("variantSize").value.trim();
-    const stock = document.getElementById("variantStock").value.trim();
-    const price = document.getElementById("variantRegularPrice").value.trim();
-    const salePrice = document.getElementById("variantSalePrice").value.trim();
+
     const category = document.getElementsByName('category')[0].value;
     let isValid = true;
 
@@ -433,52 +429,7 @@ function validateForm() {
         isValid = false;
     }
 
-    if (!/^\d+(\.\d{1,2})?$/.test(price) || parseFloat(price) < 0) {
-        displayErrorMessage('regularPrice-error', 'Please enter a valid price.');
-        isValid = false;
-    }
-
-    if (!/^\d+(\.\d{1,2})?$/.test(salePrice) ) {
-        displayErrorMessage('salePrice-error', "Please Enter this field");
-        isValid = false;
-    }else if(parseFloat(salePrice) < 0 ){
-        displayErrorMessage('salePrice-error', 'Please enter a non-negative price.');
-        isValid = false;
-    }else if( parseFloat(salePrice) >= parseFloat(price)){
-        displayErrorMessage('salePrice-error', 'Sale price should be less than regular price')
-        isValid = false;
-    }
-
-    if (parseInt(stock) < 0 ) {
-        displayErrorMessage('stock-error', 'Please enter a valid non-negative stock.');
-        isValid = false;
-    }
-
-    if(parseInt(stock) == 0){
-        displayErrorMessage('stock-error', 'Please enter a the stock of the product.');
-        isValid = false;
-    }
-
-    if(stock == ""){
-        displayErrorMessage('stock-error', 'Please enter a this Field.');
-        isValid = false;
-    }
-
-    if(size == ""){
-        displayErrorMessage('size-error', 'Please enter a this Field.');
-        isValid = false;
-    }
-
-    if (selectedImages.length === 0) {
-        displayErrorMessage('image-error', 'Please upload at least one image.');
-        isValid = false;
-    }
-
-
-    if (color.trim() === "") {
-                displayErrorMessage('color-error', 'Please enter a color.');
-                isValid = false;
-    }
+ 
 
 
     return isValid;

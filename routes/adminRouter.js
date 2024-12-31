@@ -72,8 +72,8 @@ router.post('/admin/orders/cancel/:id',adminAuth, orderController.cancelOrderAdm
 
 
 // Stock Management
-router.put("/stock/add/:productId",adminAuth,stockController.addStock);
-router.put("/stock/reduce/:productId",adminAuth,stockController.reduceStock);
+router.put("/stock/add/:productId/:variantId",adminAuth,stockController.addStock);
+router.put("/stock/reduce/:productId/:variantId",adminAuth,stockController.reduceStock);
 router.get('/admin/blockStock', adminAuth, stockController.blockedStock);
 router.get('/admin/unblockStock', adminAuth, stockController.unblockedStock)
 

@@ -77,7 +77,7 @@ const addProducts = async (req, res) => {
         let variants = [];
         if (product.variants) {
             try {
-                variants = JSON.parse(product.variants); // Parse the variants data
+                variants = JSON.parse(product.variants); 
             } catch (error) {
                 req.flash("error", "Invalid variants data");
                 return res.status(400).redirect('/admin/add-products');
@@ -101,7 +101,7 @@ const addProducts = async (req, res) => {
                 stock: variant.stock,
                 regularPrice: variant.regularPrice,
                 salePrice: variant.salePrice || 0,
-                status: "Active",
+                status: "Available",
             })),
         });
 
@@ -476,21 +476,25 @@ const deleteVariant = async (req, res) => {
     try {
         const variantId = req.params.id;
 
+        // Pull the variant from the 'variant' array
         const variantDoc = await ProductVariant.findOneAndUpdate(
             { "variant._id": variantId },
-            { $pull: { variant: { _id: variantId } } }
+            { $pull: { variant: { _id: variantId } } },
+            { new: true } 
         );
 
         if (!variantDoc) {
             return res.status(404).send('Variant not found');
         }
 
+        
         res.redirect(`/admin/product-details/${variantDoc.product_id}`);
     } catch (error) {
         console.error(error);
         res.status(500).send('Server Error');
     }
 };
+
 
 
 

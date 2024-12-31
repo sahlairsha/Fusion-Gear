@@ -54,9 +54,9 @@
                     <td class="description"><%= product.description %></td>
                     <td><%= product.category ? product.category.name : 'No Category' %></td>
                  
-                   <% if (product.variants && product.variants.length > 0) { %>
+                <% if (product.variants && product.variants.length > 0) { %>
                  <% product.variants.forEach((variant, variantIndex) => { %>
-                     <% if (variantIndex !== -1) { %>
+                     <% if (variantIndex == 0) { %>
                                 <td><%= variant.salePrice %></td>
                                 <td><%= variant.stock %></td>
                                 <td><%= variant.color %></td>
