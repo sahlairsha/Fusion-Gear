@@ -1,7 +1,7 @@
 const Order = require('../../models/orderSchema');
 const Address = require('../../models/addressSchema')
 const Product = require('../../models/productSchema')
-
+const ProductVariant = require('../../models/productVariantSchema')
 const User = require('../../models/userSchema')
 
 
@@ -9,10 +9,34 @@ async function calculateCartTotals(userId) {
     const user = await User.findById(userId).populate('cart.product_id');
     const cartItems = user.cart.filter(item => item.product_id);
 
-    // Calculate cart total
-    const cartTotal = cartItems.reduce((total, item) => {
-        return total + (item.product_id.salePrice * item.quantity);
-    }, 0);
+    console.log("Items in cart : ", cartItems);
+
+    let cartTotal = 0;
+
+    for (const item of cartItems) {
+        if (item.product_id) {
+            // Fetch the corresponding variant from the ProductVariant collection by product_id
+            const productVariant = await ProductVariant.findOne({ product_id: item.product_id._id });
+
+            console.log("Product variants:", productVariant);
+
+            if (productVariant && productVariant.variant.length > 0) {
+                // Get the first variant (or any logic you want to choose a variant)
+                const variant = productVariant.variant[0];  // Picking the first variant as default
+
+                
+                const price = variant.salePrice || variant.regularPrice;
+                cartTotal += price * item.quantity;
+                console.log("Product variant price:", price);
+            } else {
+                console.log(`No variants found for product ${item.product_id._id}`);
+            }
+        } else {
+            console.log("Item missing product_id:", item);
+        }
+
+        console.log("Product Items for search:", item.product_id._id);
+    }
 
     const shippingCharges = cartTotal > 500 ? 0 : 50;
     const netAmount = cartTotal + shippingCharges;
@@ -25,32 +49,61 @@ async function calculateCartTotals(userId) {
         netAmount: netAmount.toFixed(2),
     };
 }
-
-
 const getCheckout = async (req, res) => {
     try {
         const userId = req.session.user;
-      const savedAddress = await Address.find({user_id : userId})
+        if (!userId) {
+            req.flash('error', "Please login to proceed.");
+            return res.redirect('/login');
+        }
 
-        const user = userId ? await User.findById(userId).populate('cart.product_id') : null
-        const orderProducts = user.cart.map(item => ({
-            product_id: item.product_id._id,
-            quantity: item.quantity,
-        }));
+        const savedAddress = await Address.find({ user_id: userId });
+        const user = await User.findById(userId).populate('cart.product_id');
 
-        if (orderProducts.length === 0) {
+        if (!user || user.cart.length === 0) {
             req.flash('error', "Cart is empty! Please add a product.");
             return res.redirect('/cart');
         }
 
+        // Add variant data to cart items and check for valid product_id
+        for (let item of user.cart) {
+            if (item.product_id) {  // Check if product_id exists
+                try {
+                    const productVariant = await ProductVariant.findOne({ product_id: item.product_id._id });
+                    if (productVariant && productVariant.variant.length > 0) {
+                        const variant = productVariant.variant[0]; // Selecting the first variant as the default
+                        item.variant = variant; // Assign the variant to the item
+                    }
+                } catch (err) {
+                    console.error('Error fetching product variant:', err);
+                }
+            } else {
+                console.warn('Product ID is missing for item:', item);
+            }
+        }
 
-        const updatedCartTotals = await calculateCartTotals(userId)
+        // Now safely map order products
+        const orderProducts = user.cart
+            .filter(item => item.product_id)  // Only include items with a valid product_id
+            .map(item => ({
+                product_id: item.product_id._id,
+                quantity: item.quantity,
+            }));
 
+        if (orderProducts.length === 0) {
+            req.flash('error', "No valid products in the cart. Please add a product.");
+            return res.redirect('/cart');
+        }
+
+        // Calculate cart totals with variants
+        const updatedCartTotals = await calculateCartTotals(userId);
+
+        // Render the checkout page
         res.render('checkout', {
             user,
             address: savedAddress,
-            cartCount : orderProducts.length,
-            ...updatedCartTotals
+            cartCount: orderProducts.length,
+            ...updatedCartTotals,
         });
     } catch (error) {
         console.error("Error loading checkout page:", error);
@@ -58,6 +111,7 @@ const getCheckout = async (req, res) => {
         res.redirect('/cart');
     }
 };
+
 
 const saveAddress = async (req, res) => {
     const userId = req.session.user;
@@ -231,12 +285,8 @@ function getRandomDeliveryDate() {
     const { payment_method } = req.body;
 
     const user = await User.findById(userId).populate('cart.product_id');
-    const cartItems = user.cart
-
-    if(cartItems.length === 0 ){
-        return res.status(400).json({ message: 'Your cart is empty.' });
-    }
-
+    const cartItems = user.cart.filter(item => item.product_id); // Only include items with a valid product_id
+    console.log('Valid Cart items:', cartItems); // Log valid cart items
 
     const addressDoc = await Address.findOne({ user_id: userId });
     const selectedIndex = addressDoc.address.findIndex(addr => addr._id.equals(addressId));
@@ -245,13 +295,26 @@ function getRandomDeliveryDate() {
         return res.status(404).json({ message: "Address not found" });
     }
 
+    // Fetch the variant sale price for each item
+    let totalPrice = 0;
+    for (const item of cartItems) {
+        if (item.product_id) {
+            // Fetch the product variant based on the product
+            const productVariant = await ProductVariant.findOne({ product_id: item.product_id._id });
 
+            if (productVariant && productVariant.variant.length > 0) {
+                // Get the first variant (or you can implement a logic to choose a specific variant)
+                const variant = productVariant.variant[0];  // Use the first variant for simplicity
 
-    const totalPrice = cartItems.reduce((total, item) => {
-        return total + item.product_id.salePrice * item.quantity;
-    }, 0);
+                // Calculate the total price using the sale price of the variant
+                totalPrice += variant.salePrice * item.quantity;
+            } else {
+                console.error(`No variant found for product ${item.product_id._id}`);
+            }
+        }
+    }
 
-    const  deliveryDate = getRandomDeliveryDate()
+    const deliveryDate = getRandomDeliveryDate();
 
     const newOrder = new Order({
         user_id: userId,
@@ -266,30 +329,28 @@ function getRandomDeliveryDate() {
             addressDocId: addressDoc._id,
             addressIndex: selectedIndex,
         },
-        delivery_date :  deliveryDate 
+        delivery_date: deliveryDate,
     });
 
     await newOrder.save();
 
+    // Update product quantities in the database
     for (const item of cartItems) {
-        await Product.findByIdAndUpdate(
-            item.product_id._id,
-            { $inc: { quantity: -item.quantity } },
-            { new: true }
-        );
+        if (item.product_id) {
+            await Product.findByIdAndUpdate(
+                item.product_id._id,
+                { $inc: { quantity: -item.quantity } },
+                { new: true }
+            );
+        }
     }
 
- 
+    // Clear the cart after order confirmation
     user.cart = [];
     await user.save();
 
- 
-
     res.json({ message: 'Order confirmed successfully.' });
 };
-
-
-
 
 
 const getOrderConfirmation = async (req, res) => {
@@ -299,6 +360,19 @@ const getOrderConfirmation = async (req, res) => {
         const orders = await Order.find({ user_id: userId })
             .populate('products.product_id')
             .exec();
+  
+            for (let order of orders) {
+                for (let item of order.products) {
+                    const productVariant = await ProductVariant.findOne({ product_id: item.product_id._id });
+    
+                    if (productVariant) {
+                        // Attach variants to the order item
+                        item.variantDetails = productVariant.variant;
+                    } else {
+                        item.variantDetails = []; // No variants found
+                    }
+                }
+            }
 
             const user = userId ? await User.findById(userId) : null;
         res.render('order-confirmation', {
@@ -311,32 +385,50 @@ const getOrderConfirmation = async (req, res) => {
         res.redirect('/pagenotfound');
     }
 };
-
 const orderDetails = async (req, res) => {
-    const orderId = req.params.id;
+    try {
+        const orderId = req.params.id;
 
-    const user = req.session.user ? await User.findById(req.session.user) : null;
+        // Retrieve the user details
+        const user = req.session.user ? await User.findById(req.session.user) : null;
 
-    const orders = await Order.findById(orderId)
-        .populate({
-            path: 'products.product_id', 
-            select: 'productName color size productImage salePrice regularPrice' 
-        })
-        .populate('shippingAddress.addressDocId')
-        .exec();
+        // Fetch the order details with populated product and shipping address
+        const orders = await Order.findById(orderId)
+            .populate({
+                path: 'products.product_id',
+                select: 'productName productImage salePrice regularPrice',
+            })
+            .populate('shippingAddress.addressDocId')
+            .exec();
 
-    const specificAddress = orders.shippingAddress.addressDocId.address[orders.shippingAddress.addressIndex];
-   
-    console.log("Order with specific address:", specificAddress);
+        // Ensure the order exists
+        if (!orders) {
+            return res.redirect('/pagenotfound');
+        }
 
-    console.log("Order details :",orders)
+        // Fetch variant details for each product in the order
+        for (let item of orders.products) {
+            const productVariant = await ProductVariant.findOne({ product_id: item.product_id._id });
+            item.variantDetails = productVariant ? productVariant.variant : [];
+        }
 
-    res.render('order-details', { 
-        orders, 
-        shippingAddress: specificAddress, 
-        activePage: 'orders' ,
-        user
-    });
+        // Retrieve the specific address from the order's shipping details
+        const specificAddress = orders.shippingAddress.addressDocId.address[orders.shippingAddress.addressIndex];
+
+        console.log("Order with specific address:", specificAddress);
+        console.log("Order details:", orders);
+
+        // Render the order details page
+        res.render('order-details', {
+            orders,
+            shippingAddress: specificAddress,
+            activePage: 'orders',
+            user,
+        });
+    } catch (error) {
+        console.error("Error in Loading Order Details Page", error);
+        res.redirect('/pagenotfound');
+    }
 };
 
 

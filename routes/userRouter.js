@@ -72,8 +72,6 @@ router.get("/product-ratings",userAuth,userproductController.productRatings)
 
 
 
-//Coupon
-router.get("/coupon",userproductController.getCoupon)
 
 
 //user profile

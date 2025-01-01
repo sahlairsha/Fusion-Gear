@@ -1,16 +1,40 @@
 const Product = require("../../models/productSchema");
 const User = require("../../models/userSchema");
 const Order = require('../../models/orderSchema');
+const ProductVariant = require("../../models/productVariantSchema");
 
-// Helper function to calculate the cart totals
 async function calculateCartTotals(userId) {
     const user = await User.findById(userId).populate('cart.product_id');
     const cartItems = user.cart.filter(item => item.product_id);
 
-    // Calculate cart total
-    const cartTotal = cartItems.reduce((total, item) => {
-        return total + (item.product_id.salePrice * item.quantity);
-    }, 0);
+    console.log("Items in cart : ", cartItems);
+
+    let cartTotal = 0;
+
+    for (const item of cartItems) {
+        if (item.product_id) {
+            // Fetch the corresponding variant from the ProductVariant collection by product_id
+            const productVariant = await ProductVariant.findOne({ product_id: item.product_id._id });
+
+            console.log("Product variants:", productVariant);
+
+            if (productVariant && productVariant.variant.length > 0) {
+                // Get the first variant (or any logic you want to choose a variant)
+                const variant = productVariant.variant[0];  // Picking the first variant as default
+
+                
+                const price = variant.salePrice || variant.regularPrice;
+                cartTotal += price * item.quantity;
+                console.log("Product variant price:", price);
+            } else {
+                console.log(`No variants found for product ${item.product_id._id}`);
+            }
+        } else {
+            console.log("Item missing product_id:", item);
+        }
+
+        console.log("Product Items for search:", item.product_id._id);
+    }
 
     const shippingCharges = cartTotal > 500 ? 0 : 50;
     const netAmount = cartTotal + shippingCharges;
@@ -34,29 +58,51 @@ const getCartPage = async (req, res) => {
         const user = await User.findById(userId).populate('cart.product_id');
         const cartItems = user.cart.filter(item => item.product_id);
 
-        if(!userId){
-            req.flash('error',"Please login!!!")
-            res.redirect('/')
+        if (!userId) {
+            req.flash("error", "Please login!!!");
+            return res.redirect("/");
         }
 
         const countItems = cartItems.length;
         req.session.cartCount = countItems;
 
+        // Fetch the variants for each product in the cart
+        for (let item of cartItems) {
+            try {
+                const productVariant = await ProductVariant.findOne({ product_id: item.product_id._id });
 
-        const updatedCartTotals = await calculateCartTotals(userId); 
-        res.render('cart', {
+                if (productVariant && productVariant.variant.length > 0) {
+                    // Get the first variant (or select a specific one if needed)
+                    const variant = productVariant.variant[0];  // Picking the first variant as default
+
+                    // Add variant data to the cart item
+                    item.variant = variant;
+                    item.salePrice = variant.salePrice || variant.regularPrice;  // Use salePrice or fallback to regularPrice
+                } else {
+                    console.log(`No variants found for product ${item.product_id._id}`);
+                }
+            } catch (variantError) {
+                console.error('Error fetching product variant:', variantError);
+            }
+        }
+
+        // Now calculate the cart totals
+        const updatedCartTotals = await calculateCartTotals(userId);
+
+        // Render the cart page with updated cart items and totals
+        res.render("cart", {
             user,
             cartItems,
             ...updatedCartTotals,
-            couponMessage: '',
-            cartCount : req.session.cartCount
+            couponMessage: "",
+            cartCount: req.session.cartCount,
         });
 
     } catch (error) {
-        res.status(500).send('Error loading cart page');
+        console.log(error);
+        res.status(500).send("Error loading cart page");
     }
 };
-
 
 
 

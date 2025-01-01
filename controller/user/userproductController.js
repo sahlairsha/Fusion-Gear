@@ -2,11 +2,11 @@
 const Product = require("../../models/productSchema");
 const User = require("../../models/userSchema");
 const Category = require('../../models/categorySchema');
-
+const ProductVariant = require("../../models/productVariantSchema");
+const Coupon = require("../../models/couponSchema")
 
 const loadProducts = async (req, res) => {
     try {
-
         let category = decodeURIComponent(req.query.category || '').trim();
         let { priceRange, size, color } = req.query; 
         let search = req.query.search ? req.query.search.trim() : "";
@@ -22,45 +22,44 @@ const loadProducts = async (req, res) => {
 
         // Handle search query
         if (search) {
-           
             const matchingCategory = await Category.findOne({
                 name: { $regex: search, $options: 'i' },
             });
 
             query.$or = [
-                { productName: { $regex: search, $options: 'i' } }, 
-                { category: matchingCategory ? matchingCategory._id : null }, 
+                { productName: { $regex: search, $options: 'i' } },
+                { category: matchingCategory ? matchingCategory._id : null },
             ];
         }
 
         // Handle category filter (if explicitly selected)
         if (category) {
             const categoryData = await Category.findOne({
-                name: { $regex: `^${category}$` , $options: 'i' }
+                name: { $regex: `^${category}$`, $options: 'i' }
             });
             if (categoryData) {
                 filters.category = categoryData._id;
             }
         }
 
+        // Handle product variant filters (size, color)
+        let variantFilters = {};
         if (size) {
-            filters.size = { $regex: `^${size}$`, $options: 'i' };
+            variantFilters.size = { $regex: `^${size}$`, $options: 'i' };
         }
         
         if (color) {
-            filters.color = { $regex: `^${color}$`, $options: 'i' }; 
+            variantFilters.color = { $regex: `^${color}$`, $options: 'i' };
         }
-        
 
-        
         if (priceRange) {
             const [minPrice, maxPrice] = priceRange.split('-').map(Number);
             filters.salePrice = { $gte: minPrice, $lte: maxPrice };
         }
 
         let sortQuery = {};
-
-       
+        
+        // Sorting options
         switch (sort) {
             case 'popularity':
                 sortQuery = { views: -1 };
@@ -75,7 +74,7 @@ const loadProducts = async (req, res) => {
                 sortQuery = { 'ratings.average': -1 };
                 break;
             case 'featured':
-                sortQuery = { featured: -1, createdAt: -1};
+                sortQuery = { featured: -1, createdAt: -1 };
                 break;
             case 'newArrivals':
                 sortQuery = { createdAt: -1 };
@@ -94,26 +93,47 @@ const loadProducts = async (req, res) => {
         // Combine all filters with the base query
         Object.assign(query, filters);
 
-        // Query for products with the applied filters and sorting
         const productData = await Product.find(query)
             .limit(limit)
             .skip((page - 1) * limit)
             .sort(sortQuery)
             .exec();
 
+        // Query for the variants of the products (for filtering size/color)
+        const productIds = productData.map(product => product._id);
+        const variantsData = await ProductVariant.find({
+            product_id: { $in: productIds },
+            ...variantFilters
+        }).exec();
+
+        const productsWithVariants = await Promise.all(
+            productData.map(async (product) => {
+                const productVariants = await ProductVariant.findOne({ product_id: product._id });
+                const firstVariant = productVariants && productVariants.variant.length > 0 ? productVariants.variant[0] : null;
+                return {
+                    ...product.toObject(),
+                    variants: productVariants ? productVariants.variant : [],
+                    firstVariant, 
+                };
+            })
+        );
+        
+
+
         // Get the total count of products for pagination
         const count = await Product.countDocuments(query);
         const totalPages = Math.ceil(count / limit);
 
-        const user = req.session.user ? await User.findById(req.session.user).lean(): null;
+        const user = req.session.user ? await User.findById(req.session.user).lean() : null;
 
-        if(!user){
-           req.flash("error","Please Login!!");
-           res.redirect('/')
+        if (!user) {
+            req.flash("error", "Please Login!!");
+            res.redirect('/');
+            return;
         }
 
         const data = {
-            products: productData,
+            products: productsWithVariants, 
             totalPages,
             totalProduct: count,
             limit,
@@ -127,8 +147,6 @@ const loadProducts = async (req, res) => {
             user
         };
 
-
-      
         res.render("userproducts", data);
     } catch (error) {
         console.error("Error loading product page:", error);
@@ -149,16 +167,26 @@ const loadProductsDetails = async (req, res) => {
 
         await Product.findByIdAndUpdate(id, { $inc: { views: 1 } });
 
-        // Fetch product details
-        const productData = await Product.findById(id).populate('category').populate('reviews.user_id').exec();
-
         
+
+        // Fetch product details
+
+
+        const productData = await Product.findById(id).populate('category').populate('reviews.user_id').exec();
         if (!productData) {
             console.error(`Product not found with ID: ${id}`);
             req.flash("error", "Product not found");
             return res.redirect("/product/view");
         }
-
+        
+        // Attach variants to the product
+        const productVariants = await ProductVariant.findOne({ product_id: productData._id });
+        const productWithVariants = {
+            ...productData.toObject(),
+            variants: productVariants ? productVariants.variant : [],
+        };
+    
+        const coupons = await Coupon.findOne();
         
 
         const userData = req.session.user
@@ -166,8 +194,9 @@ const loadProductsDetails = async (req, res) => {
             : null;
         res.render("productlist", {
             user: userData,
-            product: productData,
+            product:  productWithVariants,
             category: productData.category,
+            coupons 
         });
 
     } catch (error) {
@@ -216,39 +245,6 @@ const productRatings = async(req,res)=>{
 
 
 
-const coupons = [
-    {
-        code: "DISCOUNT10",
-        discountType: "percentage",
-        discountValue: 10,
-        expiryDate: new Date("2024-12-31"),
-        minimumPurchase: 500,
-        usageLimit: 100,
-        description: "Get 10% off on your purchase of &#8377;500 or more. Valid until December 31, 2024."
-    },
-    {
-        code: "FLAT50",
-        discountType: "fixed",
-        discountValue: 50,
-        expiryDate: new Date("2024-11-30"),
-        minimumPurchase: 1000,
-        usageLimit: 50,
-        description: "Save &#8377;50 on your order of &#8377;1000 or more. Valid until November 30, 2024."
-    }
-];
-
-
-
-
-const getCoupon = async(req,res)=>{
-    try{
-        res.json({ coupons });
-    }catch(error){
-
-        res.status(500).json({error : "Something Wrong to load the coupons" })
-    }
-}
-
 
 
 
@@ -261,7 +257,6 @@ const getCoupon = async(req,res)=>{
 module.exports = {
     loadProducts,
     loadProductsDetails,
-    getCoupon,
     productRatings
 
 }

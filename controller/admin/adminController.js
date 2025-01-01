@@ -96,13 +96,15 @@ const logout = async (req, res) => {
 };
 
 
+
+
 module.exports = {
     loadLogin,
     getProfile,
     login,
     loadDashboard,
     pageerror,
-    logout
+    logout,
 }
 
 

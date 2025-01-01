@@ -43,12 +43,6 @@ const orderSchema = new mongoose.Schema({
         default: 'Pending'
 
     },
-    order_date: {
-
-        type: Date,
-        default: Date.now
-
-    },
     shippingAddress: {
         addressDocId: {
             type: mongoose.Schema.Types.ObjectId,
@@ -71,7 +65,7 @@ const orderSchema = new mongoose.Schema({
         custom: { type: String } 
     }
 
-});
+},{timestamps : true});
 
 const Order = mongoose.model('Order', orderSchema);
 

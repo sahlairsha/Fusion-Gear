@@ -1,6 +1,7 @@
 
 
 const Order = require('../../models/orderSchema');
+const ProductVariant = require('../../models/productVariantSchema');
 
 
 const getOrders = async (req, res) => {
@@ -86,6 +87,12 @@ const getDetails = async(req,res)=>{
         .populate('products.product_id')
         .populate('shippingAddress.addressDocId')
         .exec()
+
+
+        for (let item of orders.products) {
+            const productVariant = await ProductVariant.findOne({ product_id: item.product_id._id });
+            item.variantDetails = productVariant ? productVariant.variant : [];
+        }
 
     const specificAddress = orders.shippingAddress.addressDocId.address[orders.shippingAddress.addressIndex];
     console.log("Order with specific address:", specificAddress);

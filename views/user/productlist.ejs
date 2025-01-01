@@ -4,6 +4,13 @@
  <link rel="stylesheet" href="/css/user/productlist.css">
 
  <style>
+    input[type="radio"]:checked + label {
+    font-weight: bold;
+    color: #007bff;
+}
+#stock-status.text-danger {
+    color: red;
+}
     .ratings-reviews {
         position: absolute;
         top: 40%;
@@ -188,153 +195,144 @@
                 </div>
             </div>
             <div class="row">
+                <!-- Product Images Section -->
                 <div class="col-lg-3 col-md-3">
                     <ul class="nav nav-tabs" role="tablist">
                         <% for (let i = 0; i < product.productImage.length; i++) { %>
                         <li class="nav-item">
                             <a class="nav-link <%= i === 0 ? 'active' : '' %>" data-toggle="tab" href="#tabs-<%= i + 1 %>" role="tab">
-                                <img class="product__thumb__pic" src="/uploads/public-image/<%=product.productImage[i] %>">
+                                <img class="product__thumb__pic" src="/uploads/public-image/<%= product.productImage[i] %>">
                             </a>
                         </li>
                         <% } %>
                     </ul>
                 </div>
+            
+                <!-- Product Image Display -->
                 <div class="col-lg-6 col-md-9">
                     <div class="tab-content">
                         <% for (let i = 0; i < product.productImage.length; i++) { %>
-                          
                         <div class="tab-pane <%= i === 0 ? 'active' : '' %>" id="tabs-<%= i + 1 %>" role="tabpanel">
                             <% if (product.productImage && product.productImage.length > 0) { %>
-                            <div class="product__details__pic__item">
-                                  <div class="product-badge
-                                <%= product.status ? product.status.toLowerCase().replace(/ /g, '-') : 'available' %> ">
-                                <%= product.status %>
+                                <div class="product__details__pic__item">
+                                    <img class="product-image zoom" src="/uploads/public-image/<%= product.productImage[i] %>" data-zoom-image="/uploads/public-image/<%= product.productImage[i] %>" alt="">
                                 </div>
-                                 <img  class="product-image zoom" src="/uploads/public-image/<%= product.productImage[i] %>"  data-zoom-image="/uploads/public-image/<%= product.productImage[i] %>"    alt="">
-                               
-                            </div>
                             <% } else { %>
                                 <p>No images available for this product.</p>
-                             <% } %>
+                            <% } %>
                         </div>
                         <% } %>
                     </div>
                 </div>
-
-
+            
+                <!-- Ratings and Reviews Section -->
                 <div class="ratings-reviews">
                     <h2>Ratings & Reviews</h2>
                     <div class="rating-summary">
                         <div class="rating-number"><%= product.ratings.average.toFixed(1) || "0.0" %></div>
-<div>
-    <div class="stars">
-        <% for (let i = 0; i < 5; i++) { %>
-            <span><%= i < Math.round(product.ratings.average) ? "★" : "☆" %></span>
-        <% } %>
-    </div>
-    <div><%= product.ratings.count %> Ratings & <%= product.reviews.length %> Reviews</div>
-</div>
+                        <div>
+                            <div class="stars">
+                                <% for (let i = 0; i < 5; i++) { %>
+                                    <span><%= i < Math.round(product.ratings.average) ? "★" : "☆" %></span>
+                                <% } %>
+                            </div>
+                            <div><%= product.ratings.count %> Ratings & <%= product.reviews.length %> Reviews</div>
+                        </div>
                     </div>
-                   
-                <div id="rating-overview"></div>
-                <button id="rateProductBtn" data-product-id="<%= product._id %>">Rate Product</button>
-
-
+                    <div id="rating-overview"></div>
+                    <button id="rateProductBtn" data-product-id="<%= product._id %>">Rate Product</button>
+            
                     <h2>Reviews</h2>
-
-    <ul class="reviews-list">
-     
-        <% product.reviews.forEach(function(review){ %>
-            <li>            
-                <p><strong><%= review.user_id.full_name  %></strong></p>
-                <p><%= review.review %></p> 
-                <p>Rating: <%= review.rating %>★</p> 
-            </li>
-        <% }); %>
-       
-    </ul>
-</div>
-     
+                    <ul class="reviews-list">
+                        <% product.reviews.forEach(function(review) { %>
+                        <li>
+                            <p><strong><%= review.user_id.full_name %></strong></p>
+                            <p><%= review.review %></p>
+                            <p>Rating: <%= review.rating %>★</p>
+                        </li>
+                        <% }); %>
+                    </ul>
+                </div>
             </div>
+            
+            <!-- Product Details Section -->
             <div class="product__details__content">
                 <div class="container">
                     <div class="row d-flex justify-content-center">
                         <div class="col-lg-8">
-                            
                             <div class="product__details__text">
-                              
                                 <h4><%= product.productName %></h4>
-                              
-                                <h3>&#8377;<%= product.salePrice %> <span>&#8377;<%= product.regularPrice %>  </span></h3>
-                               
-                                    
-                                    <% if(product.quantity < 5 && product.quantity < 0) {%>
-                                        <p class="stock-left text-danger">Only <%= product.quantity%> left, Please hurry up!!</span>
-                                        <% }else { %>
-                                        <p class="stock-left text-danger"></span>
-                                        <% } %>
-
+            
+                                <!-- Only display once -->
                                 <p><%= product.description %></p>
-                                
-
-                                <div class="product__details__option">
-                                    <div class="product__details__option__size">
-                                        <span>Size:</span>
-                                        <% if (product.size && product.size.length > 0) { %>
-                                            <% product.size.forEach(size => { %>
-                                                <label for="<%= size %>"><%= size %>
-                                                    <input type="radio" id="<%= size %>">
-                                                </label>
-                                            <% }); %>
-                                        <% } else { %>
-                                            <span>Size:Not available</span>
-                                        <% } %>
-
-
-                                    </div>
-                                    <div class="product__details__option__color" >
-                                        <span>Color:</span>
-                                        <div class="color-options" id="colorOptionsContainer"><%= product.color%></div>
-                                    </div>
-
-
-
-
+            
+                                <!-- Display Price once -->
+                                <h3 id="productPrice">&#8377;<%= product.salePrice %></h3>
+            
+                                <!-- Stock Status and Size Selection -->
+                                <div class="product__details__option__size">
+                                    <span>Size:</span>
+                                    <% product.variants.forEach(function(variant, index) { %>
+                                        <label for="<%= variant.size %>">
+                                            <input type="radio" name="size" value="<%= variant.size %>" data-price="<%= variant.salePrice %>" 
+                                                data-stock="<%= variant.stock %>" data-variant-id="<%= variant._id %>" 
+                                                <%= index === 0 ? 'checked' : '' %> onchange="updateProductDetails(this)">
+                                            <%= variant.size %>
+                                        </label>
+                                    <% }); %>
+                                </div>
+                          
+            
+                                <!-- Add to Cart and Other Options -->
                                 <div class="product__details__cart__option">
-                               
                                     <div class="quantity">
                                         <div class="pro-qty">
                                             <input type="text" value="1">
                                         </div>
                                     </div>
-                                    <button class="add-cart-btn"><a href="#" onclick="addToCart('<%= product._id %>')" class="add-cart-link">+ Add to Cart</a>
+                                    <button class="add-cart-btn"><a href="#" onclick="addToCart('<%= product._id %>')" class="add-cart-link">+ Add to Cart</a></button>
                                 </div>
+            
+                                <!-- Other Actions -->
                                 <div class="product__details__btns__option">
-                                    <a href="#"><i class="fa fa-heart"></i> add to wishlist</a>
+                                    <a href="#"><i class="fa fa-heart"></i> Add to Wishlist</a>
                                     <a href="#"><i class="fa fa-exchange"></i> Add To Compare</a>
                                 </div>
+            
                                 <div class="product__details__last__option">
                                     <h5><span>Guaranteed Safe Checkout</span></h5>
                                     <img src="/img/shop-details/details-payment.png" alt="">
                                     <ul>
-                                        <li><span>Categories: <%=category.name%></span></li>
+                                        <li><span>Categories: <%= category.name %></span></li>
                                         <li><span>Tag:</span> Clothes, Skin, Body</li>
                                     </ul>
                                 </div>
-
                             </div>
-
-
+            
+                            <!-- Coupon Section -->
+                             <% if(coupons) {%>
                             <div id="couponSection">
                                 <h3>Available Coupons</h3>
-                                <div id="couponList"></div>
+                                <div id="couponList">
+                                    
+                                        <div class="coupon-item">
+                                            <div class="coupon-info">
+                                                <p><strong>Code:</strong> <%= coupons.code %></p>
+                                                <p><strong>Description:</strong> <%= coupons.description %></p>
+                                                <p><strong>Expires:</strong> <%= coupons.endDate %></p>
+                                            </div>
+                                            <button class="copy-button" onclick="copyCouponCode(this, '<%= coupons.code %>')">Copy Code</button>
+                                            <span class="copy-status"></span>
+                                        </div>
+                                 
+                                </div>
                             </div>
 
-                        </div>
+                            <% } %>
                     </div>
                 </div>
             </div>
-
+            
 </section>
 <!-- Shop Details Section End -->
 
@@ -493,6 +491,46 @@
 <script src="/js/user/zoom-image.js"></script>
 
 <script>
+document.addEventListener("DOMContentLoaded", function() {
+    // Trigger the update for the first selected size (if it's checked by default)
+    const firstRadioButton = document.querySelector('input[name="size"]:checked');
+    if (firstRadioButton) {
+        updateProductDetails(firstRadioButton);
+    }
+});
+
+function updateProductDetails(selectedSize) {
+    const selectedVariant = selectedSize.dataset;
+
+    // Update price
+    document.getElementById("productPrice").textContent = `₹${selectedVariant.price}`;
+
+    // Update stock status
+    const stockStatusElement = document.getElementById("stock-status");
+    const stock = parseInt(selectedVariant.stock);
+
+    if (stock < 5 && stock > 0) {
+        stockStatusElement.textContent = `Only ${stock} left, please hurry up!`;
+        stockStatusElement.classList.add("text-danger");
+    } else if (stock === 0) {
+        stockStatusElement.textContent = "Out of Stock";
+        stockStatusElement.classList.add("text-danger");
+    } else {
+        stockStatusElement.textContent = "In Stock";
+        stockStatusElement.classList.remove("text-danger");
+    }
+
+    // Optionally, save the selected variant ID if needed
+    const variantId = selectedVariant.variantId;
+    console.log(`Selected variant ID: ${variantId}`);
+}
+
+
+</script>
+
+<script>
+
+
 function formatDate(date) {
     const day = String(date.getDate()).padStart(2, '0');
     const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -500,51 +538,6 @@ function formatDate(date) {
     return `${day}-${month}-${year}`;
 }
 
-
-async function fetchCoupons() {
-    try {
-        // Fetch coupon data from the server
-        const response = await fetch('http://localhost:3001/coupon');
-        
-        // Check if the request was successful
-        if (!response.ok) {
-            throw new Error("Failed to fetch coupons");
-        }
-
-        const data = await response.json();
-        
-        // Get the coupon list container
-        const couponList = document.getElementById('couponList');
-
-        // Loop through each coupon and create HTML dynamically
-        data.coupons.forEach(coupon => {
-            const couponItem = document.createElement('div');
-            couponItem.classList.add('coupon-item');
-
-
-            const formattedExpiryDate = formatDate(new Date(coupon.expiryDate));
-
-            // Add coupon info
-            couponItem.innerHTML = `
-                <div class="coupon-info">
-                    <p><strong>Code:</strong> ${coupon.code}</p>
-                    <p><strong>Description:</strong> ${coupon.description}</p>
-                    <p><strong>Expires:</strong> ${formattedExpiryDate}</p>
-                </div>
-                <button class="copy-button" onclick="copyCouponCode(this, '${coupon.code}')">Copy Code</button>
-                <span class="copy-status"></span>
-            `;
-
-            // Append the coupon item to the coupon list
-            couponList.appendChild(couponItem);
-        });
-    } catch (error) {
-        console.error('Error fetching coupons:', error);
-    }
-}
-
-// Fetch the coupons when the page loads
-document.addEventListener('DOMContentLoaded', fetchCoupons);
 
 // Function to copy coupon code to clipboard
 function copyCouponCode(button, code) {

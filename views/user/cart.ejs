@@ -240,10 +240,6 @@ input[type="number"]::-webkit-inner-spin-button {
 <!-- Shopping Cart Section Begin -->
 <section class="shopping-cart spad">
     <div class="container">
-        <!-- Address Section -->
-        
-
-
         <!-- Cart Table -->
         <div class="row">
             <div class="col-lg-8">
@@ -253,6 +249,7 @@ input[type="number"]::-webkit-inner-spin-button {
                             <tr>
                                 <th>Product</th>
                                 <th>Quantity</th>
+                             
                                 <th></th>
                             </tr>
                         </thead>
@@ -265,16 +262,17 @@ input[type="number"]::-webkit-inner-spin-button {
                                         </div>
                                         <div class="product__cart__item__text">
                                             <h6><%= item.product_id.productName %></h6>
-                                            <h5>Price: ₹<%= item.product_id.salePrice %></h5>
+                                            <h5>Price: ₹<%= item.variant.salePrice %></h5> <!-- Use variant's salePrice -->
                                         </div>
                                     </td>
                                     <td class="quantity__item">
                                         <div class="quantity">
-                                            <button class="btn-decrement" data-available-stock="<%= item.product_id.quantity  %>" data-product-id="<%= item.product_id._id %>">-</button>
+                                            <button class="btn-decrement" data-available-stock="<%= item.variant.stock %>" data-product-id="<%= item.product_id._id %>">-</button>
                                             <input type="number" value="<%= item.quantity %>" min="1" data-product-id="<%= item.product_id._id %>" class="quantity-input">
-                                            <button class="btn-increment" data-available-stock="<%= item.product_id.quantity  %>" data-product-id="<%= item.product_id._id %>">+</button>
+                                            <button class="btn-increment" data-available-stock="<%= item.variant.stock %>" data-product-id="<%= item.product_id._id %>">+</button>
                                         </div>
                                     </td>
+                                    
                                     <td class="cart__close">
                                         <a href="#" class="remove-item" data-product-id="<%= item.product_id._id %>"><i class="fa fa-close"></i></a>
                                     </td>
@@ -282,11 +280,8 @@ input[type="number"]::-webkit-inner-spin-button {
                             <% }) %>
                         </tbody>
                     </table>
-
-
                 </div>
-                    <button class="continue__btn"><a class="continue__link" href="/products">Continue to shopping</a></button>
-
+                <button class="continue__btn"><a class="continue__link" href="/products">Continue to shopping</a></button>
             </div>
             <!-- Cart Summary -->
             <div class="col-lg-4">
@@ -308,103 +303,9 @@ input[type="number"]::-webkit-inner-spin-button {
     </div>
 </div>
 </section>
+<!-- Shopping Cart Section End -->
 
 <script>
-
-// Attach event listener to dynamically loaded content
-document.addEventListener('click', async (event) => {
-    if (event.target.closest('.remove-item')) {
-        event.preventDefault(); // Prevent default behavior
-
-        const productId = event.target.closest('.remove-item').getAttribute('data-product-id');
-
-        try {
-            const response = await fetch(`/cart/delete/${productId}`, {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            });
-
-            const data = await response.json();
-
-            if (response.ok) {
-                event.target.closest('tr').remove();
-                updateCartUI(data);
-
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Removed',
-                    text: 'Product removed from cart successfully!',
-                });
-            } else {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Failed',
-                    text: data.message || 'Failed to remove item',
-                });
-            }
-        } catch (error) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'Error removing item',
-            });
-        }
-    }
-});
-
-function updateCartUI(data) {
-    document.querySelector('#cartTotal').textContent = `₹${data.cartTotal}`;
-    document.querySelector('#discount').textContent = `-₹${data.discount}`;
-    document.querySelector('#netAmount').textContent = `₹${data.netAmount}`;
-    document.querySelector('#couponMessage').textContent = data.couponMessage || '';
-}
-
-</script>
-
-
-<script>
-    // Remove item from cart logic
-    document.addEventListener('click', async (event) => {
-        if (event.target.closest('.remove-item')) {
-            event.preventDefault();
-            const productId = event.target.closest('.remove-item').getAttribute('data-product-id');
-
-            try {
-                const response = await fetch(`/cart/delete/${productId}`, {
-                    method: 'DELETE',
-                    headers: { 'Content-Type': 'application/json' }
-                });
-
-                const data = await response.json();
-
-                if (response.ok) {
-                    event.target.closest('tr').remove();
-                    updateCartUI(data);
-
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Removed',
-                        text: 'Product removed from cart successfully!',
-                    });
-                } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Failed',
-                        text: data.message || 'Failed to remove item',
-                    });
-                }
-            } catch (error) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'Error removing item',
-                });
-            }
-        }
-    });
-
     // Update Cart Quantity Logic
     document.addEventListener('click', async (event) => {
         if (event.target.closest('.btn-increment') || event.target.closest('.btn-decrement')) {
@@ -469,9 +370,50 @@ function updateCartUI(data) {
         document.querySelector('#netAmount').textContent = `₹${data.netAmount}`;
     }
 
-    // Prevent checkout if stock exceeds available limit
-    document.querySelector('.primary-btn').addEventListener('click', async (event) => {
-        event.preventDefault(); // Prevent navigation to the checkout page initially
+    // Remove item from cart logic
+    document.addEventListener('click', async (event) => {
+        if (event.target.closest('.remove-item')) {
+            event.preventDefault();
+            const productId = event.target.closest('.remove-item').getAttribute('data-product-id');
+
+            try {
+                const response = await fetch(`/cart/delete/${productId}`, {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    event.target.closest('tr').remove();
+                    updateCartUI(data);
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Removed',
+                        text: 'Product removed from cart successfully!',
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Failed',
+                        text: data.message || 'Failed to remove item',
+                    });
+                }
+            } catch (error) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Error removing item',
+                });
+            }
+        }
+    });
+
+
+      // Prevent checkout if stock exceeds available limit
+      document.querySelector('.primary-btn').addEventListener('click', async (event) => {
+        event.preventDefault();
 
         const quantityInputs = document.querySelectorAll('.quantity-input');
         let hasInvalidStock = false;

@@ -289,7 +289,7 @@
     </div>
 
     <% orders.forEach(order => { %>
-        <div class="order-card"  data-order-id="<%= order._id %>">
+        <div class="order-card" data-order-id="<%= order._id %>">
             <% order.products.forEach(product => { %>
                 <div class="order-content">
                     <div class="product-info">
@@ -297,9 +297,18 @@
                              alt="<%= product.product_id.productName %>">
                         <div class="product-details">
                             <h6><%= product.product_id.productName %></h6>
-                            <p>Color: <%= product.product_id.color %></p>
-                            <p>Size: <%= product.product_id.size %></p>
-                            <p>Quantity: <%= product.quantity %></p>
+
+                            <!-- Display variant details if available -->
+                            <% if (product.variantDetails && product.variantDetails.length > 0) { %>
+                                <% product.variantDetails.forEach(variant => { %>
+                                    <p>Color: <%= variant.color %></p>
+                                    <p>Size: <%= variant.size %></p>
+                                    <p>Quantity: <%= product.quantity %></p>
+                                    <h6>Price: ₹<%= variant.salePrice || variant.regularPrice %></h6>
+                                <% }); %>
+                            <% } else { %>
+                                <p>No variant details available</p>
+                            <% } %>
                         </div>
                     </div>
 
@@ -312,26 +321,26 @@
                         <% if (order.delivery_date) { %>
                             <p>Delivered On: <%= new Date(order.delivery_date).toLocaleDateString() %></p>
                         <% } %>
-                        <h6>Price: ₹<%= product.product_id.salePrice || product.product_id.regularPrice %></h6>
-                        <h5 class="mt-2 ml-2">Total Price: ₹<%= order.total_price %></h5>     
+                        <h5 class="mt-2 ml-2">Total Price: ₹<%= order.total_price %></h5>
                     </div>
                 </div>
-            <% }) %>
-           
+            <% }); %>
+
+            <!-- Order summary -->
             <div class="order-summary">
-           
                 <% if (order.order_status === 'Delivered') { %>
                     <% order.products.forEach(product => { %>
                         <a href="/ratings/?id=<%= product.product_id._id %>" class="rate-btn mb-5">
                             Rate & Review <%= product.product_id.productName %>
                         </a>
-                        <% }) %>
+                    <% }); %>
                 <% } %>
             </div>
         </div>
-    <% }) %>
+    <% }); %>
     <a href="/products" class="btn go-to-shop-btn">Continue Shopping</a>
 </div>
+
 
 <script>
  document.addEventListener("DOMContentLoaded", function () {

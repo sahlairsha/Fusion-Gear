@@ -1,73 +1,89 @@
 <%-include('../../views/partials/user/header') %>
     <style>
 
-        .product-overlay{
-            height: 70%;
-        }
-        
-    .stock-left{
-    font-weight: 600;
-    font-size: 14px;
-    margin-bottom: 4px;
-    position: absolute;
-    top: 150px;
-    right: 100px;
-    background-color: #ff6b6b8c;
-    color: white;
-    padding: 5px 10px;
-    border-radius: 5px;
-    font-size: 10px;
-    font-weight: 600;
-    text-transform: uppercase;
-    }
-    .product__item{
-        border-radius: 2px;
-        border : 1px solid #0000;
-    }
-    .alert{
+.alert{
         margin-top: -100px;
         margin-left: 500px;
     }
 
-    .description p {
+    .product-card {
+    position: relative;
     overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    max-width: 100%;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+    transition: transform 0.3s ease-in-out;
 }
 
-.product-badge {
+.product-image {
+    width: 100%;
+    height: 350px; /* Increased image height */
+    overflow: hidden;
+}
+
+.product-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease-in-out;
+}
+
+.product-overlay {
     position: absolute;
-    top: 10px;
-    right: 10px;
-    background-color: #ff6b6b;
-    color: white;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Vertically center content */
+    align-items: center; /* Horizontally center content */
+    text-align: center;
+    color: #fff;
+    z-index: 2;
+    background-color: rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+}
+
+.product-card:hover .product-image img {
+    transform: scale(1.1);
+}
+
+.product-card:hover .product-overlay {
+    visibility: visible;
+    opacity: 1;
+}
+
+.product-name {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #fff;
+}
+
+.overlay-icon {
+    text-decoration: none;
+    color: #fff;
+    font-size: 14px;
+    background-color: #2874f0;
     padding: 5px 10px;
     border-radius: 5px;
-    font-size: 10px;
-    font-weight: 600;
-    text-transform: uppercase;
+    transition: background-color 0.3s ease-in-out;
 }
 
-.product-badge.available {
-    background-color: #28a745; /* Green for Available */
+.overlay-icon:hover {
+    background-color: #1c5bb6;
 }
 
-.product-badge.sold-out {
-    background-color: #dc3545; /* Red for Sold Out */
-}
-
-.product-badge.unavailable {
-    background-color: #ffc107;
-}
-
-.product-badge.out-of-stock {
-    background-color: #6c757d; /* Grey for Out of Stock */
-}
-
-.product-empty{
-    margin-left: 300px;
-    margin-top: 200px;
+.product-empty {
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
 }
 
     </style>
@@ -87,7 +103,7 @@
                                 <h2>Fall - Winter Collections 2030</h2>
                                 <p>A specialist label creating luxury essentials. Ethically crafted with an unwavering
                                 commitment to exceptional quality.</p>
-                                <a href="#" class="primary-btn">Shop now <span class="arrow_right"></span></a>
+                                <a href="/products" class="primary-btn">Shop now <span class="arrow_right"></span></a>
                                 <div class="hero__social">
                                     <a href="#"><i class="fa fa-facebook"></i></a>
                                     <a href="#"><i class="fa fa-twitter"></i></a>
@@ -135,7 +151,7 @@
                         </div>
                         <div class="banner__item__text">
                             <h2>Clothing Collections 2030</h2>
-                            <a href="#">Shop now</a>
+                            <a href="/products">Shop now</a>
                         </div>
                     </div>
                 </div>
@@ -177,57 +193,28 @@
                 </div>
             </div>
             <div class="row product__filter">
-             <%if (products.length === 0){%>
-                 <div class="product-empty"><p class="">There is no Product Available</p></div>
-                     <%}else{%>
-                            <% products.forEach(product => { %>
-                            <div class="col-lg-4 col-md-6 col-sm-6">
-                                <div class="product-card mb-4">
-                                    <div class="product-image">
-                                      <img src="/uploads/public-image/<%= product.productImage[0] %>" alt="<%= product.productName %>">
-        
-                                      <% if(product.quantity < 5) {%>
-                                        <p class="stock-left">Only <%= product.quantity%> left, Please hurry up!!!</span>
-                                        <% } %>
-                                       <!-- Stock Status Badge -->
-                                       <div class="product-badge 
-                                       <%= product.status ? product.status.toLowerCase().replace(/ /g, '-') : 'available' %> ">
-                                       <%= product.status %>
-                                   </div>
-                                        <div class="product-overlay">
-                                            <a href="/product/view?id=<%=product._id%>" class="overlay-icon">View Product</a>
-                                        </div>
-                                    </div>
-        
-                                    <!-- Product Details -->
-                                    <div class="product-details">
-                                        <h6 class="product-name"><%= product.productName %></h6>
-                                        <div class="product-price">&#8377;<%= product.salePrice %></div>
-        
-                                        <div class="description">
-                                            <p><%=product.description%></p>
-                                        </div>
-        
-                                          <!-- <div class="rating">
-                                            <% for(let i = 1; i <= 5; i++) { %>
-                                                <i class="fa <%= i <= product.rating ? 'fa-star' : 'fa-star-o' %>"></i>
-                                            <% } %>
-                                        </div> -->
-
-                                        <button class="add-cart-btn"><a href="#" onclick="addToCart('<%= product._id %>')" class="add-cart-link">+ Add to Cart</a>
-                                        </button>
-                                        <button class="buy-now-btn ">Buy Now</button>
-                                      
-                                    </div>
+                <% if (products.length === 0) { %>
+                    <div class="product-empty"><p>There are no Products Available</p></div>
+                <% } else { %>
+                    <% products.forEach(product => { %>
+                        <div class="col-lg-4 col-md-6 col-sm-6">
+                            <div class="product-card mb-4">
+                                <div class="product-image">
+                                    <img src="/uploads/public-image/<%= product.productImage[0] %>" alt="<%= product.productName %>">
+                                </div>
+                                
+                                <!-- Product Overlay with Name and View Product -->
+                                <div class="product-overlay">
+                                    <h6 class="product-name"><%= product.productName %></h6>
+                                    <a href="/product/view?id=<%= product._id %>" class="overlay-icon">View Product</a>
                                 </div>
                             </div>
-                            <% }) %>
-                        </div>        
-                        <%}%>
-
-                        
-      
-       </div>    
+                        </div>
+                    <% }); %>
+                <% } %>
+            </div>
+            
+            
     </section>
     <!-- Product Section End -->
 
@@ -278,48 +265,6 @@
         </div>
     </section>
     <!-- Categories Section End -->
-
-
-<script>
-function addToCart(productId) {
-    $.ajax({
-        url: '/cart/add/' + productId,
-        method: 'POST',
-        contentType: 'application/json',
-        success: function(response) {
-            Swal.fire({
-                title: "Success",
-                icon: "success",
-                text: "Product Added Successfully",
-                showConfirmButton: true,
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    window.location.href = '/cart';
-                }
-            });
-        },
-        error: function(xhr) {
-            if (xhr.status === 401) {
-                Swal.fire({
-                    title: "Error",
-                    icon: "error",
-                    text: "You need to log in to add products to the cart.",
-                    showConfirmButton: true,
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        window.location.href = '/login';
-                    }
-                });
-            } else {
-                alert('Failed to add product to cart!');
-            }
-        }
-    });
-}
-
-
-
-    </script>
 
 
 

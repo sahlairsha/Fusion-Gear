@@ -249,11 +249,7 @@
             <div class="col-lg-9">
                 <div class="shop__product__option">
                     <div class="row">
-                        <div class="col-lg-6 col-md-6 col-sm-6">
-                            <div class="shop__product__option__left">
-                                <p>Showing <%= currentPage%> – <%=limit%> of <%= totalProduct %> results</p>
-                            </div>
-                        </div>
+                        
                         <div class="col-lg-6 col-md-6 col-sm-6">
                             <div class="shop__product__option__right">
                                 <form method="GET" action="/products">
@@ -274,74 +270,84 @@
                     </div>
                 </div>
                 <div class="row">
-                    <%if (products.length === 0){%>
-                        <div class="product-empty"><p class="">There is no Product Available</p></div>
-                        <%}else{%>
-                    <% products.forEach(product => { %>
-                    <div class="col-lg-4 col-md-6 col-sm-6">
-                        <div class="product-card mb-4">
-                            <div class="product-image">
-                              <img src="/uploads/public-image/<%= product.productImage[0] %>" alt="<%= product.productName %>">
-
-                              <% if(product.quantity > 0 && product.quantity < 5 ) {%>
-                                <p class="stock-left">Only <%= product.quantity %> left, Please hurry up!!!</span>
-                                <% } %>
-                               <!-- Stock Status Badge -->
-                               <div class="product-badge
-                               <%= product.status ? product.status.toLowerCase().replace(/ /g, '-') : 'available' %> ">
-                               <%= product.status %>
-                               </div>
-                                <div class="product-overlay">
-                                    <a href="/product/view?id=<%=product._id%>" class="overlay-icon">View Product</a>
-                                </div>
-                            </div>
-
-                            <!-- Product Details -->
-                            <div class="product-details">
-                                <h6 class="product-name"><%= product.productName %></h6>
-                                <div class="product-price">&#8377;<%= product.salePrice %></div>
-
-                                <div class="description">
-                                    <p><%=product.description%></p>
-                                </div>
-                                
-                              
-
-                                <button class="add-cart-btn"><a href="#" onclick="addToCart('<%= product._id %>')" class="add-cart-link">+ Add to Cart</a>
-                                </button>
-                                <button class="buy-now-btn">Buy Now</button>
-                            </div>
+                    <% if (products.length === 0) { %>
+                        <div class="product-empty">
+                            <p class="">There are no Products Available</p>
                         </div>
-                    </div>
-                    <% }) %>
+                    <% } else { %>
+                        <% products.forEach(product => { %>
+                            <div class="col-lg-4 col-md-6 col-sm-6">
+                                <div class="product-card mb-4">
+                                    <div class="product-image">
+                                        <img src="/uploads/public-image/<%= product.productImage[0] %>" alt="<%= product.productName %>">
+                
+                                        <% if (product.variants.length > 0) { %>
+                                            <% product.variants.forEach(variant => { %>
+                                                <% if (variant.stock > 0 && variant.stock < 5) { %>
+                                                    <p class="stock-left">Only <%= variant.stock %> left, Please hurry up!!!</p>
+                                                <% } %>
+                
+                                                <!-- Stock Status Badge -->
+                                                <div class="product-badge <%= variant.status ? variant.status.toLowerCase().replace(/ /g, '-') : 'available' %>">
+                                                    <%= variant.status || 'In Stock' %>
+                                                </div>
+                                            <% }); %>
+                                        <% } else { %>
+                                            <p class="text-muted">No variants available</p>
+                                        <% } %>
+                
+                                        <div class="product-overlay">
+                                            <a href="/product/view?id=<%= product._id %>" class="overlay-icon">View Product</a>
+                                        </div>
+                                    </div>
+                
+                                    <!-- Product Details -->
+                                    <div class="product-details">
+                                        <h6 class="product-name"><%= product.productName %></h6>
+                
+                                        <% if (product.firstVariant) { %>
+                                            <div class="product-price">&#8377;<%= product.firstVariant.salePrice || product.firstVariant.regularPrice %></div>
+                                        <% } else { %>
+                                            <div class="product-price">Price Not Available</div>
+                                        <% } %>
+                
+                                        <div class="description">
+                                            <p><%= product.description %></p>
+                                        </div>
+                
+                                        <button class="add-cart-btn">
+                                            <a href="#" onclick="addToCart('<%= product._id %>')" class="add-cart-link">+ Add to Cart</a>
+                                        </button>
+                                        <button class="buy-now-btn">Buy Now</button>
+                                    </div>
+                                </div>
+                            </div>
+                        <% }); %>
+                    <% } %>
                 </div>
+                
+                <!-- Pagination -->
                 <div class="row">
                     <div class="col-lg-12">
-                        <div class="product__pagination d-flex align-item-center justify-content-center">
+                        <div class="product__pagination d-flex align-items-center justify-content-center">
                             <!-- Previous Page -->
                             <% if (currentPage > 1) { %>
                                 <a class="text-secondary pl-2" href="?page=<%= currentPage - 1 %>&sort=<%= sort %>&search=<%= search %>&category=<%= category %>&priceRange=<%= priceRange %>">&laquo; Previous</a>
                             <% } %>
-                        
+                
                             <!-- Page Numbers -->
                             <% for (let i = 1; i <= totalPages; i++) { %>
-                                <a class="text-secondary pl-2" href="?page=<%= i %>&sort=<%= sort %>&search=<%= search %>&category=<%= category %>&priceRange=<%= priceRange %>"><%= i %></a>
+                                <a class="text-secondary pl-2 <%= i === currentPage ? 'active' : '' %>" href="?page=<%= i %>&sort=<%= sort %>&search=<%= search %>&category=<%= category %>&priceRange=<%= priceRange %>"><%= i %></a>
                             <% } %>
-                        
+                
                             <!-- Next Page -->
                             <% if (currentPage < totalPages) { %>
                                 <a class="text-secondary pl-2" href="?page=<%= currentPage + 1 %>&sort=<%= sort %>&category=<%= category %>&search=<%= search %>&priceRange=<%= priceRange %>">Next &raquo;</a>
                             <% } %>
                         </div>
-                        
                     </div>
                 </div>
-
-                <%}%>
-
-            </div>
-        </div>
-    </div>
+                
 </section>
 
 

@@ -1,0 +1,165 @@
+
+
+<%- include('../../views/partials/admin/header') %>
+
+<style>
+
+
+form {
+    margin-top: 50px;
+    width: 100%;
+    max-width: 600px;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    font-size: 14px;
+    color: #555;
+}
+
+input[type="text"],
+input[type="number"],
+input[type="date"],
+select {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    color: #333;
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus,
+input[type="date"]:focus,
+select:focus {
+    border-color: #007bff;
+    outline: none;
+}
+
+button {
+    width: 100%;
+    padding: 12px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+div {
+    display: none;
+}
+
+div#productFields,
+div#categoryFields,
+div#orderFields {
+    display: none;
+}
+
+select {
+    background-color: #fff;
+    border: 1px solid #ccc;
+}
+
+select:focus {
+    border-color: #007bff;
+}
+
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type="number"]:focus {
+    border-color: #007bff;
+}
+
+</style>
+
+<h2>Add New Coupon</h2>
+
+<form action="/admin/add-coupon" method="POST">
+    <label for="code">Coupon Code</label>
+    <input type="text" id="code" name="code" required>
+
+    <label for="description">Description</label>
+    <input type="text" id="description" name="description" required>
+
+    <label for="discount">Discount (%)</label>
+    <input type="number" id="discount" name="discount" required>
+
+    <label for="startDate">Start Date</label>
+    <input type="date" id="startDate" name="startDate" required>
+
+    <label for="endDate">End Date</label>
+    <input type="date" id="endDate" name="endDate" required>
+
+    <label for="applicableTo">Applicable To</label>
+    <select id="applicableTo" name="applicableTo" required>
+        <option value="product">Product</option>
+        <option value="category">Category</option>
+        <option value="order">Order</option>
+    </select>
+
+    <div id="productFields">
+        <label for="productId">Product</label>
+        <select id="productId" name="productId">
+            <% products.forEach(product => { %>
+                <option value="<%= product._id %>"><%= product.productName %></option>
+            <% }); %>
+        </select>
+    </div>
+
+    <div id="categoryFields">
+        <label for="categoryId">Category</label>
+        <select id="categoryId" name="categoryId">
+            <% categories.forEach(category => { %> 
+                <option value="<%= category._id %>"><%= category.name %></option>
+            <% }); %>
+        </select>
+    </div>
+
+    <div id="orderFields">
+        <label for="minOrderValue">Minimum Order Value</label>
+        <input type="number" id="minOrderValue" name="minOrderValue">
+    </div>
+
+    <button type="submit">Create Coupon</button>
+</form>
+</div>
+<script>
+    document.getElementById('applicableTo').addEventListener('change', function() {
+        const applicableTo = this.value;
+        
+        document.getElementById('productFields').style.display = applicableTo === 'product' ? 'block' : 'none';
+        document.getElementById('categoryFields').style.display = applicableTo === 'category' ? 'block' : 'none';
+        document.getElementById('orderFields').style.display = applicableTo === 'order' ? 'block' : 'none';
+    });
+
+    // Trigger change event to show/hide fields based on the initial value
+    document.getElementById('applicableTo').dispatchEvent(new Event('change'));
+</script>
+
+<%- include('../../views/partials/admin/footer') %>

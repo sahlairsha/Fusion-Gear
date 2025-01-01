@@ -29,22 +29,32 @@
                             alt="<%= item.product_id.productName %>" class="product-img">
                         <h5>
                             <%= item.product_id.productName %>
-                                </h4>
+                                </h5>
+
+                                <% if (item.variantDetails && item.variantDetails.length > 0) { %>
+                                    <% item.variantDetails.forEach(variant => { %>
 
                                 <div class="product-info">
 
                                     <p><strong>Color:</strong>
-                                        <%= item.product_id.color %>
+                                        <%= variant.color %>
                                     </p>
                                     <p><strong>Size:</strong>
-                                        <%= item.product_id.size %>
+                                        <%= variant.size %>
                                     </p>
                                     <p><strong>Qty:</strong>
                                         <%= item.quantity %>
                                     </p>
-                                    <p><strong>Price:</strong> ₹<%= item.product_id.salePrice %>
+                                    <p><strong>Price:</strong> ₹<%= variant.salePrice %>
                                     </p>
+
+                                    <% }); %>
+                                    <% } else { %>
+                                        <p>No variant details available</p>
+                                    <% } %>
                                 </div>
+
+                             
                     </div>
                     <% }) %>
 
