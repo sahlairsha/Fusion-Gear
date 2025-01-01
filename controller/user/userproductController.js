@@ -166,12 +166,7 @@ const loadProductsDetails = async (req, res) => {
         }
 
         await Product.findByIdAndUpdate(id, { $inc: { views: 1 } });
-
-        
-
-        // Fetch product details
-
-
+    
         const productData = await Product.findById(id).populate('category').populate('reviews.user_id').exec();
         if (!productData) {
             console.error(`Product not found with ID: ${id}`);
@@ -186,7 +181,7 @@ const loadProductsDetails = async (req, res) => {
             variants: productVariants ? productVariants.variant : [],
         };
     
-        const coupons = await Coupon.findOne();
+   
         
 
         const userData = req.session.user
@@ -196,7 +191,6 @@ const loadProductsDetails = async (req, res) => {
             user: userData,
             product:  productWithVariants,
             category: productData.category,
-            coupons 
         });
 
     } catch (error) {
