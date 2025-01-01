@@ -10,6 +10,7 @@ const userproductController = require('../controller/user/userproductController'
 const userprofileController = require('../controller/user/userprofileController')
 const userCartController = require('../controller/user/userCartController');
 const userOrderController = require("../controller/user/userOrderController");
+const userwishlistController = require("../controller/user/wishlistController");
 
 
 const userAuth = require('../middleware/auth')
@@ -114,6 +115,11 @@ router.post('/orders/cancel/:id',userAuth,userOrderController.cancelOrder)
 router.get('/ratings',userAuth,userOrderController.getRating)
 router.post('/ratings/submit',userAuth, userOrderController.submitRating);
 
+
+//whishlist 
+
+// router.get('/wishlist',userAuth, userwishlistController.getWishlist)
+// router.post('/whishlist/add/:productId',userAuth,userwishlistController.addToWhishlist)
 
 router.post('/reviews',userAuth,userOrderController.submitReviews);
                      

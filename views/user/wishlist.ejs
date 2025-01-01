@@ -1,0 +1,67 @@
+<%-include('../../views/partials/user/header') %>
+
+
+<div class="row">
+    <% if (products.length === 0) { %>
+        <div class="product-empty">
+            <p class="">There are no Products Available</p>
+        </div>
+    <% } else { %>
+        <% products.forEach(product => { %>
+            <div class="col-lg-4 col-md-6 col-sm-6">
+                <div class="product-card mb-4">
+                    <div class="product-image">
+                        <img src="/uploads/public-image/<%= product.productImage[0] %>" alt="<%= product.productName %>">
+
+                        <% if (product.variants.length > 0) { %>
+                            <% product.variants.forEach(variant => { %>
+                                <% if (variant.stock > 0 && variant.stock < 5) { %>
+                                    <p class="stock-left">Only <%= variant.stock %> left, Please hurry up!!!</p>
+                                <% } %>
+
+                                <!-- Stock Status Badge -->
+                                <div class="product-badge <%= variant.status ? variant.status.toLowerCase().replace(/ /g, '-') : 'available' %>">
+                                    <%= variant.status || 'In Stock' %>
+                                </div>
+                            <% }); %>
+                        <% } else { %>
+                            <p class="text-muted">No variants available</p>
+                        <% } %>
+
+                        <div class="product-overlay">
+                            <a href="/product/view?id=<%= product._id %>" class="overlay-icon">View Product</a>
+                        </div>
+                    </div>
+
+                    <!-- Product Details -->
+                    <div class="product-details">
+                        <h6 class="product-name"><%= product.productName %></h6>
+
+                        <% if (product.firstVariant) { %>
+                            <div class="product-price">&#8377;<%= product.firstVariant.salePrice || product.firstVariant.regularPrice %></div>
+                        <% } else { %>
+                            <div class="product-price">Price Not Available</div>
+                        <% } %>
+
+                        <div class="description">
+                            <p><%= product.description %></p>
+                        </div>
+
+                        <button class="add-cart-btn">
+                            <a href="#" onclick="addToCart('<%= product._id %>')" class="add-cart-link">+ Add to Cart</a>
+                        </button>
+                        <button class="buy-now-btn">Buy Now</button>
+                    </div>
+                </div>
+            </div>
+        <% }); %>
+    <% } %>
+</div>
+
+</div>
+
+
+
+
+
+<%-include('../../views/partials/user/footer') %>

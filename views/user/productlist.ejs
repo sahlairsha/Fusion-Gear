@@ -295,7 +295,7 @@
             
                                 <!-- Other Actions -->
                                 <div class="product__details__btns__option">
-                                    <a href="#"><i class="fa fa-heart"></i> Add to Wishlist</a>
+                                   <button class="add-whish-btn"><a href="#" onclick="addToWishlist('<%= product._id%>')"><i class="fa fa-heart"></i> Add to Wishlist</a></button> 
                                     <a href="#"><i class="fa fa-exchange"></i> Add To Compare</a>
                                 </div>
             
@@ -640,5 +640,31 @@ function copyCouponCode(button, code) {
 
 </script>
 
+
+<script>
+       function addToWishlist(productId) {
+    $.ajax({
+        url: '/whishlist/add/' + productId,  
+        method: 'POST',
+        contentType: 'application/json',
+        success: function(response) {
+            Swal.fire({
+                title: "Success",
+                icon: "success",
+                text: "Product Added Successfully",
+                showConfirmButton: true,
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = '/whishlist';
+                }
+            });
+            
+        },
+        error: function() {
+            alert('Failed to add product to cart!');
+        }
+    });
+}
+</script>
 
 <%-include('../../views/partials/user/footer') %>

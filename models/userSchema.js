@@ -64,8 +64,12 @@ const userSchema = new Schema({
         default : 0,
     },
     whishlist : [{
+        product_id :{
         type :mongoose.Schema.Types.ObjectId,
-        ref : "Wishlist"
+        ref : "Product",
+
+        }
+        
     }],
     orderHistory:[{
         type : mongoose.Schema.Types.ObjectId,
