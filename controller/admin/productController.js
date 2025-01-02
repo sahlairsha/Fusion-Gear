@@ -21,7 +21,6 @@ const getProduct = async(req,res)=>{
     }
 }
 
-
 const addProducts = async (req, res) => {
     try {
         const product = req.body;
@@ -92,20 +91,25 @@ const addProducts = async (req, res) => {
             return res.status(400).redirect('/admin/add-products');
         }
 
-        // Create ProductVariant document
-        const productVariant = new ProductVariant({
-            product_id: savedProduct._id,
-            variant: variants.map((variant) => ({
+        // Create ProductVariant documents and link to Product
+        const productVariantIds = [];
+        for (const variant of variants) {
+            const newVariant = new ProductVariant({
+                product_id: savedProduct._id,
                 color: variant.color,
                 size: variant.size,
                 stock: variant.stock,
                 regularPrice: variant.regularPrice,
                 salePrice: variant.salePrice || 0,
-                status: "Available",
-            })),
-        });
+            });
 
-        await productVariant.save();
+            const savedVariant = await newVariant.save();
+            productVariantIds.push(savedVariant._id);
+        }
+
+        // Update the product with variant IDs
+        savedProduct.variants = productVariantIds;
+        await savedProduct.save();
 
         req.flash("success", "Product and variants added successfully");
         res.status(201).redirect("/admin/add-products");

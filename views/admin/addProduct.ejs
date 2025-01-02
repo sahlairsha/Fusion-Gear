@@ -2,83 +2,220 @@
 
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs/dist/cropper.min.css">
 
-    <style>
- .thumbnails-container {
-        display: flex;
-        overflow-x: auto;
-        gap: 10px;
-        }
+        <style>
+
+            .btn-info{
+                padding: 10px 20px;
+                margin-bottom:10px ;
+                margin-left: 10px;
+            }
+
+/* Content Main */
+.content-main {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    margin: 20px auto;
+    max-width: 800px;
+}
+
+/* Form container */
+.container-fluid {
+    width: 100%;
+    max-width: 800px;
+}
+
+/* Cards */
+.card {
+    background-color: #fff;
+    border-radius: 8px;
+    margin-bottom: 15px; /* Spacing between cards */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Soft shadow for depth */
+}
+
+.card-body {
+    padding: 15px;
+}
+
+
+
+/* Form Labels and Inputs */
+.form-label {
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 8px;
+}
+
+.form-control {
+    border-radius: 6px;
+    padding: 8px;
+    font-size: 13px;
+    width: 100%;
+    border: 1px solid #ddd; /* Minimal border */
+    background-color: #fff; /* Clean input background */
+    transition: border-color 0.3s ease; /* Smooth transition for focus */
+}
+
+.form-control:focus {
+    border-color: #007bff; 
+    outline: none;
+} 
+
+/* Textarea */
+textarea.form-control {
+    resize: vertical;
+}
+
+/* Select box */
+.form-select {
+    padding: 8px;
+    border-radius: 6px;
+    font-size: 13px;
+    width: 100%;
+    border: 1px solid #ddd; /* Same minimal border */
+}
+
+/* Error Messages */
+.error-message {
+    color: red;
+    font-size: 12px;
+    margin-top: 5px;
+}
+
+/* Thumbnails */
+.thumbnails-container {
+    display: flex;
+    overflow-x: auto;
+    gap: 8px;
+    margin-bottom: 12px;
+}
 
 .thumbnail {
     position: relative;
-    width: 100px;
-    height: 100px;
-    border: 1px solid #ddd;
-    padding: 5px;
+    width: 80px;
+    height: 80px;
     background-color: #f9f9f9;
     display: inline-block;
+    border-radius: 6px; /* Rounded corners for thumbnails */
+    padding: 4px;
+    transition: background-color 0.3s ease;
+}
+
+.thumbnail:hover {
+    background-color: #e9ecef; /* Hover effect */
 }
 
 .thumbnail img {
     width: 50px;
     height: 50px;
-    object-fit: contain;
+    object-fit: cover;
 }
 
-.remove-icon {
-    position: relative;
-    top: 0;
-    right: 0;
-    font-size: 20px;
-    color:#000;
-    padding: 2px 5px;
+/* Image Cropping */
+.image-cropper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 300px;
+    height: 200px;
+    margin-bottom: 15px;
+    background-color: #f8f9fa;
+    border-radius: 8px; /* Rounded corners */
+    overflow: hidden;
+    margin-left: 30px;
+}
+
+.image-cropper img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: cover;
+}
+
+.image-cropper button {
+    margin-top: 8px;
+    font-size: 12px;
+    background-color: #17a2b8;
+    color: #fff;
+    padding: 6px 10px;
+    border: none;
+    border-radius: 6px;
     cursor: pointer;
 }
 
-        .image-cropper {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            width: 300px;
-            height: 200px;
-            margin-bottom: 20px;
-            border: 1px solid #ddd;
-            margin-left: 30px;
-        }
+.image-cropper button:hover {
+    background-color: #138496;
+}
 
-        .image-cropper img {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: cover;
-        }
+/* Variant Table */
+.variant-table {
+    width: 100%;
+    margin-top: 15px;
+    border-collapse: collapse;
+}
 
-        .content-main {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-left: 30px;
-            margin-top: 30px;
-        }
+.variant-table th,
+.variant-table td {
+    padding: 8px;
+    text-align: center;
+    font-size: 13px;
+}
 
-        .variant-table {
-        width: 100%;
-        margin-top: 20px;
-        border-collapse: collapse;
-    }
+.variant-table th {
+    background-color: #f1f1f1;
+}
 
-    .variant-table th, .variant-table td {
-        border: 1px solid #ddd;
-        padding: 10px;
-        text-align: center;
-    }
+.variant-table td button {
+    font-size: 12px;
+    padding: 5px 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    background-color: #e9ecef;
+    cursor: pointer;
+}
 
-    .variant-table th {
-        background-color: #f1f1f1;
-    }
- 
+.variant-table td button:hover {
+    background-color: #007bff;
+    color: white;
+}
 
-    </style>
+/* Submit Button */
+.btn-info {
+    font-size: 14px;
+    padding: 8px 15px;
+    background-color: #17a2b8;
+    color: #fff;
+    border-radius: 6px;
+    border: none;
+    transition: background-color 0.3s;
+    cursor: pointer;
+}
+
+.btn-info:hover {
+    background-color: #138496;
+}
+
+/* Flex Layout for Variants */
+.row.gx-3.mb-3 {
+    margin-bottom: 12px;
+}
+
+/* Alignment for Buttons */
+.d-flex.justify-content-end {
+    justify-content: flex-end;
+}
+
+/* File Upload */
+input[type="file"].form-control {
+    padding: 10px;
+    height: 40px;
+    width: 400px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    margin-left: 30px;
+ }
+       
+ </style>
     <section class="content-main">
         <div class="row">
             <div class="col-9">
@@ -125,7 +262,7 @@
                                     <div class="col-sm-4">
                                         <div class="form-group">
                                             <label for="variantColor">Color:</label>
-                                            <input type="text" id="variantColor" class="form-control" placeholder="Enter color" />
+                                            <input type="text" id="variantColor"  class="form-control" placeholder="Enter color" />
                                             <div id="color-error" class="error-message"></div>
                                         </div>
                                     </div>
@@ -133,7 +270,7 @@
                                     <div class="col-sm-4">
                                         <div class="form-group">
                                             <label for="variantSize">Size:</label>
-                                            <input type="text" id="variantSize" class="form-control" placeholder="Enter size" />
+                                            <input type="text" id="variantSize"  class="form-control" placeholder="Enter size" />
                                             <div id="size-error" class="error-message"></div>
                                         </div>
                                     </div>
@@ -199,8 +336,7 @@
                                             onchange="viewImage1(event), viewImage(event, 1)">
                                         <div id="image-error" class="error-message"></div>
                                     </div>
-                                    <div class="image-cropper d-flex align-items-center"
-                                        style="display:none; width: 300px; height: 200px; margin-bottom: 20px;">
+                                    <div class="image-cropper d-flex align-items-center">
                                         <img src="" id="croppedImg1" alt="">
                                         <button type="button" id="saveButton1" class="btn-sm btn-primary">Save</button>
                                     </div>
@@ -215,8 +351,7 @@
                                             accept="image/png, image/jpeg, image/jpg"
                                             onchange="viewImage2(event),viewImage(event, 2)">
                                     </div>
-                                    <div class="image-cropper d-flex align-items-center"
-                                        style="display:none; width: 300px; height: 200px; margin-bottom: 20px;">
+                                    <div class="image-cropper d-flex align-items-center">
                                         <img src="" id="croppedImg2" alt="">
                                         <button type="button" id="saveButton2" class="btn-sm btn-primary">Save</button>
                                     </div>
@@ -231,8 +366,7 @@
                                             accept="image/png, image/jpeg, image/jpg"
                                             onchange="viewImage3(event),viewImage(event, 3)">
                                     </div>
-                                    <div class="image-cropper d-flex align-items-center"
-                                        style="display:none; width: 300px; height: 200px; margin-bottom: 20px;">
+                                    <div class="image-cropper d-flex align-items-center">
                                         <img src="" id="croppedImg3" alt="">
                                         <button type="button" id="saveButton3" class="btn-sm btn-primary">Save</button>
                                     </div>
@@ -248,8 +382,7 @@
                                             accept="image/png, image/jpeg, image/jpg"
                                             onchange="viewImage4(event),viewImage(event, 4)">
                                     </div>
-                                    <div class="image-cropper d-flex align-items-center"
-                                        style="display:none; width: 300px; height: 200px; margin-bottom: 20px;">
+                                    <div class="image-cropper d-flex align-items-center">
                                         <img src="" id="croppedImg4" alt="">
                                         <button type="button" id="saveButton4" class="btn-sm btn-primary">Save</button>
                                     </div>
@@ -282,17 +415,18 @@
 function addVariant() {
     const color = document.getElementById("variantColor").value.trim();
     const size = document.getElementById("variantSize").value.trim();
-    const stock = document.getElementById("variantStock").value.trim();
-    const regularPrice = document.getElementById("variantRegularPrice").value.trim();
-    const salePrice = document.getElementById("variantSalePrice").value.trim();
+    const stock = parseInt(document.getElementById("variantStock").value.trim());
+    const regularPrice = parseFloat(document.getElementById("variantRegularPrice").value.trim());
+    const salePrice = parseFloat(document.getElementById("variantSalePrice").value.trim());
 
-    if (!color || !size || stock <= 0 || !regularPrice || !salePrice) {
+    // Validate inputs
+    if (!color || !size || isNaN(stock) || stock <= 0 || isNaN(regularPrice) || regularPrice <= 0 || isNaN(salePrice) || salePrice < 0) {
         Swal.fire({
             title: "Error!",
-            text: "Please fill in all variant details.",
+            text: "Please fill in all variant details with valid values.",
             icon: "error",
             confirmButtonText: "Okay"
-        })
+        });
         return;
     }
 
@@ -347,7 +481,6 @@ function removeVariant(index) {
         tableBody.appendChild(row);
     });
 }
-
 
 
         function viewImage1(event) {
