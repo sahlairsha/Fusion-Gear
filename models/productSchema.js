@@ -57,6 +57,10 @@ const productSchema = new Schema({
         average: { type: Number, default: 0 },
         count: { type: Number, default: 0 },
     },
+    variants:[{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "ProductVariant",
+    }]
     
 }, { timestamps: true });
 
