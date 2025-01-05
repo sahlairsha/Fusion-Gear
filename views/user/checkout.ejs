@@ -1,6 +1,12 @@
 <%- include('../../views/partials/user/header') %>
+<!-- Add these in the head tag -->
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.css"/>
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick-theme.min.css"/>
+<link href="https://cdn.jsdelivr.net/npm/toastr@2.1.4/build/toastr.min.css" rel="stylesheet" />
 
 <style>
+
+
     /* Add your existing CSS styles here */
     #addressFormContainer {
         display: none;
@@ -37,6 +43,149 @@
         padding-left: 20px;
         
     }
+
+    .coupon-container {
+  display: flex;
+  overflow-x: auto;
+  gap: 10px;
+  padding: 10px 0;
+}
+    .coupon {
+    width: 400px;
+    height: 200px;
+    border-radius: 10px;
+    overflow: hidden;
+    margin: auto;
+    filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.5));
+    display: flex;
+    align-items: stretch;
+    position: relative;
+    text-transform: uppercase;
+  }
+
+  .coupon::before,
+  .coupon::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    width: 50%;
+    height: 100%;
+    z-index: -1;
+  }
+
+  .coupon::before {
+    left: 0;
+    background-image: radial-gradient(circle at 0 50%, transparent 25px, #a53860 26px);
+  }
+
+  .coupon::after {
+    right: 0;
+    background-image: radial-gradient(circle at 100% 50%, transparent 25px, #a53860  26px);
+  }
+
+  .coupon > div {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .left {
+    width: 20%;
+    border-right: 2px dashed rgba(0, 0, 0, 0.13);
+  }
+
+  .left div {
+    transform: rotate(-90deg);
+    white-space: nowrap;
+    font-weight: bold;
+  }
+
+  .center {
+    flex-grow: 1;
+    text-align: center;
+    padding: 10px;
+    margin-top: 10px;
+  }
+
+  .right {
+    width: 120px;
+    background-image: radial-gradient(circle at 100% 50%, transparent 25px, #fff 26px);
+  }
+
+  .right div {
+    font-size: 12px;
+    font-weight: 500;
+    transform: rotate(-90deg);
+  }
+
+  .center h2 {
+    background: #000;
+    color: #fff;
+    padding: 0 10px;
+    font-size: 2rem;
+    white-space: nowrap;
+   
+  }
+
+  .center h3 {
+    font-size: 1.5rem;
+    padding: 10px;
+  }
+
+  .center small {
+    font-size: 0.625rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+  }
+
+  .copy-btn {
+    background-color: transparent;
+    color: #000;
+    border: none;
+    border-radius: 5px;
+    padding: 5px 10px;
+    cursor: pointer;    
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .copy-btn i {
+    margin-right: 5px;
+  }
+
+  .copy-btn:hover {
+    background-color: transparent;
+  }
+
+
+
+  @media screen and (max-width: 500px) {
+    .coupon {
+      display: grid;
+      grid-template-columns: 1fr;
+    }
+
+    .left div {
+      transform: rotate(0deg);
+    }
+
+    .right div {
+      transform: rotate(0deg);
+    }
+  }
+
+  @media screen and (max-width:500px){
+    .coupon {
+      display:grid;
+      grid-template-columns:1fr;
+    }
+    .left div {
+      transform: rotate(0deg);
+    }
+    .right div {
+      transform: rotate(0deg);
+    }
+  }
 
     
 
@@ -291,42 +440,189 @@
                     </form>
                     </div>
                 </div>
-
-                  <!-- Right Section: Order Details -->
-            <div class="col-lg-4">
-                <div class="order-details-box">
-                    <h6>Order Summary</h6>
-                    <div class="order-summary-item">
-                        <p>Items:</p>
-                        <p>
-                            <%= cartCount %> items
-                        </p>
+    
+<!-- Right Section: Order Details -->
+<div class="col-lg-4">
+    <h6 class="mt-4 ml-5">Available Coupons</h6><br>
+    <div class="coupon-carousel-container">
+      <% if (coupons.length === 0) { %>
+        <div class="alert alert-warning text-center">No coupons available for the products in your cart.</div>
+      <% } else { %>
+        <div id="couponCarousel" class="carousel slide" data-ride="carousel">
+          <div class="carousel-inner">
+            <% coupons.forEach((coupon, index) => { %>
+              <div class="carousel-item <%= index === 0 ? 'active' : '' %>">
+                <div class="coupon">
+                  <div class="left">
+                    <div>Enjoy Your Gift</div>
+                  </div>
+                  <div class="center">
+                    <div>
+                      <h2>
+                        <%= coupon.discountType === 'percentage' ? `${coupon.discountValue}%` : `₹${coupon.discountValue}` %> OFF
+                      </h2>
+                      <p><%= coupon.description %></p>
+    
+                      <div class="coupon-code">
+                        <button class="copy-btn" data-code="<%= coupon.code %>" title="Copy Code">
+                          <i class="fas fa-copy"></i> Copy
+                        </button>
+                        <p><%= coupon.code %></p>
+                      </div>
+                      <small>Valid Till: <%= new Date(coupon.endDate).toDateString() %></small>
                     </div>
-                    <div class="order-summary-item">
-                        <p>Subtotal:</p>
-                        <p>
-                            <%= cartTotal %>
-                        </p>
+                  </div>
+                  <div class="right">
+                    <div class="paypal__footer">
+                      <img src="https://i.ibb.co/c8CQvBq/barcode.png" alt="Paypal Barcode" class="paypal__barcode">
+                      <p>FusionGear.com</p>
                     </div>
-                    <div class="order-summary-item">
-                        <p>Shipping:</p>
-                        <p>
-                            <%= shippingCharges %>
-                        </p>
-                    </div>
-                    <div class="order-summary-item">
-                        <p>Total:</p>
-                        <p>
-                            <%= netAmount %>
-                        </p>
-                    </div>
+                  </div>
                 </div>
-            </div>
-          
-            </div>
+              </div>
+            <% }); %>
+          </div>
+          <!-- Controls -->
+          <a class="carousel-control-prev" href="#couponCarousel" role="button" data-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="sr-only">Previous</span>
+          </a>
+          <a class="carousel-control-next" href="#couponCarousel" role="button" data-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="sr-only">Next</span>
+          </a>
+        </div>
+      <% } %>
+    </div>
+    
+    <div class="order-details-box">
+        <h6>Order Summary</h6>
+        <div class="order-summary-item">
+            <p>Items:</p>
+            <span id="cartCount"><%= cartCount%> items</span>
+        </div>
+        <div class="order-summary-item">
+            <p>Subtotal:</p>
+            <span id="cartTotal">₹ <%=cartTotal %></span>
+        </div>
+        <div class="order-summary-item">
+            <p>Discount:</p>
+            <span id="discount">₹<%= discount %></span>
+        </div>
+        <div class="order-summary-item">
+            <p>Shipping:</p>
+            <span id="shippingCharges">₹<%= shippingCharges  %></span>
+        </div>
+        <div class="order-summary-item">
+            <p>Total:</p>
+            <span id="netAmount">₹<%= netAmount%></span>
         </div>
     </div>
+    
+    
+
+        
+        
+                       
+        
+        <!-- Apply Coupon Section -->
+        <h6 class="mt-4">Apply Coupon</h6>
+        <form id="couponCode-form" action="/checkout" method="get">
+            <div class="mb-3">
+                <input type="text" id="couponCode" class="form-control" name="couponCode" placeholder="Enter coupon code" value="<%= appliedCoupon || '' %>">
+                <div id="couponCode-error" class="error-message"></div>
+            </div>
+            <button type="submit" class="btn btn-primary">Apply Coupon</button>
+        </form>
+
+        <!-- Available Coupons Section -->
+        
+    </div>
+</div>
+        </div>
 </section>
+
+
+<!-- Add these before closing the body tag -->
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/toastr@2.1.4/build/toastr.min.js"></script>
+<script>
+  $('#couponCarousel').carousel({
+  interval: 3000, 
+  ride: 'carousel', 
+});
+
+
+</script>
+
+<script>
+    document.getElementById('couponCode-form').addEventListener('submit', async function(e) {
+    e.preventDefault(); // Prevent the default form submission
+    
+    let couponCode = document.getElementById('couponCode').value.trim();
+    let error = document.getElementById('couponCode-error');
+    
+    // Clear previous error message
+    error.innerText = "";
+    
+    // Clear previous success/failure messages
+    toastr.clear();
+    
+    if (couponCode === '') {
+        error.innerText = "Coupon code is required";
+        return;
+    }
+    
+    // Send the coupon code to the backend for validation
+    try {
+        const response = await fetch(`/checkout/apply-coupon?couponCode=${couponCode}`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json'
+            }
+        });
+
+        // Check if response is successful and handle it
+        if (!response.ok) {
+            const errorData = await response.json();
+            toastr.error(errorData.error || errorData.couponMessage);
+            return;
+        }
+
+        const data = await response.json();
+        console.log("Server Response:", data);  // Log the response from the server
+
+        // If there's a coupon message, show it
+        if (data.couponMessage) {
+            toastr.error(data.couponMessage);
+        } else {
+            // If coupon is successfully applied
+            toastr.success(`Coupon code "${couponCode}" applied successfully!`);
+
+            // Update order summary in the UI
+            updateOrderSummary(data);
+        }
+
+    } catch (err) {
+        // Handling error during coupon application
+        toastr.error(`An error occurred while applying the coupon: ${err.message}`);
+        console.error("Error applying coupon:", err);
+    }
+});
+
+// Function to update order summary
+function updateOrderSummary(data) {
+    // Update the elements with the new values
+    document.getElementById('cartCount').innerText = `${data.cartCount} items`;
+    document.getElementById('cartTotal').innerText = `₹ ${data.cartTotal}`;
+    document.getElementById('discount').innerText = `₹ ${data.discount}`;
+    document.getElementById('shippingCharges').innerText = `₹ ${data.shippingCharges}`;
+    document.getElementById('netAmount').innerText = `₹ ${data.netAmount}`;
+}
+
+    </script>
+    
 
 <script>
 
@@ -648,5 +944,26 @@ document.getElementById('continueWithAddress').addEventListener('click', async f
 
 
 </script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const copyButtons = document.querySelectorAll(".copy-btn");
+
+        copyButtons.forEach(button => {
+            button.addEventListener("click", function () {
+                const couponCode = this.getAttribute("data-code");
+                navigator.clipboard.writeText(couponCode).then(() => {
+                    // Show success message using Toastr
+                    toastr.success(`Coupon Code "${couponCode}" copied to clipboard!`);
+                }).catch(err => {
+                    // Show error message using Toastr
+                    toastr.error("Error copying text: " + err);
+                    console.error("Error copying text: ", err);
+                });
+            });
+        });
+    });
+</script>
+
+
 
 <%- include('../../views/partials/user/footer') %>

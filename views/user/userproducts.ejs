@@ -283,16 +283,16 @@
                                         <img src="/uploads/public-image/<%= product.productImage[0] %>" alt="<%= product.productName %>">
                 
                                         <% if (product.variants.length > 0) { %>
-                                            <% product.variants.forEach(variant => { %>
-                                                <% if (variant.stock > 0 && variant.stock < 5) { %>
-                                                    <p class="stock-left">Only <%= variant.stock %> left, Please hurry up!!!</p>
+                                          
+                                                <!-- Stock Left Warning (Only for variants with stock < 5) -->
+                                                <% if (product.variants[0].stock > 0 && product.variants[0].stock < 5) { %>
+                                                    <p class="stock-left">Only <%=product.variants[0].stock %> left, Please hurry up!!!</p>
                                                 <% } %>
-                
-                                                <!-- Stock Status Badge -->
-                                                <div class="product-badge <%= variant.status ? variant.status.toLowerCase().replace(/ /g, '-') : 'available' %>">
-                                                    <%= variant.status || 'In Stock' %>
+                                                <!-- Stock Status Badge (Based on variant stock) -->
+                                                <div class="product-badge <%=product.variants[0].status ? product.variants[0].status.toLowerCase().replace(/ /g, '-') : 'available' %>">
+                                                    <%= product.variants[0].status || 'In Stock' %>
                                                 </div>
-                                            <% }); %>
+                                        
                                         <% } else { %>
                                             <p class="text-muted">No variants available</p>
                                         <% } %>
@@ -306,8 +306,9 @@
                                     <div class="product-details">
                                         <h6 class="product-name"><%= product.productName %></h6>
                 
-                                        <% if (product.firstVariant) { %>
-                                            <div class="product-price">&#8377;<%= product.firstVariant.salePrice || product.firstVariant.regularPrice %></div>
+                                        <% if (product.variants.length > 0) { %>
+                                            <!-- Display the price for the first variant -->
+                                            <div class="product-price">&#8377;<%= product.variants[0].salePrice || product.variants[0].regularPrice %></div>
                                         <% } else { %>
                                             <div class="product-price">Price Not Available</div>
                                         <% } %>
@@ -316,16 +317,13 @@
                                             <p><%= product.description %></p>
                                         </div>
                 
-                                        <button class="add-cart-btn">
-                                            <a href="#" onclick="addToCart('<%= product._id %>')" class="add-cart-link">+ Add to Cart</a>
-                                        </button>
-                                        <button class="buy-now-btn">Buy Now</button>
                                     </div>
                                 </div>
                             </div>
                         <% }); %>
                     <% } %>
                 </div>
+                
                 
                 <!-- Pagination -->
                 <div class="row">
@@ -351,33 +349,6 @@
                 
 </section>
 
-
-<script>
-   function addToCart(productId) {
-    $.ajax({
-        url: '/cart/add/' + productId,  
-        method: 'POST',
-        contentType: 'application/json',
-        success: function(response) {
-            Swal.fire({
-                title: "Success",
-                icon: "success",
-                text: "Product Added Successfully",
-                showConfirmButton: true,
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    window.location.href = '/cart';
-                }
-            });
-            
-        },
-        error: function() {
-            alert('Failed to add product to cart!');
-        }
-    });
-}
-
-</script>
 
 <script>
 document.querySelectorAll('.price-filter').forEach(function (link) {

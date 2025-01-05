@@ -1,7 +1,6 @@
 const Product = require('../../models/productSchema')
 const Category = require("../../models/categorySchema")
 const User = require('../../models/userSchema')
-const ProductVariant = require('../../models/productVariantSchema')
 
 const fs = require('fs');
 const path = require('path');
@@ -20,10 +19,10 @@ const getProduct = async(req,res)=>{
         res.redirect("/pageerror")
     }
 }
-
 const addProducts = async (req, res) => {
     try {
         const product = req.body;
+       
 
         // Check if the product already exists
         const productExists = await Product.findOne({ productName: product.productName });
@@ -59,24 +58,11 @@ const addProducts = async (req, res) => {
             return res.status(400).redirect('/admin/add-products');
         }
 
-        // Create the product
-        const newProduct = new Product({
-            productName: product.productName,
-            description: product.description,
-            category: categoryId,
-            productImage: images,
-            isBlocked: false,
-            isDeleted: false,
-            ratings: { average: 0, count: 0 },
-        });
-
-        const savedProduct = await newProduct.save();
-
         // Parse and validate variants
         let variants = [];
         if (product.variants) {
             try {
-                variants = JSON.parse(product.variants); 
+                variants = JSON.parse(product.variants);
             } catch (error) {
                 req.flash("error", "Invalid variants data");
                 return res.status(400).redirect('/admin/add-products');
@@ -86,30 +72,25 @@ const addProducts = async (req, res) => {
                 req.flash("error", "At least one product variant is required");
                 return res.status(400).redirect('/admin/add-products');
             }
+
         } else {
             req.flash("error", "Product variants are required");
             return res.status(400).redirect('/admin/add-products');
         }
 
-        // Create ProductVariant documents and link to Product
-        const productVariantIds = [];
-        for (const variant of variants) {
-            const newVariant = new ProductVariant({
-                product_id: savedProduct._id,
-                color: variant.color,
-                size: variant.size,
-                stock: variant.stock,
-                regularPrice: variant.regularPrice,
-                salePrice: variant.salePrice || 0,
-            });
+        // Create the product with variants directly in the document
+        const newProduct = new Product({
+            productName: product.productName,
+            description: product.description,
+            category: categoryId,
+            productImage: images,
+            isBlocked: false,
+            isDeleted: false,
+            ratings: { average: 0, count: 0 },
+            variants: variants, // Directly add variants to the product document
+        });
 
-            const savedVariant = await newVariant.save();
-            productVariantIds.push(savedVariant._id);
-        }
-
-        // Update the product with variant IDs
-        savedProduct.variants = productVariantIds;
-        await savedProduct.save();
+        const savedProduct = await newProduct.save();
 
         req.flash("success", "Product and variants added successfully");
         res.status(201).redirect("/admin/add-products");
@@ -126,10 +107,9 @@ const getAllProducts = async (req, res) => {
     try {
         let search = req.query.search || "";
         let page = parseInt(req.query.page, 10) || 1;
-
         const limit = 4;
 
-        // Fetch products
+        // Fetch products with variants and categories
         const productData = await Product.find({
             $or: [
                 { productName: { $regex: new RegExp(".*" + search + ".*"), $options: "i" } },
@@ -138,9 +118,10 @@ const getAllProducts = async (req, res) => {
             .limit(limit)
             .skip((page - 1) * limit)
             .populate('category')
+            .populate('variants') 
             .exec();
 
-        // Fetch total product count
+      
         const count = await Product.countDocuments({
             $or: [
                 { productName: { $regex: new RegExp(".*" + search + ".*"), $options: "i" } },
@@ -150,20 +131,10 @@ const getAllProducts = async (req, res) => {
         // Fetch categories
         const category = await Category.find({ isListed: true });
 
-        // Attach variants to each product
-        const productsWithVariants = await Promise.all(
-            productData.map(async (product) => {
-                const productVariants = await ProductVariant.findOne({ product_id: product._id });
-                return {
-                    ...product.toObject(),
-                    variants: productVariants ? productVariants.variant : [],
-                };
-            })
-        );
-
+      
         if (category) {
             res.render("products", {
-                data: productsWithVariants,
+                data: productData,  
                 category: category,
                 totalPages: Math.ceil(count / limit),
                 currentPage: page,
@@ -179,14 +150,11 @@ const getAllProducts = async (req, res) => {
 };
 
 
-
-
-
 const getEditProducts = async (req, res) => {
     try {
 
         const id = req.query.id;
-        const product = await Product.findOne({_id:id});
+        const product = await Product.findOne({_id: id})
         const category = await Category.find({})
 
         res.render("edit-product",{
@@ -202,64 +170,102 @@ const getEditProducts = async (req, res) => {
 
 
 
-
-const editProducts = async(req,res) =>{
-
+const editProducts = async (req, res) => {
     try {
         const id = req.params.id;
-        const product = await Product.findOne({_id: id });
         const data = req.body;
 
+        // Check if product name already exists
+        const existingProduct = await Product.findOne({ productName: data.productName, _id: { $ne: id } });
 
-        const existingProduct = await Product.findOne({
-            productName : data.productName,
-            _id : {$ne : id}
-        })
-        if(existingProduct){
-             req.flash("error","Product with this name already existed, Please try again");
-             res.redirect("/admin/editproducts")
+        if (existingProduct) {
+            req.flash("error", "Product with this name already exists. Please try again.");
+            return res.redirect(`/admin/editproducts?id=${id}`);
         }
 
+        const variants = Array.isArray(data.variants) ? data.variants : JSON.parse(data.variants);
+        const updatedVariants = [];
 
-        const images = [];
+        for (let variant of variants) {
+            // Check if the variant exists by matching color and size
+            const existingVariant = await Product.findOne(
+                { _id: id, "variants.color": variant.color, "variants.size": variant.size }
+            );
 
-        if(req.files && req.files.length > 0){
-            for(let i=0;i<req.files.length ; i++){
-                images.push(req.files[i].filename)
+            if (existingVariant) {
+                // If the variant exists, update the specific variant
+                await Product.updateOne(
+                    { _id: id, "variants.color": variant.color, "variants.size": variant.size },
+                    {
+                        $set: {
+                            "variants.$.stock": variant.stock,
+                            "variants.$.regularPrice": variant.regularPrice,
+                            "variants.$.salePrice": variant.salePrice || null,
+                            "variants.$.status": variant.stock === 0 ? "Out of Stock" : "Available",
+                        },
+                    }
+                );
+            } else {
+                // If the variant doesn't exist, push it to the new variants array
+                updatedVariants.push({
+                    color: variant.color,
+                    size: variant.size,
+                    stock: variant.stock,
+                    regularPrice: variant.regularPrice,
+                    salePrice: variant.salePrice || null,
+                    status: variant.stock === 0 ? "Out of Stock" : "Available",
+                });
             }
         }
 
-       
-
-        const updateFields = {
-            productName : data.productName,
-            description : data.description,
-            category : data.category,
-            regularPrice : data.regularPrice,
-            salePrice : data.salePrice,
-            color : data.color,
-            quantity : data.quantity,
-            size : data.size,
-
+        // If there are new variants to add
+        if (updatedVariants.length > 0) {
+            await Product.findByIdAndUpdate(
+                id,
+                {
+                    $push: { variants: { $each: updatedVariants } }, // Add new variants to the variants array
+                },
+                { new: true }
+            );
         }
 
-if(req.files.length > 0){
-    updateFields.$push = {productImage : {$each : images}}
-}
+        // Handle image files (if provided)
+        const images = req.files && req.files.length > 0
+            ? req.files.map(file => file.filename)
+            : [];
 
+        // Prepare the update fields for the product
+        const updateFields = {
+            productName: data.productName,
+            description: data.description,
+            category: data.category,  // category is a reference to Category _id
+            productOffer: data.productOffer,
+        };
 
-  await Product.findByIdAndUpdate(id,updateFields,{new : true});
+        if (images.length > 0) {
+            // Add new images to the existing product
+            await Product.findByIdAndUpdate(
+                id,
+                {
+                    ...updateFields,
+                    $push: { productImage: { $each: images } },
+                },
+                { new: true }
+            );
+        } else {
+            // Update product without new images
+            await Product.findByIdAndUpdate(id, updateFields, { new: true });
+        }
 
-res.redirect("/admin/products")
-
-
+        // Flash success and redirect
+        req.flash("success", "Product updated successfully!");
+        res.redirect("/admin/products");
 
     } catch (error) {
-        console.error(error);
-        res.redirect("/pageerror")
+        console.error("Error updating product:", error);
+        res.redirect("/pageerror");
     }
-
-}
+};
 
 
 const deleteImage = async(req,res)=>{
@@ -279,6 +285,39 @@ const deleteImage = async(req,res)=>{
         res.send({status : true})
     } catch (error) {
         res.redirect("/pageerror")
+    }
+}
+
+const removeVariant = async (req, res) => {
+    const { productId, variantIndex } = req.params;
+
+    try {
+        // Find the product by ID
+        const product = await Product.findById(productId);
+
+        if (!product) {
+            return res.status(404).json({ success: false, message: 'Product not found.' });
+        }
+
+        // Check if the variantIndex is within the range of variants
+        if (variantIndex >= product.variants.length || variantIndex < 0) {
+            return res.status(400).json({ success: false, message: 'Invalid variant index.' });
+        }
+
+        if (product.variants.length <= 1) {
+            return res.status(400).json({ success: false, message: "Cannot remove the last variant of a product." });
+        }
+
+        // Remove the variant at the given index
+        product.variants.splice(variantIndex, 1); // Removes the variant at the given index
+
+        // Save the updated product
+        await product.save();
+
+        res.json({ success: true, message: 'Variant removed successfully.' });
+    } catch (error) {
+        console.error('Error removing variant:', error);
+        res.status(500).json({ success: false, message: 'An error occurred while removing the variant.' });
     }
 }
 
@@ -366,138 +405,20 @@ const getProductDetails = async (req, res) => {
             .populate("category")
             .exec()
 
-         // Fetch the variants for the product
-         const productVariant = await ProductVariant.findOne({ product_id: productId });
-
-         // Extract the variants array
-         const variants = productVariant ? productVariant.variant : [];
-
         if (!product) {
             req.flash("error", "Product not found");
             return res.redirect("/products");
         }
 
-        res.render("admin-product-details", { product,variants });
+        res.render("admin-product-details", { product });
     } catch (error) {
         console.error(error);
         res.redirect("/pageerror");
     }
 };
 
-const getEditVariant = async (req, res) => {
-    try {
-        const variantId = req.params.id;
-
-        // Find the document containing the specific variant ID
-        const productVariant = await ProductVariant.findOne({ "variant._id": variantId });
-
-        if (!productVariant) {
-            return res.status(404).send('Variant not found');
-        }
-
-        // Find the specific variant inside the array
-        const targetVariant = productVariant.variant.find(v => v._id.toString() === variantId);
-        if (!targetVariant) {
-            return res.status(404).send('Variant not found');
-        }
-
-        const product = await Product.findById(productVariant.product_id);
-
-        res.render('edit-variant', {
-            variant: targetVariant,
-            product,
-        });
-    } catch (error) {
-        console.error(error);
-        res.status(500).send('Server Error');
-    }
-};
 
 
-const editVariant = async (req, res) => {
-    try {
-        const variantId = req.params.id;
-        const { color, size, stock, regularPrice, salePrice, status } = req.body;
-
-        // Find the document containing the variant
-        const productVariant = await ProductVariant.findOne({ "variant._id": variantId });
-
-        if (!productVariant) {
-            return res.status(404).send('Variant not found');
-        }
-
-        // Find the specific variant within the array
-        const targetVariant = productVariant.variant.find(v => v._id.toString() === variantId);
-        if (targetVariant) {
-            // Update the fields of the variant
-            targetVariant.color = color;
-            targetVariant.size = size;
-            targetVariant.stock = stock;
-            targetVariant.regularPrice = regularPrice;
-            targetVariant.salePrice = salePrice;
-            targetVariant.status = status;
-
-            // Save the updated document
-            await productVariant.save();
-        } else {
-            return res.status(404).send('Variant not found');
-        }
-
-        res.redirect(`/admin/product-details/${productVariant.product_id}`);
-    } catch (error) {
-        console.error(error);
-        res.status(500).send('Server Error');
-    }
-};
-
-const addVariant = async (req, res) => {
-    try {
-        const { color, size, regularPrice, salePrice, stock } = req.body;
-        const productId = req.params.id;
-
-        const variant = {
-            color,
-            size,
-            regularPrice,
-            salePrice,
-            stock
-        };
-
-        await ProductVariant.updateOne(
-            { product_id: productId },
-            { $push: { variant } },
-            { upsert: true }
-        );
-
-        res.redirect(`/admin/product-details/${productId}`);
-    } catch (error) {
-        console.error(error);
-        res.status(500).send('Server Error');
-    }
-};
-
-const deleteVariant = async (req, res) => {
-    try {
-        const variantId = req.params.id;
-
-        // Pull the variant from the 'variant' array
-        const variantDoc = await ProductVariant.findOneAndUpdate(
-            { "variant._id": variantId },
-            { $pull: { variant: { _id: variantId } } },
-            { new: true } 
-        );
-
-        if (!variantDoc) {
-            return res.status(404).send('Variant not found');
-        }
-
-        
-        res.redirect(`/admin/product-details/${variantDoc.product_id}`);
-    } catch (error) {
-        console.error(error);
-        res.status(500).send('Server Error');
-    }
-};
 
 
 
@@ -515,8 +436,5 @@ module.exports = {
     blockProducts,
     unblockProducts,
     getProductDetails,
-    getEditVariant,
-    editVariant,
-    addVariant,
-    deleteVariant
+    removeVariant
 }

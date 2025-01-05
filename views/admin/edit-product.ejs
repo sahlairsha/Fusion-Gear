@@ -61,6 +61,20 @@
             margin-left: 30px;
             margin-top: 30px;
         }
+        .remove-variant{
+            background-color:transparent;
+            border-radius: 50%;
+            text-align: center;
+            width: 44px;
+            height: 30px;
+            font-size: 12px;
+            margin-top: 30px;
+            border: 1px solid #000;
+        }
+        .remove-variant:hover{
+            background-color: #000;
+            color: #fff;
+        }
 
  
     </style>
@@ -104,6 +118,44 @@
                                     </div>
                                 </div>
                             </div>
+
+                            <div class="card mb-4">
+                                <div class="card-header">
+                                    <h4>Edit Product Variants</h4>
+                                </div>
+                                <div class="card-body">
+                                    <div id="variant-container">
+                                        <% product.variants.forEach((variant, index) => { %>
+                                        <div class="variant-row d-flex align-items-center mb-3" id="variant-row-<%= index %>">
+                                            <input type="hidden" name="variants[<%= index %>][id]" value="<%= variant._id %>">
+                                            <div class="me-3">
+                                                <label for="variantColor<%= index %>" class="form-label">Color</label>
+                                                <input type="text" class="form-control" id="variantColor<%= index %>" name="variants[<%= index %>][color]" value="<%= variant.color %>">
+                                            </div>
+                                            <div class="me-3">
+                                                <label for="variantSize<%= index %>" class="form-label">Size</label>
+                                                <input type="text" class="form-control" id="variantSize<%= index %>" name="variants[<%= index %>][size]" value="<%= variant.size %>">
+                                            </div>
+                                            <div class="me-3">
+                                                <label for="variantStock<%= index %>" class="form-label">Stock</label>
+                                                <input type="number" class="form-control" id="variantStock<%= index %>" name="variants[<%= index %>][stock]" value="<%= variant.stock %>">
+                                            </div>
+                                            <div class="me-3">
+                                                <label for="variantRegularPrice<%= index %>" class="form-label">Regular Price</label>
+                                                <input type="number" class="form-control" id="variantRegularPrice<%= index %>" name="variants[<%= index %>][regularPrice]" value="<%= variant.regularPrice %>">
+                                            </div>
+                                            <div class="me-3">
+                                                <label for="variantsalePrice<%= index %>" class="form-label">Sale Price</label>
+                                                <input type="number" class="form-control" id="variantsalePrice<%= index %>" name="variants[<%= index %>][salePrice]" value="<%= variant.salePrice %>">
+                                            </div>
+                                            <button type="button" class="remove-variant" onclick="removeVariant('<%= index %>')">X</button>
+                                        </div>
+                                        <% }); %>
+                                    </div>
+                                    <button type="button" class="btn btn-primary" onclick="addVariant()">Add Variant</button>
+                                </div>
+                            </div>
+
                             <div class="card mb-2">
                                 <div class="card-header">
                                     <h4>Choose images</h4>
@@ -387,6 +439,53 @@ function displayErrorMessage(elementId, message) {
                        addedImagesContainer.appendChild(thumbnail);
                    }
                };
+
+
+
+               document.addEventListener('DOMContentLoaded', function () {
+
+               })
+
+function addVariant() {
+    
+    let variantIndex = '<%= product.variants.length %>';
+    const variantContainer = document.getElementById("variant-container");
+    const variantRow = document.createElement("div");
+    variantRow.className = "variant-row d-flex align-items-center mb-3";
+    variantRow.id = `variant-row-${variantIndex}`;
+    variantRow.innerHTML = `
+        <div class="me-3">
+            <label for="variantColor${variantIndex}" class="form-label">Color</label>
+            <input type="text" class="form-control" id="variantColor${variantIndex}" name="variants[${variantIndex}][color]">
+        </div>
+        <div class="me-3">
+            <label for="variantSize${variantIndex}" class="form-label">Size</label>
+            <input type="text" class="form-control" id="variantSize${variantIndex}" name="variants[${variantIndex}][size]">
+        </div>
+        <div class="me-3">
+            <label for="variantStock${variantIndex}" class="form-label">Stock</label>
+            <input type="number" class="form-control" id="variantStock${variantIndex}" name="variants[${variantIndex}][stock]">
+        </div>
+          <div class="me-3">
+            <label for="variantRegularPrice${variantIndex}" class="form-label">Regular Price</label>
+            <input type="number" class="form-control" id="variantRegularPrice${variantIndex}" name="variants[${variantIndex}][regularPrice]">
+        </div>
+        <div class="me-3">
+     <label for="variantsalePrice${variantIndex}" class="form-label">Sale Price</label>
+     <input type="number" class="form-control" id="variantsalePrice${variantIndex}" name="variants[${variantIndex}][salePrice]">
+      </div>
+        <button type="button" class="remove-variant" onclick="removeVariant(${variantIndex})">X</button>
+    `;
+    variantContainer.appendChild(variantRow);
+    variantIndex++;
+}
+
+function removeVariant(index) {
+    const variantRow = document.getElementById(`variant-row-${index}`);
+    if (variantRow) {
+        variantRow.remove();
+    }
+}
 
 
 

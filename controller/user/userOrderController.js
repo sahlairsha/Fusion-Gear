@@ -1,54 +1,82 @@
 const Order = require('../../models/orderSchema');
 const Address = require('../../models/addressSchema')
 const Product = require('../../models/productSchema')
-const ProductVariant = require('../../models/productVariantSchema')
 const User = require('../../models/userSchema')
+const Coupon = require('../../models/couponSchema')
 
 
-async function calculateCartTotals(userId) {
+async function calculateCheckoutTotals(userId, couponCode) {
     const user = await User.findById(userId).populate('cart.product_id');
     const cartItems = user.cart.filter(item => item.product_id);
 
-    console.log("Items in cart : ", cartItems);
-
     let cartTotal = 0;
 
+    // Calculate cart total
     for (const item of cartItems) {
         if (item.product_id) {
-            // Fetch the corresponding variant from the ProductVariant collection by product_id
-            const productVariant = await ProductVariant.findOne({ product_id: item.product_id._id });
-
-            console.log("Product variants:", productVariant);
-
-            if (productVariant && productVariant.variant.length > 0) {
-                // Get the first variant (or any logic you want to choose a variant)
-                const variant = productVariant.variant[0];  // Picking the first variant as default
-
-                
+            const variantId = item.variant_id;
+            const variant = item.product_id.variants.find(v => v._id.toString() === variantId.toString());
+            if (variant) {
                 const price = variant.salePrice || variant.regularPrice;
                 cartTotal += price * item.quantity;
-                console.log("Product variant price:", price);
             } else {
-                console.log(`No variants found for product ${item.product_id._id}`);
+                console.log(`Variant not found for product ${item.product_id._id} with variantId ${variantId}`);
             }
-        } else {
-            console.log("Item missing product_id:", item);
         }
-
-        console.log("Product Items for search:", item.product_id._id);
     }
 
+    // Default shipping charges
     const shippingCharges = cartTotal > 500 ? 0 : 50;
-    const netAmount = cartTotal + shippingCharges;
 
-    // Return the updated values
+    // Fetch and validate coupon
+    let discount = 0;
+    let couponMessage = '';
+    if (couponCode) {
+        const coupon = await Coupon.findOne({ code: couponCode, status: 'active' });
+        if (coupon) {
+            const now = new Date();
+            if (now >= coupon.startDate && now <= coupon.endDate) {
+                // Check coupon applicability
+                let isApplicable = false;
+                if (coupon.applicableTo === 'order') {
+                    isApplicable = true; // Order-wide coupon
+                } else if (coupon.applicableTo === 'product') {
+                    isApplicable = cartItems.some(item => item.product_id._id.toString() === coupon.productId?.toString());
+                } else if (coupon.applicableTo === 'category') {
+                    isApplicable = cartItems.some(item => item.product_id.category.toString() === coupon.categoryId?.toString());
+                }
+
+                if (isApplicable && cartTotal >= coupon.minOrderValue) {
+                    if (coupon.discountType === 'percentage') {
+                        discount = Math.min((cartTotal * coupon.discountValue) / 100, coupon.maxDiscount || Infinity);
+                    } else if (coupon.discountType === 'fixed') {
+                        discount = Math.min(coupon.discountValue, coupon.maxDiscount || Infinity);
+                    }
+                } else {
+                    couponMessage = 'Coupon not applicable to this cart.';
+                }
+            } else {
+                couponMessage = 'Coupon expired.';
+            }
+        } else {
+            couponMessage = 'Invalid coupon code.';
+        }
+    }
+
+    const netAmount = cartTotal - discount + shippingCharges;
+
+    console.log("Discount amount :" + discount);
+    console.log("Net amount :" + netAmount);
+
     return {
         cartTotal: cartTotal.toFixed(2),
-        discount: '0.00',
+        discount: discount.toFixed(2),
         shippingCharges: shippingCharges.toFixed(2),
         netAmount: netAmount.toFixed(2),
+        couponMessage,
     };
 }
+
 const getCheckout = async (req, res) => {
     try {
         const userId = req.session.user;
@@ -65,45 +93,26 @@ const getCheckout = async (req, res) => {
             return res.redirect('/cart');
         }
 
-        // Add variant data to cart items and check for valid product_id
-        for (let item of user.cart) {
-            if (item.product_id) {  // Check if product_id exists
-                try {
-                    const productVariant = await ProductVariant.findOne({ product_id: item.product_id._id });
-                    if (productVariant && productVariant.variant.length > 0) {
-                        const variant = productVariant.variant[0]; // Selecting the first variant as the default
-                        item.variant = variant; // Assign the variant to the item
-                    }
-                } catch (err) {
-                    console.error('Error fetching product variant:', err);
-                }
-            } else {
-                console.warn('Product ID is missing for item:', item);
-            }
-        }
+        // Fetch available coupons
+        const now = new Date();
+        const coupons = await Coupon.find({
+            status: 'active',
+            startDate: { $lte: now },
+            endDate: { $gte: now },
+        });
 
-        // Now safely map order products
-        const orderProducts = user.cart
-            .filter(item => item.product_id)  // Only include items with a valid product_id
-            .map(item => ({
-                product_id: item.product_id._id,
-                quantity: item.quantity,
-            }));
+        const updatedCheckoutTotals = await calculateCheckoutTotals(userId, req.query.couponCode || null);
 
-        if (orderProducts.length === 0) {
-            req.flash('error', "No valid products in the cart. Please add a product.");
-            return res.redirect('/cart');
-        }
+        console.log("Updated Checkout", updatedCheckoutTotals);
 
-        // Calculate cart totals with variants
-        const updatedCartTotals = await calculateCartTotals(userId);
-
-        // Render the checkout page
+        // Return updated cart totals and coupon data
         res.render('checkout', {
             user,
             address: savedAddress,
-            cartCount: orderProducts.length,
-            ...updatedCartTotals,
+            cartCount: user.cart.length,
+            coupons,
+            appliedCoupon: req.query.couponCode || null,
+            ...updatedCheckoutTotals,
         });
     } catch (error) {
         console.error("Error loading checkout page:", error);
@@ -111,6 +120,51 @@ const getCheckout = async (req, res) => {
         res.redirect('/cart');
     }
 };
+
+const applyCoupon = async (req, res) => {
+    try {
+        const userId = req.session.user;
+        if (!userId) {
+            return res.status(401).json({ error: "Please login to apply a coupon." });
+        }
+
+        const user = await User.findById(userId).populate('cart.product_id');
+        if (!user || user.cart.length === 0) {
+            return res.status(400).json({ error: "Cart is empty! Please add a product." });
+        }
+
+        // Fetch the coupon code from the query
+        const couponCode = req.query.couponCode;
+        if (!couponCode) {
+            return res.status(400).json({ error: "Coupon code is required." });
+        }
+
+        // Check if coupon is valid
+        const coupon = await Coupon.findOne({ code: couponCode, status: 'active' });
+        if (!coupon) {
+            return res.status(400).json({ couponMessage: "Invalid or expired coupon code." });
+        }
+
+        // Calculate the updated totals
+        const updatedCheckoutTotals = await calculateCheckoutTotals(userId, couponCode);
+
+        console.log("Updated Checkout after applying coupon:", updatedCheckoutTotals);
+
+        // Return updated checkout totals and coupon data in the response
+        res.json({
+            cartCount: user.cart.length,
+            cartTotal: updatedCheckoutTotals.cartTotal,
+            discount: updatedCheckoutTotals.discount,
+            shippingCharges: updatedCheckoutTotals.shippingCharges,
+            netAmount: updatedCheckoutTotals.netAmount,
+            couponMessage: updatedCheckoutTotals.couponMessage || null,
+        });
+    } catch (error) {
+        console.error("Error applying coupon:", error);
+        res.status(500).json({ error: "An error occurred while applying the coupon. Please try again." });
+    }
+};
+
 
 
 const saveAddress = async (req, res) => {
@@ -656,6 +710,7 @@ module.exports = {
     getRating,
     submitRating,
     submitReviews,
-    getCancelConfirmation
+    getCancelConfirmation,
+    applyCoupon
 
 }

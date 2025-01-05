@@ -258,27 +258,37 @@ input[type="number"]::-webkit-inner-spin-button {
                                 <tr>
                                     <td class="product__cart__item">
                                         <div class="product__cart__item__pic">
-                                           <a href="/product/view?id=<%= item.product_id._id%>"><img src="/uploads/public-image/<%= item.product_id.productImage[0] %>" alt="<%= item.product_id.productName %>"></a> 
+                                            <a href="/product/view?id=<%= item.product._id %>">
+                                                <img src="/uploads/public-image/<%= item.product.productImage[0] %>" alt="<%= item.product.productName %>">
+                                            </a>
                                         </div>
                                         <div class="product__cart__item__text">
-                                            <h6><%= item.product_id.productName %></h6>
-                                            <h5>Price: ₹<%= item.variant.salePrice %></h5> <!-- Use variant's salePrice -->
+                                            <h6><%= item.product.productName %></h6>
+                                            
+                                            <!-- Use selectedVariant for variant details -->
+                                            <% if (item.selectedVariant) { %>
+                                                <p><strong>Variant:</strong> <%= item.selectedVariant.color %> - <%= item.selectedVariant.size %></p>
+                                                <h5>Price: ₹<%= item.selectedVariant.salePrice || item.selectedVariant.regularPrice %></h5>
+                                            <% } else { %>
+                                                <p><strong>Variant:</strong> N/A</p>
+                                                <h5>Price: ₹<%= item.product.regularPrice %></h5>
+                                            <% } %>
                                         </div>
                                     </td>
                                     <td class="quantity__item">
                                         <div class="quantity">
-                                            <button class="btn-decrement" data-available-stock="<%= item.variant.stock %>" data-product-id="<%= item.product_id._id %>">-</button>
-                                            <input type="number" value="<%= item.quantity %>" min="1" data-product-id="<%= item.product_id._id %>" class="quantity-input">
-                                            <button class="btn-increment" data-available-stock="<%= item.variant.stock %>" data-product-id="<%= item.product_id._id %>">+</button>
+                                            <button class="btn-decrement"data-available-stock="<%= item.selectedVariant.stock %>" data-product-id="<%= item.product._id %>" data-variant-id="<%= item.selectedVariant._id %>" >-</button>
+                                            <input type="number" value="<%= item.quantity %>" min="1" data-product-id="<%= item.product._id %>" class="quantity-input">
+                                            <button class="btn-increment" data-available-stock="<%= item.selectedVariant.stock %>" data-product-id="<%= item.product._id %>" data-variant-id="<%= item.selectedVariant._id %>">+</button>
                                         </div>
                                     </td>
-                                    
                                     <td class="cart__close">
-                                        <a href="#" class="remove-item" data-product-id="<%= item.product_id._id %>"><i class="fa fa-close"></i></a>
+                                        <a href="#" class="remove-item" data-product-id="<%= item.product._id %>"><i class="fa fa-close"></i></a>
                                     </td>
                                 </tr>
                             <% }) %>
                         </tbody>
+                        
                     </table>
                 </div>
                 <button class="continue__btn"><a class="continue__link" href="/products">Continue to shopping</a></button>
@@ -313,6 +323,7 @@ input[type="number"]::-webkit-inner-spin-button {
 
             const isIncrement = event.target.closest('.btn-increment') ? true : false;
             const productId = event.target.closest('button').getAttribute('data-product-id');
+            const variantId = event.target.getAttribute('data-variant-id');
             const quantityInput = document.querySelector(`input[data-product-id="${productId}"]`);
             let quantity = parseInt(quantityInput.value);
             const availableStock = event.target.closest('button').getAttribute('data-available-stock');
@@ -339,7 +350,7 @@ input[type="number"]::-webkit-inner-spin-button {
                 const response = await fetch(`/cart/update-quantity/${productId}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ quantity })
+                    body: JSON.stringify({ quantity , variantId})
                 });
 
                 const data = await response.json();

@@ -1,48 +1,42 @@
 const Product = require("../../models/productSchema");
 const User = require("../../models/userSchema");
-const Order = require('../../models/orderSchema');
-const ProductVariant = require("../../models/productVariantSchema");
+
 
 async function calculateCartTotals(userId) {
     const user = await User.findById(userId).populate('cart.product_id');
-    const cartItems = user.cart.filter(item => item.product_id);
-
-    console.log("Items in cart : ", cartItems);
+    const cartItems = user.cart.filter((item) => item.product_id);
 
     let cartTotal = 0;
 
     for (const item of cartItems) {
         if (item.product_id) {
-            // Fetch the corresponding variant from the ProductVariant collection by product_id
-            const productVariant = await ProductVariant.findOne({ product_id: item.product_id._id });
+            // Get the variantId stored in the cart
+            const variantId = item.variant_id;
 
-            console.log("Product variants:", productVariant);
+            // Find the selected variant for this product
+            const variant = item.product_id.variants.find(
+                (v) => v._id.toString() === variantId.toString()
+            );
 
-            if (productVariant && productVariant.variant.length > 0) {
-                // Get the first variant (or any logic you want to choose a variant)
-                const variant = productVariant.variant[0];  // Picking the first variant as default
-
-                
+            if (variant) {
                 const price = variant.salePrice || variant.regularPrice;
                 cartTotal += price * item.quantity;
-                console.log("Product variant price:", price);
             } else {
-                console.log(`No variants found for product ${item.product_id._id}`);
+                console.log(
+                    `Variant not found for product ${item.product_id._id} with variantId ${variantId}`
+                );
             }
         } else {
             console.log("Item missing product_id:", item);
         }
-
-        console.log("Product Items for search:", item.product_id._id);
     }
 
     const shippingCharges = cartTotal > 500 ? 0 : 50;
     const netAmount = cartTotal + shippingCharges;
 
-    // Return the updated values
     return {
         cartTotal: cartTotal.toFixed(2),
-        discount: '0.00',
+        discount: '0.00', 
         shippingCharges: shippingCharges.toFixed(2),
         netAmount: netAmount.toFixed(2),
     };
@@ -55,107 +49,118 @@ async function calculateCartTotals(userId) {
 const getCartPage = async (req, res) => {
     const userId = req.session.user;
     try {
-        const user = await User.findById(userId).populate('cart.product_id');
-        const cartItems = user.cart.filter(item => item.product_id);
-
+        // Ensure that the user is logged in
         if (!userId) {
             req.flash("error", "Please login!!!");
             return res.redirect("/");
         }
 
+        // Fetch the user, populate both the product and variant references
+        const user = await User.findById(userId)
+        .populate('cart.product_id')
+        .exec();
+
+        // Filter out cart items without a product reference (in case of any data issues)
+       
+const cartItems = user.cart.map((item) => {
+    const product = item.product_id; // Fetched via populate
+    if (!product) return null; // Skip invalid product references
+
+    // Find the variant by matching the variant_id
+    const selectedVariant = product.variants.find(
+        (variant) => variant._id.toString() === item.variant_id.toString()
+    );
+
+    return {
+        product,
+        selectedVariant,
+        quantity: item.quantity,
+    };
+}).filter(item => item !== null);
+
+        console.log("Cart Items: " + cartItems)
+    
+
+        // Calculate the total number of items in the cart
         const countItems = cartItems.length;
         req.session.cartCount = countItems;
 
-        // Fetch the variants for each product in the cart
-        for (let item of cartItems) {
-            try {
-                const productVariant = await ProductVariant.findOne({ product_id: item.product_id._id });
+        const selectedVariant = req.session.variant
 
-                if (productVariant && productVariant.variant.length > 0) {
-                    // Get the first variant (or select a specific one if needed)
-                    const variant = productVariant.variant[0];  // Picking the first variant as default
+        // Calculate the cart totals, ensuring variant prices are considered
+        const updatedCartTotals = await calculateCartTotals(userId,selectedVariant);
 
-                    // Add variant data to the cart item
-                    item.variant = variant;
-                    item.salePrice = variant.salePrice || variant.regularPrice;  // Use salePrice or fallback to regularPrice
-                } else {
-                    console.log(`No variants found for product ${item.product_id._id}`);
-                }
-            } catch (variantError) {
-                console.error('Error fetching product variant:', variantError);
-            }
-        }
-
-        // Now calculate the cart totals
-        const updatedCartTotals = await calculateCartTotals(userId);
-
-        // Render the cart page with updated cart items and totals
+        // Render the cart page, passing the cart items and other data to the view
         res.render("cart", {
             user,
             cartItems,
             ...updatedCartTotals,
-            couponMessage: "",
-            cartCount: req.session.cartCount,
+            couponMessage: "", // Optional: Add logic for handling any coupon messages
+            cartCount: req.session.cartCount, // Passing cart count to the session
         });
-
+        
     } catch (error) {
         console.log(error);
         res.status(500).send("Error loading cart page");
     }
 };
 
-
-
-// Add product to cart
 const addToCart = async (req, res) => {
     try {
-        const { productId } = req.params;
+        const { productId, variantId } = req.params;
+        const { quantity } = req.body; // Parse quantity from the request body
         const userId = req.session.user;
 
-        
+        req.session.variant = variantId;
+        const selectedVariant = req.session.variant;
+        console.log("Selected variant:",selectedVariant)
         // Find the product by ID
         const product = await Product.findById(productId);
         if (!product) {
             return res.status(404).json({ success: false, message: 'Product not found' });
         }
 
-       
-        const user = await User.findOne({ _id: userId });
+        // Find the selected variant
+        const variant = product.variants.find(v => v._id.toString() ===  selectedVariant);
+        if (!variant) {
+            return res.status(404).json({ success: false, message: 'Variant not found' });
+        }
 
-        
-        const existingItem = user.cart.find(item => item.product_id.toString() === productId);
+        if (variant.stock < quantity) {
+            return res.json({
+                success: false,
+                message: `Only ${variant.stock} left in stock. You can add up to ${variant.stock} to the cart.`,
+            });
+        }
+
+        // Find the user
+        const user = await User.findById(userId);
+
+        // Check if the product is already in the cart
+        const existingItem = user.cart.find(item => item.product_id.toString() === productId &&  item.variant_id.toString() === variantId);
 
         if (existingItem) {
-        
-            const newQuantity = existingItem.quantity + 1;
-            if (newQuantity > product.quantity) {
+            // Update the quantity
+            const newQuantity = existingItem.quantity + quantity;
+            if (newQuantity > variant.stock) {
                 return res.json({
                     success: false,
-                    message: `Only ${product.quantity} left in stock. You can add up to ${product.quantity} to the cart.`
+                    message: `Only ${variant.stock} left in stock.`,
                 });
             }
 
-            
             await User.updateOne(
-                { _id: userId, "cart.product_id": productId },
-                { $inc: { "cart.$.quantity": 1 } },
-                { new: true }
+                { _id: userId, "cart.product_id": productId, "cart.variant_id": variantId },
+                { $set: { "cart.$.quantity": newQuantity } }
             );
         } else {
-           
-            if (product.quantity < 1) {
-                return res.json({
-                    success: false,
-                    message: `Product is out of stock`
-                });
-            }
-
-            
-            await User.findByIdAndUpdate(
-                userId,
-                { $push: { cart: { product_id: productId, quantity: 1 } } },
-                { new: true }
-            );
+            // Add a new item to the cart
+            user.cart.push({
+                product_id: productId,
+                variant_id: variantId,
+                quantity: quantity,
+            });
+            await user.save();
         }
 
         res.json({ success: true, message: 'Product added to cart' });
@@ -199,25 +204,36 @@ const removeFromCart = async (req, res) => {
 };
 
 const updateQuantity = async (req, res) => {
-
     try {
-    const { productId } = req.params;
-    const { quantity } = req.body;
-    const userId = req.session.user;
+        const { productId } = req.params;
+        const { quantity, variantId } = req.body; // Ensure variantId is passed
+        const userId = req.session.user;
+
         const product = await Product.findById(productId);
         if (!product) {
             return res.status(404).json({ success: false, message: 'Product not found' });
         }
 
-        if (quantity > product.quantity) {
+        // Find the variant
+        const selectedVariant = product.variants.find(
+            (variant) => variant._id.toString() === variantId.toString()
+        );
+
+        if (!selectedVariant) {
+            return res.status(404).json({ success: false, message: 'Variant not found' });
+        }
+
+        // Check stock availability
+        if (quantity > selectedVariant.stock) {
             return res.json({
                 success: false,
-                message: `Only ${product.quantity} left in stock.`
+                message: `Only ${selectedVariant.stock} left in stock.`,
             });
         }
 
+        // Update quantity in the cart
         const user = await User.findOneAndUpdate(
-            { _id: userId, "cart.product_id": productId },
+            { _id: userId, "cart.product_id": productId, "cart.variant_id": variantId },
             { $set: { "cart.$.quantity": quantity } },
             { new: true }
         );
@@ -226,12 +242,12 @@ const updateQuantity = async (req, res) => {
             return res.status(404).json({ success: false, message: 'Product not found in cart' });
         }
 
-        
+        // Recalculate cart totals
         const updatedCartTotals = await calculateCartTotals(userId);
 
         res.json({
-            sucess : true,
-            ...updatedCartTotals
+            success: true,
+            ...updatedCartTotals,
         });
     } catch (error) {
         console.error('Error updating quantity:', error);

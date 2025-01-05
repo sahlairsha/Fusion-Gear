@@ -2,17 +2,15 @@ const Coupon = require('../../models/couponSchema');
 const Product = require('../../models/productSchema');
 const Category = require('../../models/categorySchema');
 
-
 const getCouponPage = async (req, res) => {
-
     try {
-        const coupons = await Coupon.find();
-        res.render( "coupon" , { coupons });
+        const coupons = await Coupon.find().populate('productId categoryId');
+        res.render('coupon', { coupons });
     } catch (error) {
         res.status(500).json({ message: 'Error fetching coupons' });
     }
+};
 
-}
 
 const getAddCouponPage = async (req, res) => {
     try {
@@ -32,35 +30,61 @@ const getAddCouponPage = async (req, res) => {
 // POST route for adding a coupon
 const addCoupon = async (req, res) => {
     try {
-        const { code, discount, startDate, endDate, applicableTo, productId, categoryId, minOrderValue } = req.body;
+        const { 
+            code, description, 
+            discountType, discountValue, startDate, applicableTo, endDate, 
+            productId, categoryId, minOrderValue, usageLimit 
+        } = req.body;
+
+        // Determine the final discount value based on the discount type
+        let discount;
+        if (discountType === 'percentage') {
+            discount = discountValue;  // percentage value
+        } else if (discountType === 'fixed') {
+            discount = discountValue;  // fixed amount value
+        }
+
+        // Create the coupon
         const coupon = new Coupon({
             code,
-            discount,
+            description: description || null,
+            discountValue: discount,
+            discountType,
             startDate,
             endDate,
-            applicableTo,
+            usageLimit,
+            applicableTo,  // Use applicableTo instead of applicableScope
             productId: applicableTo === 'product' ? productId : undefined,
             categoryId: applicableTo === 'category' ? categoryId : undefined,
             minOrderValue: applicableTo === 'order' ? minOrderValue : undefined,
+            status: 'active'
         });
 
+        // Save the coupon to the database
         await coupon.save();
-        res.redirect('/admin/coupons'); 
+        res.redirect('/admin/coupons');
     } catch (e) {
-        console.log(e);
+        console.error(e);
         res.status(500).json({ message: 'Error creating coupon' });
     }
 };
 
 
+
+
 const deleteCoupon = async (req, res) => {
     try {
         const { couponId } = req.params;
-        await Coupon.findByIdAndDelete(couponId);
-        res.json({ message: 'Coupon deleted successfully' });
+        const result = await Coupon.findByIdAndDelete(couponId);
+        
+        if (result) {
+            res.json({ success: true, message: 'Coupon deleted successfully' });
+        } else {
+            res.status(404).json({ success: false, message: 'Coupon not found' });
+        }
     } catch (e) {
         console.log(e);
-        res.status(500).json({ message: 'Error deleting coupon' });
+        res.status(500).json({ success: false, message: 'Error deleting coupon' });
     }
 };
 

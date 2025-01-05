@@ -1,6 +1,8 @@
 <%- include("../../views/partials/admin/header") %>
 
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs/dist/cropper.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs/dist/cropper.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
 
         <style>
 
@@ -214,7 +216,7 @@ input[type="file"].form-control {
     border-radius: 3px;
     margin-left: 30px;
  }
-       
+
  </style>
     <section class="content-main">
         <div class="row">
@@ -262,7 +264,7 @@ input[type="file"].form-control {
                                     <div class="col-sm-4">
                                         <div class="form-group">
                                             <label for="variantColor">Color:</label>
-                                            <input type="text" id="variantColor"  class="form-control" placeholder="Enter color" />
+                                            <input type="text" id="variantColor" class="form-control" placeholder="Enter color" />
                                             <div id="color-error" class="error-message"></div>
                                         </div>
                                     </div>
@@ -270,7 +272,7 @@ input[type="file"].form-control {
                                     <div class="col-sm-4">
                                         <div class="form-group">
                                             <label for="variantSize">Size:</label>
-                                            <input type="text" id="variantSize"  class="form-control" placeholder="Enter size" />
+                                            <input type="text" id="variantSize" class="form-control" placeholder="Enter size" />
                                             <div id="size-error" class="error-message"></div>
                                         </div>
                                     </div>
@@ -410,7 +412,7 @@ input[type="file"].form-control {
             }
         }
 
-        let variants = [];  // Declare variants globally
+        let variants = []; // Declare the variants array globally
 
 function addVariant() {
     const color = document.getElementById("variantColor").value.trim();
@@ -419,39 +421,38 @@ function addVariant() {
     const regularPrice = parseFloat(document.getElementById("variantRegularPrice").value.trim());
     const salePrice = parseFloat(document.getElementById("variantSalePrice").value.trim());
 
-    // Validate inputs
+    // Check for valid input values
     if (!color || !size || isNaN(stock) || stock <= 0 || isNaN(regularPrice) || regularPrice <= 0 || isNaN(salePrice) || salePrice < 0) {
-        Swal.fire({
-            title: "Error!",
-            text: "Please fill in all variant details with valid values.",
-            icon: "error",
-            confirmButtonText: "Okay"
-        });
+        Swal.fire({ title: "Error!", text: "Please fill in all variant details with valid values.", icon: "error", confirmButtonText: "Okay" });
         return;
     }
 
-    // Add the variant to the array
-    variants.push({ color, size, stock, regularPrice, salePrice });
-    document.getElementById("variantData").value = JSON.stringify(variants); // Update the hidden input
+    // Check if the limit has been reached
+    const variantLimit = 4; // Set the maximum number of variants allowed
+    if (variants.length >= variantLimit) {
+        Swal.fire({ title: "Error!", text: `You can only add up to ${variantLimit} variants.`, icon: "error", confirmButtonText: "Okay" });
+        return;
+    }
 
-    // Add the variant to the table
+    // Add the new variant
+    variants.push({ color, size, stock, regularPrice, salePrice });
+
+    // Update the hidden input field
+    document.getElementById("variantData").value = JSON.stringify(variants);
+
+    // Add the new variant to the table
     const tableBody = document.getElementById("variantTableBody");
     const row = document.createElement("tr");
-
-    row.innerHTML = `
-        <td>${color}</td>
-        <td>${size}</td>
-        <td>${stock}</td>
-        <td>${regularPrice}</td>
-        <td>${salePrice}</td>
-        <td>
-            <button type="button" class="btn btn-danger btn-sm" onclick="removeVariant(${variants.length - 1})">Remove</button>
-        </td>
-    `;
-
+    row.setAttribute("data-index", variants.length - 1); // Assign the index to the row for removal
+    row.innerHTML = `<td>${color}</td>
+                     <td>${size}</td>
+                     <td>${stock}</td>
+                     <td>${regularPrice}</td>
+                     <td>${salePrice}</td>
+                     <td><button type="button" class="btn btn-danger btn-sm" onclick="removeVariant(${variants.length - 1})">Remove</button></td>`;
     tableBody.appendChild(row);
 
-    // Clear the input fields
+    // Clear input fields
     document.getElementById("variantColor").value = "";
     document.getElementById("variantSize").value = "";
     document.getElementById("variantStock").value = "";
@@ -459,29 +460,14 @@ function addVariant() {
     document.getElementById("variantSalePrice").value = "";
 }
 
+// Remove variant from table and array
 function removeVariant(index) {
-    variants.splice(index, 1); // Remove the variant from the array
-    document.getElementById("variantData").value = JSON.stringify(variants); 
+    variants.splice(index, 1);
+    document.getElementById("variantData").value = JSON.stringify(variants);
 
-    // Re-render the table to reflect the changes
-    const tableBody = document.getElementById("variantTableBody");
-    tableBody.innerHTML = "";  // Clear existing rows
-    variants.forEach((variant, i) => {
-        const row = document.createElement("tr");
-        row.innerHTML = `
-            <td>${variant.color}</td>
-            <td>${variant.size}</td>
-            <td>${variant.stock}</td>
-            <td>${variant.regularPrice}</td>
-            <td>${variant.salePrice}</td>
-            <td>
-                <button type="button" class="btn btn-danger btn-sm" onclick="removeVariant(${i})">Remove</button>
-            </td>
-        `;
-        tableBody.appendChild(row);
-    });
+    const row = document.getElementById("variantTableBody").children[index];
+    row.remove();
 }
-
 
         function viewImage1(event) {
             document.getElementById('imgView1').src = URL.createObjectURL(event.target.files[0])

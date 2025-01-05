@@ -1,7 +1,7 @@
 
 
 const Order = require('../../models/orderSchema');
-const ProductVariant = require('../../models/productVariantSchema');
+
 
 
 const getOrders = async (req, res) => {
@@ -62,9 +62,11 @@ const changeOrderStatus = async (req, res) => {
             return res.status(404).json({ error: 'Order not found' });
         }
 
-        // Prevent rollback if the current status is Delivered
-        if (order.order_status === 'Delivered' && status !== 'Delivered') {
-            return res.status(400).json({ message : 'Cannot rollback from Delivered status' });
+        // Prevent rollback if the current status is Delivered or Canceled
+        if (['Delivered', 'Canceled'].includes(order.order_status) && order.order_status !== status) {
+            return res.status(400).json({ 
+                message: `Cannot change status from ${order.order_status}` 
+            });
         }
 
         order.order_status = status;
@@ -76,6 +78,7 @@ const changeOrderStatus = async (req, res) => {
         return res.status(500).json({ error: 'Server Error' });
     }
 };
+
 
 
 const getDetails = async(req,res)=>{
@@ -122,25 +125,33 @@ const cancelOrderAdmin = async (req, res) => {
             return res.status(404).send('Order not found');
         }
 
-
         if (order.order_status === 'Delivered') {
-            return res.status(400).json({message :'Cannot cancel an order that has already been delivered.'});
+            return res.status(400).json({ message: 'Cannot cancel an order that has already been delivered.' });
         }
-
 
         // Check if the order is already canceled
         if (order.order_status === 'Canceled') {
-            return res.status(400).json({message: 'Order is already canceled.'});
+            return res.status(400).json({ message: 'Order is already canceled.' });
         }
 
         // Update order status and add cancellation timestamp
         order.order_status = 'Canceled';
         order.canceled_at = new Date();
 
-        // Restore product stock if needed
+        // Restore product stock in variants
         for (const item of order.products) {
-            const product = item.product_id;
-            product.quantity += item.quantity;
+            const product = item.product_id; // Get the product document
+            const { variantId, quantity } = item; // Assuming the order stores variantId and quantity
+
+            // Find the variant within the product's variants
+            const variant = product.variants.find(v => v._id.toString() === variantId);
+
+
+            if (variant) {
+                variant.stock += quantity; // Increment the stock for the variant
+            }
+
+            // Save the updated product document
             await product.save();
         }
 
@@ -154,6 +165,7 @@ const cancelOrderAdmin = async (req, res) => {
         res.status(500).send('Internal Server Error');
     }
 };
+
 
 
 

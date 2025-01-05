@@ -55,6 +55,9 @@ const userSchema = new Schema({
         type : mongoose.Schema.Types.ObjectId,
         ref : "Product"
        },
+       variant_id: {
+        type: mongoose.Schema.Types.ObjectId
+    },
        quantity:{
         type : Number,
        }

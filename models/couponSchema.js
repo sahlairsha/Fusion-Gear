@@ -11,9 +11,15 @@ const couponSchema = new Schema({
     description:{
         type : String
     },
-    discount: {
+    discountType: {
+        type: String,
+        enum: ['percentage', 'fixed'],
+        required: true,
+    },
+    discountValue: {
         type: Number,
         required: true,
+        min: 0,
     },
     startDate: {
         type: Date,
@@ -34,21 +40,27 @@ const couponSchema = new Schema({
     },
     applicableTo: {
         type: String,
-        enum: ['product', 'category', 'order'],  // Defines if coupon applies to product, category, or whole order
+        enum: ['product', 'category', 'order'],  
         required: true,
     },
     productId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Product',  // Only used if applicableTo is 'product'
+        ref: 'Product',  
     },
     categoryId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Category',  // Only used if applicableTo is 'category'
+        ref: 'Category', 
     },
     minOrderValue: {
-        type: Number,  // Only used if applicableTo is 'order'
+        type: Number,
+        default: 0,
     },
-});
+    status: {
+        type: String,
+        enum: ['active', 'expired', 'inactive'],
+        default: 'active',
+    },
+},{timestamp : true});
 
 const Coupon = mongoose.model('Coupon', couponSchema);
 

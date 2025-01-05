@@ -1,5 +1,4 @@
-const Product = require('../../models/productSchema')
-const ProductVariant = require('../../models/productVariantSchema');
+const Product = require('../../models/productSchema');
 const User = require('../../models/userSchema')
 
 

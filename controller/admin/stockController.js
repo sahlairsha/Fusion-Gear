@@ -1,5 +1,5 @@
 const Product = require('../../models/productSchema');
-const ProductVariant = require('../../models/productVariantSchema')
+
 
 const getStocks = async (req, res) => {
     try {
@@ -23,21 +23,18 @@ const getStocks = async (req, res) => {
             ]
         }).countDocuments();
 
-        const productsWithVariants = await Promise.all(
-            productData.map(async (product) => {
-                const productVariants = await ProductVariant.findOne({ product_id: product._id });
-                return {
-                    ...product.toObject(),
-                    variants: productVariants ? productVariants.variant : [],
-                };
-            })
-        );
+
+       
+
 
         res.render('inventory', {
-            products:  productsWithVariants,
+            products : productData ,
             totalPages: Math.ceil(count / limit),
             currentPage: page
         });
+
+
+
     } catch (err) {
         res.status(500).json({ message: "Internal Server Error" });
     }
@@ -53,58 +50,66 @@ const addStock = async (req, res) => {
     }
 
     try {
-        // Find the variant by its ID and update the stock
-        const variant = await ProductVariant.findOneAndUpdate(
-            { 
-                product_id: productId, 
-                'variant._id': variantId 
-            },
+        const updatedProduct = await Product.findOneAndUpdate(
+            { _id: productId, 'variants._id': variantId },
             {
-                $inc: { 'variant.$.stock': stock }  // Increment the stock for the specific variant
+                $inc: { 'variants.$.stock': stock },
+                $set: { 'variants.$.status': stock > 0 ? 'Available' : 'Out of Stock' }
             },
-            { new: true }  // Return the updated document
+            { new: true }
         );
 
-        // Check if the variant was found and updated
-        if (!variant) {
+        if (!updatedProduct) {
             return res.status(404).json({ error: "Variant not found." });
         }
 
-        res.status(200).json({ message: "Stock added successfully.", variant });
+        res.status(200).json({ message: "Stock added successfully.", updatedProduct });
     } catch (err) {
         res.status(500).json({ error: "Internal server error.", details: err.message });
     }
 };
 
+
 const reduceStock = async (req, res) => {
-    const { productId, variantId } = req.params; // Use variantId to identify which variant to update
-    const { stock } = req.body; // Quantity to reduce
+    const { productId, variantId } = req.params; 
+    const { stock } = req.body; 
 
     if (stock <= 0) {
         return res.status(400).json({ error: "Quantity must be greater than zero." });
     }
 
     try {
-        // Find the variant by its ID
-        // Find the variant by its ID and update the stock
-        const variant = await ProductVariant.findOneAndUpdate(
-            { 
-                product_id: productId, 
-                'variant._id': variantId 
-            },
-            {
-                $inc: { 'variant.$.stock': -stock }  // Increment the stock for the specific variant
-            },
-            { new: true }  // Return the updated document
+        // Find the product and variant to validate stock before updating
+        const product = await Product.findOne(
+            { _id: productId, 'variants._id': variantId },
+            { 'variants.$': 1 } // Fetch only the relevant variant
         );
-        if (!variant) {
+
+        if (!product || !product.variants || product.variants.length === 0) {
             return res.status(404).json({ error: "Variant not found." });
         }
 
-       
-        await variant.save();
+        const variant = product.variants[0]; // Only one variant is fetched
+        if (variant.stock < stock) {
+            return res.status(400).json({ error: "Insufficient stock available to reduce." });
+        }
 
-        res.status(200).json({ message: "Stock reduced successfully.", variant });
+        // Proceed to update the stock and status
+        const updatedProduct = await Product.findOneAndUpdate(
+            { 
+                _id: productId, 
+                'variants._id': variantId 
+            },
+            {
+                $inc: { 'variants.$.stock': -stock },
+                $set: { 
+                    'variants.$.status': variant.stock - stock > 0 ? 'Available' : 'Out of Stock' 
+                }
+            },
+            { new: true } // Return the updated document
+        );
+
+        res.status(200).json({ message: "Stock reduced successfully.", updatedProduct });
     } catch (err) {
         res.status(500).json({ error: "Internal server error.", details: err.message });
     }

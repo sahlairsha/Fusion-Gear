@@ -1,31 +1,38 @@
 <%- include('../../views/partials/admin/header') %>
 
+
 <style>
     /* Table Styling */
     .table-container {
         margin-top: 30px;
         max-width: 100%;
         overflow-x: auto;
-        margin-left: 50px;
+        margin-left: 30px;
+        
     }
 
     table {
         width: 100%;
         border-collapse: collapse;
         margin-top: 20px;
+        
+        
     }
 
     table th, table td {
-        padding: 12px 15px;
+        padding: 10px 15px;
         text-align: left;
-        border: 1px solid #ddd;
+        border: 1px solid #00000070;
+       
     }
 
     table th {
-        background-color: #007bff;
+        background-color: #0000009d;
         color: white;
-        font-weight: bold;
+        font-weight: 500;
+        font-size: 12px;
         text-transform: uppercase;
+       
     }
 
     table tr:nth-child(even) {
@@ -36,20 +43,45 @@
         background-color: #f1f1f1;
     }
 
+    .badge {
+    display: inline-block;
+    padding: 5px 10px;
+    font-size: 12px;
+    font-weight: bold;
+    text-align: center;
+    border-radius: 12px;
+    color: white;
+}
+
+.badge-active {
+    background-color: #28a745;
+}
+
+.badge-expired {
+    background-color: #dc3545;
+}
+
+.badge-upcoming {
+    background-color: #007bff;
+}
+
     /* Button Styling */
     .add-coupon-btn {
         padding: 10px 20px;
-        background-color: #28a745;
+        background-color: #000;
         color: white;
         font-size: 16px;
         border: none;
         border-radius: 4px;
         cursor: pointer;
         transition: background-color 0.3s;
+        margin-top: 20px;
     }
 
     .add-coupon-btn:hover {
-        background-color: #218838;
+        background-color: #fff;
+        color: #000;
+        border: 1px solid #000;
     }
 
     .add-coupon-btn-container {
@@ -63,6 +95,11 @@
         font-size: 24px;
         font-weight: bold;
         margin-bottom: 20px;
+    }
+    .delete-btn{
+        background-color: transparent;
+        border: none;
+        padding: 20px;
     }
 </style>
 
@@ -79,66 +116,94 @@
         <thead>
             <tr>
                 <th>Code</th>
-                <th>Discount (%)</th>
+                <th>Description</th>
+                <th>Discount Value</th>
+                <th>Discount Type</th>
                 <th>Start Date</th>
                 <th>End Date</th>
+                <th>Applicable To</th>
+                <th>Status</th>
                 <th>Actions</th>
             </tr>
         </thead>
         <tbody>
-            <% coupons.forEach(function(coupon) { %>
+            <% coupons.forEach(coupon => { %>
+                <%let today = new Date();%>
+                <%let endDate = new Date(coupon.endDate)%>
+                <%let startDate = new Date(coupon.startDate);%>
+                <%let status = endDate < today ? 'Expired' : (startDate > today ? 'Upcoming' : 'Active');%>
+                <%let badgeClass = status === 'Expired' ? 'badge-expired' : (status === 'Upcoming' ? 'badge-upcoming' : 'badge-active')%>
                 <tr>
                     <td><%= coupon.code %></td>
-                    <td><%= coupon.discount %></td>
+                    <td><%= coupon.description || "N/A" %></td>
+                    <td><%= coupon.discountValue %></td>
+                    <td><%= coupon.discountType %></td>
                     <td><%= new Date(coupon.startDate).toLocaleDateString() %></td>
                     <td><%= new Date(coupon.endDate).toLocaleDateString() %></td>
+                    <td><%= coupon.applicableTo %></td>
+                    <td><span class="badge <%= badgeClass %>"><%= status %></span></td>
                     <td>
-                        <button class="delete-btn" onclick="deleteCoupon('<%= coupon._id %>')">Delete</button>
+                        <button class="delete-btn" onclick="deleteCoupon('<%= coupon._id %>')"> <i class="fas fa-trash"></i></button>
                     </td>
                 </tr>
             <% }); %>
         </tbody>
     </table>
+    
 </div>
 
 <script>
-    function deleteCoupon(couponId) {
-        swal({
-            title: "Are you sure?",
-            text: "Once deleted, you will not be able to recover this coupon.",
-            icon: "warning",
-            buttons: true,
-            dangerMode: true,
-        }).then((willDelete) => {
-            if (willDelete) {
-                fetch(`/admin/delete-coupon/${couponId}`, {
-                    method: 'DELETE',
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            swal("Coupon deleted!", {
-                                icon: "success",
-                            }).then(() => {
-                                location.reload();  // Reload the page to show updated list
-                            });
-                        } else {
-                            swal("Error deleting coupon!", {
-                                icon: "error",
-                            });
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error deleting coupon:', error);
-                        swal("Error deleting coupon!", {
-                            icon: "error",
+  function deleteCoupon(couponId) {
+    Swal.fire({
+        title: "Are you sure?",
+        text: "Once deleted, you will not be able to recover this coupon.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        confirmButtonText: "Yes, delete it!"
+    }).then((result) => {
+        if (result.isConfirmed) {
+            fetch(`/admin/delete-coupon/${couponId}`, {
+                method: 'DELETE',
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            title: "Deleted!",
+                            text: "Coupon deleted successfully.",
+                            icon: "success"
+                        }).then(() => {
+                            location.reload();
                         });
+                    } else {
+                        Swal.fire({
+                            title: "Error!",
+                            text: data.message || "Error deleting coupon.",
+                            icon: "error"
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error deleting coupon:', error);
+                    Swal.fire({
+                        title: "Error!",
+                        text: "Error deleting coupon.",
+                        icon: "error"
                     });
-            } else {
-                swal("Coupon not deleted.");
-            }
-        });
-    }
+                });
+        } else {
+            Swal.fire({
+                title: "Cancelled",
+                text: "Coupon not deleted.",
+                icon: "info"
+            });
+        }
+    });
+}
+
 </script>
+
 
 <%- include('../../views/partials/admin/footer') %>

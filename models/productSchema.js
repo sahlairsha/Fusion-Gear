@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const {Schema} = mongoose;
+const { Schema } = mongoose;
 
 const productSchema = new Schema({
     productName: {
@@ -16,7 +16,6 @@ const productSchema = new Schema({
         ref: "Category",
         required: true,
     },
-
     productOffer: {
         type: Number,
         default: 0,
@@ -57,17 +56,57 @@ const productSchema = new Schema({
         average: { type: Number, default: 0 },
         count: { type: Number, default: 0 },
     },
-    variants:[
+    variants: [
         {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "ProductVariant",
-    }
-]
-    
+            color: { type: String, required: true },
+            size: { type: String, required: true },
+            stock: { type: Number, required: true, default: 0 },
+            regularPrice: { type: Number, required: true },
+            salePrice: { type: Number, required: false },
+            status: {
+                type: String,
+                enum: ["Available", "Out of Stock", "Unavailable"],
+                default: "Available",
+            },
+        }
+    ],
 }, { timestamps: true });
 
+productSchema.pre('save', function (next) {
+    // Loop through all variants to update status based on stock
+    this.variants.forEach(variant => {
+        if (variant.stock === 0) {
+            variant.status = "Out of Stock";
+        } else if (variant.stock < 0) {
+            variant.status = "Unavailable";
+        } else {
+            variant.status = "Available";
+        }
+    });
+    next();
+});
 
-const Product = mongoose.model("Product",productSchema)
+productSchema.post('findOneAndUpdate', async function (doc) {
+    if (doc) {
+        // Loop through all variants to update their status
+        doc.variants.forEach(async (variant) => {
+            if (variant.stock === 0) {
+                variant.status = "Out of Stock";
+            } else if (variant.stock < 0) {
+                variant.status = "Unavailable";
+            } else {
+                variant.status = "Available";
+            }
+        });
+
+        // Save the updated product document with modified variant statuses
+        await doc.save();
+    }
+});
 
 
-module.exports = Product
+
+
+const Product = mongoose.model("Product", productSchema);
+
+module.exports = Product;

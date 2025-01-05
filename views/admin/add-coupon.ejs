@@ -1,10 +1,8 @@
-
-
 <%- include('../../views/partials/admin/header') %>
+<!-- Font Awesome CDN for Icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
 <style>
-
-
 form {
     margin-top: 50px;
     width: 100%;
@@ -85,7 +83,6 @@ select:focus {
     border-color: #007bff;
 }
 
-
 input[type="number"]::-webkit-outer-spin-button,
 input[type="number"]::-webkit-inner-spin-button {
     -webkit-appearance: none;
@@ -96,32 +93,52 @@ input[type="number"]:focus {
     border-color: #007bff;
 }
 
+.error-message {
+    color: red;
+    font-size: 12px;
+    margin-top: 5px;
+}
 </style>
 
 <h2>Add New Coupon</h2>
 
-<form action="/admin/add-coupon" method="POST">
+<form id="coupon-form" action="/admin/add-coupon" method="POST">
     <label for="code">Coupon Code</label>
-    <input type="text" id="code" name="code" required>
+    <input type="text" id="code" name="code">
+    <span id="code-error" class="error-message"></span>
 
     <label for="description">Description</label>
-    <input type="text" id="description" name="description" required>
+    <input type="text" id="description" name="description">
+    <span id="description-error" class="error-message"></span>
 
-    <label for="discount">Discount (%)</label>
-    <input type="number" id="discount" name="discount" required>
+    <label for="discountType">Discount Type</label>
+    <select id="discountType" name="discountType">
+        <option value="percentage">Percentage</option>
+        <option value="fixed">Fixed Amount</option>
+    </select>
+    <div id="discountType-error" class="error-message"></div>
+
+    <div id="discountValueFields">
+        <label for="discountValue">Discount Value</label>
+        <input type="number" id="discountValue" name="discountValue">
+        <span id="discountValue-error" class="error-message"></span>
+    </div>
 
     <label for="startDate">Start Date</label>
-    <input type="date" id="startDate" name="startDate" required>
+    <input type="date" id="startDate" name="startDate">
+    <span id="startDate-error" class="error-message"></span>
 
     <label for="endDate">End Date</label>
-    <input type="date" id="endDate" name="endDate" required>
+    <input type="date" id="endDate" name="endDate">
+    <span id="endDate-error" class="error-message"></span>
 
     <label for="applicableTo">Applicable To</label>
-    <select id="applicableTo" name="applicableTo" required>
+    <select id="applicableTo" name="applicableTo">
         <option value="product">Product</option>
         <option value="category">Category</option>
         <option value="order">Order</option>
     </select>
+    <div id="applicableTo-error" class="error-message"></div>
 
     <div id="productFields">
         <label for="productId">Product</label>
@@ -132,6 +149,8 @@ input[type="number"]:focus {
         </select>
     </div>
 
+    <div id="product-error" class="error-message"></div>
+
     <div id="categoryFields">
         <label for="categoryId">Category</label>
         <select id="categoryId" name="categoryId">
@@ -140,16 +159,33 @@ input[type="number"]:focus {
             <% }); %>
         </select>
     </div>
+    <div id="category-error" class="error-message"></div>
 
     <div id="orderFields">
         <label for="minOrderValue">Minimum Order Value</label>
         <input type="number" id="minOrderValue" name="minOrderValue">
-    </div>
+        <span id="minOrderValue-error" class="error-message"></span>
 
+    </div>
+    
     <button type="submit">Create Coupon</button>
 </form>
-</div>
+
 <script>
+    document.getElementById('discountType').addEventListener('change', function() {
+        const discountType = this.value;
+        
+        // Show discount value field
+        document.getElementById('discountValueFields').style.display = 'block';
+        
+        // Show/hide amount/rate field based on discount type
+        if (discountType === 'fixed') {
+            document.getElementById('discountValue').placeholder = 'Enter fixed discount amount';
+        } else {
+            document.getElementById('discountValue').placeholder = 'Enter percentage discount rate';
+        }
+    });
+
     document.getElementById('applicableTo').addEventListener('change', function() {
         const applicableTo = this.value;
         
@@ -158,8 +194,101 @@ input[type="number"]:focus {
         document.getElementById('orderFields').style.display = applicableTo === 'order' ? 'block' : 'none';
     });
 
-    // Trigger change event to show/hide fields based on the initial value
+    // Trigger change event to show/hide fields based on the initial values
+    document.getElementById('discountType').dispatchEvent(new Event('change'));
     document.getElementById('applicableTo').dispatchEvent(new Event('change'));
 </script>
 
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('coupon-form').addEventListener('submit', function(e) {
+        e.preventDefault(); // Prevent form submission
+        console.log('Form submitted, validating...');
+        let valid = true;
+
+        // Clear previous errors
+        clearErrors();
+
+        // Validate Coupon Code
+        const code = document.getElementById('code').value.trim();
+        if (code === '') {
+            document.getElementById('code-error').innerText = "Coupon Code is required.";
+            valid = false;
+        } else {
+            document.getElementById('code-error').innerText = "";
+        }
+        console.log('Coupon Code validation:', valid);
+
+        const description = document.getElementById('description').value.trim();
+        if(description === "") {
+            document.getElementById('description-error').innerText = "Description is required.";
+            valid = false;
+        } else {
+            document.getElementById('description-error').innerText = "";
+        }
+
+        // Validate Discount Value
+        const discountValue = document.getElementById('discountValue').value.trim();
+        console.log('Discount Value:', discountValue); // Debugging
+        if (discountValue === "") {
+            document.getElementById('discountValue-error').innerText = "Discount value is required";
+            valid = false;
+        } else if (discountValue <= 0) {
+            document.getElementById('discountValue-error').innerText = "Discount should be greater than zero";
+            valid = false;
+        } else {
+            document.getElementById('discountValue-error').innerText = "";
+        }
+
+        // Validate Start Date
+        const startDate = document.getElementById('startDate').value;
+
+        if (!startDate) {
+            document.getElementById('startDate-error').innerText = "Start Date is required.";
+            valid = false;
+        } else {
+            document.getElementById('startDate-error').innerText = "";
+        }
+
+        // Validate End Date
+        const endDate = document.getElementById('endDate').value;
+
+        if (!endDate) {
+            document.getElementById('endDate-error').innerText = "End Date is required.";
+            valid = false;
+        } else if (new Date(startDate) > new Date(endDate)) {
+            document.getElementById('endDate-error').innerText = "End Date must be later than Start Date.";
+            valid = false;
+        } else {
+            document.getElementById('endDate-error').innerText = "";
+        }
+
+        // Validate Applicable To
+        const applicableTo = document.getElementById('applicableTo').value;
+
+        // Validate Product/Category/Order Fields based on Applicable To
+        if (applicableTo === 'order') {
+            const minOrderValue = document.getElementById('minOrderValue').value;
+            if (!minOrderValue || minOrderValue <= 0) {
+                document.getElementById('minOrderValue-error').innerText = "Minimum Order Value must be greater than 0.";
+                valid = false;
+            }
+        }
+
+        if (valid) {
+            // If all validations pass, submit the form
+            document.getElementById('coupon-form').submit();
+        }
+    });
+});
+
+function clearErrors() {
+    const errorElements = document.querySelectorAll('.error-message');
+    errorElements.forEach((errorElement) => {
+        errorElement.innerText = ''; // Clear previous error messages
+    });
+}
+
+    </script>
+    
 <%- include('../../views/partials/admin/footer') %>

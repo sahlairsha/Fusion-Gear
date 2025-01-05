@@ -13,6 +13,79 @@
     .product_image{
         border-radius: 4px;
     }
+
+    /* Style for the variant list */
+.variant-list {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.variant-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #f9f9f9;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s, transform 0.3s;
+}
+
+.variant-item:hover {
+  background-color: #f1f1f1;
+  transform: translateY(-2px);
+}
+
+.variant-info {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  font-size: 14px;
+  color: #555;
+  font-weight: 600;
+}
+
+.variant-info span {
+  font-weight: bold;
+}
+
+.variant-price {
+  color: #28a745;
+}
+
+.variant-stock {
+  color: #17a2b8;
+}
+
+.variant-color {
+  color: #007bff;
+}
+
+.variant-size {
+  color: #dc3545;
+}
+
+.remove-variant-btn {
+  background-color: #000;
+  border: none;
+  color: white;
+  padding: 6px 12px;
+  font-size: 14px;
+  cursor: pointer;
+  border-radius: 50%;
+  margin-left: 20px;
+  transition: background-color 0.3s;
+}
+
+.remove-variant-btn:hover {
+  background-color: #fff;
+  color: #000;
+  border:1px solid #00000094;
+}
+
+
 </style>
 
 
@@ -27,73 +100,63 @@
     <table class="table table-light">
         <thead class="table-secondary">
             <tr>
-                <th scope="col"><input type="checkbox" id="selectAll"></th>
-                <th scope="col">#</th>
                 <th scope="col">Name</th>
                 <th scope="col">Image</th>
                 <th scope="col">Description</th>
                 <th scope="col">Category</th>
-                <th scope="col">Sale Price</th>
-                <th scope="col">Qty</th>
-                <th scope="col">Color</th>
-                <th scope="col">Size</th>
+                <th scope="col" colspan="4" class="text-center">Variants</th>        
                 <th scope="col">Actions</th>
             </tr>
         </thead>
         <tbody id="tableBody">
             <% data.forEach((product, index) => { %>
-                <tr data-product-id="<%= product._id %>">
-                    <td><input type="checkbox" class="checkbox"></td>
-                    <td><%= index + 1 %></td>
-                    <td>
-                       <%= product.productName %>
-                    </td>
-                    <td>
-                        <a href="/admin/product-details/<%= product._id %>"><img class="product_image" src="/uploads/public-image/<%= product.productImage[0] %>" alt="<%= product.productName %>" width="50" height="50"></a>
-                    </td>
-                    <td class="description"><%= product.description %></td>
-                    <td><%= product.category ? product.category.name : 'No Category' %></td>
-                 
-                <% if (product.variants && product.variants.length > 0) { %>
-                 <% product.variants.forEach((variant, variantIndex) => { %>
-                     <% if (variantIndex == 0) { %>
-                                <td><%= variant.salePrice %></td>
-                                <td><%= variant.stock %></td>
-                                <td><%= variant.color %></td>
-                                <td><%= variant.size %></td>
-                                <% } %>
-                             
-                        <% }); %>
-                    <% } else { %>
-                            <td class="text-center" colspan="4">No Variants Available</td>
-                       
-                    <% } %>
-
-                    <td>
-                        <button class="btn btn-primary btn-sm edit-button mb-2">
-                            <a class="text-white" href="/admin/editproducts?id=<%= product._id %>">Edit</a>
-                        </button>
-                        <% if (product.isDeleted === false) { %>
-                            <button class="btn btn-info btn-sm">
-                                <a href="/admin/deleteproducts?id=<%= product._id %>" class="text-white" style="text-decoration: none;">Delete</a>
-                            </button>
-                        <% } else { %>
-                            <button class="btn btn-success btn-sm">
-                                <a href="/admin/restoreproducts?id=<%= product._id %>" class="text-white" style="text-decoration: none;">Restore</a>
-                            </button>
-                        <% } %>
-                    </td>
-                
-                </tr>
+              <tr data-product-id="<%= product._id %>">
+                <td><%= product.productName %></td>
+                <td>
+                  <a href="/admin/product-details/<%= product._id %>">
+                    <img class="product_image" src="/uploads/public-image/<%= product.productImage[0] %>" alt="<%= product.productName %>" width="50" height="50">
+                  </a>
+                </td>
+                <td class="description"><%= product.description %></td>
+                <td><%= product.category ? product.category.name : 'No Category' %></td>
+                <td colspan="4">
+                  <% if (product.variants && product.variants.length > 0) { %>
+                    <ul class="variant-list">
+                      <% product.variants.forEach((variant, variantIndex) => { %>
+                        <li>
+                          <span>Price: <%= variant.salePrice %>, Stock: <%= variant.stock %>, Color: <%= variant.color %>, Size: <%= variant.size %></span>
+                          <button 
+                            class="remove-variant-btn" 
+                            data-variant-id="<%= variant._id %>" 
+                            data-product-id="<%= product._id %>">
+                            X
+                          </button>
+                        </li>
+                      <% }); %>
+                    </ul>
+                  <% } else { %>
+                    <span>No Variants Available</span>
+                  <% } %>
+                </td>
+                <td>
+                  <button class="btn btn-primary btn-sm edit-button mb-2">
+                    <a class="text-white" href="/admin/editproducts?id=<%= product._id %>">Edit</a>
+                  </button>
+                  <% if (product.isDeleted === false) { %>
+                    <button class="btn btn-info btn-sm">
+                      <a href="/admin/deleteproducts?id=<%= product._id %>" class="text-white" style="text-decoration: none;">Delete</a>
+                    </button>
+                  <% } else { %>
+                    <button class="btn btn-success btn-sm">
+                      <a href="/admin/restoreproducts?id=<%= product._id %>" class="text-white" style="text-decoration: none;">Restore</a>
+                    </button>
+                  <% } %>
+                </td>
+              </tr>
             <% }); %>
-        </tbody>
+          </tbody>
     </table>
     
-
-
-
-  
-
 
     <div class="pagination-container d-flex align-items-center justify-content-center mt-5">
         <% if (currentPage > 1) { %>
@@ -113,6 +176,74 @@
 </div>
 
 <script src="/js/admin/customer-search.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll(".remove-variant-btn").forEach((button, index) => {
+    button.addEventListener("click", function () {
+      const productId = this.getAttribute("data-product-id");
+      const variantIndex = index; // Get the correct index for this variant
+
+      // Get all variants for the product
+      const variantList = this.closest(".variant-list");
+      const variantCount = variantList.querySelectorAll("li").length;
+
+      // Restrict removal if only one variant is left
+      if (variantCount <= 1) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Cannot Remove Last Variant',
+          text: 'At least one variant must remain.',
+          confirmButtonText: 'Ok',
+        });
+        return;
+      }
+
+      // Confirm deletion using SweetAlert
+      Swal.fire({
+        title: 'Are you sure?',
+        text: 'You won’t be able to revert this!',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, remove it!',
+        cancelButtonText: 'Cancel',
+      }).then((result) => {
+        if (result.isConfirmed) {
+          // Send a request to remove the variant
+          fetch(`/admin/remove-variant/${productId}/${variantIndex}`, {
+            method: "DELETE", // Using DELETE method for variant removal
+            headers: {
+              "Content-Type": "application/json"
+            },
+          })
+            .then(response => response.json())
+            .then(data => {
+              if (data.success) {
+                // Remove the variant from the list in the UI
+                this.closest("li").remove();
+                Swal.fire({
+                  icon: 'success',
+                  title: 'Removed!',
+                  text: 'Variant has been removed successfully.',
+                  confirmButtonText: 'Ok',
+                });
+              } else {
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Error',
+                  text: data.message || 'An error occurred.',
+                  confirmButtonText: 'Ok',
+                });
+              }
+            })
+            .catch(error => console.error("Error:", error));
+        }
+      });
+    });
+  });
+});
+
+</script>
 
 
 

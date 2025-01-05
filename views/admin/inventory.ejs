@@ -226,6 +226,10 @@
 
 <div class="container">
     <!-- Stock Table -->
+    <div class="search-bar">
+        <input type="text" id="searchProduct" placeholder="Search product..." oninput="filterProducts()" />
+      
+    </div>
     <table class="stock-table">
         <thead>
             <tr>
@@ -237,7 +241,7 @@
         </thead>
         <tbody id="productTable">
             <% products.forEach((items) => { %>
-                <tr data-product-id="<%=items._id%>">
+                <tr data-product-id="<%= items._id %>" data-category-id="<%= items.category?._id %>">
                     <td><%= items.productName %></td>
                     <td><%= items.category ? items.category.name : 'No Category' %></td>
                     <td>
@@ -246,7 +250,7 @@
                                 <div class="variant-info">
                                     <strong>Size:</strong> <%= variant.size %><br>
                                     <strong>Stock:</strong> <%= variant.stock %>
-                                    <div class="product-badge <%= variant.status ? variant.status.toLowerCase().replace(/ /g, '-') : 'available' %>">
+                                    <div class="product-badge <%= variant.status?.toLowerCase()?.replace(/ /g, '-') || 'available' %>">
                                         <%= variant.status %>
                                     </div>
                                 </div>
@@ -261,7 +265,7 @@
                         <% }) %>
                     </td>
                     <td>
-                        <% if (items.isBlocked === false) { %>
+                        <% if (!items.isBlocked) { %>
                             <button class="btn btn-warning btn-sm">
                                 <a href="/admin/blockStock?id=<%= items._id %>" class="text-white" style="text-decoration: none;">Block</a>
                             </button>
@@ -275,7 +279,6 @@
             <% }) %>
         </tbody>
     </table>
-
     <div class="pagination-container d-flex align-items-center justify-content-center mt-5">
         <% if (currentPage > 1) { %>
             <a class="page-link" href="?page=<%= currentPage - 1 %>">&laquo; Previous</a>
@@ -309,11 +312,11 @@
     const overlay = document.getElementById('overlay');
     const modalHeader = document.getElementById('modalHeader');
     const stockInput = document.getElementById('stockInput');
+    const productTable = document.getElementById('productTable');
     let productId = '';
     let variantId = '';
     let actionType = '';
 
-    // Open modal with action type (add/reduce)
     function openModal(type, prodId, varId) {
         actionType = type;
         productId = prodId;
@@ -325,13 +328,11 @@
         overlay.classList.add('active');
     }
 
-    // Close modal
     function closeModal() {
         modal.classList.remove('active');
         overlay.classList.remove('active');
     }
 
-    // Submit stock change (Add or Reduce stock)
     async function submitStockChange() {
         const stock = parseInt(stockInput.value, 10);
         if (isNaN(stock) || stock <= 0) {
@@ -361,7 +362,7 @@
             if (response.ok) {
                 Swal.fire({
                     title: 'Success',
-                    text: `${data.message}` || 'Stock updated successfully',
+                    text: `${data.message || 'Stock updated successfully'}`,
                     icon: 'success',
                     confirmButtonText: 'Okay'
                 });
@@ -372,7 +373,7 @@
             } else {
                 Swal.fire({
                     title: 'Error',
-                    text: `${data.error}` || 'Failed to update stock',
+                    text: `${data.error || 'Failed to update stock'}`,
                     icon: 'error',
                     confirmButtonText: 'Okay'
                 });
@@ -387,6 +388,20 @@
             console.error('Error:', error);
         }
     }
-</script>
 
+    function filterProducts() {
+        const searchValue = document.getElementById('searchProduct').value.toLowerCase();
+        const categoryValue = document.getElementById('categoryFilter').value;
+
+        [...productTable.children].forEach(row => {
+            const productName = row.querySelector('td:first-child').innerText.toLowerCase();
+            const categoryId = row.getAttribute('data-category-id');
+
+            const matchesSearch = productName.includes(searchValue);
+            const matchesCategory = !categoryValue || categoryId === categoryValue;
+
+            row.style.display = matchesSearch && matchesCategory ? '' : 'none';
+        });
+    }
+</script>
 <%- include('../../views/partials/admin/footer') %>

@@ -93,7 +93,7 @@ router.post('/address-view/update/:id',userAuth,userprofileController.updateAddr
 
 //cart
 router.get('/cart',userAuth,userCartController.getCartPage)
-router.post('/cart/add/:productId',userAuth,userCartController.addToCart)
+router.post('/cart/add/:productId/:variantId', userAuth, userCartController.addToCart);
 router.post('/cart/update-quantity/:productId', userAuth, userCartController.updateQuantity);
 router.delete("/cart/delete/:productId",userAuth,userCartController.removeFromCart)
 
@@ -110,6 +110,8 @@ router.post('/confirm-order',userAuth,userOrderController.confirmOrder)
 router.get('/order-details/:id',userAuth,userOrderController.orderDetails)
 router.get('/orders/cancel/confirm',userAuth,userOrderController.getCancelConfirmation)
 router.post('/orders/cancel/:id',userAuth,userOrderController.cancelOrder)
+router.get('/checkout/apply-coupon', userAuth,userOrderController.applyCoupon);
+
 
 //ratings and reviews
 router.get('/ratings',userAuth,userOrderController.getRating)

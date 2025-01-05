@@ -199,11 +199,11 @@
                 <div class="col-lg-3 col-md-3">
                     <ul class="nav nav-tabs" role="tablist">
                         <% for (let i = 0; i < product.productImage.length; i++) { %>
-                        <li class="nav-item">
-                            <a class="nav-link <%= i === 0 ? 'active' : '' %>" data-toggle="tab" href="#tabs-<%= i + 1 %>" role="tab">
-                                <img class="product__thumb__pic" src="/uploads/public-image/<%= product.productImage[i] %>">
-                            </a>
-                        </li>
+                            <li class="nav-item">
+                                <a class="nav-link <%= i === 0 ? 'active' : '' %>" data-toggle="tab" href="#tabs-<%= i + 1 %>" role="tab">
+                                    <img class="product__thumb__pic" src="/uploads/public-image/<%= product.productImage[i] %>">
+                                </a>
+                            </li>
                         <% } %>
                     </ul>
                 </div>
@@ -212,15 +212,15 @@
                 <div class="col-lg-6 col-md-9">
                     <div class="tab-content">
                         <% for (let i = 0; i < product.productImage.length; i++) { %>
-                        <div class="tab-pane <%= i === 0 ? 'active' : '' %>" id="tabs-<%= i + 1 %>" role="tabpanel">
-                            <% if (product.productImage && product.productImage.length > 0) { %>
-                                <div class="product__details__pic__item">
-                                    <img class="product-image zoom" src="/uploads/public-image/<%= product.productImage[i] %>" data-zoom-image="/uploads/public-image/<%= product.productImage[i] %>" alt="">
-                                </div>
-                            <% } else { %>
-                                <p>No images available for this product.</p>
-                            <% } %>
-                        </div>
+                            <div class="tab-pane <%= i === 0 ? 'active' : '' %>" id="tabs-<%= i + 1 %>" role="tabpanel">
+                                <% if (product.productImage && product.productImage.length > 0) { %>
+                                    <div class="product__details__pic__item">
+                                        <img class="product-image zoom" src="/uploads/public-image/<%= product.productImage[i] %>" data-zoom-image="/uploads/public-image/<%= product.productImage[i] %>" alt="">
+                                    </div>
+                                <% } else { %>
+                                    <p>No images available for this product.</p>
+                                <% } %>
+                            </div>
                         <% } %>
                     </div>
                 </div>
@@ -245,11 +245,11 @@
                     <h2>Reviews</h2>
                     <ul class="reviews-list">
                         <% product.reviews.forEach(function(review) { %>
-                        <li>
-                            <p><strong><%= review.user_id.full_name %></strong></p>
-                            <p><%= review.review %></p>
-                            <p>Rating: <%= review.rating %>★</p>
-                        </li>
+                            <li>
+                                <p><strong><%= review.user_id.full_name %></strong></p>
+                                <p><%= review.review %></p>
+                                <p>Rating: <%= review.rating %>★</p>
+                            </li>
                         <% }); %>
                     </ul>
                 </div>
@@ -270,18 +270,25 @@
                                 <h3 id="productPrice">&#8377;<%= product.salePrice %></h3>
             
                                 <!-- Stock Status and Size Selection -->
-                                <div class="product__details__option__size">
+                                <div class="">
                                     <span>Size:</span>
                                     <% product.variants.forEach(function(variant, index) { %>
                                         <label for="<%= variant.size %>">
-                                            <input type="radio" name="size" value="<%= variant.size %>" data-price="<%= variant.salePrice %>" 
-                                                data-stock="<%= variant.stock %>" data-variant-id="<%= variant._id %>" 
-                                                <%= index === 0 ? 'checked' : '' %> onchange="updateProductDetails(this)">
-                                            <%= variant.size %>
+                                            <input 
+                                               type="radio" 
+                                                 name="size" 
+                                                 value="<%= variant.size %>" 
+                                                 data-price="<%= variant.salePrice %>" 
+                                                 data-stock="<%= variant.stock %>" 
+                                                 data-variant-id="<%= variant._id %>" 
+                                                 <%= index === 0 ? 'checked' : '' %> 
+                                                 onchange="updateProductDetails(this)"
+                                                   >
+
+                                            <%= variant.size %> 
                                         </label>
                                     <% }); %>
                                 </div>
-                          
             
                                 <!-- Add to Cart and Other Options -->
                                 <div class="product__details__cart__option">
@@ -295,7 +302,7 @@
             
                                 <!-- Other Actions -->
                                 <div class="product__details__btns__option">
-                                   <button class="add-whish-btn"><a href="#" onclick="addToWishlist('<%= product._id%>')"><i class="fa fa-heart"></i> Add to Wishlist</a></button> 
+                                    <button class="add-whish-btn"><a href="#" onclick="addToWishlist('<%= product._id%>')"><i class="fa fa-heart"></i> Add to Wishlist</a></button> 
                                     <a href="#"><i class="fa fa-exchange"></i> Add To Compare</a>
                                 </div>
             
@@ -308,27 +315,8 @@
                                     </ul>
                                 </div>
                             </div>
-            
-                            <!-- Coupon Section -->
-                             <% if(coupons) {%>
-                            <div id="couponSection">
-                                <h3>Available Coupons</h3>
-                                <div id="couponList">
-                                    
-                                        <div class="coupon-item">
-                                            <div class="coupon-info">
-                                                <p><strong>Code:</strong> <%= coupons.code %></p>
-                                                <p><strong>Description:</strong> <%= coupons.description %></p>
-                                                <p><strong>Expires:</strong> <%= coupons.endDate %></p>
-                                            </div>
-                                            <button class="copy-button" onclick="copyCouponCode(this, '<%= coupons.code %>')">Copy Code</button>
-                                            <span class="copy-status"></span>
-                                        </div>
-                                 
-                                </div>
-                            </div>
-
-                            <% } %>
+                      
+                        </div>
                     </div>
                 </div>
             </div>
@@ -560,26 +548,66 @@ function copyCouponCode(button, code) {
 </script>
 
 <script>
-    function addToCart(productId) {
+
+function addToCart(productId) {
+    // Get the selected size input
+    const selectedSizeElement = document.querySelector('input[name="size"]:checked');
+    
+    if (!selectedSizeElement) {
+        Swal.fire({
+            title: "Error",
+            icon: "error",
+            text: "Please select a size before adding to cart.",
+            showConfirmButton: true,
+        });
+        return;
+    }
+
+    // Log the selected size element
+    console.log("Selected Size Element:", selectedSizeElement);
+    console.log("Data attributes:", selectedSizeElement.dataset);
+
+    const selectedVariantId = selectedSizeElement.dataset.variantId;
+
+    if (!selectedVariantId) {
+        Swal.fire({
+            title: "Error",
+            icon: "error",
+            text: "Variant ID is missing.",
+            showConfirmButton: true,
+        });
+        return;
+    }
+
+    const quantity = document.querySelector('.pro-qty input').value;
+
+    console.log("Selected Variant ID:", selectedVariantId);
+
+    // Proceed with AJAX
     $.ajax({
-        url: '/cart/add/' + productId,  
+        url: `/cart/add/${productId}/${selectedVariantId}`,
         method: 'POST',
         contentType: 'application/json',
+        data: JSON.stringify({ quantity: parseInt(quantity, 10) }),
         success: function(response) {
             Swal.fire({
                 title: "Success",
                 icon: "success",
-                text: "Product Added Successfully",
+                text: "Product added successfully",
                 showConfirmButton: true,
             }).then((result) => {
                 if (result.isConfirmed) {
                     window.location.href = '/cart';
                 }
             });
-            
         },
         error: function() {
-            alert('Failed to add product to cart!');
+            Swal.fire({
+                title: "Error",
+                icon: "error",
+                text: "Failed to add product to cart!",
+                showConfirmButton: true,
+            });
         }
     });
 }

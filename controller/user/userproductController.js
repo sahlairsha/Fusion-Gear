@@ -2,7 +2,6 @@
 const Product = require("../../models/productSchema");
 const User = require("../../models/userSchema");
 const Category = require('../../models/categorySchema');
-const ProductVariant = require("../../models/productVariantSchema");
 const Coupon = require("../../models/couponSchema")
 
 const loadProducts = async (req, res) => {
@@ -54,7 +53,7 @@ const loadProducts = async (req, res) => {
 
         if (priceRange) {
             const [minPrice, maxPrice] = priceRange.split('-').map(Number);
-            filters.salePrice = { $gte: minPrice, $lte: maxPrice };
+            filters['variants.salePrice'] = { $gte: minPrice, $lte: maxPrice };
         }
 
         let sortQuery = {};
@@ -65,10 +64,10 @@ const loadProducts = async (req, res) => {
                 sortQuery = { views: -1 };
                 break;
             case 'priceLowToHigh':
-                sortQuery = { salePrice: 1 };
+                sortQuery = { 'variants.salePrice': 1 };
                 break;
             case 'priceHighToLow':
-                sortQuery = { salePrice: -1 };
+                sortQuery = { 'variants.salePrice': -1 };
                 break;
             case 'averageRating':
                 sortQuery = { 'ratings.average': -1 };
@@ -101,24 +100,25 @@ const loadProducts = async (req, res) => {
 
         // Query for the variants of the products (for filtering size/color)
         const productIds = productData.map(product => product._id);
-        const variantsData = await ProductVariant.find({
-            product_id: { $in: productIds },
-            ...variantFilters
+        const variantsData = await Product.find({
+            _id: { $in: productIds },
+            'variants': { $elemMatch: variantFilters }
         }).exec();
 
+        // Populate the variants for each product and apply the filters
         const productsWithVariants = await Promise.all(
             productData.map(async (product) => {
-                const productVariants = await ProductVariant.findOne({ product_id: product._id });
-                const firstVariant = productVariants && productVariants.variant.length > 0 ? productVariants.variant[0] : null;
+                const productVariants = product.variants.filter(variant => 
+                    (variantFilters.size ? variant.size.match(variantFilters.size.$regex) : true) &&
+                    (variantFilters.color ? variant.color.match(variantFilters.color.$regex) : true)
+                );
+
                 return {
                     ...product.toObject(),
-                    variants: productVariants ? productVariants.variant : [],
-                    firstVariant, 
+                    variants: productVariants,
                 };
             })
         );
-        
-
 
         // Get the total count of products for pagination
         const count = await Product.countDocuments(query);
@@ -166,30 +166,30 @@ const loadProductsDetails = async (req, res) => {
         }
 
         await Product.findByIdAndUpdate(id, { $inc: { views: 1 } });
-    
-        const productData = await Product.findById(id).populate('category').populate('reviews.user_id').exec();
+
+        // Find the product by ID and populate the category and reviews with user data
+        const productData = await Product.findById(id)
+            .populate('category')
+            .populate('reviews.user_id')
+            .exec();
+
         if (!productData) {
             console.error(`Product not found with ID: ${id}`);
             req.flash("error", "Product not found");
             return res.redirect("/product/view");
         }
-        
-        // Attach variants to the product
-        const productVariants = await ProductVariant.findOne({ product_id: productData._id });
-        const productWithVariants = {
-            ...productData.toObject(),
-            variants: productVariants ? productVariants.variant : [],
-        };
-    
-   
+
         
 
+        // Get the user data from session
         const userData = req.session.user
             ? await User.findById(req.session.user).lean()
             : null;
+
+        // Render the product details page with the necessary data
         res.render("productlist", {
             user: userData,
-            product:  productWithVariants,
+            product: productData,
             category: productData.category,
         });
 
@@ -199,6 +199,7 @@ const loadProductsDetails = async (req, res) => {
         res.redirect("/pagenotfound");
     }
 };
+
 
 
 const productRatings = async(req,res)=>{
