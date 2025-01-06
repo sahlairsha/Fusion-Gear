@@ -1,8 +1,6 @@
 <%- include('../../views/partials/admin/header')  %>
 
 <style>
-
-
     .sale-container {
         max-width: 800px;
         margin: auto;
@@ -85,32 +83,32 @@
     <div class="sale-container">
         <h1>Sales Report</h1>
         
-            <!-- Sales Report Filters Form -->
-            <form id="report-form">
-                <div class="form-group">
-                    <label for="start-date">Start Date:</label>
-                    <input type="date" id="start-date" name="start-date" required>
-                </div>
-                <div class="form-group">
-                    <label for="end-date">End Date:</label>
-                    <input type="date" id="end-date" name="end-date" required>
-                </div>
-                <div class="form-group">
-                    <label for="report-type">Report Type:</label>
-                    <select id="report-type" name="report-type">
-                        <option value="daily">Daily</option>
-                        <option value="weekly">Weekly</option>
-                        <option value="monthly">Monthly</option>
-                        <option value="custom">Custom Date Range</option>
-                    </select>
-                </div>
-                <button type="submit">Generate Report</button>
-            </form>
-    
-            <!-- Canvas for Chart.js graph -->
-            <div class="chart-container">
-                <canvas id="salesChart"></canvas>
+        <!-- Sales Report Filters Form -->
+        <form id="report-form">
+            <div class="form-group">
+                <label for="start-date">Start Date:</label>
+                <input type="date" id="start-date" name="start-date" required>
             </div>
+            <div class="form-group">
+                <label for="end-date">End Date:</label>
+                <input type="date" id="end-date" name="end-date" required>
+            </div>
+            <div class="form-group">
+                <label for="report-type">Report Type:</label>
+                <select id="report-type" name="report-type">
+                    <option value="daily">Daily</option>
+                    <option value="weekly">Weekly</option>
+                    <option value="monthly">Monthly</option>
+                    <option value="custom">Custom Date Range</option>
+                </select>
+            </div>
+            <button type="submit">Generate Report</button>
+        </form>
+
+        <!-- Canvas for Chart.js graph -->
+        <div class="chart-container">
+            <canvas id="salesChart"></canvas>
+        </div>
 
         <!-- Table to display the sales report -->
         <table id="report-table" class="hidden">
@@ -132,21 +130,22 @@
             <button id="download-excel">Download Excel</button>
         </div>
     </div>
-
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     document.getElementById("report-form").addEventListener("submit", function (e) {
-    e.preventDefault();
+        e.preventDefault();
 
-    const startDate = document.getElementById("start-date").value;
-    const endDate = document.getElementById("end-date").value;
-    const reportType = document.getElementById("report-type").value;
+        const startDate = document.getElementById("start-date").value;
+        const endDate = document.getElementById("end-date").value;
+        const reportType = document.getElementById("report-type").value;
 
-    // Fetch sales data for the selected range and type
-    fetchSalesReport(startDate, endDate, reportType);
-});
+        // Fetch sales data for the selected range and type
+        fetchSalesReport(startDate, endDate, reportType);
+    });
 
-function fetchSalesReport(startDate, endDate, reportType) {
+    function fetchSalesReport(startDate, endDate, reportType) {
     fetch(`/generate-report`, {
         method: "POST",
         headers: {
@@ -158,63 +157,101 @@ function fetchSalesReport(startDate, endDate, reportType) {
             reportType: reportType,
         }),
     })
-        .then((response) => response.json())
-        .then((data) => {
-            // Populate graph with data
-            generateSalesGraph(data);
-        })
-        .catch((error) => {
-            console.error("Error fetching sales report:", error);
-        });
-}
+    .then((response) => response.json())
+    .then((data) => {
+        // Populate table with data
+        updateSalesTable(data);
 
-function generateSalesGraph(data) {
-    const ctx = document.getElementById('salesChart').getContext('2d');
+        // Generate the graph
+        generateSalesGraph(data);
 
-    const salesCount = data.map(item => item.salesCount);
-    const totalAmount = data.map(item => item.totalOrderAmount);
-    const totalDiscount = data.map(item => item.totalDiscount);
-    const labels = data.map(item => item.date);  // Example: date labels
-
-    const chart = new Chart(ctx, {
-        type: 'bar', // Choose from 'bar', 'line', 'pie', etc.
-        data: {
-            labels: labels, // X-axis labels (e.g., days, weeks, months)
-            datasets: [
-                {
-                    label: 'Sales Count',
-                    data: salesCount,
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    borderWidth: 1
-                },
-                {
-                    label: 'Total Order Amount',
-                    data: totalAmount,
-                    backgroundColor: 'rgba(153, 102, 255, 0.2)',
-                    borderColor: 'rgba(153, 102, 255, 1)',
-                    borderWidth: 1
-                },
-                {
-                    label: 'Total Discount',
-                    data: totalDiscount,
-                    backgroundColor: 'rgba(255, 159, 64, 0.2)',
-                    borderColor: 'rgba(255, 159, 64, 1)',
-                    borderWidth: 1
-                }
-            ]
-        },
-        options: {
-            scales: {
-                y: {
-                    beginAtZero: true
-                }
-            }
-        }
+        // Show the download buttons
+        document.getElementById("download-buttons").classList.remove("hidden");
+    })
+    .catch((error) => {
+        console.error("Error fetching sales report:", error);
     });
 }
+    function generateSalesGraph(data) {
+        const ctx = document.getElementById('salesChart').getContext('2d');
 
+        const salesCount = data.map(item => item.salesCount);
+        const totalAmount = data.map(item => item.totalOrderAmount);
+        const totalDiscount = data.map(item => item.totalDiscount);
+        const labels = data.map(item => item._id); 
+
+        const chart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Sales Count',
+                        data: salesCount,
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'Total Order Amount',
+                        data: totalAmount,
+                        backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                        borderColor: 'rgba(153, 102, 255, 1)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'Total Discount',
+                        data: totalDiscount,
+                        backgroundColor: 'rgba(255, 159, 64, 0.2)',
+                        borderColor: 'rgba(255, 159, 64, 1)',
+                        borderWidth: 1
+                    }
+                ]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+
+    function updateSalesTable(data) {
+        const table = document.getElementById("report-table").querySelector("tbody");
+        table.innerHTML = "";
+
+        data.forEach(item => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td>${item.salesCount}</td>
+                <td>${item.totalOrderAmount}</td>
+                <td>${item.totalDiscount}</td>
+            `;
+            table.appendChild(row);
+        });
+
+        document.getElementById("report-table").classList.remove("hidden");
+    }
+
+
+
+    document.getElementById("download-pdf").addEventListener("click", function () {
+    const startDate = document.getElementById("start-date").value;
+    const endDate = document.getElementById("end-date").value;
+
+    // Trigger the download of the PDF report
+    window.location.href = `/download-pdf?startDate=${startDate}&endDate=${endDate}`;
+});
+
+document.getElementById("download-excel").addEventListener("click", function () {
+    const startDate = document.getElementById("start-date").value;
+    const endDate = document.getElementById("end-date").value;
+
+    // Trigger the download of the Excel report
+    window.location.href = `/download-excel?startDate=${startDate}&endDate=${endDate}`;
+});
 </script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <%- include('../../views/partials/admin/footer')  %>

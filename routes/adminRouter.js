@@ -28,6 +28,9 @@ router.get('/admin_profile',adminAuth,adminController.getProfile)
 
 // Dashboard
 router.get('/admin/dashboard', adminAuth, adminController.loadDashboard);
+router.post('/generate-report', adminAuth, adminController.generateReport);
+router.get('/download-pdf',adminAuth , adminController.downloadPdf);
+router.get('/download-excel',adminAuth, adminController.downloadExcel)
 
 
 // Customer management

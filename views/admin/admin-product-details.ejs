@@ -5,8 +5,8 @@
     
     <!-- Product Section -->
     <div class="row">
-        <!-- Product Images Carousel -->
-        <div class="col-lg-6 mb-4">
+        <!-- Product Images Carousel (Compact) -->
+        <div class="col-md-6 mb-4">
             <div class="card shadow-lg">
                 <div class="card-body">
                     <h5 class="card-title text-center">Product Images</h5>
@@ -48,86 +48,38 @@
             </div>
         </div>
 
-        <!-- Product Details -->
-        <div class="col-lg-6 mb-4">
+        <!-- Product Details and Variants -->
+        <div class="col-md-6 mb-4">
             <div class="card shadow-lg">
                 <div class="card-body">
                     <h5 class="card-title">Product Details</h5>
                     <p><strong>Description:</strong> <%= product.description %></p>
                     <p><strong>Category:</strong> <%= product.category ? product.category.name : 'No Category' %></p>
                     <p><strong>Views:</strong> <%= product.views %></p>
+                    <p><strong>Offer:</strong> <%= product.productOffer  %>% off</p>
                     <p><strong>Featured:</strong> <%= product.featured ? 'Yes' : 'No' %></p>
-                </div>
-                <div class="card-footer">
-                    <h6 class="text-center">Add New Variant</h6>
-                    <form id="addVariantForm" method="post" action="/admin/addvariant/<%= product._id %>" class="mt-3">
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="variant_color" class="form-label">Color</label>
-                                <input type="text" name="color" class="form-control border" id="variant_color" >
-                                <div id="color-error" class="invalid-feedback"></div>
-                            </div>
-                            
-                            <div class="col-md-6 mb-3">
-                                <label for="variant_size" class="form-label">Size</label>
-                                <input type="text" name="size" class="form-control border" id="variant_size">
-                                <div id="size-error" class="invalid-feedback"></div>
-                            </div>
-                            
-                            <div class="col-md-6 mb-3">
-                                <label for="variant_regular" class="form-label">Regular Price</label>
-                                <input type="number" name="regularPrice" class="form-control border" id="variant_regular">
-                                <div id="regularPrice-error" class="invalid-feedback"></div>
-                            </div>
-                            
-                            <div class="col-md-6 mb-3">
-                                <label for="variant_price" class="form-label">Sale Price</label>
-                                <input type="number" name="salePrice" class="form-control border" id="variant_price" >
-                                <div id="salePrice-error" class="invalid-feedback"></div>
-                            </div>
-                            
-                            <div class="col-12 mb-3">
-                                <label for="variant_stock" class="form-label">Stock Quantity</label>
-                                <input type="number" name="stock" class="form-control border" id="variant_stock">
-                                <div id="stock-error" class="invalid-feedback"></div>
-                            </div>
-                        </div>
-                        <button type="submit" class="btn btn-success w-100">Add Variant</button>
-                    </form>
+
+                    <!-- Variants Section -->
+                    <h6 class="mt-4">Available Variants</h6>
+                    <% if (product.variants.length > 0) { %>
+                        <% product.variants.forEach((variant) => { %>
+                            <p><strong>Color:</strong> <%= variant.color %></p>
+                            <p><strong>Size:</strong> <%= variant.size %></p>
+                            <p><strong>Regular Price:</strong> ₹<%= variant.regularPrice %></p>
+                            <p><strong>Sale Price:</strong> ₹<%= variant.salePrice %></p>
+                            <p><strong>Stock:</strong> <%= variant.stock %></p>
+                            <hr>
+                        <% }); %>
+                    <% } else { %>
+                        <p class="text-muted">No variants available for this product.</p>
+                    <% } %>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Variants Section -->
-    <h3 class="mt-5 text-center">Available Variants</h3>
-    <div class="row mt-4">
-        <% if (variants.length > 0) { %>
-            <% variants.forEach((variant) => { %>
-                <div class="col-md-4 mb-4">
-                    <div class="card h-100 shadow-sm">
-                        <div class="card-body">
-                            <h5 class="card-title text-center">Variant</h5>
-                            <p class="card-text"><strong>Color:</strong> <%= variant.color %></p>
-                            <p class="card-text"><strong>Size:</strong> <%= variant.size %></p>
-                            <p class="card-text"><strong>Regular Price:</strong> ₹<%= variant.regularPrice %></p>
-                            <p class="card-text"><strong>Sale Price:</strong> ₹<%= variant.salePrice %></p>
-                            <p class="card-text"><strong>Stock:</strong> <%= variant.stock %></p>
-                        </div>
-                        <div class="card-footer text-center">
-                            <a href="/admin/editvariant/<%= variant._id %>" class="btn btn-primary btn-sm">Edit Variant</a>
-                            <form method="post" action="/admin/deletevariant/<%= variant._id %>" class="d-inline">
-                                <button type="submit" class="btn btn-danger btn-sm">Delete Variant</button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            <% }); %>
-        <% } else { %>
-            <p class="text-center text-muted">No variants available for this product.</p>
-        <% } %>
-    </div>
 </div>
+
 
 <script>
    document.getElementById('addVariantForm').addEventListener('submit', function (e) {

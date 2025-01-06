@@ -58,6 +58,14 @@ const addProducts = async (req, res) => {
             return res.status(400).redirect('/admin/add-products');
         }
 
+        if (product.productOffer) {
+            productOffer = parseFloat(product.productOffer);
+            if (isNaN(productOffer) || productOffer < 0 || productOffer > 100) {
+                req.flash("error", "Invalid product offer percentage");
+                return res.status(400).redirect('/admin/add-products');
+            }
+        }
+
         // Parse and validate variants
         let variants = [];
         if (product.variants) {
@@ -82,6 +90,7 @@ const addProducts = async (req, res) => {
         const newProduct = new Product({
             productName: product.productName,
             description: product.description,
+            productOffer : productOffer,
             category: categoryId,
             productImage: images,
             isBlocked: false,

@@ -1,8 +1,18 @@
+const env = require('dotenv').config();
 const Order = require('../../models/orderSchema');
 const Address = require('../../models/addressSchema')
 const Product = require('../../models/productSchema')
 const User = require('../../models/userSchema')
 const Coupon = require('../../models/couponSchema')
+const crypto = require("crypto");
+
+
+const Razorpay = require("razorpay");
+
+const razorpay = new Razorpay({
+    key_id: process.env.RAZORPAY_KEY_ID,
+    key_secret: process.env.RAZORPAY_KEY_SECRET,
+});
 
 
 async function calculateCheckoutTotals(userId, couponCode) {
@@ -149,6 +159,8 @@ const applyCoupon = async (req, res) => {
         const updatedCheckoutTotals = await calculateCheckoutTotals(userId, couponCode);
 
         console.log("Updated Checkout after applying coupon:", updatedCheckoutTotals);
+
+        req.session.couponCode = couponCode;
 
         // Return updated checkout totals and coupon data in the response
         res.json({
@@ -315,6 +327,64 @@ const getPayment = async(req,res)=>{
 }
 
 
+const createRazorpay = async (req, res) => {
+    try {
+        const userId = req.session.user;
+        const couponCode = req.session.couponCode; 
+
+        const { netAmount } = await calculateCheckoutTotals(userId,couponCode);
+        
+        const amountInPaise = netAmount * 100;
+
+        // Create a Razorpay order
+        const razorpayOrder = await razorpay.orders.create({
+            amount: amountInPaise, 
+            currency: 'INR',
+            receipt: `order_rcptid_${Date.now()}`,
+            notes: {
+                userId,
+            },
+        });
+
+        // Send back order ID and Razorpay key to frontend
+        res.json({
+            id: razorpayOrder.id,
+            keyId: process.env.RAZORPAY_KEY_ID,
+            amount: razorpayOrder.amount,
+        });
+    } catch (error) {
+        console.error('Error creating Razorpay order:', error);
+        res.status(500).json({ success: false, message: 'Failed to create Razorpay order' });
+    }
+};
+
+const verifyPayment = async (req, res) => {
+    try {
+        const { razorpay_payment_id, razorpay_order_id, razorpay_signature } = req.body;
+
+        const generatedSignature = crypto
+            .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
+            .update(razorpay_order_id + "|" + razorpay_payment_id)
+            .digest("hex");
+
+        if (generatedSignature === razorpay_signature) {
+            // Update order status to "Completed" in the database
+            await Order.findOneAndUpdate(
+                { razorpay_order_id },
+                { payment_status: "Completed" }
+            );
+
+            res.json({ success: true });
+        } else {
+            res.status(400).json({ success: false, message: "Payment verification failed." });
+        }
+    } catch (error) {
+        console.error("Error verifying payment:", error);
+        res.status(500).json({ success: false, message: "Internal Server Error" });
+    }
+};
+
+
 function getRandomDeliveryDate() {
     // Get the current date
     const currentDate = new Date();
@@ -334,101 +404,134 @@ function getRandomDeliveryDate() {
 
 
   const confirmOrder = async (req, res) => {
-    const userId = req.session.user;
-    const addressId = req.session.selectedAddress;
-    const { payment_method } = req.body;
-
-    const user = await User.findById(userId).populate('cart.product_id');
-    const cartItems = user.cart.filter(item => item.product_id); // Only include items with a valid product_id
-    console.log('Valid Cart items:', cartItems); // Log valid cart items
-
-    const addressDoc = await Address.findOne({ user_id: userId });
-    const selectedIndex = addressDoc.address.findIndex(addr => addr._id.equals(addressId));
-
-    if (selectedIndex === -1) {
-        return res.status(404).json({ message: "Address not found" });
-    }
-
-    // Fetch the variant sale price for each item
-    let totalPrice = 0;
-    for (const item of cartItems) {
-        if (item.product_id) {
-            // Fetch the product variant based on the product
-            const productVariant = await ProductVariant.findOne({ product_id: item.product_id._id });
-
-            if (productVariant && productVariant.variant.length > 0) {
-                // Get the first variant (or you can implement a logic to choose a specific variant)
-                const variant = productVariant.variant[0];  // Use the first variant for simplicity
-
-                // Calculate the total price using the sale price of the variant
-                totalPrice += variant.salePrice * item.quantity;
-            } else {
-                console.error(`No variant found for product ${item.product_id._id}`);
-            }
-        }
-    }
-
-    const deliveryDate = getRandomDeliveryDate();
-
-    const newOrder = new Order({
-        user_id: userId,
-        products: cartItems.map(item => ({
-            product_id: item.product_id._id,
-            quantity: item.quantity,
-        })),
-        total_price: totalPrice,
-        payment_method,
-        payment_status: 'Completed',
-        shippingAddress: {
-            addressDocId: addressDoc._id,
-            addressIndex: selectedIndex,
-        },
-        delivery_date: deliveryDate,
-    });
-
-    await newOrder.save();
-
-    // Update product quantities in the database
-    for (const item of cartItems) {
-        if (item.product_id) {
-            await Product.findByIdAndUpdate(
-                item.product_id._id,
-                { $inc: { quantity: -item.quantity } },
-                { new: true }
-            );
-        }
-    }
-
-    // Clear the cart after order confirmation
-    user.cart = [];
-    await user.save();
-
-    res.json({ message: 'Order confirmed successfully.' });
-};
-
-
+      try {
+          const userId = req.session.user;
+          const addressId = req.session.selectedAddress;
+          const couponCode = req.session.couponCode;
+          const { payment_method } = req.body;
+  
+          if (!userId || !addressId) {
+              return res.status(400).json({ message: "User or address information missing." });
+          }
+  
+          const user = await User.findById(userId).populate("cart.product_id");
+          if (!user || !user.cart.length) {
+              return res.status(400).json({ message: "Cart is empty. Please add items to proceed." });
+          }
+  
+          const addressDoc = await Address.findOne({ user_id: userId });
+          const selectedIndex = addressDoc.address.findIndex(addr => addr._id.equals(addressId));
+          if (selectedIndex === -1) {
+              return res.status(404).json({ message: "Address not found." });
+          }
+  
+          // Calculate checkout totals, including discount
+          const { netAmount } = await calculateCheckoutTotals(userId, couponCode);
+  
+          const deliveryDate = getRandomDeliveryDate();
+  
+          // Fetch variant details and build the order products array
+          const orderProducts = [];
+          for (const item of user.cart) {
+              const variant = item.product_id.variants.find(v => v._id.toString() === item.variant_id.toString());
+              if (!variant) {
+                  return res.status(400).json({ message: `Variant not found for product ${item.product_id._id}` });
+              }
+  
+              orderProducts.push({
+                  product_id: item.product_id._id,
+                  variant_id: item.variant_id,
+                  quantity: item.quantity,
+              });
+          }
+  
+          let paymentStatus = "Pending";
+          let razorpayOrderId = null;
+          const amountInPaise = netAmount * 100;
+  
+          if (payment_method === "Razorpay") {
+              // Create a Razorpay order
+              const razorpayOrder = await razorpay.orders.create({
+                  amount: amountInPaise,
+                  currency: "INR",
+                  receipt: `order_rcptid_${Date.now()}`,
+                  notes: { userId },
+              });
+  
+              razorpayOrderId = razorpayOrder.id;
+          } else if (payment_method === "COD") {
+              paymentStatus = "Completed";
+          }
+  
+          // Save the order
+          const newOrder = new Order({
+              user_id: userId,
+              products: orderProducts,
+              total_price: netAmount,
+              payment_method,
+              payment_status: paymentStatus,
+              razorpay_order_id: razorpayOrderId,
+              shippingAddress: {
+                  addressDocId: addressDoc._id,
+                  addressIndex: selectedIndex,
+              },
+              delivery_date: deliveryDate,
+          });
+  
+          await newOrder.save();
+  
+          if (payment_method === "Razorpay") {
+              return res.json({
+                  message: "Proceed to complete the Razorpay payment.",
+                  razorpayOrderId,
+                  keyId: process.env.RAZORPAY_KEY_ID,
+                  orderId: newOrder._id,
+              });
+          }
+  
+          // Update stock for each product's variant
+          for (const item of user.cart) {
+              await Product.updateOne(
+                  { _id: item.product_id._id, "variants._id": item.variant_id },
+                  { $inc: { "variants.$.stock": -item.quantity } }
+              );
+          }
+  
+          // Clear the cart
+          user.cart = [];
+          await user.save();
+  
+          res.json({ message: "Order confirmed successfully.", orderId: newOrder._id });
+      } catch (error) {
+          console.error("Error confirming order:", error);
+          res.status(500).json({ message: "An error occurred while confirming the order. Please try again." });
+      }
+  };
+  
 const getOrderConfirmation = async (req, res) => {
     try {
         const userId = req.session.user;
 
+        // Fetch all orders for the user
         const orders = await Order.find({ user_id: userId })
-            .populate('products.product_id')
+            .populate('products.product_id')  // Populate the product details
+            .populate('products.variant_id')  // Populate the variant details
             .exec();
-  
-            for (let order of orders) {
-                for (let item of order.products) {
-                    const productVariant = await ProductVariant.findOne({ product_id: item.product_id._id });
-    
-                    if (productVariant) {
-                        // Attach variants to the order item
-                        item.variantDetails = productVariant.variant;
-                    } else {
-                        item.variantDetails = []; // No variants found
-                    }
-                }
-            }
 
-            const user = userId ? await User.findById(userId) : null;
+        // Iterate through orders to populate the variant details manually
+        for (let order of orders) {
+            for (let item of order.products) {
+                // Retrieve the correct variant details
+                const product = item.product_id;
+                const variant = product.variants.find(v => v._id.toString() === item.variant_id.toString());
+
+                // Attach the variant details to the item
+                item.variantDetails = variant || {};  // If variant not found, set an empty object
+            }
+        }
+
+        const user = userId ? await User.findById(userId) : null;
+
         res.render('order-confirmation', {
             orders,
             activePage: 'orders',
@@ -439,6 +542,8 @@ const getOrderConfirmation = async (req, res) => {
         res.redirect('/pagenotfound');
     }
 };
+
+
 const orderDetails = async (req, res) => {
     try {
         const orderId = req.params.id;
@@ -462,17 +567,28 @@ const orderDetails = async (req, res) => {
 
         // Fetch variant details for each product in the order
         for (let item of orders.products) {
-            const productVariant = await ProductVariant.findOne({ product_id: item.product_id._id });
-            item.variantDetails = productVariant ? productVariant.variant : [];
+            
+            const variant = await Product.findOne({
+                _id: item.product_id._id,
+                "variants._id": item.variant_id 
+            });
+
+            if (variant) {
+                const variantDetails = variant.variants.find(v => v._id.toString() === item.variant_id.toString());
+                item.variantDetails = variantDetails || {}; 
+            } else {
+                item.variantDetails = {}; 
+            }
         }
 
-        // Retrieve the specific address from the order's shipping details
+        // Fetch the specific shipping address for the order
         const specificAddress = orders.shippingAddress.addressDocId.address[orders.shippingAddress.addressIndex];
 
+        // Log the fetched details (for debugging purposes)
         console.log("Order with specific address:", specificAddress);
         console.log("Order details:", orders);
 
-        // Render the order details page
+        // Render the order details page with all the necessary data
         res.render('order-details', {
             orders,
             shippingAddress: specificAddress,
@@ -484,7 +600,6 @@ const orderDetails = async (req, res) => {
         res.redirect('/pagenotfound');
     }
 };
-
 
 
 const getCancelConfirmation = async(req,res)=>{
@@ -509,35 +624,35 @@ const cancelOrder = async (req, res) => {
     const { reason, customReason } = req.body;
 
     try {
-       
         const order = await Order.findById(orderId);
 
         if (!order) {
             return res.status(404).send('Order not found');
         }
 
-      
         if (order.order_status === 'Canceled' || order.order_status === 'Delivered') {
             return res.status(400).send('Order cannot be canceled');
         }
 
-       
         order.order_status = 'Canceled';
         order.canceled_at = new Date();
         order.cancellation_reason = {
             predefined: reason,
             custom: customReason,
         };
-        
+
         await order.save();
 
-
+        // Restock the product variant stock
         for (const item of order.products) {
-            await Product.findByIdAndUpdate(
-                item.product_id,
-                { $inc: { quantity: item.quantity } },
-                { new: true }
-            );
+            const product = await Product.findById(item.product_id);
+
+            const variant = product.variants.find(variant => variant._id.toString() === item.variant_id.toString());
+
+            if (variant) {
+                variant.stock += item.quantity;
+                await product.save();
+            }
         }
 
         res.redirect(`/order-details/${orderId}`);
@@ -711,6 +826,8 @@ module.exports = {
     submitRating,
     submitReviews,
     getCancelConfirmation,
-    applyCoupon
+    applyCoupon,
+    verifyPayment,
+    createRazorpay
 
 }

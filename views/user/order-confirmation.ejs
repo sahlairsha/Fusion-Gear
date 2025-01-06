@@ -297,27 +297,25 @@
                              alt="<%= product.product_id.productName %>">
                         <div class="product-details">
                             <h6><%= product.product_id.productName %></h6>
-
-                            <!-- Display variant details if available -->
-                            <% if (product.variantDetails && product.variantDetails.length > 0) { %>
-                                <% product.variantDetails.forEach(variant => { %>
-                                    <p>Color: <%= variant.color %></p>
-                                    <p>Size: <%= variant.size %></p>
-                                    <p>Quantity: <%= product.quantity %></p>
-                                    <h6>Price: ₹<%= variant.salePrice || variant.regularPrice %></h6>
-                                <% }); %>
+                            
+                            <!-- Display variant details -->
+                            <% if (product.variantDetails) { %>
+                                <p>Color: <%= product.variantDetails.color %></p>
+                                <p>Size: <%= product.variantDetails.size %></p>
+                                <p>Quantity: <%= product.quantity %></p>
+                                <h6>Price: ₹<%= product.variantDetails.salePrice || product.variantDetails.regularPrice %></h6>
                             <% } else { %>
                                 <p>No variant details available</p>
                             <% } %>
                         </div>
                     </div>
-
+    
                     <div class="order-status">
                         <p>
                             <span class="status-icon <%= order.order_status.toLowerCase().replace(' ', '-') %>"></span>
                             <span class="status-text"><%= order.order_status %></span>
                         </p>
-                        <p>Order Date: <%= new Date(order.order_date).toLocaleDateString() %></p>
+                        <p>Order Date: <%= new Date(order.createdAt).toLocaleDateString() %></p>
                         <% if (order.delivery_date) { %>
                             <p>Delivered On: <%= new Date(order.delivery_date).toLocaleDateString() %></p>
                         <% } %>
@@ -325,7 +323,7 @@
                     </div>
                 </div>
             <% }); %>
-
+    
             <!-- Order summary -->
             <div class="order-summary">
                 <% if (order.order_status === 'Delivered') { %>
@@ -338,6 +336,8 @@
             </div>
         </div>
     <% }); %>
+    
+    
     <a href="/products" class="btn go-to-shop-btn">Continue Shopping</a>
 </div>
 

@@ -112,13 +112,9 @@
     <h2>Choose Payment Method</h2>
     <form id="payment-form">
         <div class="payment-methods">
-            <div class="payment-option" onclick="selectPaymentOption('upi')">
-                <input type="radio" id="upi" name="payment_method" value="UPI">
-                <label for="upi">UPI</label>
-            </div>
-            <div class="payment-option" onclick="selectPaymentOption('net_banking')">
-                <input type="radio" id="net_banking" name="payment_method" value="Net Banking">
-                <label for="net_banking">Net Banking</label>
+            <div class="payment-option" onclick="selectPaymentOption('razorpay')">
+                <input type="radio" id="razorpay" name="payment_method" value="Razorpay">
+                <label for="razorpay">Razorpay (Card, UPI, Net Banking)</label>
             </div>
             <div class="payment-option" onclick="selectPaymentOption('cod')">
                 <input type="radio" id="cod" name="payment_method" value="COD">
@@ -130,65 +126,137 @@
     </form>
 </div>
 
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script>
     const proceedButton = document.getElementById('proceed-button');
     const paymentForm = document.getElementById('payment-form');
 
-// Show the proceed button when a payment option is selected
-function selectPaymentOption(optionId) {
-    document.getElementById(optionId).checked = true;
-    proceedButton.style.display = 'block';
-}
-
-// Handle form submission
-paymentForm.addEventListener('submit', async function (e) {
-    e.preventDefault();
-    const paymentMethod = document.querySelector('input[name="payment_method"]:checked');
-    const errorMessage = document.getElementById('error-message');
-
-    if (!paymentMethod) {
-        errorMessage.textContent = 'Please select a payment method.';
-        return;
+    // Show the proceed button when a payment option is selected
+    function selectPaymentOption(optionId) {
+        document.getElementById(optionId).checked = true;
+        proceedButton.style.display = 'block';
     }
 
-    errorMessage.textContent = '';
-    proceedButton.textContent = 'Processing...';
-    proceedButton.disabled = true;
+    // Handle form submission
+    paymentForm.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        const paymentMethod = document.querySelector('input[name="payment_method"]:checked');
+        const errorMessage = document.getElementById('error-message');
 
-    try {
-        const response = await fetch('/confirm-order', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                payment_method: paymentMethod.value,
-            }),
-        });
-
-        const result = await response.json();
-        if (response.ok) {
-            Swal.fire({
-                title: 'Payment Successful!',
-                text: 'You have selected ' + paymentMethod.value + ' as your payment method.',
-                icon: 'success',
-                timer: 3000,
-                timerProgressBar: true,
-                showConfirmButton: false,
-            }).then(() => {
-            window.location.href = "/order-confirm";
-
-            });
-        } else {
-            errorMessage.textContent = result.message || 'Failed to confirm the order.';
+        if (!paymentMethod) {
+            errorMessage.textContent = 'Please select a payment method.';
+            return;
         }
-    } catch (error) {
-        console.error('Error:', error.message);
-        errorMessage.textContent = 'An error occurred while confirming the order. Please try again.';
-    }
-});
 
+        errorMessage.textContent = '';
+        proceedButton.textContent = 'Processing...';
+        proceedButton.disabled = true;
 
+        if (paymentMethod.value === 'Razorpay') {
+            // Initiate Razorpay payment
+            try {
+                const orderResponse = await fetch('/create-razorpay-order', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+
+                const orderData = await orderResponse.json();
+                if (!orderResponse.ok) throw new Error(orderData.message);
+
+                console.log("order data for razor pay:",orderData)
+
+                const options = {
+                    key: 'YOUR_RAZORPAY_KEY_ID',
+                    amount: orderData.amount,
+                    currency: 'INR',
+                    order_id: orderData.id,
+                    name: 'Your Business Name',
+                    description: 'Order Payment',
+                    image: '/path/to/logo.png',
+                    handler: async function (response) {
+                        const verificationResponse = await fetch('/verify-payment', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                razorpay_payment_id: response.razorpay_payment_id,
+                                razorpay_order_id: response.razorpay_order_id,
+                                razorpay_signature: response.razorpay_signature,
+                            }),
+                        });
+
+                        const verificationResult = await verificationResponse.json();
+                        if (verificationResult.success) {
+                            Swal.fire({
+                                title: 'Payment Successful!',
+                                text: 'Your payment was successful.',
+                                icon: 'success',
+                                timer: 3000,
+                                timerProgressBar: true,
+                                showConfirmButton: false,
+                            }).then(() => {
+                                window.location.href = '/order-confirm';
+                            });
+                        } else {
+                            throw new Error(verificationResult.message || 'Payment verification failed.');
+                        }
+                    },
+                    prefill: {
+                        name: 'User Name',
+                        email: 'user@example.com',
+                        contact: '1234567890',
+                    },
+                    theme: {
+                        color: '#3399cc',
+                    },
+                };
+
+                const razorpay = new Razorpay(options);
+                razorpay.open();
+            } catch (error) {
+                errorMessage.textContent = error.message || 'Failed to initiate Razorpay payment.';
+            } finally {
+                proceedButton.textContent = 'Proceed';
+                proceedButton.disabled = false;
+            }
+        } else {
+            // Handle other payment methods (COD, UPI, Net Banking)
+            try {
+                const response = await fetch('/confirm-order', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        payment_method: paymentMethod.value,
+                    }),
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    Swal.fire({
+                        title: 'Order Confirmed!',
+                        text: 'You have selected ' + paymentMethod.value + ' as your payment method.',
+                        icon: 'success',
+                        timer: 3000,
+                        timerProgressBar: true,
+                        showConfirmButton: false,
+                    }).then(() => {
+                        window.location.href = '/order-confirm';
+                    });
+                } else {
+                    errorMessage.textContent = result.message || 'Failed to confirm the order.';
+                }
+            } catch (error) {
+                errorMessage.textContent = 'An error occurred while confirming the order. Please try again.';
+            } finally {
+                proceedButton.textContent = 'Proceed';
+                proceedButton.disabled = false;
+            }
+        }
+    });
 </script>
-
 <%- include('../../views/partials/user/footer') %>

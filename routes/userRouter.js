@@ -111,7 +111,8 @@ router.get('/order-details/:id',userAuth,userOrderController.orderDetails)
 router.get('/orders/cancel/confirm',userAuth,userOrderController.getCancelConfirmation)
 router.post('/orders/cancel/:id',userAuth,userOrderController.cancelOrder)
 router.get('/checkout/apply-coupon', userAuth,userOrderController.applyCoupon);
-
+router.post('/create-razorpay-order',userAuth,userOrderController.createRazorpay)
+router.post('/verify-payment',userAuth,userOrderController.verifyPayment)
 
 //ratings and reviews
 router.get('/ratings',userAuth,userOrderController.getRating)

@@ -215,14 +215,11 @@
             <!-- Product Info -->
             <div class="product-info">
                 <h4><%= item.product_id.productName %></h4>
-                <% if (item.variantDetails && item.variantDetails.length > 0) { %>
-                    <% item.variantDetails.forEach(variant => { %>
-                <p><strong>Color:</strong> <%= variant.color %></p>
-                <p><strong>Size:</strong><%= variant.size %> </p>
-                <p><strong>Qty:</strong> <%= item.quantity %></p>
-                <p><strong>Price:</strong> ₹<%= variant.salePrice || variant.regularPrice %></p>
-
-                <% }); %>
+                <% if (item.variantDetails) { %>
+                    <p>Color: <%= item.variantDetails.color %></p>
+                    <p>Size: <%= item.variantDetails.size %></p>
+                    <p>Quantity: <%= item.quantity %></p>
+                    <h6>Price: ₹<%= item.variantDetails.salePrice || item.variantDetails.regularPrice %></h6>
                 <% } else { %>
                     <p>No variant details available</p>
                 <% } %>

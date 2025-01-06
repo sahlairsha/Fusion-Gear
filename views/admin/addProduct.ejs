@@ -322,6 +322,12 @@ input[type="file"].form-control {
                                 <input type="hidden" name="variants" id="variantData">
                                 <div id="variant-error" class="error-message"></div>
                             </div>
+
+                            <div class="mb-4">
+                                <label for="product_offer" class="form-label">Product Offer</label>
+                                <input type="text" placeholder="Type here" name="productOffer" class="form-control border" id="productOffer">
+                                <div id="productOffer-error" class="error-message"></div>
+                            </div>
                             
                             <div class="card mb-2">
                                 <div class="card-header">
@@ -534,6 +540,7 @@ function validateForm() {
     clearErrorMessages();
     const name = document.getElementsByName('productName')[0].value;
     const description = document.getElementById('descriptionid').value;
+    const offer = document.getElementById('productOffer').value
 
     const category = document.getElementsByName('category')[0].value;
     let isValid = true;
@@ -548,6 +555,11 @@ function validateForm() {
         isValid = false;
     }
 
+    if(offer.trim() === "" || offer < 0 ){
+        displayErrorMessage('offer-error', 'Offer should be a positive number.');
+        isValid = false;
+    }
+
  
 
 
@@ -556,6 +568,7 @@ function validateForm() {
 
 name.addEventListener('blur',validateForm)
 description.addEventListener('blur',validateForm)
+offer.addEventListener('blur',validateForm)
 price.addEventListener('blur',validateForm)
 salePrice.addEventListener('blur',validateForm)
 color.addEventListener('blur',validateForm)
