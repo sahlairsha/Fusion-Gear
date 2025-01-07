@@ -25,6 +25,11 @@ const orderSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
+    discountAmount:{
+        type: Number,
+        default : 0
+
+    },
     payment_method: {
         type: String,
         enum: ['UPI', 'Net Banking', 'COD'],

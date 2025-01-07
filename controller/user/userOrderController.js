@@ -426,7 +426,7 @@ function getRandomDeliveryDate() {
           }
   
           // Calculate checkout totals, including discount
-          const { netAmount } = await calculateCheckoutTotals(userId, couponCode);
+          const { netAmount,discount } = await calculateCheckoutTotals(userId, couponCode);
   
           const deliveryDate = getRandomDeliveryDate();
   
@@ -469,6 +469,7 @@ function getRandomDeliveryDate() {
               products: orderProducts,
               total_price: netAmount,
               payment_method,
+              discountAmount : discount,
               payment_status: paymentStatus,
               razorpay_order_id: razorpayOrderId,
               shippingAddress: {

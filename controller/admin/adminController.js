@@ -52,7 +52,7 @@ const login = async (req, res) => {
             return res.redirect('/admin/login');
         }
 
-        const passwordMatch = await bcrypt.compare(password, findAdmin.password);
+        const passwordMatch =  bcrypt.compare(password, findAdmin.password);
         if (!passwordMatch) {
             req.flash("error", "Invalid Password! Try again.")
             return res.redirect("/admin/login");
@@ -84,39 +84,6 @@ const loadDashboard = async (req, res) => {
 };
 
 
-const generateReport = async(req,res)=>{
-    const { startDate, endDate, reportType } = req.body;
-
-    try {
-        let matchQuery = {
-            createdAt: { $gte: new Date(startDate), $lte: new Date(endDate) },
-            order_status: { $ne: 'Canceled' } // Exclude canceled orders
-        };
-
-        // Aggregation logic to calculate sales report
-        const salesReport = await Order.aggregate([
-            { $match: matchQuery },
-            {
-                $group: {
-                    _id: { 
-                        $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } // Group by day
-                    },
-                    salesCount: { $sum: 1 }, // Count orders
-                    totalOrderAmount: { $sum: "$total_price" }, // Sum of total prices
-                    totalDiscount: { $sum: { $subtract: ["$total_price", { $multiply: ["$total_price", 0.1] }] } } // Example discount logic (10% off)
-                }
-            },
-            { $sort: { _id: 1 } } // Sort by date
-        ]);
-
-        res.json(salesReport); // Send the aggregated data back to the client
-    } catch (error) {
-        console.error("Error generating sales report:", error);
-        res.status(500).send("Error generating sales report");
-    }
-}
-
-
 
 
 
@@ -138,6 +105,39 @@ const logout = async (req, res) => {
 };
 
 
+const generateReport = async (req, res) => {
+    const { startDate, endDate, reportType } = req.body;
+
+    try {
+        let matchQuery = {
+            createdAt: { $gte: new Date(startDate), $lte: new Date(endDate) },
+            order_status: { $ne: 'Canceled' } // Exclude canceled orders
+        };
+
+        const salesReport = await Order.aggregate([
+            { $match: matchQuery },
+            {
+                $group: {
+                    _id: {
+                        $dateToString: { format: "%Y-%m-%d", date: "$createdAt" }
+                    },
+                    salesCount: { $sum: 1 },
+                    totalOrderAmount: { $sum: "$total_price" },
+                    totalDiscount:  { $sum:"$discountAmount" }      
+                }
+            },
+            { $sort: { _id: 1 } }
+        ]);
+
+        res.json(salesReport); 
+    } catch (error) {
+        console.error("Error generating sales report:", error);
+        res.status(500).send("Error generating sales report");
+    }
+};
+
+
+
 const downloadPdf = async (req, res) => {
     const { startDate, endDate } = req.query;
 
@@ -145,44 +145,56 @@ const downloadPdf = async (req, res) => {
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', 'attachment; filename=sales-report.pdf');
 
-    // Fetch data for the report
-    const data = await Order.aggregate([
-        { 
-            $match: {
-                order_date: { $gte: new Date(startDate), $lte: new Date(endDate) }
+    try {
+        // Fetch data for the report
+        const data = await Order.aggregate([
+            {
+                $match: {
+                    createdAt: { $gte: new Date(startDate), $lte: new Date(endDate) },
+                    order_status: { $ne: 'Canceled' }, // Exclude canceled orders
+                }
+            },
+            {
+                $group: {
+                    _id: null,
+                    salesCount: { $sum: 1 },
+                    totalOrderAmount: { $sum: '$total_price' },
+                    totalDiscount: { $sum: '$discountAmount' }
+                }
             }
-        },
-        {
-            $group: {
-                _id: null,
-                salesCount: { $sum: 1 },
-                totalOrderAmount: { $sum: '$total_price' },
-                totalDiscount: { $sum: '$discount' }
-            }
-        }
-    ]);
-  console.log("Aggregation Result:", data);
-    // Add content to the PDF document
-    doc.text(`Sales Report: ${startDate} to ${endDate}`, { align: 'center', fontSize: 16 });
+        ]);
 
-    // Add table header
-    doc.text('Sales Count', 50, 100);
-    doc.text('Total Order Amount', 150, 100);
-    doc.text('Total Discount', 300, 100);
+        // Handle case where no data is returned
+        const reportData = data.length > 0 ? data[0] : { salesCount: 0, totalOrderAmount: 0, totalDiscount: 0 };
 
-    // Add data row
-    doc.text(data.salesCount, 50, 120);
-    doc.text(data.totalOrderAmount, 150, 120);
-    doc.text(data.totalDiscount, 300, 120);
+        // Add content to the PDF document
+        doc.fontSize(16).text(`Sales Report: ${startDate} to ${endDate}`, { align: 'center' });
+        doc.moveDown(1);
 
-    // Draw lines to simulate a table
-    doc.moveTo(50, 110).lineTo(550, 110).stroke(); // Header line
-    doc.moveTo(50, 130).lineTo(550, 130).stroke(); // Data line
+        // Add table header
+        doc.fontSize(12).text('Sales Count', 50, 100);
+        doc.text('Total Order Amount', 150, 100);
+        doc.text('Total Discount', 300, 100);
 
-    // End and send the PDF document
-    doc.end();
-    doc.pipe(res);
+        // Add data row
+        doc.text(reportData.salesCount, 50, 120);
+        doc.text(reportData.totalOrderAmount.toFixed(2), 150, 120);
+        doc.text(reportData.totalDiscount.toFixed(2), 300, 120);
+
+        // Draw lines to simulate a table
+        doc.moveTo(50, 110).lineTo(550, 110).stroke(); // Header line
+        doc.moveTo(50, 130).lineTo(550, 130).stroke(); // Data line
+
+        // End and send the PDF document
+        doc.end();
+        doc.pipe(res);
+
+    } catch (error) {
+        console.error("Error generating PDF report:", error);
+        res.status(500).send("Error generating PDF report");
+    }
 };
+
 
 const downloadExcel = async (req, res) => {
     const { startDate, endDate } = req.query;
@@ -190,39 +202,58 @@ const downloadExcel = async (req, res) => {
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('Sales Report');
 
-    // Fetch data for the report
-    const data = await Order.aggregate([
-        { 
-            $match: {
-                order_date: { $gte: new Date(startDate), $lte: new Date(endDate) }
+    try {
+        // Fetch data for the report
+        const data = await Order.aggregate([
+            {
+                $match: {
+                    createdAt: { $gte: new Date(startDate), $lte: new Date(endDate) },
+                    order_status: { $ne: 'Canceled' } // Exclude canceled orders
+                }
+            },
+            {
+                $group: {
+                    _id: null,
+                    salesCount: { $sum: 1 },
+                    totalOrderAmount: { $sum: '$total_price' },
+                    totalDiscount: { $sum: '$discountAmount' }
+                }
             }
-        },
-        {
-            $group: {
-                _id: null,
-                salesCount: { $sum: 1 },
-                totalOrderAmount: { $sum: '$total_price' },
-                totalDiscount: { $sum: '$discount' }
-            }
-        }
-    ]);
+        ]);
 
-    // Add header row
-    worksheet.addRow(['Sales Count', 'Total Order Amount', 'Total Discount']);
-    
-    // Add data row
-    worksheet.addRow([data.salesCount, data.totalOrderAmount, data.totalDiscount]);
+        // Handle case where no data is returned
+        const reportData = data.length > 0 ? data[0] : { salesCount: 0, totalOrderAmount: 0, totalDiscount: 0 };
 
-    // Set response headers for file download
-    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    res.setHeader('Content-Disposition', 'attachment; filename=sales-report.xlsx');
+        // Add header row
+        worksheet.addRow(['Sales Count', 'Total Order Amount', 'Total Discount']);
 
-    // Write the Excel file to the response
-    await workbook.xlsx.write(res);
-    res.end();
-}
+        // Add data row
+        worksheet.addRow([
+            reportData.salesCount,
+            reportData.totalOrderAmount.toFixed(2),
+            reportData.totalDiscount.toFixed(2)
+        ]);
 
+        // Auto-size columns only if headers exist
+        worksheet.columns = [
+            { header: 'Sales Count', key: 'salesCount', width: 15 },
+            { header: 'Total Order Amount', key: 'totalOrderAmount', width: 20 },
+            { header: 'Total Discount', key: 'totalDiscount', width: 15 }
+        ];
 
+        // Set response headers for file download
+        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        res.setHeader('Content-Disposition', 'attachment; filename=sales-report.xlsx');
+
+        // Write the Excel file to the response
+        await workbook.xlsx.write(res);
+        res.end();
+
+    } catch (error) {
+        console.error("Error generating Excel report:", error);
+        res.status(500).json({message : "Error generating Excel report"});
+    }
+};
 
 
 module.exports = {

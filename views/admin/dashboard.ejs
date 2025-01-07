@@ -1,70 +1,93 @@
-<%- include('../../views/partials/admin/header')  %>
+<%- include('../../views/partials/admin/header') %>
 
 <style>
+    .dashboard-head{
+        text-align: center;
+        background-color: #f0f0f0;
+        padding: 20px;
+        margin-bottom: 40px;
+
+    }
     .sale-container {
         max-width: 800px;
         margin: auto;
         background: white;
         padding: 20px;
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        position: relative;
     }
-    
+
     h1 {
         text-align: center;
+        margin-bottom: 20px;
     }
-    
-    .form-group {
+
+    .form-row {
+        display: flex;
+        gap: 15px;
         margin-bottom: 15px;
     }
-    
+
+    .form-group {
+        flex: 1;
+        margin-bottom: 0;
+    }
+
     label {
         display: block;
         margin-bottom: 5px;
+        font-size: 14px;
     }
-    
-    input, select, button {
+
+    input, select {
         width: 100%;
-        padding: 8px;
-        margin-bottom: 10px;
+        padding: 6px;
         border: 1px solid #ccc;
         border-radius: 4px;
+        font-size: 14px;
     }
-    
-    button {
+
+    button#generate-button {
         background-color: #28a745;
         color: white;
-        cursor: pointer;
+        padding: 8px 16px;
         border: none;
+        border-radius: 4px;
+        font-size: 14px;
+        cursor: pointer;
+        position: absolute;
+        top: 20px;
+        right: 20px;
     }
-    
-    button:hover {
+
+    button#generate-button:hover {
         background-color: #218838;
     }
-    
+
     table {
         width: 100%;
         border-collapse: collapse;
         margin-top: 20px;
     }
-    
+
     table, th, td {
         border: 1px solid #ddd;
     }
-    
+
     th, td {
         padding: 10px;
         text-align: center;
     }
-    
+
     .hidden {
         display: none;
     }
-    
+
     #download-buttons {
         text-align: center;
         margin-top: 20px;
     }
-    
+
     #download-pdf, #download-excel {
         background-color: #007bff;
         color: white;
@@ -73,47 +96,48 @@
         cursor: pointer;
         margin: 5px;
     }
-    
+
     #download-pdf:hover, #download-excel:hover {
         background-color: #0056b3;
     }
 </style>
+
 <div class="container py-5">
-    <h4>Welcome to Dashboard</h4>
+    <h4 class="dashboard-head" >Welcome to Dashboard</h4>
     <div class="sale-container">
         <h1>Sales Report</h1>
-        
+
         <!-- Sales Report Filters Form -->
         <form id="report-form">
-            <div class="form-group">
-                <label for="start-date">Start Date:</label>
-                <input type="date" id="start-date" name="start-date" required>
+            <button id="generate-button" type="submit">Generate Report</button>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="start-date">Start Date:</label>
+                    <input type="date" id="start-date" name="start-date" required>
+                </div>
+                <div class="form-group">
+                    <label for="end-date">End Date:</label>
+                    <input type="date" id="end-date" name="end-date" required>
+                </div>
             </div>
-            <div class="form-group">
-                <label for="end-date">End Date:</label>
-                <input type="date" id="end-date" name="end-date" required>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="report-type">Report Type:</label>
+                    <select id="report-type" name="report-type">
+                        <option value="daily">Daily</option>
+                        <option value="weekly">Weekly</option>
+                        <option value="monthly">Monthly</option>
+                        <option value="custom">Custom Date Range</option>
+                    </select>
+                </div>
             </div>
-            <div class="form-group">
-                <label for="report-type">Report Type:</label>
-                <select id="report-type" name="report-type">
-                    <option value="daily">Daily</option>
-                    <option value="weekly">Weekly</option>
-                    <option value="monthly">Monthly</option>
-                    <option value="custom">Custom Date Range</option>
-                </select>
-            </div>
-            <button type="submit">Generate Report</button>
         </form>
-
-        <!-- Canvas for Chart.js graph -->
-        <div class="chart-container">
-            <canvas id="salesChart"></canvas>
-        </div>
 
         <!-- Table to display the sales report -->
         <table id="report-table" class="hidden">
             <thead>
                 <tr>
+                    <th>Date</th>
                     <th>Sales Count</th>
                     <th>Total Order Amount</th>
                     <th>Total Discount</th>
@@ -130,128 +154,76 @@
             <button id="download-excel">Download Excel</button>
         </div>
     </div>
+
+    <script>
+        document.getElementById("report-form").addEventListener("submit", function (e) {
+            e.preventDefault();
+
+            const startDate = document.getElementById("start-date").value;
+            const endDate = document.getElementById("end-date").value;
+            const reportType = document.getElementById("report-type").value;
+
+            // Fetch sales data for the selected range and type
+            fetchSalesReport(startDate, endDate, reportType);
+        });
+
+        function fetchSalesReport(startDate, endDate, reportType) {
+            fetch(`/generate-report`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    startDate: startDate,
+                    endDate: endDate,
+                    reportType: reportType,
+                }),
+            })
+                .then((response) => response.json())
+                .then((data) => {
+                    // Populate table with data
+                    updateSalesTable(data);
+
+                    // Show the download buttons
+                    document.getElementById("download-buttons").classList.remove("hidden");
+                })
+                .catch((error) => {
+                    console.error("Error fetching sales report:", error);
+                });
+        }
+
+        function updateSalesTable(data) {
+            const table = document.getElementById("report-table").querySelector("tbody");
+            table.innerHTML = ""; // Clear existing rows
+
+            data.forEach(item => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${item._id}</td>
+                    <td>${item.salesCount}</td>
+                    <td>${item.totalOrderAmount.toFixed(2)}</td>
+                    <td>${item.totalDiscount.toFixed(2)}</td>
+                `;
+                table.appendChild(row);
+            });
+
+            // Show the table
+            document.getElementById("report-table").classList.remove("hidden");
+        }
+
+        // Download handlers
+        document.getElementById("download-pdf").addEventListener("click", function () {
+            const startDate = document.getElementById("start-date").value;
+            const endDate = document.getElementById("end-date").value;
+            window.location.href = `/download-pdf?startDate=${startDate}&endDate=${endDate}`;
+        });
+
+        document.getElementById("download-excel").addEventListener("click", function () {
+            const startDate = document.getElementById("start-date").value;
+            const endDate = document.getElementById("end-date").value;
+            window.location.href = `/download-excel?startDate=${startDate}&endDate=${endDate}`;
+        });
+    </script>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-    document.getElementById("report-form").addEventListener("submit", function (e) {
-        e.preventDefault();
-
-        const startDate = document.getElementById("start-date").value;
-        const endDate = document.getElementById("end-date").value;
-        const reportType = document.getElementById("report-type").value;
-
-        // Fetch sales data for the selected range and type
-        fetchSalesReport(startDate, endDate, reportType);
-    });
-
-    function fetchSalesReport(startDate, endDate, reportType) {
-    fetch(`/generate-report`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-            startDate: startDate,
-            endDate: endDate,
-            reportType: reportType,
-        }),
-    })
-    .then((response) => response.json())
-    .then((data) => {
-        // Populate table with data
-        updateSalesTable(data);
-
-        // Generate the graph
-        generateSalesGraph(data);
-
-        // Show the download buttons
-        document.getElementById("download-buttons").classList.remove("hidden");
-    })
-    .catch((error) => {
-        console.error("Error fetching sales report:", error);
-    });
-}
-    function generateSalesGraph(data) {
-        const ctx = document.getElementById('salesChart').getContext('2d');
-
-        const salesCount = data.map(item => item.salesCount);
-        const totalAmount = data.map(item => item.totalOrderAmount);
-        const totalDiscount = data.map(item => item.totalDiscount);
-        const labels = data.map(item => item._id); 
-
-        const chart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: labels,
-                datasets: [
-                    {
-                        label: 'Sales Count',
-                        data: salesCount,
-                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                        borderColor: 'rgba(75, 192, 192, 1)',
-                        borderWidth: 1
-                    },
-                    {
-                        label: 'Total Order Amount',
-                        data: totalAmount,
-                        backgroundColor: 'rgba(153, 102, 255, 0.2)',
-                        borderColor: 'rgba(153, 102, 255, 1)',
-                        borderWidth: 1
-                    },
-                    {
-                        label: 'Total Discount',
-                        data: totalDiscount,
-                        backgroundColor: 'rgba(255, 159, 64, 0.2)',
-                        borderColor: 'rgba(255, 159, 64, 1)',
-                        borderWidth: 1
-                    }
-                ]
-            },
-            options: {
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                }
-            }
-        });
-    }
-
-    function updateSalesTable(data) {
-        const table = document.getElementById("report-table").querySelector("tbody");
-        table.innerHTML = "";
-
-        data.forEach(item => {
-            const row = document.createElement("tr");
-            row.innerHTML = `
-                <td>${item.salesCount}</td>
-                <td>${item.totalOrderAmount}</td>
-                <td>${item.totalDiscount}</td>
-            `;
-            table.appendChild(row);
-        });
-
-        document.getElementById("report-table").classList.remove("hidden");
-    }
-
-
-
-    document.getElementById("download-pdf").addEventListener("click", function () {
-    const startDate = document.getElementById("start-date").value;
-    const endDate = document.getElementById("end-date").value;
-
-    // Trigger the download of the PDF report
-    window.location.href = `/download-pdf?startDate=${startDate}&endDate=${endDate}`;
-});
-
-document.getElementById("download-excel").addEventListener("click", function () {
-    const startDate = document.getElementById("start-date").value;
-    const endDate = document.getElementById("end-date").value;
-
-    // Trigger the download of the Excel report
-    window.location.href = `/download-excel?startDate=${startDate}&endDate=${endDate}`;
-});
-</script>
-
-<%- include('../../views/partials/admin/footer')  %>
+<%- include('../../views/partials/admin/footer') %>
