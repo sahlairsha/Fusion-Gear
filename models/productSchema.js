@@ -16,9 +16,13 @@ const productSchema = new Schema({
         ref: "Category",
         required: true,
     },
-    productOffer: {
-        type: Number,
-        default: 0,
+    offer: {
+        discountPercentage: { 
+            type: Number,
+            default: 0 
+        },
+        startDate: Date,
+        endDate: Date,
     },
     productImage: {
         type: [String],
@@ -98,8 +102,7 @@ productSchema.post('findOneAndUpdate', async function (doc) {
                 variant.status = "Available";
             }
         });
-
-        // Save the updated product document with modified variant statuses
+        
         await doc.save();
     }
 });

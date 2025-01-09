@@ -19,10 +19,11 @@ const getProduct = async(req,res)=>{
         res.redirect("/pageerror")
     }
 }
+
+
 const addProducts = async (req, res) => {
     try {
         const product = req.body;
-       
 
         // Check if the product already exists
         const productExists = await Product.findOne({ productName: product.productName });
@@ -58,6 +59,8 @@ const addProducts = async (req, res) => {
             return res.status(400).redirect('/admin/add-products');
         }
 
+        // Validate product offer
+        let productOffer = 0;
         if (product.productOffer) {
             productOffer = parseFloat(product.productOffer);
             if (isNaN(productOffer) || productOffer < 0 || productOffer > 100) {
@@ -81,6 +84,14 @@ const addProducts = async (req, res) => {
                 return res.status(400).redirect('/admin/add-products');
             }
 
+            // Calculate the offer price for each variant
+            variants.forEach(variant => {
+                if (variant.regularPrice && productOffer > 0) {
+                    // Calculate salePrice based on offer percentage
+                    const discountAmount = (variant.regularPrice * productOffer) / 100;
+                    variant.salePrice = variant.regularPrice - discountAmount;
+                }
+            });
         } else {
             req.flash("error", "Product variants are required");
             return res.status(400).redirect('/admin/add-products');
@@ -90,16 +101,20 @@ const addProducts = async (req, res) => {
         const newProduct = new Product({
             productName: product.productName,
             description: product.description,
-            productOffer : productOffer,
+            offer: {
+                discountPercentage: productOffer,
+                startDate: product.offerStartDate || null,
+                endDate: product.offerEndDate || null,
+            },
             category: categoryId,
             productImage: images,
             isBlocked: false,
             isDeleted: false,
             ratings: { average: 0, count: 0 },
-            variants: variants, // Directly add variants to the product document
+            variants: variants, // Store variants with calculated sale prices
         });
 
-        const savedProduct = await newProduct.save();
+        await newProduct.save();
 
         req.flash("success", "Product and variants added successfully");
         res.status(201).redirect("/admin/add-products");
@@ -109,8 +124,6 @@ const addProducts = async (req, res) => {
         res.status(500).redirect('/admin/add-products');
     }
 };
-
-
 
 const getAllProducts = async (req, res) => {
     try {

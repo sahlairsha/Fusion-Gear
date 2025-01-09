@@ -16,7 +16,7 @@ const couponController = require('../controller/admin/couponController')
 const multer = require('multer');
 const { storage, editedStorage } = require("../helper/multer");
 
-const uploads = multer({ storage }); // For original images
+const uploads = multer({ storage });
 const editUploads = multer({ storage: editedStorage }); 
 
 // Admin login & logout
@@ -49,7 +49,7 @@ router.get('/admin/restorecategory', adminAuth, categoryController.restoreCatego
 
 // Product management
 router.get('/admin/add-products', adminAuth, productController.getProduct);
-router.post('/admin/add-products', adminAuth, uploads.array("image", 4), productController.addProducts);
+router.post('/admin/add-products',adminAuth, uploads.array("image", 4),productController.addProducts);
 router.get("/admin/products", adminAuth, productController.getAllProducts);
 router.get("/admin/editproducts", adminAuth, productController.getEditProducts);
 router.post("/admin/editproducts/:id", adminAuth, editUploads.array("image", 4), productController.editProducts);

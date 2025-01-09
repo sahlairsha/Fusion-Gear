@@ -4,7 +4,7 @@ const path = require('path');
 // Define storage for uploaded product images
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, path.join(__dirname, "../Public/uploads/re-image")); // Original image storage folder
+        cb(null, path.join(__dirname, "../Public/uploads/re-image"));
     },
     filename: (req, file, cb) => {
         cb(null, Date.now() + "-" + file.originalname);

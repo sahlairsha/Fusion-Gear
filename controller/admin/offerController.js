@@ -1,7 +1,4 @@
 // Admin Controller (controllers/admin.js)
-const Offer = require('../../models/offerSchema');
-
-
 const getOfferPage = async(req, res) =>{
     try{
         const offers = await Offer.find();

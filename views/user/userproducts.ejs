@@ -174,7 +174,7 @@
                                                 <input type="radio" name="size" value="M" id="md">
                                             </label>
                                             <label for="lg">l
-                                                <input type="radio" name="size" value="L" id="l">
+                                                <input type="radio" name="size" value="L" id="lg">
                                             </label>
                                             <label for="xl">xl
                                                 <input type="radio" name="size" value="XL" id="xl">
@@ -251,7 +251,7 @@
                 <div class="shop__product__option">
                     <div class="row">
                         
-                        <div class="col-lg-6 col-md-6 col-sm-6">
+                        <div class="col-lg-6 col-md-6 col-sm-6 d-flex me-auto">
                             <div class="shop__product__option__right">
                                 <form method="GET" action="/products">
                                     <select name="sort" id="sort" onchange="this.form.submit()">
@@ -316,9 +316,11 @@
                                         <div class="description">
                                             <p><%= product.description %></p>
                                         </div>
-                
+                                       <button class="add-wishlist">Wishlists</button>
+                                        <button class="add-cart-btn"><a href="#" onclick="addToCart('<%= product._id %>')" class="add-cart-link">+ Add to Cart</a></button>
                                     </div>
                                 </div>
+                               
                             </div>
                         <% }); %>
                     <% } %>
@@ -382,9 +384,6 @@ document.querySelectorAll('.price-filter').forEach(function (link) {
 });
 
 
-
-
-
    document.querySelectorAll('input[name="size"], input[name="color"]').forEach(input => {
     input.addEventListener('change', function () {
         updateFilters();
@@ -408,6 +407,41 @@ function updateFilters() {
     // Update the URL
     window.location.search = queryParams.toString();
 }
+
+
+function addToCart(productId) {
+
+    const quantity = document.querySelector('.pro-qty input').value;
+
+    // Proceed with AJAX
+    $.ajax({
+        url: `/cart/add/${productId}`,
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ quantity: parseInt(quantity, 10) }),
+        success: function(response) {
+            Swal.fire({
+                title: "Success",
+                icon: "success",
+                text: "Product added successfully",
+                showConfirmButton: true,
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = '/cart';
+                }
+            });
+        },
+        error: function() {
+            Swal.fire({
+                title: "Error",
+                icon: "error",
+                text: "Failed to add product to cart!",
+                showConfirmButton: true,
+            });
+        }
+    });
+}
+
 
 
 </script>

@@ -56,7 +56,7 @@
                     <p><strong>Description:</strong> <%= product.description %></p>
                     <p><strong>Category:</strong> <%= product.category ? product.category.name : 'No Category' %></p>
                     <p><strong>Views:</strong> <%= product.views %></p>
-                    <p><strong>Offer:</strong> <%= product.productOffer  %>% off</p>
+                    <p><strong>Offer:</strong> <%= product.offer.discountPercentage%>% off</p>
                     <p><strong>Featured:</strong> <%= product.featured ? 'Yes' : 'No' %></p>
 
                     <!-- Variants Section -->

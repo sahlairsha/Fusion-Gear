@@ -76,6 +76,9 @@ try {
     if (!user) {
         return res.status(404).json({ success: false, message: "User not found." });
     }
+    if (password!== confirm_password) {
+        return res.status(400).json({ success: false, message: "Passwords do not match." });
+    }
 
 
     user.password = hashedPassword;
@@ -86,13 +89,7 @@ res.status(200).json({ success: true, message: "Password updated successfully." 
     res.status(500).json({ success: false, message: "An error occurred while updating the password." });
 }
 
-
-
 }
-
-
-
-
 
 
 const viewAddress = async(req,res)=>{

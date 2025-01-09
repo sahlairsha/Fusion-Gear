@@ -1,5 +1,5 @@
 
-const Product = require("../../models/productSchema");
+const Product = require( "../../models/productSchema" );
 const User = require("../../models/userSchema");
 const Category = require('../../models/categorySchema');
 const Coupon = require("../../models/couponSchema")
@@ -37,23 +37,25 @@ const loadProducts = async (req, res) => {
                 name: { $regex: `^${category}$`, $options: 'i' }
             });
             if (categoryData) {
-                filters.category = categoryData._id;
+                query.category = categoryData._id;
             }
         }
 
         // Handle product variant filters (size, color)
         let variantFilters = {};
-        if (size) {
-            variantFilters.size = { $regex: `^${size}$`, $options: 'i' };
-        }
-        
-        if (color) {
-            variantFilters.color = { $regex: `^${color}$`, $options: 'i' };
+        if (size || color) {
+            query.variants = { $elemMatch: {} };
+            if (size) {
+                query.variants.$elemMatch.size = { $regex: `^${size}$`, $options: 'i' };
+            }
+            if (color) {
+                query.variants.$elemMatch.color = { $regex: `^${color}$`, $options: 'i' };
+            }
         }
 
         if (priceRange) {
             const [minPrice, maxPrice] = priceRange.split('-').map(Number);
-            filters['variants.salePrice'] = { $gte: minPrice, $lte: maxPrice };
+            query['variants.salePrice'] = { $gte: minPrice, $lte: maxPrice };
         }
 
         let sortQuery = {};
@@ -98,28 +100,7 @@ const loadProducts = async (req, res) => {
             .sort(sortQuery)
             .exec();
 
-        // Query for the variants of the products (for filtering size/color)
-        const productIds = productData.map(product => product._id);
-        const variantsData = await Product.find({
-            _id: { $in: productIds },
-            'variants': { $elemMatch: variantFilters }
-        }).exec();
-
-        // Populate the variants for each product and apply the filters
-        const productsWithVariants = await Promise.all(
-            productData.map(async (product) => {
-                const productVariants = product.variants.filter(variant => 
-                    (variantFilters.size ? variant.size.match(variantFilters.size.$regex) : true) &&
-                    (variantFilters.color ? variant.color.match(variantFilters.color.$regex) : true)
-                );
-
-                return {
-                    ...product.toObject(),
-                    variants: productVariants,
-                };
-            })
-        );
-
+        
         // Get the total count of products for pagination
         const count = await Product.countDocuments(query);
         const totalPages = Math.ceil(count / limit);
@@ -133,7 +114,7 @@ const loadProducts = async (req, res) => {
         }
 
         const data = {
-            products: productsWithVariants, 
+            products: productData, 
             totalPages,
             totalProduct: count,
             limit,
