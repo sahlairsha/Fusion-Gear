@@ -1,0 +1,312 @@
+<%- include('../../views/partials/user/header') %>
+
+<link href="https://fonts.cdnfonts.com/css/lt-binary-neue" rel="stylesheet">
+
+<%- include('../../views/partials/user/user-side') %>
+
+<style>
+  .wallet-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
+    gap: 20px;
+    margin-left: 40px;
+  }
+
+  .wallet-card {
+    margin-top: 10px;
+    grid-column: 1;
+    width: 400px;
+    height: 200px;
+    padding: 30px;
+    background-color: transparent;
+    border-radius: 20px;
+    border: .5px solid #0000001e;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1), inset 0 -5px 10px rgba(0, 0, 0, 0.05);
+    text-align: left;
+  }
+
+  .wallet-card h6 {
+    margin-bottom: 10px;
+    padding-left: 20px;
+    color: #000;
+  }
+
+  .wallet-card p {
+    color: #000;
+    font-weight: 800;
+    padding-left: 20px;
+  }
+
+  .wallet-card button {
+    margin: 5px;
+    padding: 10px 15px;
+    background-color: transparent;
+    color: #000;
+    font-weight: 600;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+  #balance {
+    font-weight: 200;
+    color: green;
+  }
+
+  .credit-card-section {
+    grid-column: 2;
+    text-align: center;
+  }
+
+  .credit-card {
+    position: relative;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1), inset 0 -5px 10px rgba(0, 0, 0, 0.05);
+    width: 300px;
+    height: 180px;
+    margin: 0 auto;
+    perspective: 1000px;
+  }
+
+  .credit-card .front,
+  .credit-card .back {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #0a0a0a, #141414 25%, #1f1f1f 50%, #141414 75%, #0a0a0a);
+    border-radius: 10px;
+    backface-visibility: hidden;
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+    margin-top: 20px;
+  }
+
+  .credit-card .back {
+    background-color: #0056b3;
+    transform: rotateY(180deg);
+  }
+
+  .credit-card p {
+    font-family: 'LT Binary Neue', sans-serif;
+    background-clip: text;
+    font-weight: bold;
+    color: #c0c0c0;
+  }
+
+  .credit-card:hover {
+    transform: rotateY(180deg);
+    transition: transform 1s;
+  }
+
+  #addCardButton {
+    margin-top: 10px;
+  }
+
+  .transaction-history {
+    grid-column: 1 / 3;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .transaction-history table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .transaction-history th,
+  .transaction-history td {
+    padding: 10px;
+    border: 1px solid #ccc;
+    text-align: left;
+  }
+
+  /* Modal Styling */
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.4);
+  }
+
+  .modal-content {
+    background-color: #fff;
+    margin: 15% auto;
+    padding: 20px;
+    border-radius: 10px;
+    width: 80%;
+    max-width: 400px;
+  }
+
+  .close-btn {
+    color: #aaa;
+    font-size: 30px;
+    font-weight: bold;
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    cursor: pointer;
+  }
+</style>
+
+<div class="wallet-container">
+  <!-- Wallet Details Card -->
+  <div class="wallet-card">
+    <h6>Wallet Details</h6>
+    <p>Balance: <span id="balance">₹<%= walletBalance %></span></p>
+    <button onclick="showModal()">+Add Money</button>
+    <button onclick="sendMoney()">Withdraw Money</button>
+  </div>
+
+  <!-- Add Money Modal -->
+  <div id="addMoneyModal" class="modal">
+    <div class="modal-content">
+      <span class="close-btn" onclick="closeModal()">&times;</span>
+      <h2>Add Money</h2>
+      <form id="addMoneyForm">
+        <input type="number" id="addMoneyAmount" placeholder="Enter amount to add" required>
+        <button type="submit">Submit</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Credit Card Section -->
+  <div class="credit-card-section">
+    <div class="credit-card" id="creditCard">
+      <div class="front">
+        <p><span id="cardName">Your Name</span></p>
+        <p><span id="cardNumber">1XXX XXXX XXXX XXXX</span></p>
+      </div>
+      <div class="back">
+        <p>CVV: <span id="cardCVV">XXX</span></p>
+      </div>
+    </div>
+    <button id="addCardButton" onclick="toggleCardForm()">Add Credit Card</button>
+    <form id="cardForm" style="display: none;" onsubmit="updateCard(event)">
+      <input type="text" id="newCardName" placeholder="Cardholder Name" required>
+      <input type="text" id="newCardNumber" placeholder="Card Number" required>
+      <input type="text" id="newCardCVV" placeholder="CVV" required>
+      <button type="submit">Update Card</button>
+    </form>
+  </div>
+
+  <!-- Transaction History -->
+  <div class="transaction-history">
+    <h2>Transaction History</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Description</th>
+          <th>Amount</th>
+        </tr>
+      </thead>
+      <tbody id="transactionTable">
+        <% if (transactions.length > 0) { %>
+          <% transactions.forEach(transaction => { %>
+            <tr>
+              <td><%= new Date(transaction.date).toLocaleString() %></td>
+              <td><%= transaction.type %></td>
+              <td style="color: '<%= transaction.amount > 0 ? 'green' : 'red' %>';">
+                ₹<%= transaction.amount.toFixed(2) %>
+              </td>
+            </tr>
+          <% }) %>
+        <% } else { %>
+          <tr>
+            <td colspan="3">No transactions yet.</td>
+          </tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+</div>
+</div>
+<script>
+  // Show the Add Money modal
+function showModal() {
+  document.getElementById('addMoneyModal').style.display = 'block';
+}
+
+// Close the Add Money modal
+function closeModal() {
+  document.getElementById('addMoneyModal').style.display = 'none';
+}
+// Handle Add Money form submission
+document.getElementById('addMoneyForm').addEventListener('submit', async function (event) {
+    event.preventDefault(); // Prevent the default form submission
+    
+    const amount = parseFloat(document.getElementById('addMoneyAmount').value);
+    
+    // Input validation
+    if (isNaN(amount) || amount <= 0) {
+        alert('Please enter a valid amount.');
+        return;
+    }
+
+    try {
+        const response = await fetch('/wallet/add', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ amount }),
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            document.getElementById('balance').innerText = `₹${data.newBalance.toFixed(2)}`;
+            addTransactionToTable(data.transaction);
+            closeModal();
+            
+            // Show success message using SweetAlert
+            Swal.fire({
+                title: 'Success!',
+                text: 'Money added successfully!',
+                icon: 'success',
+                confirmButtonText: 'OK'
+            });
+        } else {
+            
+            alert(data.message || 'Failed to add money.');
+        }
+    } catch (error) {
+        console.error('Error adding money:', error);
+        alert('An error occurred while processing your request. Please try again.');
+    }
+});
+
+// Function to add the new transaction to the transaction table
+function addTransactionToTable(transaction) {
+  const table = document.getElementById("transactionTable");
+  const row = document.createElement("tr");
+
+  const dateCell = document.createElement("td");
+  dateCell.innerText = new Date(transaction.date).toLocaleString();
+
+  const descCell = document.createElement("td");
+  descCell.innerText = transaction.type;
+
+  const amountCell = document.createElement("td");
+  amountCell.innerText = `₹${transaction.amount.toFixed(2)}`;
+  amountCell.style.color = transaction.amount > 0 ? "green" : "red";
+
+  row.appendChild(dateCell);
+  row.appendChild(descCell);
+  row.appendChild(amountCell);
+  table.appendChild(row);
+}
+
+
+</script>
+
+<%- include('../../views/partials/user/footer') %>

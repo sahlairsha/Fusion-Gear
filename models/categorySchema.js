@@ -33,9 +33,17 @@ const categorySchema = new Schema({
         default: true,
     },
     categoryDiscount: {
-        percentage: Number,
-        startDate: Date,
-        endDate: Date,
+        percentage:{
+            type: Number,
+            default: 0,
+
+        },
+        startDate:{
+            type: Date
+        },
+        endDate:{
+            type: Date
+        },
     },
     createdAt: {
         type: Date,

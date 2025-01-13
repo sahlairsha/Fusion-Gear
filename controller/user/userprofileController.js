@@ -1,11 +1,11 @@
 
 const User = require("../../models/userSchema");
-const Address = require("../../models/addressSchema")
+const Address = require("../../models/addressSchema");
 const bcrypt = require("bcrypt");
 
 const getProfile = async (req, res) => {
   try {
-    const userId = req.query.id;
+    const userId = req.session.user;
     if (!userId) {
       return res.redirect('/login');
     }
@@ -196,6 +196,26 @@ const updateAddress = async(req,res)=>{
 }
 
 
+
+const refferalPage = async(req,res)=>{
+  try {
+    const userId = req.session.user
+    if (!userId) {
+      return res.redirect('/login');
+    }
+
+    const user= await User.findById(userId);
+    if (!user) {
+      req.flash('error',"User not found")
+      return res.redirect('/userProfile')
+    }
+    res.render('referral',{ user ,activePage : 'referral'})
+  } catch (error) {
+    console.log(error);
+    res.redirect('/pagenotfound')
+  }
+}
+
 module.exports = {
     getProfile,
     editProfile,
@@ -204,5 +224,6 @@ module.exports = {
     deleteAddress,
     editAddress,
     updateAddress,
-    resetPassword
-}
+    resetPassword,
+    refferalPage,
+ };

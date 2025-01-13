@@ -25,11 +25,13 @@ const loadHomePage = async (req, res) => {
     try{
     const productData = await Product.find().populate('category')
     if (!req.session.user) {
-        res.render('home', { user: null , products : productData});
+        console.log("No user in session");
+        res.render('home', { user: null, products: productData });
     } else {
+        console.log("Session user:", req.session.user);
         const userData = await User.findById(req.session.user);
-      
-        res.render('home', { user: userData,products : productData})
+        console.log("Fetched user:", userData);
+        res.render('home', { user: userData, products: productData });
     }
 }catch(error){
     console.log("Home page is not loading", error.message);
@@ -49,7 +51,8 @@ const loadSignup = async(req,res)=>{
 function generateOtp() {
     return Math.floor(100000 + Math.random() * 900000).toString();
 }
-
+// Securely generate a reset token
+const generateResetToken = () => crypto.randomBytes(32).toString('hex');
 async function sendVerificationEmail(email, otp) {
     try {
         const transporter = nodemailer.createTransport({
@@ -91,54 +94,101 @@ const validateAvatar = async (avatarUrl) => {
     }
   };
 
+  const generateReferralCode = (userId) => {
+    return crypto.createHash('sha256').update(userId.toString()).digest('hex').slice(0, 8);
+};
+
+const handleReferral = async (newUser, referralCode) => {
+    if (referralCode) {
+        const referrer = await User.findOne({ referralCode });
+
+        if (referrer) {
+            // Reward the referrer
+            referrer.wallet += 10;  // Add 10 to referrer's wallet
+            referrer.redeemedUser.push(newUser._id);  // Store the new user ID in referrer
+            referrer.transactions.push({
+                type: 'referral_bonus',
+                amount: 10,
+                description: `Referral bonus for inviting ${newUser.username}`,
+                date: new Date(),
+            });
+
+            // Save the referrer after updating the wallet and transactions
+            await referrer.save();
+
+            // Optionally reward the referred user (new user)
+            newUser.wallet += 5;  // Add 5 to the new user's wallet
+            newUser.transactions.push({
+                type: 'referral_bonus',
+                amount: 5,
+                description: `Referral bonus from ${referrer.username}`,
+                date: new Date(),
+            });
+
+            // Save the new user after updating the wallet and transactions
+            await newUser.save();
+        } else {
+            console.error("Invalid referral code");
+        }
+    }
+};
+
+
 
 
 const signup = async (req, res) => {
     try {
-        const { full_name, username, phone, email, password, confirm_password } = req.body;
+        const { full_name, username, phone, email, password, confirm_password, referralCode } = req.body;
 
-        const findUser = await User.findOne({ email });
-        if (findUser) {
+        // Check if the user already exists
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
             req.flash('error', 'User already exists');
             return res.redirect('/signup');
         }
 
-let avatarUrl;
-
-if (email) {
-    avatarUrl = `https://www.gravatar.com/avatar/${crypto.createHash('md5').update(email.trim().toLowerCase()).digest('hex')}?d=robohash&r=g&s=200`; 
-}
-
-
-const isAvatarValid = await validateAvatar(avatarUrl);
-if (!isAvatarValid) {
-    return res.render("signup", { message: "Invalid avatar. Please try again." });
-}
-
-
-if ( password !== confirm_password) {
-    return res.render("signup", { message: "Passwords do not match" });
-}
+        // Validate passwords
         if (password !== confirm_password) {
             return res.render("signup", { message: "Passwords do not match" });
         }
 
-     
+        // Generate avatar URL
+        const avatarUrl = `https://www.gravatar.com/avatar/${crypto.createHash('md5').update(email.trim().toLowerCase()).digest('hex')}?d=robohash&r=g&s=200`;
 
+        // Validate avatar
+        const isAvatarValid = await validateAvatar(avatarUrl);
+        if (!isAvatarValid) {
+            return res.render("signup", { message: "Invalid avatar. Please try again." });
+        }
+
+        // Handle referrals
+        let referrer = null;
+        if (referralCode) {
+            referrer = await User.findOne({ referralCode });
+            if (referrer) {
+                req.session.referrer = referrer;
+            } else {
+                req.flash('error', 'Invalid referral code');
+                return res.redirect('/signup');
+            }
+        }
+
+        // Generate and send OTP
         const otp = generateOtp();
         const emailSent = await sendVerificationEmail(email, otp);
-        console.log("OTP Send:",otp)
         if (!emailSent) {
             return res.render("signup", { message: "Failed to send OTP. Try again later." });
         }
 
-        req.session.userOtp = { otp, expires: Date.now() + 10 * 60 * 1000 };
-        req.session.userData = { full_name, username, phone, email, password ,profile_pic: avatarUrl};
-
+        console.log("Verification Otp:" , otp)
+        // Store OTP and user data in the session
+        req.session.userOtp = { otp, expires: Date.now() + 10 * 60 * 1000 }; // OTP expires in 10 minutes
+        req.session.userData = { full_name, username, phone, email, password, profile_pic: avatarUrl };
+        console.log("Session User Data :", req.session.userData)
         res.render("verification-otp");
     } catch (error) {
         console.error("Signup error:", error);
-        return res.render("signup", { message: "An error occurred. Please try again." });
+        res.render("signup", { message: "An error occurred. Please try again." });
     }
 };
 
@@ -159,46 +209,48 @@ const verifyOtp = async (req, res) => {
     try {
         const { otp } = req.body;
 
-        // Log session data for debugging
-        console.log("Session OTP:", req.session.userOtp?.otp);
-        console.log("Entered OTP:", otp);
-
+        // Check OTP expiration
         if (!req.session.userOtp || Date.now() > req.session.userOtp.expires) {
             return res.status(400).json({ success: false, message: "OTP expired. Please request a new one." });
         }
 
+        // Verify OTP
         if (otp !== req.session.userOtp.otp) {
             return res.status(400).json({ success: false, message: "Invalid OTP. Please try again!" });
         }
 
-        // Save user as intended if OTP is correct
+        // Create user
         const user = req.session.userData;
+        const hashedPassword = await securePassword(user.password);
 
-        
-
-        const passwordHash = await securePassword(user.password);
-        const saveUser = new User({
+        const newUser = new User({
             full_name: user.full_name,
             username: user.username,
             email: user.email,
-            password: passwordHash,
+            password: hashedPassword,
             phone: user.phone,
             profile_pic: user.profile_pic,
         });
 
-         if (!user.googleId) {
-            saveUser.password = await securePassword(user.password);
+        // Handle referral rewards
+        if (req.session.referrer) {
+            await handleReferral(newUser, req.session.referrer.referralCode);
         }
 
-        await saveUser.save();
+        // Generate referral code
+        newUser.referralCode = generateReferralCode(newUser._id);
+        await newUser.save();
 
-        req.session.user = saveUser._id;
+        // Clear session data
         req.session.userOtp = null;
+        req.session.user = newUser._id;
+
+        console.log("user Id :",req.session.user)
 
         res.json({ success: true, redirectUrl: '/' });
     } catch (error) {
-        console.error("Error in verifying OTP", error);
-        res.status(500).json({ success: false, message: "An Error Occurred" });
+        console.error("Error verifying OTP:", error);
+        res.status(500).json({ success: false, message: "An error occurred. Please try again." });
     }
 };
 
@@ -293,8 +345,7 @@ const logout = (req, res) => {
 
 
 
-// Securely generate a reset token
-const generateResetToken = () => crypto.randomBytes(32).toString('hex');
+
 
 // Hash the token for secure storage
 const hashToken = (token) => crypto.createHash('sha256').update(token).digest('hex');
@@ -386,6 +437,85 @@ const resetPassword = async (req, res) => {
 };
 
 
+const getWallet = async (req, res) => {
+    try {
+        const user = await User.findById(req.session.user);
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found.' });
+        }
+
+        // Assuming you want to show balance and transaction history
+        res.render('wallet', {
+            user,
+            walletBalance: user.wallet,
+            transactions: user.transactions || [],
+            activePage : 'wallet'
+        });
+    } catch (error) {
+        console.error("Error loading wallet:", error);
+        res.status(500).json({ message: 'Failed to load wallet.' });
+    }
+};
+
+const addMoney = async (amount, userId) => {
+    try {
+        // Ensure userId is provided and valid
+        if (!userId) throw new Error('User ID is required');
+
+        // Fetch the user from the database
+        const user = await User.findById(userId);
+        
+        // Check if the user exists
+        if (!user) throw new Error('User not found.');
+
+        // Add the money to the wallet
+        user.wallet += amount;
+
+        // Create a transaction record
+        user.transactions.push({ type: 'Credit', amount });
+
+        // Save the user with updated wallet and transactions
+        await user.save();
+
+        return user;  // Return the updated user object
+    } catch (error) {
+        console.error('Error adding money:', error);
+        throw error;  // Re-throw error for handling in the calling function
+    }
+}
+
+const addWallet = async (req, res) => {
+    const { amount } = req.body;
+    const userId = req.session.user;
+
+    // Validate amount
+    if (!amount || amount <= 0) {
+        return res.status(400).json({ message: 'Invalid amount.' });
+    }
+
+    try {
+        // Add money and get updated user info
+        const updatedUser = await addMoney(parseFloat(amount), userId);
+
+        // Respond with new balance and transaction details
+        const newBalance = updatedUser.wallet
+        const newTransaction = updatedUser.transactions[updatedUser.transactions.length - 1];
+
+        res.json({
+            newBalance: newBalance,
+            transaction: newTransaction
+        });
+    } catch (error) {
+        console.error('Error adding money:', error);
+        res.status(500).json({ message: 'Failed to add money.' });
+    }
+}
+
+
+
+
+
 module.exports = {
     loadHomePage,
     pageNotFound,
@@ -397,5 +527,7 @@ module.exports = {
     login,
     logout,
     forgotPassword,
-    resetPassword
+    resetPassword,
+    getWallet ,
+    addWallet,
 }

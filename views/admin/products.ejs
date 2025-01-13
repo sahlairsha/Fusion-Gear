@@ -104,7 +104,11 @@
                 <th scope="col">Image</th>
                 <th scope="col">Description</th>
                 <th scope="col">Category</th>
-                <th scope="col" colspan="4" class="text-center">Variants</th>        
+                <th scope="col">Offer(%)</th> 
+                <th scope="col">Price</th>
+                <th scope="col">Stock</th>
+                <th scope="col">Color</th>
+                <th scope="col">Size</th>        
                 <th scope="col">Actions</th>
             </tr>
         </thead>
@@ -119,25 +123,27 @@
                 </td>
                 <td class="description"><%= product.description %></td>
                 <td><%= product.category ? product.category.name : 'No Category' %></td>
-                <td colspan="4">
+                <td><%= product.offer.discountPercentage %>%</td> 
+                
                   <% if (product.variants && product.variants.length > 0) { %>
-                    <ul class="variant-list">
+                    
                       <% product.variants.forEach((variant, variantIndex) => { %>
-                        <li>
-                          <span>Price: <%= variant.salePrice %>, Stock: <%= variant.stock %>, Color: <%= variant.color %>, Size: <%= variant.size %></span>
-                          <button 
-                            class="remove-variant-btn" 
-                            data-variant-id="<%= variant._id %>" 
-                            data-product-id="<%= product._id %>">
-                            X
-                          </button>
-                        </li>
+                        <% if(variantIndex === 0) {%>
+                        <td><%= variant.salePrice  %></td>
+                        <td><%= variant.stock  %></td>
+                        <td>
+                          <%=variant.color  %>
+                        </td>
+                        <td>
+                          <%=variant.size  %>
+                        </td>
+                        <% } %>
                       <% }); %>
-                    </ul>
+                    
                   <% } else { %>
-                    <span>No Variants Available</span>
+                    <td colspan="4" class="text-center">No Variants Available</td>
                   <% } %>
-                </td>
+               
                 <td>
                   <button class="btn btn-primary btn-sm edit-button mb-2">
                     <a class="text-white" href="/admin/editproducts?id=<%= product._id %>">Edit</a>
@@ -176,75 +182,6 @@
 </div>
 
 <script src="/js/admin/customer-search.js"></script>
-
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-  document.querySelectorAll(".remove-variant-btn").forEach((button, index) => {
-    button.addEventListener("click", function () {
-      const productId = this.getAttribute("data-product-id");
-      const variantIndex = index; // Get the correct index for this variant
-
-      // Get all variants for the product
-      const variantList = this.closest(".variant-list");
-      const variantCount = variantList.querySelectorAll("li").length;
-
-      // Restrict removal if only one variant is left
-      if (variantCount <= 1) {
-        Swal.fire({
-          icon: 'warning',
-          title: 'Cannot Remove Last Variant',
-          text: 'At least one variant must remain.',
-          confirmButtonText: 'Ok',
-        });
-        return;
-      }
-
-      // Confirm deletion using SweetAlert
-      Swal.fire({
-        title: 'Are you sure?',
-        text: 'You won’t be able to revert this!',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'Yes, remove it!',
-        cancelButtonText: 'Cancel',
-      }).then((result) => {
-        if (result.isConfirmed) {
-          // Send a request to remove the variant
-          fetch(`/admin/remove-variant/${productId}/${variantIndex}`, {
-            method: "DELETE", // Using DELETE method for variant removal
-            headers: {
-              "Content-Type": "application/json"
-            },
-          })
-            .then(response => response.json())
-            .then(data => {
-              if (data.success) {
-                // Remove the variant from the list in the UI
-                this.closest("li").remove();
-                Swal.fire({
-                  icon: 'success',
-                  title: 'Removed!',
-                  text: 'Variant has been removed successfully.',
-                  confirmButtonText: 'Ok',
-                });
-              } else {
-                Swal.fire({
-                  icon: 'error',
-                  title: 'Error',
-                  text: data.message || 'An error occurred.',
-                  confirmButtonText: 'Ok',
-                });
-              }
-            })
-            .catch(error => console.error("Error:", error));
-        }
-      });
-    });
-  });
-});
-
-</script>
-
 
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

@@ -66,7 +66,21 @@ const userSchema = new Schema({
         type : Number,
         default : 0,
     },
-    whishlist : [{
+    transactions: [{
+        type: {
+            type: String, 
+            required: true,
+        },
+        amount: {
+            type: Number,
+            required: true,
+        },
+        date: {
+            type: Date,
+            default: Date.now,
+        },
+    }],
+    wishlist : [{
         product_id :{
         type :mongoose.Schema.Types.ObjectId,
         ref : "Product",
@@ -82,8 +96,9 @@ const userSchema = new Schema({
         type : Date,
         default : Date.now
     },
-    referalCode : {
+    referralCode : {
         type : String,
+        unique: true
     },
     redeemed : {
         type : Boolean

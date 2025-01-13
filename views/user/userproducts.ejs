@@ -68,6 +68,14 @@
     margin-top: 200px;
 }
 
+.wishlist-btn{
+    background-color: #ff6b6b;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 50%;
+    border: 0.5px solid #000;
+    cursor: pointer;
+}
 
 
     </style>
@@ -316,7 +324,7 @@
                                         <div class="description">
                                             <p><%= product.description %></p>
                                         </div>
-                                       <button class="add-wishlist">Wishlists</button>
+                                        <a href="/wishlist"><button class="wishlist-btn"><img src="/img/icon/heart.png" alt=""></button></a>
                                         <button class="add-cart-btn"><a href="#" onclick="addToCart('<%= product._id %>')" class="add-cart-link">+ Add to Cart</a></button>
                                     </div>
                                 </div>

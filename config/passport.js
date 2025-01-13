@@ -15,6 +15,8 @@ passport.use(new GoogleStrategy({
 
 
         if (!user) {
+
+
             // Generate an avatar URL using Gravatar or a default service
             const emailHash = profile.emails && profile.emails[0].value
                 ? crypto.createHash('md5').update(profile.emails[0].value.trim().toLowerCase()).digest('hex')
@@ -29,14 +31,16 @@ passport.use(new GoogleStrategy({
                 full_name: profile.displayName,
                 email: profile.emails[0]?.value || null, // Handle cases where email is not provided
                 googleId: profile.id,
-                profile_pic: avatarUrl 
+                profile_pic: avatarUrl, 
             });
 
             await user.save();
        
         }
+            return done(null, user);
 
-        return done(null, user);
+        
+
     } catch (error) {
         return done(error, null);
     }

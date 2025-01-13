@@ -44,8 +44,8 @@ const categoryInfo = async(req,res)=>{
 
 const addCategories = async (req, res) => {
     try {
-        const { name, description } = req.body;
-        const newCategory = new Category({ name, description });
+        const { name, description,discount,startDate, endDate} = req.body;
+        const newCategory = new Category({ name, description,discount,startDate, endDate});
         await newCategory.save();
 
         req.flash('success', 'Category added successfully!');
@@ -65,11 +65,11 @@ const addCategories = async (req, res) => {
 const editCategories = async(req,res) => {
     try {
         const { id } = req.query;
-        const {name, description} = req.body;
+        const {name, description,discount,startDate, endDate} = req.body;
 
         const updatedCategory = await Category.findByIdAndUpdate(
             id,
-            { name, description },
+            { name, description,discount,startDate, endDate },
             { new: true }
         );
 

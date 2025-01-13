@@ -4,6 +4,8 @@ const router = express.Router();
 
 const passport = require('../config/passport');
 
+const crypto = require('crypto');
+const User = require('../models/userSchema')
 
 const userController = require('../controller/user/userController')
 const userproductController = require('../controller/user/userproductController');
@@ -29,12 +31,77 @@ router.post('/resend-otp',userController.resendOtp)
 
 router.get('/auth/google', passport.authenticate('google',{scope : ['profile','email']}))
 
-router.get('/auth/google/callback',passport.authenticate('google', { failureRedirect: '/signup'}),
-    (req, res) => {
-        req.session.user = req.user._id;
-        res.redirect('/');
+
+router.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/signup' }),
+    async (req, res) => {
+        try {
+            // Attach the user to the session
+            const user = req.user;
+            req.session.user = user._id;
+
+            // Handle referral code if present
+            const referralCode = req.query.referral_code;
+            if (referralCode) {
+                const referrer = await User.findOne({ referralCode });
+
+                if (referrer) {
+                    // Reward the referrer
+                    referrer.wallet += 10;
+                    referrer.redeemedUser.push(user._id); // Link the referred user to the referrer
+
+                    // Log the referral bonus transaction for the referrer
+                    referrer.transactions.push({
+                        type: 'referral_bonus',
+                        amount: 10,
+                        date: new Date(),
+                    });
+                    await referrer.save();
+
+                    // Reward the referred user
+                    user.wallet = (user.wallet || 0) + 5; // Ensure wallet is initialized
+                    user.redeemedBy = referrer._id; // Link the referrer to the referred user
+
+                    // Log the referral bonus transaction for the new user
+                    user.transactions.push({
+                        type: 'referral_bonus',
+                        amount: 5,
+                        date: new Date(),
+                    });
+                }
+            }
+
+            // Generate a unique referral code for the new user if they don't already have one
+            if (!user.referralCode) {
+                const generateReferralCode = () =>
+                    crypto.randomBytes(4).toString('hex').toUpperCase();
+
+                let newReferralCode;
+                let isUnique = false;
+
+                while (!isUnique) {
+                    newReferralCode = generateReferralCode();
+                    const existingCode = await User.findOne({ referralCode: newReferralCode });
+                    if (!existingCode) {
+                        isUnique = true;
+                    }
+                }
+
+                user.referralCode = newReferralCode;
+            }
+
+            // Save updated user details
+            await user.save();
+
+            // Redirect to the referral page or dashboard
+            res.redirect('/referral');
+        } catch (error) {
+            console.error('Error handling referral during Google sign-in:', error);
+            res.redirect('/signup');
+        }
     }
 );
+
+
 router.get('/login',userController.loadLogin)
 
 router.post('/login',userController.login)
@@ -59,6 +126,9 @@ router.get('/reset-password', (req, res) => {
 router.post('/reset-password', userController.resetPassword);
 
 
+router.get('/wallet', userAuth,userController.getWallet);
+router.post('/wallet/add',userAuth,userController.addWallet);
+
 
 
 //Product details and lists
@@ -80,6 +150,7 @@ router.get("/product-ratings",userAuth,userproductController.productRatings)
 router.get('/userProfile',userAuth,userprofileController.getProfile)   
 router.put('/update-profile',userAuth,userprofileController.editProfile)
 router.post('/update-password',userAuth,userprofileController.resetPassword)
+router.get('/referral',userAuth,userprofileController.refferalPage)
 
 
 //address view
@@ -121,7 +192,7 @@ router.post('/ratings/submit',userAuth, userOrderController.submitRating);
 
 //whishlist 
 
-router.get('/wishlist',userAuth, wishlistController.getWhishlist)
+router.get('/wishlist',userAuth, wishlistController.getWishlist)
 router.post('/whishlist/add/:productId',userAuth, wishlistController.addToWhishlist)
 
 router.post('/reviews',userAuth,userOrderController.submitReviews);

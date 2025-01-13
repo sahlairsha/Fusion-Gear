@@ -1,72 +1,155 @@
 <%- include('../../views/partials/admin/header') %>
 
-<div class="container mt-5">
-    <h2 class="mb-4">Add New Category</h2>
+<div class="container mt-5 w-50">
+  <h2 class="mb-4">Add New Category</h2>
 
-    <% if (flash.error) { %>
-        <div class="alert alert-danger w-50 text-center alert-dismissible fade show" role="alert">
-            <%= flash.error %>
-        </div>
-    <% } %>
+  <% if (flash.error) { %>
+  <div
+    class="alert alert-danger w-50 text-center alert-dismissible fade show"
+    role="alert"
+  >
+    <%= flash.error %>
+  </div>
+  <% } %> <% if (flash.success) { %>
+  <div
+    class="alert alert-success w-50 text-center alert-dismissible fade show"
+    role="alert"
+  >
+    <%= flash.success %>
+  </div>
+  <% } %>
 
-    <% if (flash.success) { %>
-        <div class="alert alert-success w-50 text-center alert-dismissible fade show" role="alert">
-            <%= flash.success %>
-        </div>
-    <% } %>
+  <form id="form-submit" action="/admin/addcategory" method="POST">
+    <div class="mb-3">
+      <label for="name" class="form-label">Category Name</label>
+      <input
+        type="text"
+        class="form-control"
+        id="name"
+        name="name"
+        placeholder="Enter category name"
+      />
+      <div id="nameError" class="error-message text-danger"></div>
+    </div>
 
-    <form id="form-submit" action="/admin/addcategory" method="POST">
-        <div class="mb-3">
-            <label for="name" class="form-label">Category Name</label>
-            <input type="text" class="form-control" id="name" name="name" placeholder="Enter category name">
-            <div id="nameError" class="error-message text-danger"></div>
-        </div>
+    <div class="mb-3">
+      <label for="description" class="form-label">Description</label>
+      <textarea
+        class="form-control"
+        id="description"
+        name="description"
+        rows="3"
+        placeholder="Enter category description"
+      ></textarea>
+      <div id="descriptionError" class="error-message text-danger"></div>
+    </div>
 
-        <div class="mb-3">
-            <label for="description" class="form-label">Description</label>
-            <textarea class="form-control" id="description" name="description" rows="3" placeholder="Enter category description"></textarea>
-            <div id="descriptionError" class="error-message text-danger"></div>
-        </div>
+    <div class="mb-3">
+      <label for="discount" class="form-label">Discount(%)</label>
+      <input
+        type="Number"
+        class="form-control"
+        id="discount"
+        name="percentage"
+        rows="3"
+        placeholder="Enter discount percentage"
+      />
+      <div id="discountError" class="error-message text-danger"></div>
+    </div>
+    <div class="mb-3">
+      <label for="start_Date" class="form-label">Start Date</label>
+      <input
+        type="date"
+        class="form-control"
+        id="start_Date"
+        name="startDate"
+        rows="3"
+        placeholder="Enter starting dating"
+      />
+      <div id="start_DateError" class="error-message text-danger"></div>
+    </div>
+    <div class="mb-3">
+      <label for="end_Date" class="form-label">End Date</label>
+      <input
+        type="date"
+        class="form-control"
+        id="end_Date"
+        name="endDate"
+        rows="3"
+        placeholder="Enter starting dating"
+      />
+      <div id="end_DateError" class="error-message text-danger"></div>
+    </div>
 
-
-        <button type="submit" class="btn btn-primary">Add item</button>
-    </form>
+    <button type="submit" class="btn btn-primary">Add item</button>
+  </form>
 </div>
 
 <script>
-    const formSubmit = document.getElementById('form-submit');
-    const nameField = document.getElementById('name');
-    const descriptionField = document.getElementById('description');
+  const formSubmit = document.getElementById("form-submit");
+  const nameField = document.getElementById("name");
+  const descriptionField = document.getElementById("description");
+  const discountField = document.getElementById("discount");
+  const startDateField = document.getElementById("start_Date");
+  const endDateField = document.getElementById("end_Date");
 
-    const nameError = document.getElementById('nameError');
-    const descriptionError = document.getElementById('descriptionError');
+  const nameError = document.getElementById("nameError");
+  const descriptionError = document.getElementById("descriptionError");
+  const discountError = document.getElementById("discountError");
+  const startDateError = document.getElementById("start_DateError");
+  const endDateError = document.getElementById("end_DateError");
 
-    function formValidation() {
-        let isValid = true;
+  function formValidation() {
+    let isValid = true;
 
-        if (nameField.value.trim() === '') {
-            nameError.innerText = "Please enter a category name.";
-            isValid = false;
-        } else {
-            nameError.innerText = "";
-        }
-
-        if (descriptionField.value.trim() === '' ) {
-            descriptionError.innerText = "Please enter a description.";
-            isValid = false;
-        } else {
-            descriptionError.innerText = "";
-        }
-        return isValid;
+    if (nameField.value.trim() === "") {
+      nameError.innerText = "Please enter a category name.";
+      isValid = false;
+    } else {
+      nameError.innerText = "";
     }
 
-    formSubmit.addEventListener('submit', (e) => {
-        e.preventDefault(); 
-      
-        if (formValidation()) {
-            formSubmit.submit(); 
-        }
-    });
+    if (descriptionField.value.trim() === "") {
+      descriptionError.innerText = "Please enter a description.";
+      isValid = false;
+    } else {
+      descriptionError.innerText = "";
+    }
+
+    if (
+      discountField.value.trim() === "" ||
+      isNaN(discountField.value) ||
+      discountField.value < 0 ||
+      discountField.value > 100
+    ) {
+      discountError.innerText = "Please enter a discount between 0 and 100.";
+      isValid = false;
+    } else {
+      discountError.innerText = "";
+    }
+    if (startDateField.value.trim() === "") {
+      startDateError.innerText = "Please select a start date.";
+      isValid = false;
+    } else {
+      startDateError.innerText = "";
+    }
+
+    if (endDateField.value.trim() === "") {
+      endDateError.innerText = "Please select an end date.";
+      isValid = false;
+    } else {
+      endDateError.innerText = "";
+    }
+    return isValid;
+  }
+
+  formSubmit.addEventListener("submit", (e) => {
+    e.preventDefault();
+
+    if (formValidation()) {
+      formSubmit.submit();
+    }
+  });
 </script>
 
 <%- include('../../views/partials/admin/footer') %>

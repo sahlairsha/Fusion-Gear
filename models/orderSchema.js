@@ -62,6 +62,9 @@ const orderSchema = new mongoose.Schema({
         type: Date,
         default: null
     },
+    razorpay_order_id:{
+        type : String
+    },
     canceled_at: { 
         type: Date, 
         default: null,

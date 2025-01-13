@@ -515,8 +515,8 @@ const getOrderConfirmation = async (req, res) => {
 
         // Fetch all orders for the user
         const orders = await Order.find({ user_id: userId })
-            .populate('products.product_id')  // Populate the product details
-            .populate('products.variant_id')  // Populate the variant details
+            .populate('products.product_id') 
+            .populate('products.variant_id')  
             .exec();
 
         // Iterate through orders to populate the variant details manually
@@ -527,7 +527,7 @@ const getOrderConfirmation = async (req, res) => {
                 const variant = product.variants.find(v => v._id.toString() === item.variant_id.toString());
 
                 // Attach the variant details to the item
-                item.variantDetails = variant || {};  // If variant not found, set an empty object
+                item.variantDetails = variant || {}; 
             }
         }
 
@@ -585,7 +585,6 @@ const orderDetails = async (req, res) => {
         // Fetch the specific shipping address for the order
         const specificAddress = orders.shippingAddress.addressDocId.address[orders.shippingAddress.addressIndex];
 
-        // Log the fetched details (for debugging purposes)
         console.log("Order with specific address:", specificAddress);
         console.log("Order details:", orders);
 

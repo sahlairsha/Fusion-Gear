@@ -716,6 +716,24 @@ function closeCropModal() {
                 isValid = false;
             }
 
+            const imageInputs = ['input1', 'input2', 'input3', 'input4'];
+            let imageUploaded = false;
+        
+            imageInputs.forEach(function (inputId) {
+                const fileInput = document.getElementById(inputId);
+                const file = fileInput.files[0];
+        
+                if (file) {
+                    imageUploaded = true;
+                }
+            });
+        
+            // If no image is uploaded, show an error
+            if (!imageUploaded) {
+                displayErrorMessage('image-error', 'You should upload at least one image.');
+                isValid = false;
+            }
+
             return isValid;
 
 

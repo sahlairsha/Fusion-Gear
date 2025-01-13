@@ -1,5 +1,5 @@
-const Product = require('../../models/productSchema')
-const Category = require("../../models/categorySchema")
+const Product = require('../../models/productSchema');
+const Category = require("../../models/categorySchema");
 const User = require('../../models/userSchema')
 
 const fs = require('fs');
@@ -59,16 +59,6 @@ const addProducts = async (req, res) => {
             return res.status(400).redirect('/admin/add-products');
         }
 
-        // Validate product offer
-        let productOffer = 0;
-        if (product.productOffer) {
-            productOffer = parseFloat(product.productOffer);
-            if (isNaN(productOffer) || productOffer < 0 || productOffer > 100) {
-                req.flash("error", "Invalid product offer percentage");
-                return res.status(400).redirect('/admin/add-products');
-            }
-        }
-
         // Parse and validate variants
         let variants = [];
         if (product.variants) {
@@ -84,34 +74,27 @@ const addProducts = async (req, res) => {
                 return res.status(400).redirect('/admin/add-products');
             }
 
-            // Calculate the offer price for each variant
-            variants.forEach(variant => {
-                if (variant.regularPrice && productOffer > 0) {
-                    // Calculate salePrice based on offer percentage
-                    const discountAmount = (variant.regularPrice * productOffer) / 100;
-                    variant.salePrice = variant.regularPrice - discountAmount;
-                }
-            });
         } else {
             req.flash("error", "Product variants are required");
             return res.status(400).redirect('/admin/add-products');
         }
+
 
         // Create the product with variants directly in the document
         const newProduct = new Product({
             productName: product.productName,
             description: product.description,
             offer: {
-                discountPercentage: productOffer,
-                startDate: product.offerStartDate || null,
-                endDate: product.offerEndDate || null,
+                discountPercentage: product.discountPercentage,
+                startDate: product.startDate || null,
+                endDate: product.endDate || null,
             },
             category: categoryId,
             productImage: images,
             isBlocked: false,
             isDeleted: false,
             ratings: { average: 0, count: 0 },
-            variants: variants, // Store variants with calculated sale prices
+            variants: variants, 
         });
 
         await newProduct.save();
@@ -124,6 +107,7 @@ const addProducts = async (req, res) => {
         res.status(500).redirect('/admin/add-products');
     }
 };
+
 
 const getAllProducts = async (req, res) => {
     try {
@@ -228,7 +212,7 @@ const editProducts = async (req, res) => {
                     }
                 );
             } else {
-                // If the variant doesn't exist, push it to the new variants array
+               
                 updatedVariants.push({
                     color: variant.color,
                     size: variant.size,
@@ -245,7 +229,7 @@ const editProducts = async (req, res) => {
             await Product.findByIdAndUpdate(
                 id,
                 {
-                    $push: { variants: { $each: updatedVariants } }, // Add new variants to the variants array
+                    $push: { variants: { $each: updatedVariants } }, 
                 },
                 { new: true }
             );
@@ -260,8 +244,12 @@ const editProducts = async (req, res) => {
         const updateFields = {
             productName: data.productName,
             description: data.description,
-            category: data.category,  // category is a reference to Category _id
-            productOffer: data.productOffer,
+            category: data.category, 
+            offer :{
+                discountPercentage : data.discountPercentage,
+                startDate : data.startDate,
+                endDate : data.endDate
+            }
         };
 
         if (images.length > 0) {
@@ -314,9 +302,10 @@ const removeVariant = async (req, res) => {
     const { productId, variantIndex } = req.params;
 
     try {
+        console.log("Product ID:", productId, "Variant Index:", variantIndex); // Log to check if the route is triggered
+
         // Find the product by ID
         const product = await Product.findById(productId);
-
         if (!product) {
             return res.status(404).json({ success: false, message: 'Product not found.' });
         }
@@ -326,9 +315,7 @@ const removeVariant = async (req, res) => {
             return res.status(400).json({ success: false, message: 'Invalid variant index.' });
         }
 
-        if (product.variants.length <= 1) {
-            return res.status(400).json({ success: false, message: "Cannot remove the last variant of a product." });
-        }
+        
 
         // Remove the variant at the given index
         product.variants.splice(variantIndex, 1); // Removes the variant at the given index
@@ -341,7 +328,7 @@ const removeVariant = async (req, res) => {
         console.error('Error removing variant:', error);
         res.status(500).json({ success: false, message: 'An error occurred while removing the variant.' });
     }
-}
+};
 
 const deleteProducts = async (req, res) => {
     try {

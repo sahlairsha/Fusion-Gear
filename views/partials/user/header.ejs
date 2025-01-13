@@ -15,7 +15,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css" integrity="sha512-5Hs3dF2AEPkpNAR7UiOHba+lRSJNeM2ECkwxUIxC1Q/FLycGTbNapWXB4tP889k5T5Ju8fs4b1P5z/iB4nMfSQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <!-- Css Styles -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
-
     <link rel="stylesheet" href="/css/bootstrap.min.css" type="text/css">
     <link rel="stylesheet" href="/css/font-awesome.min.css" type="text/css">
     <link rel="stylesheet" href="/css/elegant-icons.css" type="text/css">
@@ -72,12 +71,13 @@
                                 <a href="#" class="sign-in-link"><%= user.full_name %></a>
                                 <div class="dropdown-content">
                                     <a href="/userProfile?id=<%=user._id%>">Profile</a>
+                                    <a href="/wallet">Wallet</a>
                                     <a href="/logout">Logout</a>
                                 </div>
                             </div>
                         <% } %>
                         <a href="#" class="search-switch"><img src="/img/icon/search.png" alt=""></a>
-                        <a href="#"><img src="/img/icon/heart.png" alt=""></a>
+                        <a href="/wishlist"><img src="/img/icon/heart.png" alt=""></a>
                         <a href="/cart"><img src="/img/icon/cart.png" alt=""></a>
                     </div>
                 </div>
