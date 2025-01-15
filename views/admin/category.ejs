@@ -27,6 +27,9 @@
                 <th scope="col">#</th>
                 <th scope="col">Name</th>
                 <th scope="col">Description</th>
+                <th scope="col">Offer</th>
+                <th scope="col">Start Date</th>
+                <th scope="col">End Date</th>
                 <th scope="col">Actions</th>
             </tr>
         </thead>
@@ -37,6 +40,13 @@
                     <td><%= index + 1 %></td>
                     <td class="editable" contenteditable="false"><%= category.name %></td>
                  <td class="editable w-25" contenteditable="false"><%= category.description %></td>
+                 <td class="editable" contenteditable="false"><%= category.categoryDiscount.percentage %></td>
+                 <td class="editable" contenteditable="false">
+                <%= category.categoryDiscount.startDate ? new Date(category.categoryDiscount.startDate).toLocaleDateString() : 'NA' %>
+                </td>
+                <td class="editable" contenteditable="false">
+                    <%= category.categoryDiscount.endDate ? new Date(category.categoryDiscount.endDate).toLocaleDateString() : 'NA' %>
+                </td>
 <td>
     <button class="btn btn-primary btn-md edit-button">Edit</button>
     <% if (category.isDeleted === false) { %>
@@ -74,7 +84,7 @@
 <script src="/js/admin/customer-search.js"></script>
 
 <script>
-   document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', function () {
     const editButtons = document.querySelectorAll('.edit-button');
 
     editButtons.forEach(button => {
@@ -82,15 +92,24 @@
             const row = button.closest('tr');
             const nameCell = row.cells[2];
             const descriptionCell = row.cells[3];
+            const discountCell = row.cells[4];
+            const startDateCell = row.cells[5];
+            const endDateCell = row.cells[6];
 
             const isEditable = nameCell.contentEditable === 'true';
             nameCell.contentEditable = !isEditable;
             descriptionCell.contentEditable = !isEditable;
+            discountCell.contentEditable = !isEditable;
+            startDateCell.contentEditable = !isEditable;
+            endDateCell.contentEditable = !isEditable;
 
             if (isEditable) {
                 const categoryId = row.getAttribute('data-category-id');
                 const updatedName = nameCell.textContent.trim();
                 const updatedDescription = descriptionCell.textContent.trim();
+                const updatedDiscount = discountCell.textContent.trim();
+                const updatedStartDate = startDateCell.textContent.trim();
+                const updatedEndDate = endDateCell.textContent.trim();
 
                 // Validation: Check if the fields are empty or only spaces
                 if (updatedName === "" || updatedDescription === "") {
@@ -115,7 +134,13 @@
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ name: updatedName, description: updatedDescription }),
+                    body: JSON.stringify({
+                        name: updatedName,
+                        description: updatedDescription,
+                        discount: updatedDiscount,
+                        startDate: updatedStartDate,
+                        endDate: updatedEndDate
+                    }),
                 })
                     .then(response => {
                         if (response.ok) {
@@ -133,6 +158,10 @@
 
                         nameCell.contentEditable = 'false';
                         descriptionCell.contentEditable = 'false';
+                        discountCell.contentEditable = 'false';
+                        startDateCell.contentEditable = 'false';
+                        endDateCell.contentEditable = 'false';
+
                         button.textContent = "Edit";
                     })
                     .catch(error => {

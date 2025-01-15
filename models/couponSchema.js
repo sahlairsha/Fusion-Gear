@@ -38,19 +38,6 @@ const couponSchema = new Schema({
         type: Number,
         default: 0,
     },
-    applicableTo: {
-        type: String,
-        enum: ['product', 'category', 'order'],  
-        required: true,
-    },
-    productId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Product',  
-    },
-    categoryId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Category', 
-    },
     minOrderValue: {
         type: Number,
         default: 0,

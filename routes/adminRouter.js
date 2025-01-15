@@ -9,7 +9,6 @@ const categoryController = require('../controller/admin/categoryController');
 const productController = require('../controller/admin/productController');
 const orderController = require('../controller/admin/orderController')
 const stockController = require('../controller/admin/stockController')
-const offerController = require('../controller/admin/offerController')
 const couponController = require('../controller/admin/couponController')
 
 
@@ -83,16 +82,6 @@ router.get('/admin/unblockStock', adminAuth, stockController.unblockedStock)
 
 //Stock Management
 router.get('/admin/stock',adminAuth, stockController.getStocks)
-
-
-
-//offer management
-router.get("/admin/offer",adminAuth, offerController.getOfferPage)
-router.get('/admin/add-offer',adminAuth, offerController.getOfferCreate)
-router.post('/admin/create-product-offer',adminAuth, offerController.createProductOffer);
-router.post('/admin/create-category-offer',adminAuth, offerController.createCategoryOffer);
-router.get('/admin/create-referral-offer',adminAuth, offerController.createReferralOffer);
-router.delete('/admin/delete-offer/:id',adminAuth, offerController.deleteOffer)
 
 
 //Coupon mangament

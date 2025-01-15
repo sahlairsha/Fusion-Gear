@@ -62,14 +62,27 @@ const addCategories = async (req, res) => {
 
 
 
-const editCategories = async(req,res) => {
+const editCategories = async(req, res) => {
     try {
         const { id } = req.query;
-        const {name, description,discount,startDate, endDate} = req.body;
+        const { name, description, discount, startDate, endDate } = req.body;
 
+        // Convert the startDate and endDate to Date objects
+        const start = startDate ? new Date(startDate) : null;
+        const end = endDate ? new Date(endDate) : null;
+
+        // Update the category with the provided data
         const updatedCategory = await Category.findByIdAndUpdate(
             id,
-            { name, description,discount,startDate, endDate },
+            {
+                name,
+                description,
+                categoryDiscount: {
+                    percentage: discount,
+                    startDate: start,
+                    endDate: end
+                }
+            },
             { new: true }
         );
 
@@ -84,6 +97,7 @@ const editCategories = async(req,res) => {
         res.status(500).json({ error: "Internal Server Error" });
     }
 }
+
 
 const deleteCategories = async (req, res) => {
     try {

@@ -290,6 +290,7 @@
 
     <% orders.forEach(order => { %>
         <div class="order-card" data-order-id="<%= order._id %>">
+            
             <% order.products.forEach(product => { %>
                 <div class="order-content">
                     <div class="product-info">
@@ -320,9 +321,14 @@
                             <p>Delivered On: <%= new Date(order.delivery_date).toLocaleDateString() %></p>
                         <% } %>
                         <h5 class="mt-2 ml-2">Total Price: ₹<%= order.total_price %></h5>
+                        <% if (order.order_status === 'Delivered' && order.return_status === 'Pending') { %>
+                           <a href="/order/return-form/<%= order._id  %>"><button class="btn btn-success return-btn mt-4">Return</button></a> 
+                        <% } %>
                     </div>
-                </div>
             <% }); %>
+                </div>
+
+
     
             <!-- Order summary -->
             <div class="order-summary">
@@ -340,7 +346,38 @@
     
     <a href="/products" class="btn go-to-shop-btn">Continue Shopping</a>
 </div>
-
+<script>
+    // Open return form modal
+    function openReturnForm(orderId) {
+        const modal = document.getElementById('return-modal');
+        modal.style.display = 'block';
+        modal.setAttribute('data-order-id', orderId);
+    }
+    
+    // Close return form modal
+    document.querySelector('.close-btn').addEventListener('click', () => {
+        document.getElementById('return-modal').style.display = 'none';
+    });
+    
+    // Submit return request
+    function submitReturnRequest() {
+        const orderId = document.getElementById('return-modal').getAttribute('data-order-id');
+        const reason = document.getElementById('return-reason').value;
+    
+        fetch('/order/return', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ orderId, returnReason: reason }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.message);
+            document.getElementById('return-modal').style.display = 'none';
+            location.reload(); // Reload the page to show updated status
+        })
+        .catch(error => console.error('Error submitting return request:', error));
+    }
+    </script>
 
 <script>
  document.addEventListener("DOMContentLoaded", function () {

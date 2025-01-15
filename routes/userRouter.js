@@ -164,7 +164,7 @@ router.post('/address-view/update/:id',userAuth,userprofileController.updateAddr
 
 //cart
 router.get('/cart',userAuth,userCartController.getCartPage)
-router.post('/cart/add/:productId/:variantId', userAuth, userCartController.addToCart);
+router.post('/cart/add', userAuth, userCartController.addToCart);
 router.post('/cart/update-quantity/:productId', userAuth, userCartController.updateQuantity);
 router.delete("/cart/delete/:productId",userAuth,userCartController.removeFromCart)
 
@@ -182,6 +182,9 @@ router.get('/order-details/:id',userAuth,userOrderController.orderDetails)
 router.get('/orders/cancel/confirm',userAuth,userOrderController.getCancelConfirmation)
 router.post('/orders/cancel/:id',userAuth,userOrderController.cancelOrder)
 router.get('/checkout/apply-coupon', userAuth,userOrderController.applyCoupon);
+router.post('/remove-coupon', userAuth,userOrderController.removeCoupon);
+
+//Razorpay integration
 router.post('/create-razorpay-order',userAuth,userOrderController.createRazorpay)
 router.post('/verify-payment',userAuth,userOrderController.verifyPayment)
 
@@ -189,12 +192,14 @@ router.post('/verify-payment',userAuth,userOrderController.verifyPayment)
 router.get('/ratings',userAuth,userOrderController.getRating)
 router.post('/ratings/submit',userAuth, userOrderController.submitRating);
 
+router.get('/order/return-form/:orderId',userAuth,userOrderController.getReturnPage)
+router.post('/order/return',userAuth,userOrderController.returnReason )
 
 //whishlist 
 
 router.get('/wishlist',userAuth, wishlistController.getWishlist)
-router.post('/whishlist/add/:productId',userAuth, wishlistController.addToWhishlist)
-
+router.post('/wishlist/add',userAuth, wishlistController.addToWhishlist)
+router.delete('/wishlist/remove',userAuth, wishlistController.removeFromWishlist)
 router.post('/reviews',userAuth,userOrderController.submitReviews);
                      
 router.get('/pagenotfound', userController.pageNotFound)

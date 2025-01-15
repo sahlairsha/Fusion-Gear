@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const env = require("dotenv").config();
-const User = require("../models/userSchema"); // Adjust the path as needed
+const User = require("../models/userSchema");
 
 const connectDB = async () => {
     try {

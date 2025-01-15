@@ -519,12 +519,12 @@
             }
 
             if (isNaN(regularPrice) < isNaN(salePrice)) {
-                Swal.fire({ title: "Error!", text: "Sale price should be less than regular price.", icon: "error", confirmButtonText: "Okay" });
+                Swal.fire({ title: "Error!", text: "Regular price should be greater than sale price.", icon: "error", confirmButtonText: "Okay" });
                 return;
             }
 
             // Check if the limit has been reached
-            const variantLimit = 4; // Set the maximum number of variants allowed
+            const variantLimit = 4;
             if (variants.length >= variantLimit) {
                 Swal.fire({ title: "Error!", text: `You can only add up to ${variantLimit} variants.`, icon: "error", confirmButtonText: "Okay" });
                 return;

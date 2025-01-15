@@ -4,6 +4,13 @@
  <link rel="stylesheet" href="/css/user/productlist.css">
 
  <style>
+#productPrice {
+    font-size: 24px;
+    color: #000;
+    font-weight: bold;
+}
+
+
     input[type="radio"]:checked + label {
     font-weight: bold;
     color: #007bff;
@@ -266,30 +273,35 @@
                                 <!-- Only display once -->
                                 <p><%= product.description %></p>
             
-                                <!-- Display Price once -->
-                                <h3 id="productPrice">&#8377;<%= product.salePrice %></h3>
+                               
+                                    <h3 id="productPrice" style="font-weight: bold;">
+                                     &#8377;<%= product.offerPrice %>
+                                    </h3>
+                                    
+                              
+                                
             
                                 <!-- Stock Status and Size Selection -->
                                 <div class="">
                                     <span>Size:</span>
-                                    <% product.variants.forEach(function(variant, index) { %>
+                                    <% product.variants.forEach(function (variant, index) { %>
                                         <label for="<%= variant.size %>">
-                                            <input 
-                                               type="radio" 
-                                                 name="size" 
-                                                 value="<%= variant.size %>" 
-                                                 data-price="<%= variant.salePrice %>" 
-                                                 data-stock="<%= variant.stock %>" 
-                                                 data-variant-id="<%= variant._id %>" 
-                                                 <%= index === 0 ? 'checked' : '' %> 
-                                                 onchange="updateProductDetails(this)"
-                                                   >
-
-                                            <%= variant.size %> 
+                                            <input
+                                                type="radio"
+                                                name="size"
+                                                value="<%= variant.size %>"
+                                                data-variant-id="<%= variant._id %>" 
+                                                data-offer-price="<%= variant.offerPrice %>"
+                                                data-sale-price="<%= variant.salePrice %>"
+                                                data-stock="<%= variant.stock %>"
+                                                <%= index === 0 ? 'checked' : '' %>
+                                                onchange="updateProductDetails(this)"
+                                            >
+                                            <%= variant.size %>
                                         </label>
                                     <% }); %>
                                 </div>
-            
+                                
                                 <!-- Add to Cart and Other Options -->
                                 <div class="product__details__cart__option">
                                     <div class="quantity">
@@ -302,7 +314,11 @@
             
                                 <!-- Other Actions -->
                                 <div class="product__details__btns__option">
-                                    <button class="add-whish-btn"><a href="#" onclick="addToWishlist('<%= product._id%>')"><i class="fa fa-heart"></i> Add to Wishlist</a></button> 
+                                    <button class="add-whish-btn">
+                                        <a href="#" onclick="addToWishlist('<%= product._id %>')">
+                                            <i class="fa fa-heart"></i> Add to Wishlist
+                                        </a>
+                                    </button> 
                                     <a href="#"><i class="fa fa-exchange"></i> Add To Compare</a>
                                 </div>
             
@@ -479,19 +495,19 @@
 <script src="/js/user/zoom-image.js"></script>
 
 <script>
-document.addEventListener("DOMContentLoaded", function() {
-    // Trigger the update for the first selected size (if it's checked by default)
-    const firstRadioButton = document.querySelector('input[name="size"]:checked');
-    if (firstRadioButton) {
-        updateProductDetails(firstRadioButton);
-    }
-});
-
-function updateProductDetails(selectedSize) {
+    document.addEventListener("DOMContentLoaded", function() {
+        // Trigger the update for the first selected size (if it's checked by default)
+        const firstRadioButton = document.querySelector('input[name="size"]:checked');
+        if (firstRadioButton) {
+            updateProductDetails(firstRadioButton);
+        }
+    });
+    function updateProductDetails(selectedSize) {
     const selectedVariant = selectedSize.dataset;
 
-    // Update price
-    document.getElementById("productPrice").textContent = `₹${selectedVariant.price}`;
+    // Update price: only display the offer price
+    const productPriceElement = document.getElementById("productPrice");
+    productPriceElement.textContent = `₹${selectedVariant.offerPrice}`;
 
     // Update stock status
     const stockStatusElement = document.getElementById("stock-status");
@@ -508,14 +524,15 @@ function updateProductDetails(selectedSize) {
         stockStatusElement.classList.remove("text-danger");
     }
 
-    // Optionally, save the selected variant ID if needed
+    // Log variant ID for debugging
     const variantId = selectedVariant.variantId;
     console.log(`Selected variant ID: ${variantId}`);
 }
 
+    </script>
 
-</script>
-
+    
+    
 <script>
 
 
@@ -548,9 +565,8 @@ function copyCouponCode(button, code) {
 </script>
 
 <script>
-
 function addToCart(productId) {
-    // Get the selected size input
+    // Get the selected size input (radio button with the name 'size')
     const selectedSizeElement = document.querySelector('input[name="size"]:checked');
     
     if (!selectedSizeElement) {
@@ -563,10 +579,7 @@ function addToCart(productId) {
         return;
     }
 
-    // Log the selected size element
-    console.log("Selected Size Element:", selectedSizeElement);
-    console.log("Data attributes:", selectedSizeElement.dataset);
-
+    // Get the selected variant ID from the data-variant-id attribute
     const selectedVariantId = selectedSizeElement.dataset.variantId;
 
     if (!selectedVariantId) {
@@ -579,16 +592,19 @@ function addToCart(productId) {
         return;
     }
 
-    const quantity = document.querySelector('.pro-qty input').value;
+    // Get the quantity from the input field (use default value of 1 if empty)
+    const quantity = document.querySelector('.pro-qty input').value || 1;
 
-    console.log("Selected Variant ID:", selectedVariantId);
-
-    // Proceed with AJAX
+    // Proceed with AJAX to add the product to the cart
     $.ajax({
-        url: `/cart/add/${productId}/${selectedVariantId}`,
+        url: `/cart/add`,
         method: 'POST',
         contentType: 'application/json',
-        data: JSON.stringify({ quantity: parseInt(quantity, 10) }),
+        data: JSON.stringify({ 
+            quantity: parseInt(quantity, 10),
+            productId: productId,
+            variantId: selectedVariantId 
+        }),
         success: function(response) {
             Swal.fire({
                 title: "Success",
@@ -597,7 +613,7 @@ function addToCart(productId) {
                 showConfirmButton: true,
             }).then((result) => {
                 if (result.isConfirmed) {
-                    window.location.href = '/cart';
+                    window.location.href = '/cart';  // Redirect to cart page
                 }
             });
         },
@@ -611,7 +627,6 @@ function addToCart(productId) {
         }
     });
 }
-
 
 </script>
 
@@ -670,29 +685,59 @@ function addToCart(productId) {
 
 
 <script>
-       function addToWishlist(productId) {
+function addToWishlist(productId) {
+    const selectedSizeElement = document.querySelector('input[name="size"]:checked');
+    
+    if (!selectedSizeElement) {
+        Swal.fire({
+            title: "Error",
+            icon: "error",
+            text: "Please select a size before adding to wishlist.",
+            showConfirmButton: true,
+        });
+        return;
+    }
+
+    const selectedVariantId = selectedSizeElement.dataset.variantId;
+
+    // Log the data being sent to ensure it's correct
+    console.log({
+        productId: productId,
+        variantId: selectedVariantId
+    });
+
     $.ajax({
-        url: '/whishlist/add/' + productId,  
+        url: '/wishlist/add',
         method: 'POST',
         contentType: 'application/json',
+        data: JSON.stringify({
+            productId: productId,
+            variantId: selectedVariantId
+        }),
         success: function(response) {
             Swal.fire({
                 title: "Success",
                 icon: "success",
-                text: "Product Added Successfully",
+                text: "Product added to wishlist successfully",
                 showConfirmButton: true,
             }).then((result) => {
                 if (result.isConfirmed) {
-                    window.location.href = '/whishlist';
+                    window.location.href = '/wishlist';
                 }
             });
-            
         },
-        error: function() {
-            alert('Failed to add product to cart!');
+        error: function(xhr, status, error) {
+            console.error("Error:", error);
+            Swal.fire({
+                title: "Error",
+                icon: "error",
+                text: "Failed to add product to wishlist.",
+                showConfirmButton: true,
+            });
         }
     });
 }
+
 </script>
 
 <%-include('../../views/partials/user/footer') %>

@@ -44,11 +44,13 @@
         
     }
 
-    .coupon-container {
+  .coupon-container {
   display: flex;
   overflow-x: auto;
   gap: 10px;
   padding: 10px 0;
+
+  
 }
     .coupon {
     width: 400px;
@@ -62,7 +64,10 @@
     position: relative;
     text-transform: uppercase;
   }
-
+.coupon-description{
+  font-size: 14px;
+  color: #000;
+}
   .coupon::before,
   .coupon::after {
     content: "";
@@ -75,12 +80,12 @@
 
   .coupon::before {
     left: 0;
-    background-image: radial-gradient(circle at 0 50%, transparent 25px, #a53860 26px);
+    background-image: radial-gradient(circle at 0 50%, transparent 25px, #fca311 26px);
   }
 
   .coupon::after {
     right: 0;
-    background-image: radial-gradient(circle at 100% 50%, transparent 25px, #a53860  26px);
+    background-image: radial-gradient(circle at 100% 50%, transparent 25px, #fca311  26px);
   }
 
   .coupon > div {
@@ -273,8 +278,9 @@
         border: 1px solid #ddd;
         border-radius: 5px;
         background-color: #f9f9f9;
-        width: 100%;
+        width: 50%;
         margin-top: 40px;
+        margin-left: 50px;
     }
 
     .order-summary-item {
@@ -307,7 +313,9 @@
         top: 15px;
         right: 97.5%;
     }
-
+#couponCode-form{
+  margin-left: 50px;
+}
    
 </style>
 
@@ -442,102 +450,103 @@
                 </div>
     
 <!-- Right Section: Order Details -->
-<div class="col-lg-4">
-    <h6 class="mt-4 ml-5">Available Coupons</h6><br>
-    <div class="coupon-carousel-container">
-      <% if (coupons.length === 0) { %>
-        <div class="alert alert-warning text-center">No coupons available for the products in your cart.</div>
-      <% } else { %>
-        <div id="couponCarousel" class="carousel slide" data-ride="carousel">
-          <div class="carousel-inner">
-            <% coupons.forEach((coupon, index) => { %>
-              <div class="carousel-item <%= index === 0 ? 'active' : '' %>">
-                <div class="coupon">
-                  <div class="left">
-                    <div>Enjoy Your Gift</div>
+
+<div class="coupon-carousel-container">
+  <% if (coupons.length === 0) { %>
+    <div class="alert alert-warning text-center">
+      No coupons available for the products in your cart.
+    </div>
+  <% } else { %>
+    <h6 class="mb-2">Available Coupons</h6>
+    <div id="couponCarousel" class="carousel slide" data-ride="carousel">
+      <div class="carousel-inner">
+        <% coupons.forEach((coupon, index) => { %>
+          <div class="carousel-item <%= index === 0 ? 'active' : '' %>">
+            <div class="coupon">
+              <div class="left">
+                <div>Enjoy Your Gift</div>
+              </div>
+              <div class="center">
+                <div>
+                  <h2>
+                    <%= coupon.discountType === 'percentage' 
+                      ? `${coupon.discountValue}%` 
+                      : `₹${coupon.discountValue}` %> OFF
+                  </h2>
+                  <p class="coupon-description"><%= coupon.description %></p>
+                  <div class="coupon-code">
+                    <button class="copy-btn" data-code="<%= coupon.code %>" title="Copy Code">
+                      <i class="fas fa-copy"></i> Copy
+                    </button>
+                    <p><%= coupon.code %></p>
                   </div>
-                  <div class="center">
-                    <div>
-                      <h2>
-                        <%= coupon.discountType === 'percentage' ? `${coupon.discountValue}%` : `₹${coupon.discountValue}` %> OFF
-                      </h2>
-                      <p><%= coupon.description %></p>
-    
-                      <div class="coupon-code">
-                        <button class="copy-btn" data-code="<%= coupon.code %>" title="Copy Code">
-                          <i class="fas fa-copy"></i> Copy
-                        </button>
-                        <p><%= coupon.code %></p>
-                      </div>
-                      <small>Valid Till: <%= new Date(coupon.endDate).toDateString() %></small>
-                    </div>
-                  </div>
-                  <div class="right">
-                    <div class="paypal__footer">
-                      <img src="https://i.ibb.co/c8CQvBq/barcode.png" alt="Paypal Barcode" class="paypal__barcode">
-                      <p>FusionGear.com</p>
-                    </div>
-                  </div>
+                  <small>Valid Till: <%= new Date(coupon.endDate).toDateString() %></small>
+                  <small class="text-muted">Min Order: ₹<%= coupon.minOrderValue %></small>
                 </div>
               </div>
-            <% }); %>
-          </div>
-          <!-- Controls -->
-          <a class="carousel-control-prev" href="#couponCarousel" role="button" data-slide="prev">
-            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-            <span class="sr-only">Previous</span>
-          </a>
-          <a class="carousel-control-next" href="#couponCarousel" role="button" data-slide="next">
-            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-            <span class="sr-only">Next</span>
-          </a>
-        </div>
-      <% } %>
-    </div>
-    
-    <div class="order-details-box">
-        <h6>Order Summary</h6>
-        <div class="order-summary-item">
-            <p>Items:</p>
-            <span id="cartCount"><%= cartCount%> items</span>
-        </div>
-        <div class="order-summary-item">
-            <p>Subtotal:</p>
-            <span id="cartTotal">₹ <%=cartTotal %></span>
-        </div>
-        <div class="order-summary-item">
-            <p>Discount:</p>
-            <span id="discount">₹<%= discount %></span>
-        </div>
-        <div class="order-summary-item">
-            <p>Shipping:</p>
-            <span id="shippingCharges">₹<%= shippingCharges  %></span>
-        </div>
-        <div class="order-summary-item">
-            <p>Total:</p>
-            <span id="netAmount">₹<%= netAmount%></span>
-        </div>
-    </div>
-    
-    
-
-        
-        
-                       
-        
-        <!-- Apply Coupon Section -->
-        <h6 class="mt-4">Apply Coupon</h6>
-        <form id="couponCode-form" action="/checkout" method="get">
-            <div class="mb-3">
-                <input type="text" id="couponCode" class="form-control" name="couponCode" placeholder="Enter coupon code" value="<%= appliedCoupon || '' %>">
-                <div id="couponCode-error" class="error-message"></div>
+              <div class="right">
+                <div class="paypal__footer">
+                  <img src="https://i.ibb.co/c8CQvBq/barcode.png" alt="Paypal Barcode" class="paypal__barcode">
+                  <p>FusionGear.com</p>
+                </div>
+              </div>
             </div>
-            <button type="submit" class="btn btn-primary">Apply Coupon</button>
-        </form>
-
-        <!-- Available Coupons Section -->
-        
+          </div>
+        <% }); %>
+      </div>
+      <!-- Controls -->
+      <a class="carousel-control-prev" href="#couponCarousel" role="button" data-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="sr-only">Previous</span>
+      </a>
+      <a class="carousel-control-next" href="#couponCarousel" role="button" data-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="sr-only">Next</span>
+      </a>
     </div>
+  <% } %>
+</div>
+        </div>
+    
+<div class="order-details-box">
+  <h6>Order Summary</h6>
+  <div class="order-summary-item">
+      <p>Items:</p>
+      <span id="cartCount"><%= cartCount%> items</span>
+  </div>
+  <div class="order-summary-item">
+      <p>Subtotal:</p>
+      <span id="cartTotal">₹ <%=cartTotal %></span>
+  </div>
+  <div class="order-summary-item">
+    <p>Offer Discount:</p>
+    <span id="offerDiscount">-₹<%= offerDiscount %></span>
+</div>
+<div class="order-summary-item">
+    <p>Coupon Discount:</p>
+    <span id="couponDiscount">-₹<%= couponDiscount %></span>
+</div>
+  <div class="order-summary-item">
+      <p>Shipping:</p>
+      <span id="shippingCharges">₹<%= shippingCharges  %></span>
+  </div>
+  <div class="order-summary-item">
+      <p>Total:</p>
+      <span id="netAmount">₹<%= netAmount%></span>
+  </div>
+</div>
+
+        <!-- Apply Coupon Section -->
+        <h6 class="mt-4 ml-5 mb-3">Apply Coupon</h6>
+        <div id="coupon-section">
+                <form id="couponCode-form" action="/checkout" method="GET">
+                  <input type="text" id="couponCode" name="couponCode" placeholder="Enter coupon code"/>
+                  <button type="submit" class="btn btn-primary">Apply Coupon</button>
+                  <div id="couponCode-error" class="error-message"></div>
+              </form>
+        
+      </div>
+ </div>
 </div>
         </div>
 </section>
@@ -547,6 +556,50 @@
 <script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/toastr@2.1.4/build/toastr.min.js"></script>
+
+
+
+<script>
+function removeCoupon() {
+    $.ajax({
+        url: '/remove-coupon',
+        method: 'POST',
+        success: function(response) {
+            updateOrderSummary(response);
+
+            // Update the coupon section dynamically
+            const couponSection = document.getElementById('coupon-section');
+            couponSection.innerHTML = `
+                <form id="couponCode-form" action="/checkout" method="GET">
+                    <input type="text" id="couponCode" name="couponCode" placeholder="Enter coupon code" required />
+                    <button type="submit" class="btn btn-primary">Apply Coupon</button>
+                    <div id="couponCode-error" class="error-message"></div>
+                </form>
+            `;
+
+            toastr.success("Coupon removed successfully!");
+        },
+        error: function(error) {
+            console.error('Error removing coupon:', error);
+            toastr.error('An error occurred while removing the coupon. Please try again.');
+        }
+    });
+}
+
+// Function to update the order summary dynamically
+function updateOrderSummary(data) {
+    document.getElementById('cartTotal').innerText = `₹ ${data.cartTotal}`;
+    document.getElementById('offerDiscount').innerText = `-₹ ${data.offerDiscount}`;
+    document.getElementById('couponDiscount').innerText = `-₹ ${data.couponDiscount}`;
+    document.getElementById('shippingCharges').innerText = `₹ ${data.shippingCharges}`;
+    document.getElementById('netAmount').innerText = `₹ ${data.netAmount}`;
+    document.getElementById('cartCount').innerText = `${data.cartCount} items`;
+}
+
+
+</script>
+
+
 <script>
   $('#couponCarousel').carousel({
   interval: 3000, 
@@ -591,19 +644,24 @@
         }
 
         const data = await response.json();
-        console.log("Server Response:", data);  // Log the response from the server
+        console.log("Server Response:", data); // Log the response from the server
 
-        // If there's a coupon message, show it
         if (data.couponMessage) {
             toastr.error(data.couponMessage);
         } else {
-            // If coupon is successfully applied
+            // Successfully applied the coupon
             toastr.success(`Coupon code "${couponCode}" applied successfully!`);
-
-            // Update order summary in the UI
             updateOrderSummary(data);
-        }
 
+            // Update the coupon section dynamically
+            const couponSection = document.getElementById('coupon-section');
+            couponSection.innerHTML = `
+                <div id="applied-coupon">
+                    <p>Applied Coupon: <strong>${couponCode}</strong></p>
+                    <button id="remove-coupon-btn" class="btn btn-danger" onclick="removeCoupon()">Remove Coupon</button>
+                </div>
+            `;
+        }
     } catch (err) {
         // Handling error during coupon application
         toastr.error(`An error occurred while applying the coupon: ${err.message}`);
@@ -611,14 +669,14 @@
     }
 });
 
-// Function to update order summary
+
 function updateOrderSummary(data) {
-    // Update the elements with the new values
-    document.getElementById('cartCount').innerText = `${data.cartCount} items`;
     document.getElementById('cartTotal').innerText = `₹ ${data.cartTotal}`;
-    document.getElementById('discount').innerText = `₹ ${data.discount}`;
+    document.getElementById('offerDiscount').innerText = `-₹ ${data.offerDiscount}`;
+    document.getElementById('couponDiscount').innerText = `-₹ ${data.couponDiscount}`;
     document.getElementById('shippingCharges').innerText = `₹ ${data.shippingCharges}`;
     document.getElementById('netAmount').innerText = `₹ ${data.netAmount}`;
+    document.getElementById('cartCount').innerText = `${data.cartCount} items`;
 }
 
     </script>

@@ -134,6 +134,11 @@ const cancelOrderAdmin = async (req, res) => {
             return res.status(400).json({ message: 'Order is already canceled.' });
         }
 
+        if (order.order_status === 'Return') {
+            return res.status(400).json({ message: 'Cannot cancel an order that has already been Returned.' });
+        }
+
+
         // Update order status and add cancellation timestamp
         order.order_status = 'Canceled';
         order.canceled_at = new Date();
@@ -166,13 +171,55 @@ const cancelOrderAdmin = async (req, res) => {
     }
 };
 
+const approveReturn = async (req, res) => {
+    try {
+        const { orderId } = req.body;
 
+        const order = await Order.findById(orderId);
+        if (!order || order.return_status !== 'Pending') {
+            return res.status(400).json({ message: 'Return not pending or order not found.' });
+        }
 
+        // Mark return as approved and process refund
+        order.return_status = 'Approved';
+        order.refund_status = 'Completed';
+        order.restocked_at = new Date();
+
+   
+        await order.save();
+
+        res.json({ success: true, message: 'Return approved, refund processed.' });
+    } catch (error) {
+        console.error('Error approving return:', error);
+        res.status(500).json({ success: false, message: 'Failed to approve return' });
+    }
+};
+
+const rejectReturn = async(req,res)=>{
+    const { orderId } = req.body;
+
+    try {
+        const order = await Order.findById(orderId);
+        if (!order || order.return_status !== 'Pending') {
+            return res.status(400).json({ message: 'Return not pending or order not found.' });
+        }
+
+        // Mark return as rejected
+        order.return_status = 'Rejected';
+        await order.save();
+        res.json({ success: true, message: 'Return rejected.' });
+    } catch (error) {
+        console.error('Error rejecting return:', error);
+        res.status(500).json({ success: false, message: 'Failed to reject return' });
+    }
+}
 
 module.exports = {
     getOrders,
     changeOrderStatus ,
     getDetails,
-    cancelOrderAdmin
+    cancelOrderAdmin,
+    approveReturn,
+    rejectReturn
 
 }

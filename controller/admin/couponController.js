@@ -4,7 +4,7 @@ const Category = require('../../models/categorySchema');
 
 const getCouponPage = async (req, res) => {
     try {
-        const coupons = await Coupon.find().populate('productId categoryId');
+        const coupons = await Coupon.find(); // Fetch all coupons without population of product/category
         res.render('coupon', { coupons });
     } catch (error) {
         res.status(500).json({ message: 'Error fetching coupons' });
@@ -32,16 +32,16 @@ const addCoupon = async (req, res) => {
     try {
         const { 
             code, description, 
-            discountType, discountValue, startDate, applicableTo, endDate, 
-            productId, categoryId, minOrderValue, usageLimit 
+            discountType, discountValue, startDate,  endDate, 
+            minOrderValue, usageLimit 
         } = req.body;
 
-        // Determine the final discount value based on the discount type
+    
         let discount;
         if (discountType === 'percentage') {
-            discount = discountValue;  // percentage value
+            discount = discountValue; 
         } else if (discountType === 'fixed') {
-            discount = discountValue;  // fixed amount value
+            discount = discountValue;  
         }
 
         // Create the coupon
@@ -53,10 +53,7 @@ const addCoupon = async (req, res) => {
             startDate,
             endDate,
             usageLimit,
-            applicableTo,  // Use applicableTo instead of applicableScope
-            productId: applicableTo === 'product' ? productId : undefined,
-            categoryId: applicableTo === 'category' ? categoryId : undefined,
-            minOrderValue: applicableTo === 'order' ? minOrderValue : undefined,
+            minOrderValue,
             status: 'active'
         });
 

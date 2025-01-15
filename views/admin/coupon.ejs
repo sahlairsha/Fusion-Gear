@@ -121,7 +121,7 @@
                 <th>Discount Type</th>
                 <th>Start Date</th>
                 <th>End Date</th>
-                <th>Applicable To</th>
+                
                 <th>Status</th>
                 <th>Actions</th>
             </tr>
@@ -140,7 +140,6 @@
                     <td><%= coupon.discountType %></td>
                     <td><%= new Date(coupon.startDate).toLocaleDateString() %></td>
                     <td><%= new Date(coupon.endDate).toLocaleDateString() %></td>
-                    <td><%= coupon.applicableTo %></td>
                     <td><span class="badge <%= badgeClass %>"><%= status %></span></td>
                     <td>
                         <button class="delete-btn" onclick="deleteCoupon('<%= coupon._id %>')"> <i class="fas fa-trash"></i></button>

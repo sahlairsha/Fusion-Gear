@@ -1,6 +1,111 @@
 <%-include('../../views/partials/user/header') %>
 
 <style>
+/* Flex container for product name, rating, and price */
+.product-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px; 
+    margin-bottom: 10px; 
+}
+.offer-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background-color: #ff6b6b;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: uppercase;
+    z-index: 10;
+}
+.product-price-container {
+    position: relative;
+    margin-right: 50px;
+    display: inline-block;
+    margin-bottom: 20px;
+}
+
+.sale-price {
+    font-size: 14px;
+    color: #777;
+    text-decoration: line-through;
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform: translateY(0);
+    animation: moveUpAndDisappear 2s forwards;
+}
+
+.offer-price {
+    font-size: 18px;
+    font-weight: bold;
+    color: #000;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    transform: translateY(100%);
+    animation: slideInFromBottom 2s 1s forwards;
+}
+
+@keyframes moveUpAndDisappear {
+    0% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+    50% {
+        transform: translateY(-50%);
+        opacity: 0.5;
+    }
+    100% {
+        transform: translateY(-100%);
+        opacity: 0; /* Ensures it's fully hidden */
+    }
+}
+
+@keyframes slideInFromBottom {
+    0% {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+
+/* Styling for product name */
+.product-header .product-name {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0;
+    flex-grow: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Styling for rating badge */
+.product-header .product-rating { 
+    border-radius: 5px;
+    font-size: 12px;
+    font-weight: 600;
+   margin-right: 65px;
+}
+
+/* Styling for product price */
+.product-header .product-price {
+    font-size: 14px;
+    font-weight: bold;
+    color: #ff6b6b; 
+    margin-top: 20px;
+   
+ 
+}
 
 
     .stock-left{
@@ -69,14 +174,32 @@
 }
 
 .wishlist-btn{
-    background-color: #ff6b6b;
-    color: white;
-    padding: 5px 10px;
     border-radius: 50%;
+    background-color: transparent;
+    width: 30px;
+    height: 30px;
     border: 0.5px solid #000;
-    cursor: pointer;
 }
 
+/* Style for the heart icon */
+.heart-icon {
+    font-size: 24px;
+    transition: color 0.3s ease, transform 0.3s ease;
+}
+
+/* Optional: Heart icon animation */
+.wishlist-btn i {
+    transition: transform 0.2s ease;
+}
+
+.wishlist-btn i.fas.fa-heart {
+    color: red;
+    transform: scale(1.2); /* Make the icon slightly bigger when filled */
+}
+
+.add-cart-btn{
+    margin-left: 20px;
+}
 
     </style>
 <link rel="stylesheet" href="/css/user/product-display.css">
@@ -288,6 +411,11 @@
                             <div class="col-lg-4 col-md-6 col-sm-6">
                                 <div class="product-card mb-4">
                                     <div class="product-image">
+                                        <% if (product.offer && product.offer.discountPercentage > 0) { %>
+                                            <div class="offer-badge">
+                                                <%= product.offer.discountPercentage %>% OFF
+                                            </div>
+                                        <% } %>
                                         <img src="/uploads/public-image/<%= product.productImage[0] %>" alt="<%= product.productName %>">
                 
                                         <% if (product.variants.length > 0) { %>
@@ -310,23 +438,47 @@
                                         </div>
                                     </div>
                 
-                                    <!-- Product Details -->
                                     <div class="product-details">
-                                        <h6 class="product-name"><%= product.productName %></h6>
-                
-                                        <% if (product.variants.length > 0) { %>
-                                            <!-- Display the price for the first variant -->
-                                            <div class="product-price">&#8377;<%= product.variants[0].salePrice || product.variants[0].regularPrice %></div>
-                                        <% } else { %>
-                                            <div class="product-price">Price Not Available</div>
-                                        <% } %>
-                
+                                        <div class="product-header">
+                                            <h6 class="product-name"><%= product.productName %></h6>
+                                            <div class="product-rating badge <%= 
+                                                product.ratings.average >= 4 ? 'badge-success' : 
+                                                (product.ratings.average >= 3 ? 'badge-warning' : 
+                                                (product.ratings.average >= 2 ? 'badge-danger' : 'badge-secondary')) 
+                                            %>">
+                                                ★<%= product.ratings.average %>
+                                            </div>
+                                    
+                                            <% if (product.variants.length > 0) { %>
+                                                <div class="product-price">
+                                                    <!-- Strike-through for sale price if offer is applied -->
+                                                    <% if (product.variants[0].salePrice > product.variants[0].offerPrice) { %>
+                                                        <div class="product-price-container">
+                                                            <span class="sale-price"><s>&#8377;<%= product.variants[0].salePrice %></s></span>
+                                                            <span class="offer-price">&#8377;<%= product.variants[0].offerPrice %></span>
+                                                        </div>      
+                                                    <% } else { %>
+                                                        <span class="offer-price">&#8377;<%= product.variants[0].salePrice %></span>
+                                                    <% } %>
+                                                </div>
+                                            <% } else { %>
+                                                <div class="product-price">Price Not Available</div>
+                                            <% } %>
+                                        </div>
+                                    
                                         <div class="description">
                                             <p><%= product.description %></p>
                                         </div>
-                                        <a href="/wishlist"><button class="wishlist-btn"><img src="/img/icon/heart.png" alt=""></button></a>
-                                        <button class="add-cart-btn"><a href="#" onclick="addToCart('<%= product._id %>')" class="add-cart-link">+ Add to Cart</a></button>
+                                    
+                                        <!-- Wishlist button with the heart icon -->
+                                        <button class="wishlist-btn" onclick="addToWishlist('<%= product._id %>', '<%= product.variants[0]._id %>')">
+                                            <i id="heart-icon" class="far fa-heart"></i>
+                                        </button>
+                                        <button class="add-cart-btn">
+                                            <a href="#" onclick="addToCart('<%= product._id %>','<%= product.variants[0]._id %>')" class="add-cart-link">+ Add to Cart</a>
+                                        </button>
                                     </div>
+                                    
                                 </div>
                                
                             </div>
@@ -358,6 +510,64 @@
                 </div>
                 
 </section>
+
+<script>
+function addToWishlist(productId, variantId) {
+    const quantity = 1;
+    fetch('/wishlist/add', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+        },
+        body: JSON.stringify({
+            productId: productId,
+            variantId: variantId,
+            quantity : quantity
+        }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.message === 'Product added to wishlist') {
+            const heartIcon = document.getElementById('heart-icon');
+            heartIcon.classList.remove('far', 'fa-heart');
+            heartIcon.classList.add('fas', 'fa-heart');
+            
+            // Show success alert without redirecting
+            Swal.fire({
+                title: 'Product added to wishlist',
+                  icon: 'success',
+                showCancelButton: true,
+                confirmButtonText: 'Go to Wishlist',
+                    cancelButtonText: 'Stay Here',
+            }).then((result) => {
+                if (result.isConfirmed) {
+        window.location.href = '/wishlist';
+     }
+            });
+        } else {
+            Swal.fire({
+                title: 'Error',
+                icon: 'error',
+                text: data.message || 'Failed to add to wishlist',
+                confirmButtonText: 'Try Again',
+            });
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        Swal.fire({
+            title: 'Error',
+            icon: 'error',
+            text: 'Internal Server Error',
+            confirmButtonText: 'Try Again',
+        });
+    });
+}
+
+
+</script>
+
 
 
 <script>
@@ -450,6 +660,58 @@ function addToCart(productId) {
     });
 }
 
+
+
+</script>
+
+<script>
+   function addToCart(productId, variantId) {
+    const quantity = 1;  // Default quantity set to 1
+
+    fetch('/cart/add', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+        },
+        body: JSON.stringify({
+            productId: productId,
+            variantId: variantId,
+            quantity: quantity, 
+        }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            Swal.fire({
+                title: 'Added to Cart',
+                text: 'The product has been added to your cart.',
+                icon: 'success',
+                confirmButtonText: 'Go to Cart',
+            }).then(result => {
+                if (result.isConfirmed) {
+                    window.location.href = '/cart';
+                }
+            });
+        } else {
+            Swal.fire({
+                title: 'Error',
+                text: data.message || 'Failed to add product to cart.',
+                icon: 'error',
+                confirmButtonText: 'Try Again',
+            });
+        }
+    })
+    .catch(error => {
+        console.error('Error adding product to cart:', error);
+        Swal.fire({
+            title: 'Error',
+            text: 'Internal Server Error',
+            icon: 'error',
+            confirmButtonText: 'Try Again',
+        });
+    });
+}
 
 
 </script>

@@ -974,10 +974,10 @@ li{
 
 /* Product Image and Overlay */
 .product-image img {
-	object-fit: contain;
-	object-position: center center;
+	object-fit: cover;
+	object-position: top center;
     width: 100%;
-    height: auto;
+    height: 250px;
     border-radius: 10px 10px 0 0;
 }
 
@@ -985,7 +985,7 @@ li{
     position: absolute;
     top: 0;
     width: 100%;
-    height: 69%;
+    height: 60%;
     background-color: rgba(0, 0, 0, 0.178);
     display: flex;
     justify-content: center;

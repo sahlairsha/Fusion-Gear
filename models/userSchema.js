@@ -85,7 +85,9 @@ const userSchema = new Schema({
         type :mongoose.Schema.Types.ObjectId,
         ref : "Product",
 
-        }
+        },
+        variant_id: { type: mongoose.Schema.Types.ObjectId }
+
         
     }],
     orderHistory:[{
@@ -98,7 +100,7 @@ const userSchema = new Schema({
     },
     referralCode : {
         type : String,
-        unique: true
+         unique: true
     },
     redeemed : {
         type : Boolean

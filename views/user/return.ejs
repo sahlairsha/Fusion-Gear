@@ -1,0 +1,198 @@
+<%- include('../../views/partials/user/header') %>
+
+<style>
+    .return-form-container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 30px;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        background-color: #f9f9f9;
+    }
+
+    .return-form-container h2 {
+        text-align: center;
+        margin-bottom: 25px;
+    }
+
+    .form-group {
+        margin-bottom: 25px;
+    }
+
+    .form-group label {
+        font-size: 16px;
+        font-weight: 600;
+        display: block;
+        margin-bottom: 10px;
+    }
+
+    .form-group select,
+    .form-group textarea {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 14px;
+        color: #555;
+        margin-top: 5px;
+        margin-bottom: 40px;
+    }
+
+    .form-group textarea {
+        resize: vertical;
+    }
+
+    .form-group button {
+    
+        background-color: #007bff;
+        color: white;
+        border: none;
+        padding: 12px 20px;
+        font-size: 16px;
+        cursor: pointer;
+        border-radius: 5px;
+        display: block;
+        width: 100%;
+        transition: background-color 0.3s ease;
+    }
+
+    .form-group button:hover {
+        background-color: #0056b3;
+    }
+
+    .back-link {
+        text-align: center;
+        margin-top: 25px;
+        font-size: 16px;
+    }
+
+    .back-link a {
+        color: #007bff;
+        text-decoration: none;
+    }
+
+    .back-link a:hover {
+        text-decoration: underline;
+    }
+
+    /* Padding for the entire form */
+    .return-form-container {
+        padding: 40px;
+    }
+</style>
+
+<section class="breadcrumb-option">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="breadcrumb__text">
+                    <h4>Request Product Return</h4>
+                    <div class="breadcrumb__links">
+                        <a href="/">Home</a>
+                        <a href="/orders">Orders</a>
+                        <span>Return Request</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="return-form-container">
+    <h2>Request a Return</h2>
+    <form id="return-form" method="POST" action="/order/return">
+        <input type="hidden" id="orderId" name="orderId" value="<%= orderId %>">
+        
+        <div class="form-group">
+            <label for="returnReason">Reason for Return:</label>
+            <select id="returnReason" name="returnReason">
+                <option value="" disabled selected>Select a reason</option>
+                <option value="Product Damaged">Product Damaged</option>
+                <option value="Wrong Item Delivered">Wrong Item Delivered</option>
+                <option value="Product Not As Described">Product Not As Described</option>
+                <option value="Quality Issues">Quality Issues</option>
+                <option value="I Changed My Mind">I Changed My Mind</option>
+                <option value="Other">Other</option>
+            </select>
+        </div>
+        <br><br>
+        
+        <div class="form-group">
+            <label for="additionalInfo" id="additional-info-label" style="display: none;">Additional Information (Optional):</label>
+            <textarea id="additionalInfo" name="additionalInfo" rows="5" placeholder="Please provide any additional information..." style="display: none;"></textarea>
+        </div>
+        
+        <div class="form-group">
+            <button type="submit" >Submit Return Request</button>
+        </div>
+    </form>
+
+    <div class="back-link">
+        <a href="/orders">Back to Orders</a>
+    </div>
+</div>
+
+<script>
+    // Handle the "Other" option for additional information
+    document.getElementById('returnReason').addEventListener('change', function() {
+        const additionalInfoLabel = document.getElementById('additional-info-label');
+        const additionalInfoTextarea = document.getElementById('additionalInfo');
+        
+        if (this.value === 'Other') {
+            additionalInfoLabel.style.display = 'block';
+            additionalInfoTextarea.style.display = 'block';
+        } else {
+            additionalInfoLabel.style.display = 'none';
+            additionalInfoTextarea.style.display = 'none';
+        }
+    });
+
+    // Handle form submission
+    document.getElementById('return-form').addEventListener('submit', async function (e) {
+        e.preventDefault();
+
+        const orderId = document.getElementById('orderId').value;
+        const returnReason = document.getElementById('returnReason').value;
+        const additionalInfo = document.getElementById('additionalInfo').value;
+
+        try {
+            const response = await fetch('/order/return', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ orderId, returnReason, additionalInfo }),
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Return Request Submitted',
+                    text: 'Your return request has been submitted successfully!',
+                    confirmButtonText: 'OK',
+                }).then(() => {
+                    window.location.href = '/order-confirm';
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'There was an issue with your return request: ' + data.message,
+                    confirmButtonText: 'OK',
+                });
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Something went wrong',
+                text: 'Please try again later.',
+                confirmButtonText: 'OK',
+            });
+        }
+    });
+</script>
+
+<%- include('../../views/partials/user/footer') %>

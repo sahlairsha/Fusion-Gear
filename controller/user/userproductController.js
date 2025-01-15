@@ -100,6 +100,23 @@ const loadProducts = async (req, res) => {
             .sort(sortQuery)
             .exec();
 
+            const productsWithOffers = productData.map(product => {
+                const variantsWithOffer = product.variants.map(variant => {
+                    const offerPrice =
+                        product.offer && product.offer.discountPercentage > 0
+                            ? Math.round(variant.salePrice * (1 - product.offer.discountPercentage / 100))
+                            : variant.salePrice;
+                    return {
+                        ...variant.toObject(),
+                        offerPrice,
+                    };
+                });
+                return {
+                    ...product.toObject(),
+                    variants: variantsWithOffer,
+                };
+            });
+    
         
         // Get the total count of products for pagination
         const count = await Product.countDocuments(query);
@@ -114,7 +131,7 @@ const loadProducts = async (req, res) => {
         }
 
         const data = {
-            products: productData, 
+            products: productsWithOffers, 
             totalPages,
             totalProduct: count,
             limit,
@@ -139,7 +156,6 @@ const loadProductsDetails = async (req, res) => {
     try {
         const { id } = req.query;
 
-        // Validate the product ID
         if (!id) {
             console.error("Product ID is missing");
             req.flash("error", "Product ID is required");
@@ -148,11 +164,10 @@ const loadProductsDetails = async (req, res) => {
 
         await Product.findByIdAndUpdate(id, { $inc: { views: 1 } });
 
-        // Find the product by ID and populate the category and reviews with user data
         const productData = await Product.findById(id)
             .populate('category')
             .populate('reviews.user_id')
-            .exec();
+            .lean();
 
         if (!productData) {
             console.error(`Product not found with ID: ${id}`);
@@ -160,26 +175,30 @@ const loadProductsDetails = async (req, res) => {
             return res.redirect("/product/view");
         }
 
-        
+        productData.variants = productData.variants.map(variant => {
+            const offerPrice = productData.offer?.discountPercentage
+                ? Math.round(variant.salePrice * (1 - productData.offer.discountPercentage / 100))
+                : variant.salePrice;
 
-        // Get the user data from session
+            return { ...variant, offerPrice };
+        });
+
         const userData = req.session.user
             ? await User.findById(req.session.user).lean()
             : null;
 
-        // Render the product details page with the necessary data
         res.render("productlist", {
             user: userData,
             product: productData,
             category: productData.category,
         });
-
     } catch (error) {
         console.error("Error loading product details page:", error.message);
         req.flash("error", "An error occurred while loading product details");
         res.redirect("/pagenotfound");
     }
 };
+
 
 
 

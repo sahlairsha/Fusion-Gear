@@ -286,9 +286,9 @@ input[type="number"]::-webkit-inner-spin-button {
                                         <a href="#" class="remove-item" data-product-id="<%= item.product._id %>"><i class="fa fa-close"></i></a>
                                     </td>
                                 </tr>
-                            <% }) %>
+                          
                         </tbody>
-                        
+                        <% }) %>
                     </table>
                 </div>
                 <button class="continue__btn"><a class="continue__link" href="/products">Continue to shopping</a></button>
@@ -298,9 +298,11 @@ input[type="number"]::-webkit-inner-spin-button {
                 <div class="shopping__cart__summary">
                     <h5>Cart totals</h5>
                     <ul>
+                      
+                        
                         <li>Subtotal <span id="cartTotal">₹<%= cartTotal %></span></li>
-                        <li>Discount <span id="discount">-₹<%= discount %></span></li>
-                        <li>Shipping <span id="shippingCharges">₹<%= shippingCharges %></span></li>
+                        <li>Discount <span id="discount" class="text-success">-₹<%= discount %></span></li>
+                        <li>Shipping <span id="shippingCharges" class="text-danger">₹<%= shippingCharges %></span></li>
                         <li>Total <span id="netAmount">₹<%= netAmount %></span></li>
                     </ul>
                     
@@ -312,6 +314,7 @@ input[type="number"]::-webkit-inner-spin-button {
         </div>
     </div>
 </div>
+
 </section>
 <!-- Shopping Cart Section End -->
 

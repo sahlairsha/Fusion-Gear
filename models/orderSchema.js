@@ -32,7 +32,7 @@ const orderSchema = new mongoose.Schema({
     },
     payment_method: {
         type: String,
-        enum: ['UPI', 'Net Banking', 'COD'],
+        enum: ['UPI', 'Net Banking', 'COD','Razorpay'],
         required: true
     },
     payment_status: {
@@ -45,7 +45,7 @@ const orderSchema = new mongoose.Schema({
     order_status: {
 
         type: String,
-        enum: ['Pending', 'Shipped', 'Delivered', 'Canceled'],
+        enum: ['Pending', 'Shipped', 'Delivered', 'Canceled','Return'],
         default: 'Pending'
 
     },
@@ -72,7 +72,25 @@ const orderSchema = new mongoose.Schema({
     cancellation_reason: { 
         predefined: { type: String }, 
         custom: { type: String } 
-    }
+    },
+    return_status: {
+        type: String,
+        enum: ['Pending', 'Approved', 'Rejected'],
+        default: 'Pending'
+    },
+    return_reason: {
+        type: String, // Reason for the return
+        default: null
+    },
+    refund_status: {
+        type: String,
+        enum: ['Pending', 'Completed', 'Failed'],
+        default: 'Pending'
+    },
+    restocked_at: {
+        type: Date,
+        default: null
+    },
 
 },{timestamps : true});
 
