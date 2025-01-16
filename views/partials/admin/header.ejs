@@ -21,44 +21,81 @@
     padding: 0;
     box-sizing: border-box;
 }
-.sidebar {
-    width: 250px;
-    background-color:#fdf0d5;
-    height: 130vh;
+body{
+  background-color: #e3eef1cb;
 }
-a{
+.sidebar {
+    width: 70px;
+    background-color:#ffff;
+    height: auto;
+    overflow: hidden;
+    transition: width 1s ease;
+    position: relative;
+    border-radius: 8px;
+    margin-left: 20px;
+    margin-top: 20px;
+    padding-bottom: 30px;
+}
+
+.sidebar:hover {
+    width: 250px;
+   
+}
+
+a {
     text-decoration: none;
 }
 
 .sidebar .nav-link {
-    transition: background-color 0.3s;
+    transition: background-color 0.5s, padding 0.5s;
     color: #000;
     font-weight: 500;
     padding: 15px;
     text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: start;
+}
+
+.sidebar .nav-link i {
+    margin-right: 10px;
+    font-size: 16px;
+    min-width: 30px;
+    text-align: center;
+}
+
+.sidebar .nav-link span {
+    display: none;
+    white-space: nowrap;
+}
+
+.sidebar:hover .nav-link span {
+    display: inline;
+    margin-left: 10px;
 }
 
 .sidebar .nav-link:hover {
-    background-color: #c1121f;
+    background-color: #219ebc;
     color: #fff;
 }
 
 .icon-custom {
     margin-right: 10px;
 }
+
 .table-light {
     background-color: #f8f9fa;
 }
 
-.table-secondary{
-  font-size: 14px;
+.table-secondary {
+    font-size: 14px;
 }
 
 .table-light th,
 .table-light td {
-    vertical-align: middle; 
-   
+    vertical-align: middle;
 }
+
 .btn-sm {
     margin-right: 5px;
     margin-left: 5px;
@@ -72,19 +109,74 @@ a{
 
 .pagination-container .current-page {
     padding: 0.5rem 1rem;
-    color:red; 
+    color: red;
 }
 
-.error-message{
-  font-size: 14px;
-  color: red;
+.error-message {
+    font-size: 14px;
+    color: red;
 }
 
+.profile-section {
+    position: absolute;
+    bottom: 20px;
+    width: 100%;
+    text-align: center;
+    transition: opacity 0.3s;
+    opacity: 0;
+}
+
+.sidebar:hover .profile-section {
+    opacity: 1;
+}
+
+.profile-section img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-bottom: 10px;
+}
+
+.profile-section span {
+    display: none;
+    font-size: 14px;
+    color: #000;
+}
+
+.sidebar:hover .profile-section span {
+    display: block;
+}
 
 @media (max-width: 768px) {
     .sidebar {
         width: 100%;
+        height: auto;
     }
+}
+
+.nav-link.active {
+    position: relative;
+    background-color: transparent;
+    color: #219ebc;
+}
+
+.nav-link.active::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 5px;
+    height: 70%;
+    width: 4px;
+    background-color: #219ebc;
+    border-radius: 2px;
+}
+
+.nav-link:hover::before {
+    background-color: #219ebc; /* Slightly darker color for hover */
+}
+
+.nav-link.active:hover {
+    color: #fff; /* Change text color slightly on hover */
 }
 
     </style>
@@ -110,34 +202,51 @@ a{
       <div class="d-flex">
         <nav class="flex-column pt-4 sidebar">
             <a href="/admin/dashboard" class="nav-link d-flex align-items-center">
-                <i class="icon-custom"></i> Dashboard
-              </a>
-          <a href="/admin/users" class="nav-link d-flex align-items-center">
-            <i class="icon-custom"></i> Customers
-          </a>
-          <a href="/admin/category" class="nav-link d-flex align-items-center">
-            <i class="icon-custom"></i> Category
-          </a>
-          <a href="/admin/products" class="nav-link d-flex align-items-center">
-            <i class="icon-custom"></i> Product
-          </a>
-          <a href="/admin/add-products" class="nav-link d-flex align-items-center">
-            <i class="icon-custom"></i> Add Product
-          </a>
-          <a href="#" class="nav-link d-flex align-items-center">
-            <i class="icon-custom"></i> Banner
-          </a>
-          <a href="/admin/coupons" class="nav-link d-flex align-items-center">
-            <i class="icon-custom"></i> Coupon
-          </a>
-          <a href="/admin/offer" class="nav-link d-flex align-items-center">
-            <i class="icon-custom"></i> Offers
-          </a>
-          <a href="/admin/orders" class="nav-link d-flex align-items-center">
-            <i class="icon-custom"></i> Orders
-          </a>
-          <a href="/admin/stock" class="nav-link d-flex align-items-center">
-            <i class="icon-custom"></i> Stock/Inventory
-          </a>
+                <i class="icon-custom fas fa-tachometer-alt"></i> <span>Dashboard</span>
+            </a>
+            <a href="/admin/users" class="nav-link d-flex align-items-center">
+                <i class="icon-custom fas fa-users"></i> <span>Customers</span>
+            </a>
+            <a href="/admin/category" class="nav-link d-flex align-items-center">
+                <i class="icon-custom fas fa-th-list"></i> <span>Category</span>
+            </a>
+            <a href="/admin/products" class="nav-link d-flex align-items-center">
+                <i class="icon-custom fas fa-box"></i> <span>Product</span>
+            </a>
+            <a href="/admin/add-products" class="nav-link d-flex align-items-center">
+                <i class="icon-custom fas fa-plus"></i> <span>Add Product</span>
+            </a>
+            <a href="#" class="nav-link d-flex align-items-center">
+                <i class="icon-custom fas fa-image"></i> <span>Banner</span>
+            </a>
+            <a href="/admin/coupons" class="nav-link d-flex align-items-center">
+                <i class="icon-custom fas fa-tags"></i> <span>Coupon</span>
+            </a>
+            
+            <a href="/admin/orders" class="nav-link d-flex align-items-center">
+                <i class="icon-custom fas fa-shopping-cart"></i> <span>Orders</span>
+            </a>
+            <a href="/admin/stock" class="nav-link d-flex align-items-center">
+                <i class="icon-custom fas fa-warehouse"></i> <span>Stock/Inventory</span>
+            </a>
         </nav>
+        <div class="profile-section">
+            <img src="/path/to/profile.jpg" alt="Profile">
+            <span>Admin Name</span>
+        </div>
 
+        <script>
+          // Get the current URL path
+          const currentPath = window.location.pathname;
+      
+          // Select all sidebar links
+          const sidebarLinks = document.querySelectorAll('.sidebar .nav-link');
+      
+          // Loop through links to find the one matching the current path
+          sidebarLinks.forEach(link => {
+              if (link.getAttribute('href') === currentPath) {
+                  link.classList.add('active');
+
+              }
+          });
+      </script>
