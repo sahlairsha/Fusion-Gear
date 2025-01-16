@@ -1,7 +1,12 @@
 <%-include('../../views/partials/user/header') %>
 
 <style>
-/* Flex container for product name, rating, and price */
+
+.active {
+    font-weight: bold;
+    color: #ff6600;
+}
+
 .product-header {
     display: flex;
     align-items: center;
@@ -76,6 +81,45 @@
         opacity: 1;
     }
 }
+
+
+/* Ensure Specificity for Clear Filter Links */
+.clear-filter{
+    display: inline-block;
+    margin-top: 10px;
+    color: #219ebc; 
+    font-size: 14px;
+    cursor: pointer;
+    text-decoration: none; 
+}
+
+.clear-filter:hover {
+    color: #000 !important;
+    text-decoration: underline; 
+}
+
+
+/* Clear All Button */
+.clear-all {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.clear-all a {
+    color: #fff; 
+    padding: 10px 20px;
+    border-radius: 5px;
+    background-color: #000; 
+    text-transform: uppercase;
+    font-weight: bold;
+    text-decoration: none; 
+}
+
+.clear-all a:hover {
+    background-color: #780000; 
+    color: #fff; 
+}
+
 
 
 /* Styling for product name */
@@ -245,6 +289,7 @@
                     </div>
                     <div class="shop__sidebar__accordion">
                         <div class="accordion" id="accordionExample">
+                            <!-- Categories -->
                             <div class="card">
                                 <div class="card-heading">
                                     <a data-toggle="collapse" data-target="#collapseOne">Categories</a>
@@ -253,22 +298,34 @@
                                     <div class="card-body">
                                         <div class="shop__sidebar__categories">
                                             <ul class="nice-scroll">
-                                                <li><a href="?page=1&category=<%= encodeURIComponent("men's wear") %>&sort=<%= sort %>&search=<%= search %>">Men's Wear</a></li>
-                                                <li><a href="?page=1&category=<%= encodeURIComponent("men's accessories") %>&sort=<%= sort %>&search=<%= search %>">Men's Accessories</a></li>
-                                                <li><a href="?page=1&category=<%= encodeURIComponent("men's footware") %>&sort=<%= sort %>&search=<%= search %>">Men's Footwear</a></li>
-                                                <li><a href="?page=1&category=<%= encodeURIComponent("men's active wear") %>&sort=<%= sort %>&search=<%= search %>">Men's Activewear</a></li>
-                                                <li><a href="?page=1&category=<%= encodeURIComponent('smart watch') %>&sort=<%= sort %>&search=<%= search %>">Smart Watch</a></li>
-                                                <li><a href="?page=1&category=<%= encodeURIComponent('tech accessories') %>&sort=<%= sort %>&search=<%= search %>">Tech Accessories</a></li>
-                                                <li><a href="?page=1&category=<%= encodeURIComponent("women's clothing") %>&sort=<%= sort %>&search=<%= search %>">Women's Clothing</a></li>
-                                                <li><a href="?page=1&category=<%= encodeURIComponent("women's accessories") %>&sort=<%= sort %>&search=<%= search %>">Women's Accessories</a></li>
-                                                <li><a href="?page=1&category=<%= encodeURIComponent("women's activewear") %>&sort=<%= sort %>&search=<%= search %>">Women's Activewear</a></li>
-                                                <li><a href="?page=1&category=<%= encodeURIComponent("women's footwear") %>&sort=<%= sort %>&search=<%= search %>">Women's Footwear</a></li>
-                                                
+                                                <% const categories = [
+                                                    "men's wear",
+                                                    "men's accessories",
+                                                    "men's footware",
+                                                    "men's active wear",
+                                                    "smart watch",
+                                                    "tech accessories",
+                                                    "women's clothing",
+                                                    "women's accessories",
+                                                    "women's activewear",
+                                                    "women's footwear"
+                                                ]; %>
+                                                <% categories.forEach(cat => { %>
+                                                    <li>
+                                                        <a href="?page=1&category=<%= encodeURIComponent(cat) %>&sort=<%= sort %>&search=<%= search %>&priceRange=<%= priceRange %>" 
+                                                           class="<%= category === cat ? 'active' : '' %>">
+                                                            <%= cat.charAt(0).toUpperCase() + cat.slice(1) %>
+                                                        </a>
+                                                    </li>
+                                                <% }); %>
                                             </ul>
                                         </div>
+                                        <a href="?clearCategory=true" class="clear-filter">Clear Categories</a>
                                     </div>
                                 </div>
                             </div>
+                    
+                            <!-- Filter Price -->
                             <div class="card">
                                 <div class="card-heading">
                                     <a data-toggle="collapse" data-target="#collapseThree">Filter Price</a>
@@ -277,17 +334,30 @@
                                     <div class="card-body">
                                         <div class="shop__sidebar__price">
                                             <ul>
-                                                <li><a href="#" class="price-filter" data-range="250-500">₹200.00- ₹500.00</a></li>
-                                                <li><a href="#" class="price-filter" data-range="500-1000">₹500.00 - ₹1000.00</a></li>
-                                                <li><a href="#" class="price-filter" data-range="1000-1500">₹1000.00 - ₹1500.00</a></li>
-                                                <li><a href="#" class="price-filter" data-range="1500-2000">₹1500.00 - ₹2000.00</a></li>
-                                                <li><a href="#" class="price-filter" data-range="2000-2500">₹2000.00 - ₹2500.00</a></li>
-                                                <li><a href="#" class="price-filter" data-range="2500-999999">₹2500.00+</a></li>
+                                                <% const priceRanges = [
+                                                    { range: "250-500", label: "₹200.00 - ₹500.00" },
+                                                    { range: "500-1000", label: "₹500.00 - ₹1000.00" },
+                                                    { range: "1000-1500", label: "₹1000.00 - ₹1500.00" },
+                                                    { range: "1500-2000", label: "₹1500.00 - ₹2000.00" },
+                                                    { range: "2000-2500", label: "₹2000.00 - ₹2500.00" },
+                                                    { range: "2500-999999", label: "₹2500.00+" }
+                                                ]; %>
+                                                <% priceRanges.forEach(price => { %>
+                                                    <li>
+                                                        <a href="?page=1&priceRange=<%= price.range %>&sort=<%= sort %>&search=<%= search %>&category=<%= category %>" 
+                                                           class="<%= priceRange === price.range ? 'active' : '' %>">
+                                                            <%= price.label %>
+                                                        </a>
+                                                    </li>
+                                                <% }); %>
                                             </ul>
                                         </div>
+                                        <a href="?clearPrice=true" class="clear-filter">Clear Price</a>
                                     </div>
                                 </div>
                             </div>
+                    
+                            <!-- Size -->
                             <div class="card">
                                 <div class="card-heading">
                                     <a data-toggle="collapse" data-target="#collapseFour">Size</a>
@@ -295,47 +365,21 @@
                                 <div id="collapseFour" class="collapse show" data-parent="#accordionExample">
                                     <div class="card-body">
                                         <div class="shop__sidebar__size">
-                                            <label for="xs">xs
-                                                <input type="radio" name="size" value="XS" id="xs">
-                                            </label>
-                                            <label for="sm">s
-                                                <input type="radio" name="size" value="S" id="sm">
-                                            </label>
-                                            <label for="md">m
-                                                <input type="radio" name="size" value="M" id="md">
-                                            </label>
-                                            <label for="lg">l
-                                                <input type="radio" name="size" value="L" id="lg">
-                                            </label>
-                                            <label for="xl">xl
-                                                <input type="radio" name="size" value="XL" id="xl">
-                                            </label>
-                                            <label for="2xl">2xl
-                                                <input type="radio" name="size" value="XXL" id="2xl">
-                                            </label>
-                                            <label for="3xl">3xl
-                                                <input type="radio" name="size" value="3XL" id="3xl">
-                                            </label>
-                                            <label for="4xl">4xl
-                                                <input type="radio" name="size" value="4XL" id="4xl">
-                                            </label>
-                                            <label for="5xl">5
-                                                <input type="radio" name="size" value="5" id="5xl">
-                                            </label>
-                                            <label for="6xl">6
-                                                <input type="radio" name="size" value="6" id="6xl">
-                                            </label>
-                                            <label for="7xl">7
-                                                <input type="radio" name="size" value="7" id="7xl">
-                                            </label>
-                                            <label for="8xl">8
-                                                <input type="radio" name="size" value="8" id="8xl">
-                                            </label>
+                                            <% const sizes = ["XS", "S", "M", "L", "XL", "XXL", "3XL", "4XL", "5", "6", "7", "8"]; %>
+                                            <% sizes.forEach(sizeOption => { %>
+                                                <label for="<%= sizeOption.toLowerCase() %>" class="<%= size === sizeOption ? 'active' : '' %>">
+                                                    <%= sizeOption %>
+                                                    <input type="radio" name="size" value="<%= sizeOption %>" id="<%= sizeOption.toLowerCase() %>" 
+                                                           <%= size === sizeOption ? 'checked' : '' %>>
+                                                </label>
+                                            <% }); %>
+                                            <a href="?clearSize=true" class="clear-filter">Clear Sizes</a>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            
+                    
+                            <!-- Colors -->
                             <div class="card">
                                 <div class="card-heading">
                                     <a data-toggle="collapse" data-target="#collapseFive">Colors</a>
@@ -343,37 +387,30 @@
                                 <div id="collapseFive" class="collapse show" data-parent="#accordionExample">
                                     <div class="card-body">
                                         <div class="shop__sidebar__color">
-                                            <label class="c-1" for="sp-1">
-                                                <input type="radio" name="color" value="Black" id="sp-1">
-                                            </label>
-                                            <label class="c-2" for="sp-2">
-                                                <input type="radio" name="color" value="blue" id="sp-2">
-                                            </label>
-                                            <label class="c-3" for="sp-3">
-                                                <input type="radio" name="color" value="biege" id="sp-3">
-                                            </label>
-                                            <label class="c-4" for="sp-4">
-                                                <input type="radio" name="color" value="red" id="sp-4">
-                                            </label>
-                                            <label class="c-5" for="sp-5">
-                                                <input type="radio" name="color" value="white" id="sp-5">
-                                            </label>
-                                            <label class="c-6" for="sp-6">
-                                                <input type="radio" name="color" value="Yellow" id="sp-6">
-                                            </label>
-                                            <label class="c-7" for="sp-7">
-                                                <input type="radio" name="color" value="pink" id="sp-7">
-                                            </label>
-                                            <label class="c-8" for="sp-8">
-                                                <input type="radio" name="color" value="Red" id="sp-8">
-                                            </label>
-                                            <label class="c-9" for="sp-9">
-                                                <input type="radio" name="color" value="purple" id="sp-9">
-                                            </label>
+                                            <% const colors = [
+                                                { name: "Black", class: "c-1" },
+                                                { name: "Blue", class: "c-2" },
+                                                { name: "Beige", class: "c-3" },
+                                                { name: "Red", class: "c-4" },
+                                                { name: "White", class: "c-5" },
+                                                { name: "Yellow", class: "c-6" },
+                                                { name: "Pink", class: "c-7" },
+                                                { name: "Purple", class: "c-9" }
+                                            ]; %>
+                                            <% colors.forEach(color => { %>
+                                                <label class="<%= color.class %> <%= color.name === color ? 'active' : '' %>" for="sp-<%= color.class %>">
+                                                    <input type="radio" name="color" value="<%= color.name %>" id="sp-<%= color.class %>" 
+                                                           <%= color === color.name ? 'checked' : '' %>>
+                                                </label>
+                                            <% }); %>
                                         </div>
+                                        <a href="?clearColor=true" class="clear-filter">Clear Colors</a>
                                     </div>
                                 </div>
-                            </div>                            
+                            </div>
+                        </div>
+                        <div class="clear-all">
+                            <a href="?clearAll=true" class="btn btn-secondary">Clear All Filters</a>
                         </div>
                     </div>
                 </div>
@@ -498,7 +535,10 @@
                 
                             <!-- Page Numbers -->
                             <% for (let i = 1; i <= totalPages; i++) { %>
-                                <a class="text-secondary pl-2 <%= i === currentPage ? 'active' : '' %>" href="?page=<%= i %>&sort=<%= sort %>&search=<%= search %>&category=<%= category %>&priceRange=<%= priceRange %>"><%= i %></a>
+                                <a class="text-secondary pl-2 <%= i === currentPage ? 'active' : '' %>" 
+                                   href="?page=<%= i %>&sort=<%= sort %>&search=<%= search %>&category=<%= category %>&priceRange=<%= priceRange %>">
+                                   <%= i %>
+                                </a>
                             <% } %>
                 
                             <!-- Next Page -->
@@ -508,7 +548,6 @@
                         </div>
                     </div>
                 </div>
-                
 </section>
 
 <script>
@@ -715,6 +754,8 @@ function addToCart(productId) {
 
 
 </script>
+
+
 
 
 <%-include('../../views/partials/user/footer') %>

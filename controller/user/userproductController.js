@@ -91,6 +91,28 @@ const loadProducts = async (req, res) => {
                 break;
         }
 
+        if (req.query.clearCategory) {
+            req.query.category = true;
+        }
+        
+        if (req.query.clearPrice) {
+            req.query.priceRange = true;
+        }
+        
+        if (req.query.clearSize) {
+            req.query.size = true;
+        }
+        
+        if (req.query.clearColor) {
+            req.query.color = true;
+        }
+        
+        if (req.query.clearAll) {
+            req.query = {};
+        }
+        
+
+        
         // Combine all filters with the base query
         Object.assign(query, filters);
 
@@ -130,6 +152,7 @@ const loadProducts = async (req, res) => {
             return;
         }
 
+       
         const data = {
             products: productsWithOffers, 
             totalPages,
@@ -144,6 +167,8 @@ const loadProducts = async (req, res) => {
             color,
             user
         };
+
+       
 
         res.render("userproducts", data);
     } catch (error) {

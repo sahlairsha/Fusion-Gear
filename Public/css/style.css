@@ -1227,10 +1227,19 @@ li{
 	transition: all, 0.3s;
 }
 
-.shop__sidebar__categories ul li a:hover,
-.shop__sidebar__price ul li a:hover,
-.shop__sidebar__brand ul li a:hover {
-	color: #111111;
+.shop__sidebar__categories ul li a.active,
+.shop__sidebar__price ul li a.active,
+.shop__sidebar__brand ul li a.active {
+    color: #780000; 
+    font-weight: bold;
+    pointer-events: none; 
+}
+
+/* Hover effect applies only to non-active links */
+.shop__sidebar__categories ul li a:not(.active):hover,
+.shop__sidebar__price ul li a:not(.active):hover,
+.shop__sidebar__brand ul li a:not(.active):hover {
+    color: #111111; /* Hover color */
 }
 
 .shop__sidebar__brand ul {

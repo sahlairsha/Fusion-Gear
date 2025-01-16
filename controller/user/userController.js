@@ -25,12 +25,12 @@ const loadHomePage = async (req, res) => {
     try{
     const productData = await Product.find().populate('category')
     if (!req.session.user) {
-        console.log("No user in session");
+        
         res.render('home', { user: null, products: productData });
     } else {
-        console.log("Session user:", req.session.user);
+        
         const userData = await User.findById(req.session.user);
-        console.log("Fetched user:", userData);
+        
         res.render('home', { user: userData, products: productData });
     }
 }catch(error){
@@ -104,23 +104,23 @@ const handleReferral = async (newUser, referralCode) => {
 
         if (referrer) {
             // Reward the referrer
-            referrer.wallet += 10;  // Add 10 to referrer's wallet
-            referrer.redeemedUser.push(newUser._id);  // Store the new user ID in referrer
+            referrer.wallet += 100;  
+            referrer.redeemedUser.push(newUser._id);  
             referrer.transactions.push({
                 type: 'referral_bonus',
-                amount: 10,
+                amount: 100,
                 description: `Referral bonus for inviting ${newUser.username}`,
                 date: new Date(),
             });
 
-            // Save the referrer after updating the wallet and transactions
+            
             await referrer.save();
 
             // Optionally reward the referred user (new user)
-            newUser.wallet += 5;  // Add 5 to the new user's wallet
+            newUser.wallet += 50;
             newUser.transactions.push({
                 type: 'referral_bonus',
-                amount: 5,
+                amount: 50,
                 description: `Referral bonus from ${referrer.username}`,
                 date: new Date(),
             });
@@ -184,7 +184,7 @@ const signup = async (req, res) => {
         // Store OTP and user data in the session
         req.session.userOtp = { otp, expires: Date.now() + 10 * 60 * 1000 }; // OTP expires in 10 minutes
         req.session.userData = { full_name, username, phone, email, password, profile_pic: avatarUrl };
-        console.log("Session User Data :", req.session.userData)
+       
         res.render("verification-otp");
     } catch (error) {
         console.error("Signup error:", error);
@@ -245,7 +245,7 @@ const verifyOtp = async (req, res) => {
         req.session.userOtp = null;
         req.session.user = newUser._id;
 
-        console.log("user Id :",req.session.user)
+        
 
         res.json({ success: true, redirectUrl: '/' });
     } catch (error) {
