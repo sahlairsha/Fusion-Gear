@@ -209,7 +209,7 @@
 }
 
 .product-badge.out-of-stock {
-    background-color: #6c757d; /* Grey for Out of Stock */
+    background-color: #6c757d; 
 }
 
 .product-empty{
@@ -456,19 +456,17 @@
                                         <img src="/uploads/public-image/<%= product.productImage[0] %>" alt="<%= product.productName %>">
                 
                                         <% if (product.variants.length > 0) { %>
-                                          
-                                                <!-- Stock Left Warning (Only for variants with stock < 5) -->
-                                                <% if (product.variants[0].stock > 0 && product.variants[0].stock < 5) { %>
-                                                    <p class="stock-left">Only <%=product.variants[0].stock %> left, Please hurry up!!!</p>
-                                                <% } %>
-                                                <!-- Stock Status Badge (Based on variant stock) -->
-                                                <div class="product-badge <%=product.variants[0].status ? product.variants[0].status.toLowerCase().replace(/ /g, '-') : 'available' %>">
-                                                    <%= product.variants[0].status || 'In Stock' %>
-                                                </div>
-                                        
+                                            <% if (product.variants[0].stock > 0 && product.variants[0].stock < 5) { %>
+                                                <p class="stock-left">Only <%= product.variants[0].stock %> left, Please hurry up!!!</p>
+                                            <% } %>
+                                            <!-- Stock Status Badge -->
+                                            <div class="product-badge <%= product.variants[0].status.toLowerCase().replace(/ /g, '-') %>">
+                                                <%= product.variants[0].status %>
+                                            </div>
                                         <% } else { %>
                                             <p class="text-muted">No variants available</p>
                                         <% } %>
+                                        
                 
                                         <div class="product-overlay">
                                             <a href="/product/view?id=<%= product._id %>" class="overlay-icon">View Product</a>
@@ -491,8 +489,8 @@
                                                     <!-- Strike-through for sale price if offer is applied -->
                                                     <% if (product.variants[0].salePrice > product.variants[0].offerPrice) { %>
                                                         <div class="product-price-container">
-                                                            <span class="sale-price"><s>&#8377;<%= product.variants[0].salePrice %></s></span>
-                                                            <span class="offer-price">&#8377;<%= product.variants[0].offerPrice %></span>
+                                                            <span class="sale-price"><span>&#8377;<%= product.variants[0].salePrice %></span></span>
+                                                            <span class="offer-price"><span>&#8377;<%= product.variants[0].offerPrice %></span></span>
                                                         </div>      
                                                     <% } else { %>
                                                         <span class="offer-price">&#8377;<%= product.variants[0].salePrice %></span>

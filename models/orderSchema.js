@@ -32,21 +32,21 @@ const orderSchema = new mongoose.Schema({
     },
     payment_method: {
         type: String,
-        enum: ['UPI', 'Net Banking', 'COD','Razorpay'],
+        enum: ['UPI', 'Net Banking', 'COD','Razorpay','Wallet'],
         required: true
     },
     payment_status: {
 
         type: String,
-        enum: ['Pending', 'Completed', 'Failed'],
+        enum: ['Pending', 'Completed', 'Failed','Refunded'],
         default: 'Pending'
 
     },
     order_status: {
 
         type: String,
-        enum: ['Pending', 'Shipped', 'Delivered', 'Canceled','Return'],
-        default: 'Pending'
+        enum: ['Dispatch', 'Shipped', 'Delivered', 'Canceled','Return'],
+        default: 'Dispatch'
 
     },
     shippingAddress: {

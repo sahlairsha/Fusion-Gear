@@ -76,37 +76,20 @@ const productSchema = new Schema({
     ],
 }, { timestamps: true });
 
+
+
 productSchema.pre('save', function (next) {
-    // Loop through all variants to update status based on stock
     this.variants.forEach(variant => {
-        if (variant.stock === 0) {
-            variant.status = "Out of Stock";
-        } else if (variant.stock < 0) {
-            variant.status = "Unavailable";
-        } else {
+        if (variant.stock > 0) {
             variant.status = "Available";
+        } else if (variant.stock === 0) {
+            variant.status = "Out of Stock";
+        } else {
+            variant.status = "Unavailable";
         }
     });
     next();
 });
-
-productSchema.post('findOneAndUpdate', async function (doc) {
-    if (doc) {
-        // Loop through all variants to update their status
-        doc.variants.forEach(async (variant) => {
-            if (variant.stock === 0) {
-                variant.status = "Out of Stock";
-            } else if (variant.stock < 0) {
-                variant.status = "Unavailable";
-            } else {
-                variant.status = "Available";
-            }
-        });
-        
-        await doc.save();
-    }
-});
-
 
 
 

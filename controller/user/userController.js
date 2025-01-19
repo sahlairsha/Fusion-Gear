@@ -458,32 +458,7 @@ const getWallet = async (req, res) => {
     }
 };
 
-const addMoney = async (amount, userId) => {
-    try {
-        // Ensure userId is provided and valid
-        if (!userId) throw new Error('User ID is required');
 
-        // Fetch the user from the database
-        const user = await User.findById(userId);
-        
-        // Check if the user exists
-        if (!user) throw new Error('User not found.');
-
-        // Add the money to the wallet
-        user.wallet += amount;
-
-        // Create a transaction record
-        user.transactions.push({ type: 'Credit', amount });
-
-        // Save the user with updated wallet and transactions
-        await user.save();
-
-        return user;  // Return the updated user object
-    } catch (error) {
-        console.error('Error adding money:', error);
-        throw error;  // Re-throw error for handling in the calling function
-    }
-}
 
 const addWallet = async (req, res) => {
     const { amount } = req.body;
@@ -530,4 +505,5 @@ module.exports = {
     resetPassword,
     getWallet ,
     addWallet,
+   
 }

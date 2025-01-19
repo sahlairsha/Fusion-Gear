@@ -13,6 +13,7 @@ const userprofileController = require('../controller/user/userprofileController'
 const userCartController = require('../controller/user/userCartController');
 const userOrderController = require("../controller/user/userOrderController");
 const wishlistController = require("../controller/user/wishlistController");
+const walletController = require('../controller/user/walletController')
 
 
 const userAuth = require('../middleware/auth')
@@ -126,10 +127,10 @@ router.get('/reset-password', (req, res) => {
 router.post('/reset-password', userController.resetPassword);
 
 
-router.get('/wallet', userAuth,userController.getWallet);
-router.post('/wallet/add',userAuth,userController.addWallet);
-
-
+router.get('/wallet', userAuth,walletController.getWallet);
+router.post('/wallet/add',userAuth,walletController.addWallet);
+router.post('/wallet/create-order',userAuth,walletController.createOrder)
+router.post('/wallet/verify-payment',userAuth,walletController.verifyPayment)
 
 //Product details and lists
 router.get("/products",userAuth,userproductController.loadProducts)
@@ -183,6 +184,8 @@ router.get('/orders/cancel/confirm',userAuth,userOrderController.getCancelConfir
 router.post('/orders/cancel/:id',userAuth,userOrderController.cancelOrder)
 router.get('/checkout/apply-coupon', userAuth,userOrderController.applyCoupon);
 router.post('/remove-coupon', userAuth,userOrderController.removeCoupon);
+
+router.get('/generate-invoice/:orderId',userAuth,userOrderController.generateInvoice);
 
 //Razorpay integration
 router.post('/create-razorpay-order',userAuth,userOrderController.createRazorpay)

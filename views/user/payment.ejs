@@ -106,12 +106,22 @@
         font-size: 14px;
         margin-top: 10px;
     }
+    .wallet-balance{
+        font-size: 12px;
+        color: green;
+    }
 </style>
 
 <div class="payment-container">
     <h2>Choose Payment Method</h2>
     <form id="payment-form">
         <div class="payment-methods">
+            <div class="payment-option" onclick="selectPaymentOption('wallet')">
+                <input type="radio" id="wallet" name="payment_method" value="Wallet">
+                <label for="wallet">Wallet Payment</label>
+                <p class="wallet-balance">Wallet Balance : ₹<%= user.wallet  %> </p> 
+            </div>
+            
             <div class="payment-option" onclick="selectPaymentOption('razorpay')">
                 <input type="radio" id="razorpay" name="payment_method" value="Razorpay">
                 <label for="razorpay">Razorpay (Card, UPI, Net Banking)</label>
@@ -152,47 +162,45 @@
         proceedButton.textContent = 'Processing...';
         proceedButton.disabled = true;
 
-        if (paymentMethod.value === 'Razorpay') {
-            // Initiate Razorpay payment
-            try {
-                const orderResponse = await fetch('/create-razorpay-order', {
+        try {
+            let response, result;
+
+            if (paymentMethod.value === 'Razorpay') {
+                // Initiate Razorpay payment
+                response = await fetch('/create-razorpay-order', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                 });
+                result = await response.json();
 
-                const orderData = await orderResponse.json();
-                if (!orderResponse.ok) throw new Error(orderData.message);
-
-                console.log("order data for razor pay:",orderData)
+                if (!response.ok) throw new Error(result.message);
 
                 const options = {
-                    key: 'rzp_test_slK6OGJAoLPk9J',
-                    amount: orderData.amount,
+                    key: 'rzp_test_slK6OGJAoLPk9J', // Replace with your Razorpay test/live key
+                    amount: result.amount,
                     currency: 'INR',
-                    order_id: orderData.id,
+                    order_id: result.razorpayOrderId,
                     name: 'Fusion Gear',
                     description: 'Order Payment',
-                    image: '/path/to/logo.png',
-                    handler: async function (response) {
+                    image: '/path/to/logo.png', // Replace with your logo URL
+                    handler: async function (razorpayResponse) {
+                        // Verify payment on server
                         const verificationResponse = await fetch('/verify-payment', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
                             },
-                            body: JSON.stringify({
-                                razorpay_payment_id: response.razorpay_payment_id,
-                                razorpay_order_id: response.razorpay_order_id,
-                                razorpay_signature: response.razorpay_signature,
-                            }),
+                            body: JSON.stringify(razorpayResponse),
                         });
 
                         const verificationResult = await verificationResponse.json();
+
                         if (verificationResult.success) {
                             Swal.fire({
                                 title: 'Payment Successful!',
-                                text: 'Your payment was successful.',
+                                text: 'Your payment was successfully verified.',
                                 icon: 'success',
                                 timer: 3000,
                                 timerProgressBar: true,
@@ -205,9 +213,9 @@
                         }
                     },
                     prefill: {
-                        name: 'User Name',
-                        email: 'user@example.com',
-                        contact: '1234567890',
+                        name: 'User Name', // Replace with dynamic user name
+                        email: 'user@example.com', // Replace with dynamic user email
+                        contact: '1234567890', // Replace with dynamic user contact
                     },
                     theme: {
                         color: '#3399cc',
@@ -216,30 +224,22 @@
 
                 const razorpay = new Razorpay(options);
                 razorpay.open();
-            } catch (error) {
-                errorMessage.textContent = error.message || 'Failed to initiate Razorpay payment.';
-            } finally {
-                proceedButton.textContent = 'Proceed';
-                proceedButton.disabled = false;
-            }
-        } else {
-            // Handle other payment methods (COD, UPI, Net Banking)
-            try {
-                const response = await fetch('/confirm-order', {
+            } else {
+                // Handle other payment methods like COD or Wallet
+                response = await fetch('/confirm-order', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({
-                        payment_method: paymentMethod.value,
-                    }),
+                    body: JSON.stringify({ payment_method: paymentMethod.value }),
                 });
 
-                const result = await response.json();
-                if (response.ok) {
+                result = await response.json();
+
+                if (response.ok && result.success) {
                     Swal.fire({
                         title: 'Order Confirmed!',
-                        text: 'You have selected ' + paymentMethod.value + ' as your payment method.',
+                        text: result.message || 'Your order has been placed successfully.',
                         icon: 'success',
                         timer: 3000,
                         timerProgressBar: true,
@@ -248,15 +248,23 @@
                         window.location.href = '/order-confirm';
                     });
                 } else {
-                    errorMessage.textContent = result.message || 'Failed to confirm the order.';
+                    throw new Error(result.message || 'Failed to confirm the order.');
                 }
-            } catch (error) {
-                errorMessage.textContent = 'An error occurred while confirming the order. Please try again.';
-            } finally {
-                proceedButton.textContent = 'Proceed';
-                proceedButton.disabled = false;
             }
+        } catch (error) {
+            Swal.fire({
+                title: 'Error',
+                text:   error.message || 'An error occurred while processing your payment. Please try again.',
+                icon: 'error',
+                confirmButtonText: 'OK',
+            });
+        } finally {
+            proceedButton.textContent = 'Proceed';
+            proceedButton.disabled = false;
         }
     });
 </script>
+
+
+
 <%- include('../../views/partials/user/footer') %>
