@@ -4,8 +4,25 @@ const Category = require('../../models/categorySchema');
 
 const getCouponPage = async (req, res) => {
     try {
-        const coupons = await Coupon.find(); // Fetch all coupons without population of product/category
-        res.render('coupon', { coupons });
+        let page = parseInt(req.query.page, 10) || 1;
+        const limit = 4;
+
+        // Fetch coupons for the current page
+        const coupons = await Coupon.find({})
+            .limit(limit)
+            .skip((page - 1) * limit)
+            .exec();
+
+        // Get the total count of coupons in the database
+        const count = await Coupon.countDocuments(); // Await the count
+
+        // Render the page with the coupons and pagination data
+        res.render('coupon', { 
+            coupons,
+            totalPages: Math.ceil(count / limit),
+            currentPage: page,                  
+        });
+        
     } catch (error) {
         res.status(500).json({ message: 'Error fetching coupons' });
     }

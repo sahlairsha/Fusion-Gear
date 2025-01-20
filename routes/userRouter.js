@@ -186,6 +186,9 @@ router.get('/checkout/apply-coupon', userAuth,userOrderController.applyCoupon);
 router.post('/remove-coupon', userAuth,userOrderController.removeCoupon);
 
 router.get('/generate-invoice/:orderId',userAuth,userOrderController.generateInvoice);
+router.post('/retry-payment',userAuth,userOrderController.retryPayment);
+router.post('/retry-payment-verify',userAuth,userOrderController.RetryPaymentVerification)
+
 
 //Razorpay integration
 router.post('/create-razorpay-order',userAuth,userOrderController.createRazorpay)

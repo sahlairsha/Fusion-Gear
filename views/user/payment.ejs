@@ -181,7 +181,7 @@
                     key: 'rzp_test_slK6OGJAoLPk9J', // Replace with your Razorpay test/live key
                     amount: result.amount,
                     currency: 'INR',
-                    order_id: result.razorpayOrderId,
+                    order_id: result.id,
                     name: 'Fusion Gear',
                     description: 'Order Payment',
                     image: '/path/to/logo.png', // Replace with your logo URL
@@ -209,13 +209,21 @@
                                 window.location.href = '/order-confirm';
                             });
                         } else {
-                            throw new Error(verificationResult.message || 'Payment verification failed.');
+                            // Payment pending or failed
+                            Swal.fire({
+                                title: 'Payment Pending!',
+                                text: 'Your payment is still pending. Please retry.',
+                                icon: 'warning',
+                                confirmButtonText: 'OK',
+                            }).then(() => {
+                                window.location.href = '/order-confirm?paymentStatus=pending';
+                            });
                         }
                     },
                     prefill: {
-                        name: 'User Name', // Replace with dynamic user name
-                        email: 'user@example.com', // Replace with dynamic user email
-                        contact: '1234567890', // Replace with dynamic user contact
+                        name: 'User Name', 
+                        email: 'user@example.com', 
+                        contact: '1234567890',
                     },
                     theme: {
                         color: '#3399cc',
@@ -254,7 +262,7 @@
         } catch (error) {
             Swal.fire({
                 title: 'Error',
-                text:   error.message || 'An error occurred while processing your payment. Please try again.',
+                text: error.message || 'An error occurred while processing your payment. Please try again.',
                 icon: 'error',
                 confirmButtonText: 'OK',
             });

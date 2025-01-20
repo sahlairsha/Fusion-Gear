@@ -58,6 +58,7 @@
     align-items: flex-start;
     gap: 10px;
     width: 100%;
+    flex-wrap: wrap;
 }
 
 .product-info {
@@ -120,6 +121,10 @@
 
 .status-icon.dispatch{
     background-color: #FFC107;
+  
+}
+.status-icon.pending{
+    background-color: #007bff;
   
 }
 .status-icon.shipped{
@@ -294,8 +299,8 @@
     </div>
 
     <% orders.forEach(order => { %>
-        <div class="order-card" data-order-id="<%= order._id %>">
-            
+        <div class="order-card" data-order-id="<%= order._id %>">   
+          
             <% order.products.forEach(product => { %>
                 <div class="order-content">
                     <div class="product-info">
@@ -304,7 +309,6 @@
                         <div class="product-details">
                             <h6><%= product.product_id.productName %></h6>
                             
-                            <!-- Display variant details -->
                             <% if (product.variantDetails) { %>
                                 <p>Color: <%= product.variantDetails.color %></p>
                                 <p>Size: <%= product.variantDetails.size %></p>
@@ -315,7 +319,7 @@
                             <% } %>
                         </div>
                     </div>
-    
+
                     <div class="order-status">
                         <p>
                             <span class="status-icon <%= order.order_status.toLowerCase().replace(' ', '-') %>"></span>
@@ -326,17 +330,20 @@
                             <p>Delivered On: <%= new Date(order.delivery_date).toLocaleDateString() %></p>
                         <% } %>
                         <h5 class="mt-2 ml-2">Total Price: ₹<%= order.total_price %></h5>
+
                         <% if (order.order_status === 'Delivered' && order.return_status === 'Pending') { %>
-                           <a href="/order/return-form/<%= order._id  %>"><button class="btn btn-success return-btn mt-4">Return</button></a> 
+                            <a href="/order/return-form/<%= order._id  %>"><button class="btn btn-success return-btn mt-4">Return</button></a> 
                         <% } %>
                     </div>
-            <% }); %>
+                <% }); %>
+
+            <!-- In the order page -->
+
                 </div>
 
-
-    
             <!-- Order summary -->
             <div class="order-summary">
+                
                 <% if (order.order_status === 'Delivered') { %>
                     <% order.products.forEach(product => { %>
                         <a href="/ratings/?id=<%= product.product_id._id %>" class="rate-btn mb-5">
@@ -345,12 +352,31 @@
                     <% }); %>
                 <% } %>
             </div>
+            
+            <!-- Handle Payment Pending -->
+            <% if (order.payment_status === 'Pending') { %>
+                <div class="payment-pending">
+                    <p>Your payment is still pending. Please retry the payment.</p>
+                    <button class="btn btn-primary" onclick="retryPayment('<%= order.razorpay_order_id %>')">Retry Payment</button>
+                </div>
+            <% } else if (order.payment_status === 'Completed') { %>
+                <div class="payment-completed">
+                    <p class="text-success">Your payment has been completed successfully.</p>
+                </div>
+            <% } %>
+            
         </div>
     <% }); %>
-    
-    
+
+        
     <a href="/products" class="btn go-to-shop-btn">Continue Shopping</a>
 </div>
+
+
+</div>
+</div>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script>
     // Open return form modal
     function openReturnForm(orderId) {
@@ -417,6 +443,99 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         });
     });
+
+</script>
+<script>
+function retryPayment(orderId) {
+    console.log("Retrying payment for orderId:", orderId);
+    if (!orderId) {
+        console.error("Invalid order ID");
+        return;
+    }
+
+    fetch('/retry-payment', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ orderId })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const options = {
+                key: data.keyId,
+                amount: data.amount * 100, // Convert to paise for Razorpay
+                currency: 'INR',
+                name: 'Fusion Gear',
+                description: 'Order Payment',
+                order_id: data.razorpay_order_id, // Razorpay order ID
+                handler: function (response) {
+                    console.log("Payment response received:", response);
+                    fetch('/retry-payment-verify', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            razorpay_payment_id: response.razorpay_payment_id,
+                            razorpay_order_id: response.razorpay_order_id,
+                            razorpay_signature: response.razorpay_signature,
+                        })
+                    })
+                    .then(res => res.json())
+                    .then(result => {
+                        if (result.success) {
+                            Swal.fire({
+                                title: 'Payment Successful!',
+                                text: 'Your order has been paid successfully.',
+                                icon: 'success',
+                            }).then(() => {
+                                window.location.reload(); // Reload to show updated order status
+                            });
+                        } else {
+                            Swal.fire({
+                                title: 'Payment Verification Failed!',
+                                text: 'The payment could not be verified. Please try again later.',
+                                icon: 'error',
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error verifying payment:', error);
+                        Swal.fire({
+                            title: 'Payment Verification Error!',
+                            text: 'Error verifying payment, please try again later.',
+                            icon: 'error',
+                        });
+                    });
+                },
+                prefill: {
+                    name: 'User Name',
+                    email: 'user@example.com',
+                    contact: '1234567890',
+                },
+            };
+
+            const rzp1 = new Razorpay(options);
+            rzp1.open();
+        } else {
+            Swal.fire({
+                title: 'Payment Failed',
+                text: data.message || 'Failed to retry payment. Please try again later.',
+                icon: 'error',
+            });
+        }
+    })
+    .catch(error => {
+        console.error('Error retrying payment:', error);
+        Swal.fire({
+            title: 'Payment Failed',
+            text: 'Failed to retry payment. Please try again later.',
+            icon: 'error',
+        });
+    });
+}
 
 </script>
 
