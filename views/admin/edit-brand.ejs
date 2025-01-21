@@ -1,0 +1,126 @@
+<%- include('../../views/partials/admin/header') %>
+
+<div class="container mt-5 w-50">
+  <h2 class="mb-4">Edit Brand</h2>
+
+  <% if (flash.error) { %>
+  <script>
+    Swal.fire({
+      icon: 'error',
+      title: 'Oops...',
+      text: '<%= flash.error %>',
+      confirmButtonColor: '#dc3545',
+    });
+  </script>
+  <% } %> 
+
+  <% if (flash.success) { %>
+  <script>
+    Swal.fire({
+      icon: 'success',
+      title: 'Success!',
+      text: '<%= flash.success %>',
+      confirmButtonColor: '#28a745',
+    });
+  </script>
+  <% } %>
+
+  <form
+  id="editBrandForm"
+  action="/admin/editbrand/<%= brand._id %>"
+  method="POST"
+  enctype="multipart/form-data"
+>
+  <div class="mb-3">
+    <label for="brand_name" class="form-label">Brand Name</label>
+    <input
+      type="text"
+      class="form-control"
+      id="brand_name"
+      name="brand_name"
+      value="<%= brand.brand_name %>"
+      required
+    />
+    <div id="brandNameError" class="text-danger mt-1"></div>
+  </div>
+
+  <div class="mb-3">
+    <label for="description" class="form-label">Description</label>
+    <textarea
+      class="form-control"
+      id="description"
+      name="description"
+      rows="3"
+      required
+    ><%= brand.description %></textarea>
+    <div id="descriptionError" class="text-danger mt-1"></div>
+  </div>
+
+  <div class="mb-3">
+    <label for="logo" class="form-label">Update Logo (Optional)</label>
+    <input
+      type="file"
+      class="form-control"
+      id="logo"
+      name="logo"
+      accept="image/*"
+    />
+    <div id="logoError" class="text-danger mt-1"></div>
+  </div>
+
+  <div class="mb-3">
+    <p>Current Logo:</p>
+    <% if (brand.logo) { %>
+    <img
+      src="<%= brand.logo %>"
+      alt="Brand Logo"
+      class="img-thumbnail"
+      style="max-height: 150px;"
+    />
+    <% } else { %>
+    <p>No logo uploaded.</p>
+    <% } %>
+  </div>
+
+  <button type="submit" class="btn btn-primary">Update Brand</button>
+</form>
+</div>
+
+<script>
+  // Form validation
+  const form = document.getElementById('editBrandForm');
+  const brandNameField = document.getElementById('brand_name');
+  const descriptionField = document.getElementById('description');
+  const logoField = document.getElementById('logo');
+
+  const brandNameError = document.getElementById('brandNameError');
+  const descriptionError = document.getElementById('descriptionError');
+
+  function validateForm(event) {
+    let isValid = true;
+
+    // Reset error messages
+    brandNameError.textContent = '';
+    descriptionError.textContent = '';
+
+    // Validate brand name
+    if (brandNameField.value.trim() === '') {
+      brandNameError.textContent = 'Please enter the brand name.';
+      isValid = false;
+    }
+
+    // Validate description
+    if (descriptionField.value.trim() === '') {
+      descriptionError.textContent = 'Please enter a description.';
+      isValid = false;
+    }
+
+    if (!isValid) {
+      event.preventDefault(); // Prevent form submission if validation fails
+    }
+  }
+
+  form.addEventListener('submit', validateForm);
+</script>
+
+<%- include('../../views/partials/admin/footer') %>

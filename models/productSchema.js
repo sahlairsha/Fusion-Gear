@@ -7,6 +7,11 @@ const productSchema = new Schema({
         type: String,
         required: true,
     },
+    brands:{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Brand',
+        required : true
+    },
     description: {
         type: String,
         required: true,

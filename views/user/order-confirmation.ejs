@@ -298,26 +298,26 @@
         <button class="search-button">Search Orders</button>
     </div>
 
-    <% orders.forEach(order => { %>
-        <div class="order-card" data-order-id="<%= order._id %>">   
-          
-            <% order.products.forEach(product => { %>
-                <div class="order-content">
-                    <div class="product-info">
-                        <img class="product-image" src="/uploads/public-image/<%= product.product_id.productImage[0] %>" 
-                             alt="<%= product.product_id.productName %>">
-                        <div class="product-details">
-                            <h6><%= product.product_id.productName %></h6>
-                            
-                            <% if (product.variantDetails) { %>
-                                <p>Color: <%= product.variantDetails.color %></p>
-                                <p>Size: <%= product.variantDetails.size %></p>
-                                <p>Quantity: <%= product.quantity %></p>
-                                <h6>Price: ₹<%= product.variantDetails.salePrice || product.variantDetails.regularPrice %></h6>
-                            <% } else { %>
-                                <p>No variant details available</p>
-                            <% } %>
-                        </div>
+  <% orders.forEach(order => { %>
+    <div class="order-card">
+        <% order.products.forEach(product => { %>
+            <div class="order-content">
+                <div class="product-info">
+                    <!-- Ensure the correct path is used -->
+                    <img class="product-image" 
+                         src="/uploads/public-image/<%= product.product_id.productImage[0] %>" 
+                         alt="<%= product.product_id.productName %>">
+                    <div class="product-details">
+                        <h6><%= product.product_id.productName %></h6>
+                        <% if (product.variantDetails) { %>
+                            <p>Color: <%= product.variantDetails.color %></p>
+                            <p>Size: <%= product.variantDetails.size %></p>
+                            <p>Quantity: <%= product.quantity %></p>
+                            <h6>Price: ₹<%= product.variantDetails.salePrice || product.variantDetails.regularPrice %></h6>
+                        <% } else { %>
+                            <p>No variant details available</p>
+                        <% } %>
+                    </div>
                     </div>
 
                     <div class="order-status">

@@ -10,10 +10,19 @@ const productController = require('../controller/admin/productController');
 const orderController = require('../controller/admin/orderController')
 const stockController = require('../controller/admin/stockController')
 const couponController = require('../controller/admin/couponController')
+const brandController = require('../controller/admin/brandController')
+const chartController = require('../controller/admin/chartController')
+
 
 
 const multer = require('multer');
 const { storage, editedStorage } = require("../helper/multer");
+
+const logoUpload = require('../helper/logoUpload');
+
+const{logoStorage} = logoUpload
+const upload = multer({ storage: logoStorage });
+
 
 const uploads = multer({ storage });
 const editUploads = multer({ storage: editedStorage }); 
@@ -90,6 +99,23 @@ router.get('/admin/coupons',adminAuth, couponController.getCouponPage)
 router.get('/admin/add-coupon',adminAuth,couponController.getAddCouponPage)
 router.post('/admin/add-coupon',adminAuth, couponController.addCoupon)
 router.delete('/admin/delete-coupon/:couponId', couponController.deleteCoupon);
+
+//Brand Management
+
+router.get('/admin/brands',adminAuth,brandController.getAllBrands)
+router.get('/admin/addbrand',adminAuth,brandController.getAddBrand)
+router.post('/admin/addbrand',adminAuth,logoUpload.single('logo'),brandController.addBrands)
+router.get('/admin/editbrand/:id', adminAuth, brandController.getEditBrand);
+router.post('/admin/editbrand/:id', adminAuth, upload.single('logo'), brandController.editBrand);
+
+router.delete('/admin/brands/delete/:id',adminAuth, brandController.deleteBrand);
+
+
+
+//charts
+router.get('/top-products', adminAuth, chartController.topProducts);
+router.get('/top-categories', adminAuth, chartController.topCategories);
+router.get('/top-brands', adminAuth, chartController.topBrands);
 
 
 

@@ -1,23 +1,23 @@
 <%- include('../../views/partials/admin/header') %>
 
 <style>
-    .dashboard-head{
-        text-align: center;
-        background-color: #f0f0f0;
-        padding: 20px;
-        margin-bottom: 40px;
-
+    .container {
+        display: flex;
+        justify-content: space-between;
+        gap: 30px;
+        margin-top: 30px;
     }
+
+    /* Left Side - Sales Report */
     .sale-container {
-        max-width: 800px;
-        margin: auto;
+        width: 48%;
         background: white;
         padding: 20px;
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        position: relative;
+        border-radius: 10px;
     }
 
-    h1 {
+    .sale-container h1 {
         text-align: center;
         margin-bottom: 20px;
     }
@@ -39,7 +39,8 @@
         font-size: 14px;
     }
 
-    input, select {
+    input,
+    select {
         width: 100%;
         padding: 6px;
         border: 1px solid #ccc;
@@ -55,9 +56,8 @@
         border-radius: 4px;
         font-size: 14px;
         cursor: pointer;
-        position: absolute;
-        top: 20px;
-        right: 20px;
+        position: relative;
+        transition: background-color 0.3s ease;
     }
 
     button#generate-button:hover {
@@ -70,11 +70,14 @@
         margin-top: 20px;
     }
 
-    table, th, td {
+    table,
+    th,
+    td {
         border: 1px solid #ddd;
     }
 
-    th, td {
+    th,
+    td {
         padding: 10px;
         text-align: center;
     }
@@ -88,7 +91,8 @@
         margin-top: 20px;
     }
 
-    #download-pdf, #download-excel {
+    #download-pdf,
+    #download-excel {
         background-color: #007bff;
         color: white;
         border: none;
@@ -97,19 +101,65 @@
         margin: 5px;
     }
 
-    #download-pdf:hover, #download-excel:hover {
+    #download-pdf:hover,
+    #download-excel:hover {
+        background-color: #0056b3;
+    }
+
+    /* Right Side - Charts */
+    .charts-container {
+        width: 48%;
+        background: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .charts-container h2 {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .charts-container canvas {
+        width: 100%;
+        height: 250px; /* Set a fixed height to make charts smaller */
+        margin: 20px 0;
+    }
+
+    .filters {
+        margin-bottom: 20px;
+    }
+
+    .filters select,
+    .filters input {
+        width: 100%;
+        padding: 6px;
+        margin: 5px 0;
+    }
+
+    .filters button {
+        background-color: #007bff;
+        color: white;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        width: 100%;
+        margin-top: 10px;
+    }
+
+    .filters button:hover {
         background-color: #0056b3;
     }
 </style>
 
 <div class="container py-5">
-    <h4 class="dashboard-head" >Welcome to Dashboard</h4>
+    <!-- Left Side - Sales Report -->
     <div class="sale-container">
         <h1>Sales Report</h1>
-
         <!-- Sales Report Filters Form -->
         <form id="report-form">
-            <button id="generate-button" type="submit">Generate Report</button>
+            <button id="generate-button" class="d-flex mb-2 ms-auto" type="submit">Generate Report</button>
             <div class="form-row">
                 <div class="form-group">
                     <label for="start-date">Start Date:</label>
@@ -154,6 +204,156 @@
             <button id="download-excel">Download Excel</button>
         </div>
     </div>
+
+    <!-- Right Side - Charts -->
+    <div class="charts-container">
+        <h2>Top Performers</h2>
+
+        <!-- Filters Section -->
+        <div class="filters">
+            <label for="timeRange">Select Time Range:</label>
+            <select id="timeRange" class="filter-select">
+                <option value="day">Today</option>
+                <option value="week">This Week</option>
+                <option value="month">This Month</option>
+                <option value="year">This Year</option>
+                <option value="custom">Custom</option>
+            </select>
+
+            <!-- Custom Date Range Inputs (Initially Hidden) -->
+            <div id="custom-date-range" class="custom-date-range" style="display: none;">
+                <label for="startDate">Start Date:</label>
+                <input type="date" id="startDate" />
+                <label for="endDate">End Date:</label>
+                <input type="date" id="endDate" />
+            </div>
+            <button id="applyFilters" class="apply-filters-btn">Apply Filters</button>
+        </div>
+
+        <!-- Charts -->
+        <div>
+            <h3>Top 10 Best-Selling Products</h3>
+            <canvas id="top-products-chart"></canvas>
+        </div>
+        <div>
+            <h3>Top 10 Best-Selling Categories</h3>
+            <canvas id="top-categories-chart"></canvas>
+        </div>
+        <div>
+            <h3>Top 10 Best-Selling Brands</h3>
+            <canvas id="top-brands-chart"></canvas>
+        </div>
+    </div>
+</div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+    const timeRangeSelect = document.getElementById("timeRange");
+    const customDateRange = document.getElementById("custom-date-range");
+    const startDateInput = document.getElementById("startDate");
+    const endDateInput = document.getElementById("endDate");
+    const applyFiltersButton = document.getElementById("applyFilters");
+
+    // Toggle custom date range inputs based on selection
+    timeRangeSelect.addEventListener("change", (e) => {
+        if (e.target.value === "custom") {
+            customDateRange.style.display = "block";
+        } else {
+            customDateRange.style.display = "none";
+        }
+    });
+
+    // Fetch data and update charts on filter application
+    applyFiltersButton.addEventListener("click", async () => {
+        const timeRange = timeRangeSelect.value;
+        const startDate = startDateInput.value;
+        const endDate = endDateInput.value;
+
+        // Validate custom date range if selected
+        if (timeRange === "custom" && (!startDate || !endDate)) {
+            alert("Please select both start and end dates.");
+            return;
+        }
+
+        try {
+            // Fetch data for each chart
+            const topProducts = await fetchChartData("/top-products", timeRange, startDate, endDate);
+            const topCategories = await fetchChartData("/top-categories", timeRange, startDate, endDate);
+            const topBrands = await fetchChartData("/top-brands", timeRange, startDate, endDate);
+
+            // Update charts
+            updateChart("top-products-chart", topProducts, "Best-Selling Products");
+            updateChart("top-categories-chart", topCategories, "Best-Selling Categories");
+            updateChart("top-brands-chart", topBrands, "Best-Selling Brands");
+        } catch (error) {
+            console.error("Error fetching or updating charts:", error);
+        }
+    });
+});
+
+// Helper function to fetch chart data
+async function fetchChartData(endpoint, timeRange, startDate, endDate) {
+    const params = new URLSearchParams({ timeRange });
+    if (timeRange === "custom") {
+        params.append("startDate", startDate);
+        params.append("endDate", endDate);
+    }
+
+    const response = await fetch(`${endpoint}?${params.toString()}`);
+    if (!response.ok) throw new Error(`Error fetching data from ${endpoint}`);
+    return response.json();
+}
+
+// Helper function to update a chart
+function updateChart(canvasId, data, label) {
+    const ctx = document.getElementById(canvasId).getContext("2d");
+
+    const chart = new Chart(ctx, {
+        type: "bar",
+        data: {
+            labels: data.map((item) => item.name || "Unknown"),
+            datasets: [
+                {
+                    label,
+                    data: data.map((item) => item.totalSales), 
+                    borderColor: "rgba(75, 192, 192, 1)",
+                    backgroundColor: "rgba(75, 192, 192, 0.2)",
+                    fill: true,
+                    tension: 0.4, 
+                },
+            ],
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: true },
+            },
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: "Name",
+                    },
+                },
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: "Total Sales",
+                    },
+                },
+            },
+        },
+    });
+
+    return chart;
+}
+
+
+    </script>
 
     <script>
         document.getElementById("report-form").addEventListener("submit", function (e) {

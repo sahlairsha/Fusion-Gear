@@ -98,6 +98,14 @@
                                 <input type="text" placeholder="Type here" value="<%=product.productName%>" name="productName" class="form-control border" id="product_name">
                                 <div id="productName-error" class="error-message"></div>
                             </div>
+                            <label class="form-label">Brands</label>
+                            <select class="form-select border" style="width: 150px;" name="brands">
+                                <% brands.forEach(brand => { %>
+                                    <option value="<%= brand._id %>" <%= brand._id.toString() === product.brands.toString() ? 'selected' : '' %>>
+                                        <%= brand.brand_name %>(<%= brand.description  %>)
+                                    </option>
+                                <% }) %>
+                            </select>
                             <div class="mb-4">
                                 <label class="form-label">Full description</label>
                                 <textarea placeholder="Type here" id="descriptionid" value="<%=product.description%>" name="description" class="form-control border" rows="4"><%=product.description%></textarea>

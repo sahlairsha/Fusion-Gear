@@ -175,7 +175,7 @@ const getCheckout = async (req, res) => {
             coupons,
             appliedCoupon,
             isCouponApplied: !!appliedCoupon,
-            ...updatedCheckoutTotals, // Pass all updated totals
+            ...updatedCheckoutTotals, 
         });
     } catch (error) {
         console.error("Error loading checkout page:", error);
@@ -640,36 +640,57 @@ const verifyPayment = async (req, res) => {
 const getOrderConfirmation = async (req, res) => {
     try {
         const userId = req.session.user;
+        console.log("User ID:", userId);
 
-        // Fetch all orders for the user
+        const userData = await User.findById(userId);
+
+        // Fetch orders and populate product details
         const orders = await Order.find({ user_id: userId })
-            .populate('products.product_id')
-            .populate('products.variant_id')
+            .populate('products.product_id', 'productName productImage variants') // Populate product info and variants
             .exec();
 
-        // Separate completed and pending orders
-        const completedOrders = orders.filter(order => order.payment_status === 'Completed');
-        const pendingOrders = orders.filter(order => order.payment_status === 'Pending');
+        console.log("Orders:", orders);
 
-        // Fetch user details
-        const user = userId ? await User.findById(userId) : null;
+        // Add variant details for each product
+        const structuredOrders = orders.map((order) => {
+            const productsWithVariants = order.products.map((product) => {
+                const productData = product.product_id;
+                const variantDetails = productData.variants.find(
+                    (variant) => variant._id.toString() === product.variant_id.toString()
+                );
 
-        // Check if there are any pending orders
-        const isPaymentPending = pendingOrders.length > 0;
+                return {
+                    ...product.toObject(),
+                    variantDetails: variantDetails || {}, // Attach variant details
+                };
+            });
+
+            return {
+                ...order.toObject(),
+                products: productsWithVariants,
+            };
+        });
+
+        const completedOrders = structuredOrders.filter(
+            (order) => order.payment_status === 'Completed'
+        );
+        const pendingOrders = structuredOrders.filter(
+            (order) => order.payment_status === 'Pending'
+        );
         const pendingOrder = pendingOrders.length > 0 ? pendingOrders[0] : null;
 
         res.render('order-confirmation', {
-            orders,
-            completedOrders,  
-            pendingOrders, 
+            orders: structuredOrders,
+            completedOrders,
+            pendingOrders,
             activePage: 'orders',
-            user,
-            isPaymentPending,
+            user: userData,
+            isPaymentPending: pendingOrders.length > 0,
             payment_method: pendingOrder ? pendingOrder.payment_method : null,
             razorpay_order_id: pendingOrder ? pendingOrder.razorpay_order_id : null,
         });
     } catch (error) {
-        console.error("Error in Loading Orders Page", error);
+        console.error("Error fetching orders:", error);
         res.redirect('/pagenotfound');
     }
 };

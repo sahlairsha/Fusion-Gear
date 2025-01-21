@@ -274,6 +274,16 @@
                                                 <div id="productName-error" class="error-message"></div>
                                             </div>
 
+                                            <div class="brand-section">
+                                                <label class="form-label">Brand</label>
+                                                <select class="form-select border" name="brands">
+                                                    <% for (let i=0; i < brand.length; i++) { %>
+                                                        <option value="<%= brand[i]._id %>">
+                                                            <%= brand[i].brand_name %>,<%= brand[i].description  %>
+                                                        </option>
+                                                        <% } %>
+                                                </select>
+                                            </div>
 
                                             <div class="mb-4">
                                                 <label class="form-label">Full description</label>
@@ -680,6 +690,7 @@ function closeCropModal() {
             const offer = document.getElementById('productOffer').value
             const startDate = document.getElementById('offer_start').value
             const endDate = document.getElementById('offer_end').value
+            const brand = document.getElementById('brand_name').value
 
 
             const category = document.getElementsByName('category')[0].value;
@@ -687,6 +698,10 @@ function closeCropModal() {
 
             if (name.trim() === "" || !/^[a-zA-Z\s]+$/.test(name)) {
                 displayErrorMessage('productName-error', 'Please enter a valid product name with alphabetic characters.');
+                isValid = false;
+            }
+            if (brand.trim() === "") {
+                displayErrorMessage('brand-error', 'Please enter a valid brand name.');
                 isValid = false;
             }
 

@@ -1,0 +1,82 @@
+<%- include("../../views/partials/admin/header") %>
+<div class="container mt-4">
+    <h2 class="mb-4">Brand Details</h2>
+
+    <% if (flash.error) { %>
+        <div class="alert alert-danger">
+            <%= flash.error %>
+        </div>
+    <% } %>
+
+    <% if (flash.success) { %>
+        <div class="alert alert-success">
+            <%= flash.success %>
+        </div>
+    <% } %>
+
+    <div class="mb-3">
+        <input type="text" class="form-control" id="searchBar" placeholder="Search brands by name or description">
+    </div>
+
+    <button class="btn btn-success text-white mb-2 d-flex w-20 ms-auto">
+        <a class="text-white" href="/admin/addBrand" style="text-decoration: none;">Add Brand</a>
+    </button>
+
+    <table class="table table-light">
+        <thead class="table-secondary">
+            <tr>
+                <th scope="col"><input type="checkbox" id="selectAll"></th>
+                <th scope="col">#</th>
+                <th scope="col">Brand Name</th>
+                <th scope="col">Description</th>
+                <th scope="col">Logo</th>
+                <th scope="col">Actions</th>
+            </tr>
+        </thead>
+        <tbody id="tableBody">
+            <% brands.forEach((brand, index) => { %>
+                <tr data-brand-id="<%= brand._id %>">
+                    <td><input type="checkbox" class="checkbox"></td>
+                    <td><%= index + 1 %></td>
+                    <td class="editable" contenteditable="false"><%= brand.brand_name %></td>
+                    <td class="editable w-25" contenteditable="false"><%= brand.description %></td>
+                    <td>
+                        <% if (brand.logo) { %>
+                            <img src="<%= brand.logo %>" alt="<%= brand.brand_name %>" style="width: 60px; height: 60px; object-fit: cover;">
+                        <% } else { %>
+                            No Logo
+                        <% } %>
+                    </td>
+                                     <td>
+                        <button class="btn btn-primary btn-md">
+                            <a href="/admin/editBrand/<%= brand._id %>" class="text-white" style="text-decoration: none;">Edit</a>
+                        </button>
+                        
+                            <button class="btn btn-warning btn-md">
+                                <a href="/admin/brands/delete/<%=brand._id %>" class="text-white" style="text-decoration: none;">Delete</a>
+                            </button>
+
+                    </td>
+                </tr>
+            <% }); %>
+        </tbody>
+    </table>
+
+    <div class="pagination d-flex align-items-center justify-content-center">
+        <% if (hasPrevPage) { %>
+        <a href="?page=<%= currentPage - 1 %>&limit=<%= limit %>">Previous</a>
+        <% } %>
+        <% for (let i = 1; i <= totalPages; i++) { %>
+            <a href="?page=<%= i %>&limit=<%= limit %>" class="<%= i === currentPage ? 'active' : '' %>"><%= i %></a>
+        <% } %>
+        <% if (hasNextPage) { %>
+        <a href="?page=<%= currentPage + 1 %>&limit=<%= limit %>">Next</a>
+        <% } %>
+    </div>
+
+</div>
+
+
+
+
+<%- include("../../views/partials/admin/footer") %>

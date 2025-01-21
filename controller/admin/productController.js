@@ -1,6 +1,7 @@
 const Product = require('../../models/productSchema');
 const Category = require("../../models/categorySchema");
 const User = require('../../models/userSchema')
+const Brand = require('../../models/brandSchema')
 
 const fs = require('fs');
 const path = require('path');
@@ -11,8 +12,10 @@ const sharp = require('sharp');
 const getProduct = async(req,res)=>{
     try {
         const category = await Category.find({isListed : true});
+        const brand = await Brand.find({});
         res.render("addProduct",{
             cat : category,
+            brand : brand
         })
     } catch (error) {
         console.error("Error in loading the add product page")
@@ -59,6 +62,13 @@ const addProducts = async (req, res) => {
             return res.status(400).redirect('/admin/add-products');
         }
 
+        // Validate the brand
+        const brandId = product.brands;
+        if (!brandId) {
+            req.flash("error", "Brand is required");
+            return res.status(400).redirect('/admin/add-products');
+        }
+
         // Parse and validate variants
         let variants = [];
         if (product.variants) {
@@ -90,6 +100,7 @@ const addProducts = async (req, res) => {
                 endDate: product.endDate || null,
             },
             category: categoryId,
+            brands: brandId,
             productImage: images,
             isBlocked: false,
             isDeleted: false,
@@ -123,6 +134,7 @@ const getAllProducts = async (req, res) => {
         })
             .limit(limit)
             .skip((page - 1) * limit)
+            .populate('brands')
             .populate('category')
             .populate('variants') 
             .exec();
@@ -136,8 +148,7 @@ const getAllProducts = async (req, res) => {
 
         // Fetch categories
         const category = await Category.find({ isListed: true });
-
-      
+         
         if (category) {
             res.render("products", {
                 data: productData,  
@@ -149,6 +160,9 @@ const getAllProducts = async (req, res) => {
             req.flash("error", "Category not found. Please try again.");
             res.redirect("/admin/products");
         }
+
+
+
     } catch (error) {
         console.error("Error fetching products:", error);
         res.redirect("/pageerror");
@@ -162,10 +176,12 @@ const getEditProducts = async (req, res) => {
         const id = req.query.id;
         const product = await Product.findOne({_id: id})
         const category = await Category.find({})
+        const brand = await Brand.find({})
 
         res.render("edit-product",{
             product : product,
-            category: category
+            category: category,
+            brands: brand
         })
 
     } catch (error) {
@@ -245,6 +261,7 @@ const editProducts = async (req, res) => {
             productName: data.productName,
             description: data.description,
             category: data.category, 
+            brands : data.brands,
             offer :{
                 discountPercentage : data.discountPercentage,
                 startDate : data.startDate,
