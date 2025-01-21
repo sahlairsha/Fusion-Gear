@@ -320,7 +320,7 @@
                                                 <% }); %>
                                             </ul>
                                         </div>
-                                        <a href="?clearCategory=true" class="clear-filter">Clear Categories</a>
+                                        <a href="?clearCategory=true" class="clear-filter" data-filter="category">Clear Categories</a>
                                     </div>
                                 </div>
                             </div>
@@ -352,7 +352,7 @@
                                                 <% }); %>
                                             </ul>
                                         </div>
-                                        <a href="?clearPrice=true" class="clear-filter">Clear Price</a>
+                                        <a href="?clearPrice=true" class="clear-filter" data-filter="priceRange">Clear Price</a>
                                     </div>
                                 </div>
                             </div>
@@ -373,7 +373,7 @@
                                                            <%= size === sizeOption ? 'checked' : '' %>>
                                                 </label>
                                             <% }); %>
-                                            <a href="?clearSize=true" class="clear-filter">Clear Sizes</a>
+                                            <a href="?clearSize=true" class="clear-filter" data-filter="size">Clear Sizes</a>
                                         </div>
                                     </div>
                                 </div>
@@ -404,7 +404,7 @@
                                                 </label>
                                             <% }); %>
                                         </div>
-                                        <a href="?clearColor=true" class="clear-filter">Clear Colors</a>
+                                        <a href="?clearColor=true" class="clear-filter" data-filter="color">Clear Colors</a>
                                     </div>
                                 </div>
                             </div>
@@ -753,7 +753,82 @@ function addToCart(productId) {
 
 </script>
 
+<script>
+    // Function to check and show/hide clear buttons
+function toggleClearButtons() {
+    const urlParams = new URLSearchParams(window.location.search);
 
+    // Toggle individual clear buttons
+    document.querySelectorAll('.clear-filter').forEach(button => {
+        const filterType = button.getAttribute('data-filter');
+        if (urlParams.has(filterType) && urlParams.get(filterType) !== '') {
+            button.style.display = 'inline-block'; // Show the button
+        } else {
+            button.style.display = 'none'; // Hide the button
+        }
+    });
+
+    // Toggle "Clear All" button
+    const clearAllButton = document.querySelector('.clear-all a');
+    if ([...urlParams].length > 0) {
+        clearAllButton.style.display = 'inline-block'; // Show the button
+    } else {
+        clearAllButton.style.display = 'none'; // Hide the button
+    }
+}
+
+// Apply filters
+function updateFilters() {
+    const queryParams = new URLSearchParams(window.location.search);
+
+    // Get selected size and color values
+    const size = document.querySelector('input[name="size"]:checked')?.value;
+    const color = document.querySelector('input[name="color"]:checked')?.value;
+
+    // Update query parameters for size and color
+    if (size) queryParams.set('size', size);
+    else queryParams.delete('size');
+
+    if (color) queryParams.set('color', color);
+    else queryParams.delete('color');
+
+    // Update the URL and reload the page
+    window.location.search = queryParams.toString();
+}
+
+// Clear individual filters
+document.querySelectorAll('.clear-filter').forEach(button => {
+    button.addEventListener('click', function (event) {
+        event.preventDefault();
+
+        const filterType = this.getAttribute('data-filter');
+        const queryParams = new URLSearchParams(window.location.search);
+
+        // Remove the specific filter from the URL
+        queryParams.delete(filterType);
+
+        // Update the URL
+        window.location.search = queryParams.toString();
+    });
+});
+
+// Clear all filters
+document.querySelector('.clear-all a').addEventListener('click', function (event) {
+    event.preventDefault();
+
+    // Reload the page without query parameters
+    window.location.search = '';
+});
+
+// Monitor changes to size and color filters
+document.querySelectorAll('input[name="size"], input[name="color"]').forEach(input => {
+    input.addEventListener('change', updateFilters);
+});
+
+// Initial check for active filters
+toggleClearButtons();
+
+</script>
 
 
 <%-include('../../views/partials/user/footer') %>
