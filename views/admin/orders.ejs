@@ -123,6 +123,7 @@
                             <!-- Dropdown for changing order status -->
                             <select class="form-select order-status-dropdown" data-order-id="<%= order._id %>" style="width: 150px;">
                                 <option value="Pending"  <%= order.order_status === 'Pending' ? 'selected' : '' %>>Pending</option>
+                                <option value="Dispatch"  <%= order.order_status === 'Dispatch' ? 'selected' : '' %>>Dispatch</option>
                                 <option value="Shipped" <%= order.order_status === 'Shipped' ? 'selected' : '' %>>Shipped</option>
                                 <option value="Delivered" <%= order.order_status === 'Delivered' ? 'selected' : '' %>>Delivered</option>
                                 <option value="Canceled" <%= order.order_status === 'Canceled' ? 'selected' : '' %>>Canceled</option>
@@ -158,65 +159,59 @@
 <script>
   
   document.addEventListener('change', function (event) {
-    if (event.target.classList.contains('order-status-dropdown')) {
+        if (event.target.classList.contains('order-status-dropdown')) {
+            const orderId = event.target.getAttribute('data-order-id');
+            const newStatus = event.target.value;
 
-        const orderId = event.target.getAttribute('data-order-id');
-        
-        const newStatus = event.target.value;
-
-        // Update order status via AJAX
-        fetch(`/admin/orders/${orderId}/status`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ status: newStatus }),
-        })
-            .then((response) => {
-                if (response.ok) {
-                    
-                    const statusCell = event.target.closest('tr').querySelector('.order-status-display');
-                    statusCell.textContent = newStatus;
-
-                    // Add a class to reflect the status color
-                    statusCell.className = `order-status-display text-center bg-${getStatusColor(newStatus)}`;
-
-                    // Notify the user of the successful update
-                    console.log(`Order status changed to ${newStatus}`);
+            Swal.fire({
+                title: "Are you sure?",
+                text: `Do you want to change the order status to "${newStatus}"?`,
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes, update it!",
+                cancelButtonText: "Cancel"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch(`/admin/orders/${orderId}/status`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ status: newStatus }),
+                    })
+                    .then((response) => {
+                        if (response.ok) {
+                            const statusCell = event.target.closest('tr').querySelector('.order-status-display');
+                            statusCell.textContent = newStatus;
+                            statusCell.className = `order-status-display text-center bg-${getStatusColor(newStatus)}`;
+                            Swal.fire("Updated!", "Order status has been updated.", "success");
+                        } else {
+                            Swal.fire("Error!", "Failed to update order status.", "error");
+                        }
+                    })
+                    .catch((error) => {
+                        console.error('Error:', error);
+                        Swal.fire("Error!", "Something went wrong.", "error");
+                    });
                 } else {
-                   Swal.fire({
-                    title:'Error',
-                    icon:"error",
-                    text: response.message || "You can't change order status after delivered the product.",
-                   })
+                    event.target.value = event.target.getAttribute('data-current-status');
                 }
-            })
-            .catch((error) => {
-                console.error('Error:', error);
-                Swal.fire({
-                    title:'Error',
-                    icon:"error",
-                    text:"Something went wrong!!!"
-                   })
             });
-    }
-});
+        }
+    });
 
-// Helper function to get the color class for each status
-function getStatusColor(status) {
-    switch (status) {
-        case 'Pending':
-            return 'warning';
-        case 'Shipped':
-            return 'info'; 
-        case 'Delivered':
-            return 'success';
-        case 'Canceled':
-            return 'danger'; 
-        default:
-            return 'secondary';
+    function getStatusColor(status) {
+        switch (status) {
+            case 'Pending': return 'warning';
+            case 'Dispatch': return 'primary';
+            case 'Shipped': return 'info';
+            case 'Delivered': return 'success';
+            case 'Canceled': return 'danger';
+            default: return 'secondary';
+        }
     }
-}
 
 
 document.getElementById('searchBar').addEventListener('input', function() {

@@ -52,7 +52,7 @@ const changeOrderStatus = async (req, res) => {
         const { id } = req.params;
         const { status } = req.body;
 
-        const validStatuses = ['Pending', 'Shipped', 'Delivered', 'Canceled'];
+        const validStatuses = ['Pending','Dispatch','Shipped', 'Delivered', 'Canceled','Return'];
         if (!validStatuses.includes(status)) {
             return res.status(400).json({ error: 'Invalid status' });
         }
@@ -63,7 +63,7 @@ const changeOrderStatus = async (req, res) => {
         }
 
         // Prevent rollback if the current status is Delivered or Canceled
-        if (['Delivered', 'Canceled'].includes(order.order_status) && order.order_status !== status) {
+        if (['Delivered', 'Canceled',"Return"].includes(order.order_status) && order.order_status !== status) {
             return res.status(400).json({ 
                 message: `Cannot change status from ${order.order_status}` 
             });
@@ -138,6 +138,10 @@ const cancelOrderAdmin = async (req, res) => {
             return res.status(400).json({ message: 'Cannot cancel an order that has already been Returned.' });
         }
 
+        // Check if admin confirmation exists
+        if (!order.admin_confirmation) {
+            return res.status(400).json({ message: 'Admin confirmation required to cancel the order.' });
+        }
 
         // Update order status and add cancellation timestamp
         order.order_status = 'Canceled';
@@ -145,31 +149,27 @@ const cancelOrderAdmin = async (req, res) => {
 
         // Restore product stock in variants
         for (const item of order.products) {
-            const product = item.product_id; // Get the product document
-            const { variantId, quantity } = item; // Assuming the order stores variantId and quantity
+            const product = item.product_id;
+            const { variantId, quantity } = item;
 
-            // Find the variant within the product's variants
+            // Find the variant and update stock
             const variant = product.variants.find(v => v._id.toString() === variantId);
-
-
             if (variant) {
-                variant.stock += quantity; // Increment the stock for the variant
+                variant.stock += quantity;
             }
 
-            // Save the updated product document
             await product.save();
         }
 
-        // Save the updated order
         await order.save();
 
-        // Redirect or respond to the admin
         res.redirect(`/admin/order-details/${orderId}`);
     } catch (error) {
         console.error('Error canceling order:', error);
         res.status(500).send('Internal Server Error');
     }
 };
+
 
 const approveReturn = async (req, res) => {
     try {

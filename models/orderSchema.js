@@ -89,6 +89,7 @@ const orderSchema = new mongoose.Schema({
         type: Date,
         default: null
     },
+    admin_confirmation: { type: Boolean, default: false },
 
 },{timestamps : true});
 
