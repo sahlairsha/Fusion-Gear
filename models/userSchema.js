@@ -69,6 +69,7 @@ const userSchema = new Schema({
     transactions: [{
         type: {
             type: String, 
+            enum : ['Credit','Debit','Referral_bonus','Refund'],
             required: true,
         },
         amount: {
@@ -94,10 +95,6 @@ const userSchema = new Schema({
         type : mongoose.Schema.Types.ObjectId,
         ref : "Order"
     }],
-    createdOn : {
-        type : Date,
-        default : Date.now
-    },
     referralCode : {
         type : String,
          unique: true
@@ -146,7 +143,7 @@ const userSchema = new Schema({
         },
     ],
 
-})
+},{timestamps:true})
 
 
 

@@ -112,7 +112,7 @@ const handleReferral = async (newUser, referralCode) => {
             referrer.wallet += 100;  
             referrer.redeemedUser.push(newUser._id);  
             referrer.transactions.push({
-                type: 'referral_bonus',
+                type: 'Referral_bonus',
                 amount: 100,
                 description: `Referral bonus for inviting ${newUser.username}`,
                 date: new Date(),
@@ -124,7 +124,7 @@ const handleReferral = async (newUser, referralCode) => {
             // Optionally reward the referred user (new user)
             newUser.wallet += 50;
             newUser.transactions.push({
-                type: 'referral_bonus',
+                type: 'Referral_bonus',
                 amount: 50,
                 description: `Referral bonus from ${referrer.username}`,
                 date: new Date(),
@@ -442,56 +442,6 @@ const resetPassword = async (req, res) => {
 };
 
 
-const getWallet = async (req, res) => {
-    try {
-        const user = await User.findById(req.session.user);
-
-        if (!user) {
-            return res.status(404).json({ message: 'User not found.' });
-        }
-
-        // Assuming you want to show balance and transaction history
-        res.render('wallet', {
-            user,
-            walletBalance: user.wallet,
-            transactions: user.transactions || [],
-            activePage : 'wallet'
-        });
-    } catch (error) {
-        console.error("Error loading wallet:", error);
-        res.status(500).json({ message: 'Failed to load wallet.' });
-    }
-};
-
-
-
-const addWallet = async (req, res) => {
-    const { amount } = req.body;
-    const userId = req.session.user;
-
-    // Validate amount
-    if (!amount || amount <= 0) {
-        return res.status(400).json({ message: 'Invalid amount.' });
-    }
-
-    try {
-        // Add money and get updated user info
-        const updatedUser = await addMoney(parseFloat(amount), userId);
-
-        // Respond with new balance and transaction details
-        const newBalance = updatedUser.wallet
-        const newTransaction = updatedUser.transactions[updatedUser.transactions.length - 1];
-
-        res.json({
-            newBalance: newBalance,
-            transaction: newTransaction
-        });
-    } catch (error) {
-        console.error('Error adding money:', error);
-        res.status(500).json({ message: 'Failed to add money.' });
-    }
-}
-
 
 
 
@@ -507,8 +457,6 @@ module.exports = {
     login,
     logout,
     forgotPassword,
-    resetPassword,
-    getWallet ,
-    addWallet,
+    resetPassword
    
 }

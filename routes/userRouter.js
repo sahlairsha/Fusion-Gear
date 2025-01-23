@@ -52,8 +52,8 @@ router.get('/auth/google/callback', passport.authenticate('google', { failureRed
 
                     // Log the referral bonus transaction for the referrer
                     referrer.transactions.push({
-                        type: 'referral_bonus',
-                        amount: 10,
+                        type: 'Referral_bonus',
+                        amount: 100,
                         date: new Date(),
                     });
                     await referrer.save();
@@ -64,8 +64,8 @@ router.get('/auth/google/callback', passport.authenticate('google', { failureRed
 
                     // Log the referral bonus transaction for the new user
                     user.transactions.push({
-                        type: 'referral_bonus',
-                        amount: 5,
+                        type: 'Referral_bonus',
+                        amount: 50,
                         date: new Date(),
                     });
                 }

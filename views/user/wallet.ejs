@@ -1,6 +1,8 @@
 <%-include('../../views/partials/user/header') %>
 <%-include('../../views/partials/user/user-side') %>
 <style>
+
+
    /* Container */
    .wallet-container {
     display: flex;
@@ -60,7 +62,7 @@
   .transaction-history {
     margin-top: 30px;
     padding: 20px;
-    width: 450px;
+    width: 600px;
     background-color: #fff;
     border-radius: 15px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -200,6 +202,42 @@
   #addMoneyForm button:hover {
     background-color: #000;
   }
+  .pagination-container {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.pagination {
+    list-style: none;
+    padding: 0;
+    display: inline-block;
+}
+
+.pagination li {
+  position: relative;
+    display: inline;
+    margin: 0 5px;
+}
+
+.pagination li a {
+    text-decoration: none;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    color: #333;
+    transition: background-color 0.3s;
+}
+
+.pagination li a:hover {
+    background-color: #f0f0f0;
+}
+
+.pagination li.active a {
+    background-color: #333;
+    color: #fff;
+    border-color: #333;
+}
+
 </style>
 
 
@@ -237,33 +275,65 @@
   <!-- Transaction History -->
   <div class="transaction-history">
     <h2>Transaction History</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Description</th>
-          <th>Amount</th>
-        </tr>
-      </thead>
-      <tbody id="transactionTable">
-        <% if (transactions.length > 0) { %>
-          <% transactions.forEach(transaction => { %>
+    <table class="table">
+        <thead>
             <tr>
-              <td><%= new Date(transaction.date).toLocaleString() %></td>
-              <td><%= transaction.type %></td>
-              <td style="color: '<%= transaction.amount > 0 ? 'green' : 'red' %>';">
-                ₹<%= transaction.amount.toFixed(2) %>
-              </td>
+                <th>Date</th>
+                <th>Description</th>
+                <th>Amount</th>
             </tr>
-          <% }) %>
-        <% } else { %>
-          <tr>
-            <td colspan="3">No transactions yet.</td>
-          </tr>
-        <% } %>
-      </tbody>
+        </thead>
+        <tbody id="transactionTable">
+          <% if (transactions.length > 0) { %>
+            <% transactions.forEach(transaction => { %>
+              <tr>
+                <td><%= new Date(transaction.date).toLocaleString() %></td>
+                <td><%= transaction.type %></td>
+                <td class="<%= transaction.type === 'Debit' ? 'text-danger' : (['Credit', 'Referral_bonus', 'Refund'].includes(transaction.type) ? 'text-success' : '') %>">
+                  <%= transaction.type === 'Debit' ? '-' : '+' %>₹<%= transaction.amount.toFixed(2) %>
+                </td>
+              </tr>
+            <% }) %>
+          <% } else { %>
+            <tr>
+              <td colspan="3">No transactions yet.</td>
+            </tr>
+          <% } %>
+        </tbody>
     </table>
   </div>
+  
+  
+        
+        
+    </table>
+
+    <!-- Pagination -->
+    <div class="pagination-container">
+      <% if (totalPages > 1) { %>
+          <nav>
+              <ul class="pagination">
+                  <% if (currentPage > 1) { %>
+                      <li><a href="?page=<%= currentPage - 1 %>">Prev</a></li>
+                  <% } %>
+                  <% for (let i = 1; i <= Math.min(5, totalPages); i++) { %>
+                      <li class="<%= currentPage === i ? 'active' : '' %>">
+                          <a href="?page=<%= i %>"><%= i %></a>
+                      </li>
+                  <% } %>
+                  <% if (totalPages > 5) { %>
+                      <li>...</li>
+                      <li><a href="?page=<%= totalPages %>"><%= totalPages %></a></li>
+                  <% } %>
+                  <% if (currentPage < totalPages) { %>
+                      <li><a href="?page=<%= currentPage + 1 %>">Next</a></li>
+                  <% } %>
+              </ul>
+          </nav>
+      <% } %>
+  </div>
+  
+</div>
 </div>
 </div>
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
@@ -380,4 +450,5 @@ function addTransactionToTable(transaction) {
   table.appendChild(row);
 }
 </script>
+
 <%-include('../../views/partials/user/footer') %>

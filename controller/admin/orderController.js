@@ -125,7 +125,7 @@ const processRefundAndRestock = async (order) => {
         if (user) {
             user.wallet += order.total_price;
             user.transactions.push({
-                type: "Credit",
+                type: "Refund",
                 amount: order.total_price,
                 description: `Refund for canceled order ${order._id}`,
                 date: new Date(),

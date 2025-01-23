@@ -601,7 +601,7 @@ const verifyPayment = async (req, res) => {
 
             user.wallet -= netAmount;
             user.transactions.push({
-                type: "debit",
+                type: "Debit",
                 amount: netAmount,
                 description: "Order Payment",
                 date: new Date(),

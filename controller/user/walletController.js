@@ -17,17 +17,31 @@ const getWallet = async (req, res) => {
             return res.status(404).json({ message: 'User not found.' });
         }
 
+        const page = parseInt(req.query.page) || 1; // Default to page 1
+        const limit = 8; // Show 5 transactions per page
+        const skip = (page - 1) * limit;
+
+        const totalTransactions = user.transactions.length;
+        const transactions = user.transactions
+            .sort((a, b) => new Date(b.date) - new Date(a.date)) // Sort by latest first
+            .slice(skip, skip + limit);
+
+        const totalPages = Math.ceil(totalTransactions / limit);
+
         res.render('wallet', {
             user,
             walletBalance: user.wallet,
-            transactions: user.transactions || [],
-            activePage: 'wallet'
+            transactions,
+            totalPages,
+            currentPage: page,
+            activePage: 'wallet',
         });
     } catch (error) {
         console.error("Error loading wallet:", error);
         res.status(500).json({ message: 'Failed to load wallet.' });
     }
 };
+
 
 // Add Money to Wallet
 const addMoney = async (amount, userId) => {
