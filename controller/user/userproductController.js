@@ -4,6 +4,8 @@ const User = require("../../models/userSchema");
 const Category = require('../../models/categorySchema');
 const Coupon = require("../../models/couponSchema")
 
+
+
 const loadProducts = async (req, res) => {
     try {
         let category = decodeURIComponent(req.query.category || '').trim();
@@ -52,6 +54,7 @@ const loadProducts = async (req, res) => {
                 query.variants.$elemMatch.color = { $regex: `^${color}$`, $options: 'i' };
             }
         }
+        
 
         if (priceRange) {
             const [minPrice, maxPrice] = priceRange.split('-').map(Number);
@@ -91,24 +94,17 @@ const loadProducts = async (req, res) => {
                 break;
         }
 
-        if (req.query.clearCategory) {
-            req.query.category = true;
-        }
-        
-        if (req.query.clearPrice) {
-            req.query.priceRange = true;
-        }
-        
-        if (req.query.clearSize) {
-            req.query.size = true;
-        }
-        
-        if (req.query.clearColor) {
-            req.query.color = true;
-        }
-        
+        if (req.query.clearCategory) category = '';
+        if (req.query.clearPrice) priceRange = '';
+        if (req.query.clearSize) size = '';
+        if (req.query.clearColor) color = '';
         if (req.query.clearAll) {
-            req.query = {};
+            category = '';
+            priceRange = '';
+            size = '';
+            color = '';
+            search = '';
+            sort = '';
         }
         
 
@@ -177,6 +173,7 @@ const loadProducts = async (req, res) => {
     }
 };
 
+
 const loadProductsDetails = async (req, res) => {
     try {
         const { id } = req.query;
@@ -191,6 +188,7 @@ const loadProductsDetails = async (req, res) => {
 
         const productData = await Product.findById(id)
             .populate('category')
+            .populate('brands')
             .populate('reviews.user_id')
             .lean();
 
@@ -200,6 +198,7 @@ const loadProductsDetails = async (req, res) => {
             return res.redirect("/product/view");
         }
 
+        // Calculate offer price
         productData.variants = productData.variants.map(variant => {
             const offerPrice = productData.offer?.discountPercentage
                 ? Math.round(variant.salePrice * (1 - productData.offer.discountPercentage / 100))
@@ -208,6 +207,20 @@ const loadProductsDetails = async (req, res) => {
             return { ...variant, offerPrice };
         });
 
+        // Fetch related products based on the same category or brand
+        const relatedProducts = await Product.find({
+            $or: [
+                { category: productData.category._id },
+                { brands: productData.brands._id }
+            ],
+            _id: { $ne: id }, // Exclude the current product
+            isBlocked: false,
+            isDeleted: false
+        })
+            .populate('category')
+            .populate('brands')
+            .limit(4)  
+            .lean();
         const userData = req.session.user
             ? await User.findById(req.session.user).lean()
             : null;
@@ -216,6 +229,7 @@ const loadProductsDetails = async (req, res) => {
             user: userData,
             product: productData,
             category: productData.category,
+            relatedProducts: relatedProducts
         });
     } catch (error) {
         console.error("Error loading product details page:", error.message);
@@ -223,8 +237,6 @@ const loadProductsDetails = async (req, res) => {
         res.redirect("/pagenotfound");
     }
 };
-
-
 
 
 const productRatings = async(req,res)=>{

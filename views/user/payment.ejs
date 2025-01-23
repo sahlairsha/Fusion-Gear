@@ -119,7 +119,7 @@
             <div class="payment-option" onclick="selectPaymentOption('wallet')">
                 <input type="radio" id="wallet" name="payment_method" value="Wallet">
                 <label for="wallet">Wallet Payment</label>
-                <p class="wallet-balance">Wallet Balance : ₹<%= user.wallet  %> </p> 
+                <p class="wallet-balance mt-2">Balance : ₹<%= user.wallet.toFixed(2)  %> </p> 
             </div>
             
             <div class="payment-option" onclick="selectPaymentOption('razorpay')">
@@ -178,7 +178,7 @@
                 if (!response.ok) throw new Error(result.message);
 
                 const options = {
-                    key: 'rzp_test_slK6OGJAoLPk9J', // Replace with your Razorpay test/live key
+                    key: 'rzp_test_slK6OGJAoLPk9J', 
                     amount: result.amount,
                     currency: 'INR',
                     order_id: result.id,

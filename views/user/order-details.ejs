@@ -1,7 +1,48 @@
 <%- include('../../views/partials/user/header') %>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
 
 <style>
 /* Container Styling */
+  /* Alert Box Styles */
+    .alert {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 15px 30px;
+        background-color: #f44336;
+        color: white;
+        font-size: 16px;
+        border-radius: 5px;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        z-index: 9999;
+        animation: fadeInOut 5s ease-in-out;
+    }
+
+    .alert.success {
+        background-color: #4CAF50;
+    }
+
+    .alert.error {
+        background-color: #f44336;
+    }
+
+    /* Animation for fade in and fade out */
+    @keyframes fadeInOut {
+        0% { opacity: 0; }
+        10% { opacity: 1; }
+        90% { opacity: 1; }
+        100% { opacity: 0; }
+    }
+.updated-step {
+    animation: flash 1.5s ease-in-out;
+}
+
+@keyframes flash {
+    0% { background-color: #e0ffe0; }
+    100% { background-color: transparent; }
+}
 .details-container {
     width: 90%;
     max-width: 1200px;
@@ -36,6 +77,7 @@
     align-items: center;
     padding: 20px;
     width: 100%;
+    flex-wrap: wrap;
 }
 
 .product-img {
@@ -137,6 +179,34 @@
 }
 
 
+/* Canceled Step */
+.timeline-step.completed.canceled .step-circle {
+    background-color: red;
+}
+
+.timeline-step.completed.canceled .step-text {
+    color: red;
+    font-weight: bold;
+}
+
+.timeline-step.canceled::after {
+    background-color: red;
+}
+
+/* Inactive Step */
+.timeline-step.inactive .step-circle {
+    background-color: #ddd;
+}
+
+.timeline-step.inactive .step-text {
+    color: #ddd;
+    font-weight: normal;
+}
+
+.timeline-step.inactive::after {
+    background-color: #ddd;
+}
+
 
 .timeline-step.completed .step-text {
     color: green;
@@ -235,14 +305,15 @@
             <!-- Order Status -->
             <div class="order-status">
                 <h4>Order Status</h4>
-                <% const orderStatuses = ['Dispatch', 'Shipped', 'Delivered', 'Canceled']; %>
-
+                <% const orderStatuses = ['Pending','Dispatch', 'Shipped', 'Delivered', 'Canceled']; %>
+            
                 <div class="timeline">
                     <% orderStatuses.forEach((status, index) => { %>
                         <% 
-                            // Determine the class for each step
                             let stepClass = '';
-                            if (orders.order_status === status) {
+                            if (orders.order_status === 'Canceled') {
+                                stepClass = status === 'Canceled' ? 'completed canceled' : 'inactive'; 
+                            } else if (orders.order_status === status) {
                                 stepClass = 'active'; 
                             } else if (orderStatuses.indexOf(orders.order_status) > index) {
                                 stepClass = 'completed'; 
@@ -254,6 +325,9 @@
                         </div>
                     <% }); %>
                 </div>
+            </div>
+            
+            
                  <!-- Cancel Order Button -->
 <% if (orders.order_status === 'Dispatch') { %>
         <button type="submit" class="btn btn-danger"><a  class="cancel" href="/orders/cancel/confirm?id=<%= orders._id  %>">Cancel Order</a></button>
@@ -265,6 +339,72 @@
 
 </div>
 
-</div>
 
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.8.1/socket.io.js" integrity="sha512-8BHxHDLsOHx+flIrQ0DrZcea7MkHqRU5GbTHmbdzMRnAaoCIkZ97PqZcXJkKZckMMhqfoeaJE+DNUVuyoQsO3Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+<script>
+   
+          const socket = io({
+            auth: { userId: "<%= user._id %>" }
+        });
+
+        // Handle successful connection
+        socket.on("connect", () => {
+            console.log("Connected to the server");
+        });
+
+        // Handle connection error
+        socket.on("connect_error", (err) => {
+            console.error("Connection error:", err.message);
+            showAlert("Connection to the server lost. Please check your network.", "error");
+        });
+
+        // Listen for order update events
+        socket.on("order_update", (data) => {
+            console.log("Order update received:", data);
+            showAlert(data.message, "success");
+            updateTimeline(data.status);
+        
+        });
+
+        // Function to display custom styled alert
+        function showAlert(message, type) {
+            const alertBox = document.createElement('div');
+            alertBox.classList.add('alert', type);
+            alertBox.innerHTML = message;
+            document.body.appendChild(alertBox);
+            
+           
+            setTimeout(() => {
+                alertBox.remove();
+            }, 10000);
+
+        }
+
+        // Helper function to regenerate the timeline HTML based on the current status
+        function updateTimeline(currentStatus) {
+            const statuses = ['Pending', 'Dispatch', 'Shipped', 'Delivered', 'Canceled'];
+            const timeline = document.getElementById("timeline");
+            if (timeline) {
+                timeline.innerHTML = statuses
+                    .map((status, index) => {
+                        let stepClass = '';
+                        if (currentStatus === 'Canceled') {
+                            stepClass = status === 'Canceled' ? 'completed canceled' : 'inactive';
+                        } else if (currentStatus === status) {
+                            stepClass = 'active';
+                        } else if (statuses.indexOf(currentStatus) > index) {
+                            stepClass = 'completed';
+                        }
+                        return `
+                            <div class="timeline-step ${stepClass}">
+                                <div class="step-circle"></div>
+                                <div class="step-text">${status}</div>
+                            </div>`;
+                    })
+                    .join('');
+            }
+        }
+</script>
 <%- include('../../views/partials/user/footer') %>

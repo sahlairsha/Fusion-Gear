@@ -24,14 +24,19 @@ const pageNotFound = async(req,res) =>{
 const loadHomePage = async (req, res) => {
     try{
     const productData = await Product.find().populate('category')
+    .sort({createdAt: -1})
+    .limit(6)
     if (!req.session.user) {
         
         res.render('home', { user: null, products: productData });
     } else {
         
-        const userData = await User.findById(req.session.user);
+        const userData = await User.findById(req.session.user).populate('cart.product_id');
+
+         req.session.cartCount = userData.cart.length;
+         const count = req.session.cartCount
         
-        res.render('home', { user: userData, products: productData });
+        res.render('home', { user: userData, products: productData ,count});
     }
 }catch(error){
     console.log("Home page is not loading", error.message);

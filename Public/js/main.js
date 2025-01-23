@@ -142,8 +142,6 @@
     // For demo preview end
 
 
-    // Uncomment below and use your date //
-
     /* var timerdate = "2020/12/30" */
 
     $("#countdown").countdown(timerdate, function (event) {

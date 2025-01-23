@@ -5,7 +5,10 @@
 <link href="https://cdn.jsdelivr.net/npm/toastr@2.1.4/build/toastr.min.css" rel="stylesheet" />
 
 <style>
-
+.TotalAmount{
+  font-size: 16px;
+  font-weight: 500;
+}
 
     /* Add your existing CSS styles here */
     #addressFormContainer {
@@ -517,24 +520,31 @@
       <span id="cartCount"><%= cartCount%> items</span>
   </div>
   <div class="order-summary-item">
-      <p>Subtotal:</p>
-      <span id="cartTotal">₹ <%=cartTotal %></span>
-  </div>
+    <p>Product Price:</p>
+    <span id="cartTotal" class="TotalAmount">₹ <%=totalSalePrice %></span>
+</div>
+  
   <div class="order-summary-item">
     <p>Offer Discount:</p>
-    <span id="offerDiscount">-₹<%= offerDiscount %></span>
+    <span id="offerDiscount"  class="text-success">-₹<%= offerDiscount %></span>
 </div>
+
+<div class="order-summary-item">
+  <p>Subtotal:</p>
+  <span id="cartTotal" class="TotalAmount">₹ <%=cartTotal %></span>
+</div>
+
 <div class="order-summary-item">
     <p>Coupon Discount:</p>
-    <span id="couponDiscount">-₹<%= couponDiscount %></span>
+    <span id="couponDiscount" class="text-success">-₹<%= couponDiscount %></span>
 </div>
   <div class="order-summary-item">
       <p>Shipping:</p>
-      <span id="shippingCharges">₹<%= shippingCharges  %></span>
+      <span id="shippingCharges"  class="text-danger">₹<%= shippingCharges  %></span>
   </div>
   <div class="order-summary-item">
       <p>Total:</p>
-      <span id="netAmount">₹<%= netAmount%></span>
+      <span id="netAmount"  class="TotalAmount">₹<%= netAmount%></span>
   </div>
 </div>
 

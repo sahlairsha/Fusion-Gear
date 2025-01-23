@@ -136,7 +136,15 @@ const userSchema = new Schema({
     resetTokenExpiry:{
         type : Date,
         default: Date.now
-    }
+    },
+    notifications: [
+        {
+            message: { type: String, required: true },
+            type: { type: String, enum: ['order', 'general'], default: 'general' },
+            orderId: { type: mongoose.Schema.Types.ObjectId, ref: 'Order' },
+            date: { type: Date, default: Date.now },
+        },
+    ],
 
 })
 

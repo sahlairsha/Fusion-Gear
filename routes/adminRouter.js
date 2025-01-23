@@ -77,7 +77,7 @@ router.get('/admin/unblockedproduct', adminAuth, productController.unblockProduc
 router.get('/admin/orders', adminAuth ,orderController.getOrders)
 router.post('/admin/orders/:id/status', adminAuth, orderController.changeOrderStatus);
 router.get('/admin/order-details/:id',adminAuth, orderController.getDetails)
-router.post('/admin/orders/cancel/:id',adminAuth, orderController.cancelOrderAdmin);
+router.post('/admin/cancel-order/:orderId',adminAuth,orderController.adminCancelOrder)
 
 
 

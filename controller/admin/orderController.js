@@ -1,7 +1,8 @@
 
-
+const { getIo, emitToUser  } = require('../../config/socket')
 const Order = require('../../models/orderSchema');
-
+const User = require('../../models/userSchema');
+const Product = require('../../models/productSchema');
 
 
 const getOrders = async (req, res) => {
@@ -89,6 +90,7 @@ const getDetails = async(req,res)=>{
         const orders = await Order.findById(orderId)
         .populate('products.product_id')
         .populate('shippingAddress.addressDocId')
+        .sort({createdAt: -1})
         .exec()
 
 
@@ -114,59 +116,81 @@ const getDetails = async(req,res)=>{
     }
 }
 
-const cancelOrderAdmin = async (req, res) => {
-    const orderId = req.params.id;
+
+
+const processRefundAndRestock = async (order) => {
+    // Refund logic
+    if (["Wallet", "Razorpay"].includes(order.payment_method)) {
+        const user = await User.findById(order.user_id);
+        if (user) {
+            user.wallet += order.total_price;
+            user.transactions.push({
+                type: "Credit",
+                amount: order.total_price,
+                description: `Refund for canceled order ${order._id}`,
+                date: new Date(),
+            });
+            await user.save();
+        }
+    }
+
+    // Restock logic
+    for (const item of order.products) {
+        const product = await Product.findById(item.product_id);
+        if (product) {
+            const variant = product.variants.find(v => v._id.toString() === item.variant_id.toString());
+            if (variant) {
+                variant.stock += item.quantity;
+                await product.save();
+            }
+        }
+    }
+};
+
+const adminCancelOrder = async (req, res) => {
+    const { orderId } = req.params;
+    const { action } = req.body; 
 
     try {
-        // Find the order by ID
-        const order = await Order.findById(orderId).populate('products.product_id');
-
-        if (!order) {
-            return res.status(404).send('Order not found');
+        const order = await Order.findById(orderId);
+        if (!order || order.order_status !== 'Pending Cancellation') {
+            return res.status(400).send('Invalid or non-pending order');
         }
 
-        if (order.order_status === 'Delivered') {
-            return res.status(400).json({ message: 'Cannot cancel an order that has already been delivered.' });
+        if (action === 'approve') {
+            order.order_status = 'Canceled';
+            order.canceled_at = new Date();
+            order.payment_status = 'Refunded';
+
+            await processRefundAndRestock(order);
+
+            // Emit to the user via Socket.IO
+            emitToUser(order.user_id, 'order_update', {
+                status: 'approved',
+                orderId: order._id,
+                message: `Your cancellation request for Order ${order._id} has been approved.`,
+            });
+
+            await order.save();
+            res.json({ message: 'Order cancellation approved' });
+        } else if (action === 'reject') {
+            order.order_status = 'Dispatch';
+
+            // Emit to the user via Socket.IO
+            emitToUser(order.user_id, 'order_update', {
+                status: 'rejected',
+                orderId: order._id,
+                message: `Your cancellation request for Order ${order._id} has been rejected.`,
+            });
+
+            await order.save();
+            res.json({ message: 'Order cancellation rejected' });
+        } else {
+            res.status(400).send('Invalid action');
         }
-
-        // Check if the order is already canceled
-        if (order.order_status === 'Canceled') {
-            return res.status(400).json({ message: 'Order is already canceled.' });
-        }
-
-        if (order.order_status === 'Return') {
-            return res.status(400).json({ message: 'Cannot cancel an order that has already been Returned.' });
-        }
-
-        // Check if admin confirmation exists
-        if (!order.admin_confirmation) {
-            return res.status(400).json({ message: 'Admin confirmation required to cancel the order.' });
-        }
-
-        // Update order status and add cancellation timestamp
-        order.order_status = 'Canceled';
-        order.canceled_at = new Date();
-
-        // Restore product stock in variants
-        for (const item of order.products) {
-            const product = item.product_id;
-            const { variantId, quantity } = item;
-
-            // Find the variant and update stock
-            const variant = product.variants.find(v => v._id.toString() === variantId);
-            if (variant) {
-                variant.stock += quantity;
-            }
-
-            await product.save();
-        }
-
-        await order.save();
-
-        res.redirect(`/admin/order-details/${orderId}`);
     } catch (error) {
-        console.error('Error canceling order:', error);
-        res.status(500).send('Internal Server Error');
+        console.error('Error in adminCancelOrder:', error);
+        res.status(500).send('Server Error');
     }
 };
 
@@ -218,7 +242,7 @@ module.exports = {
     getOrders,
     changeOrderStatus ,
     getDetails,
-    cancelOrderAdmin,
+    adminCancelOrder,
     approveReturn,
     rejectReturn
 

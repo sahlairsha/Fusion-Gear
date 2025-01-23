@@ -61,6 +61,7 @@ const getCartPage = async (req, res) => {
 
         const user = await User.findById(userId).populate('cart.product_id').exec();
 
+
         const cartItems = user.cart.map((item) => {
             const product = item.product_id;
             if (!product) return null;
@@ -68,10 +69,11 @@ const getCartPage = async (req, res) => {
             const selectedVariant = product.variants.find(
                 (variant) => variant._id.toString() === item.variant_id.toString()
             );
-
+            const salePrice = selectedVariant?.salePrice || 0;
             return {
                 product,
                 selectedVariant,
+                salePrice,
                 quantity: item.quantity,
             };
         }).filter(item => item !== null);
@@ -79,15 +81,22 @@ const getCartPage = async (req, res) => {
 
         console.log("Cart Items:", cartItems);
 
+
+
         const countItems = cartItems.length;
         req.session.cartCount = countItems;
+     
         console.log("Cart Count",req.session.cartCount);
+        const totalSalePrice = cartItems.reduce((total, item) => {
+            return total + item.salePrice * item.quantity;
+        }, 0);
 
         const updatedCartTotals = await calculateCartTotals(userId);
 
         res.render("cart", {
             user,
             cartItems,
+            totalSalePrice,
             ...updatedCartTotals, 
             couponMessage: "",
             cartCount: req.session.cartCount,

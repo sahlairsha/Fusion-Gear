@@ -299,9 +299,10 @@ input[type="number"]::-webkit-inner-spin-button {
                     <h5>Cart totals</h5>
                     <ul>
                       
-                        
-                        <li>Subtotal <span id="cartTotal">₹<%= cartTotal %></span></li>
+                       <li>Product Price<span id="cartTotal">₹<%= totalSalePrice%></span></li>
+                   
                         <li>Discount <span id="discount" class="text-success">-₹<%= discount %></span></li>
+                        <li>Subtotal <span id="cartTotal">₹<%= cartTotal %></span></li>
                         <li>Shipping <span id="shippingCharges" class="text-danger">₹<%= shippingCharges %></span></li>
                         <li>Total <span id="netAmount">₹<%= netAmount %></span></li>
                     </ul>
@@ -452,6 +453,15 @@ input[type="number"]::-webkit-inner-spin-button {
             window.location.href = "/checkout";
         }
     });
+
+    function updateCartUI(data) {
+        document.querySelector('#cartTotal').textContent = `₹${data.cartTotal}`;
+        document.querySelector('#discount').textContent = `-₹${data.discount}`;
+        document.querySelector('#shippingCharges').textContent = `₹${data.shippingCharges}`;
+        document.querySelector('#netAmount').textContent = `₹${data.netAmount}`;
+    }
+
+
 </script>
 
 

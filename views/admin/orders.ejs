@@ -120,15 +120,23 @@
                         </td> 
 
                         <td>
-                            <!-- Dropdown for changing order status -->
-                            <select class="form-select order-status-dropdown" data-order-id="<%= order._id %>" style="width: 150px;">
-                                <option value="Pending"  <%= order.order_status === 'Pending' ? 'selected' : '' %>>Pending</option>
-                                <option value="Dispatch"  <%= order.order_status === 'Dispatch' ? 'selected' : '' %>>Dispatch</option>
-                                <option value="Shipped" <%= order.order_status === 'Shipped' ? 'selected' : '' %>>Shipped</option>
-                                <option value="Delivered" <%= order.order_status === 'Delivered' ? 'selected' : '' %>>Delivered</option>
-                                <option value="Canceled" <%= order.order_status === 'Canceled' ? 'selected' : '' %>>Canceled</option>
-                                <option value="Return" <%= order.order_status === 'Return' ? 'selected' : '' %>>Return</option>
-                            </select>
+                            <% if (order.order_status === 'Pending Cancellation') { %>
+                                <div>
+                                    <button class="btn btn-success btn-sm approve-cancel-btn" data-order-id="<%= order._id %>">Approve</button>
+                                    <button class="btn btn-danger btn-sm reject-cancel-btn" data-order-id="<%= order._id %>">Reject</button>
+                                </div>
+                            <% } else { %>
+                                <!-- Original Dropdown -->
+                                <select class="form-select order-status-dropdown" data-order-id="<%= order._id %>" style="width: 150px;">
+                                    <option value="Pending" <%= order.order_status === 'Pending' ? 'selected' : '' %>>Pending</option>
+                                    <option value="Dispatch" <%= order.order_status === 'Dispatch' ? 'selected' : '' %>>Dispatch</option>
+                                    <option value="Shipped" <%= order.order_status === 'Shipped' ? 'selected' : '' %>>Shipped</option>
+                                    <option value="Delivered" <%= order.order_status === 'Delivered' ? 'selected' : '' %>>Delivered</option>
+                                    <option value="Canceled" <%= order.order_status === 'Canceled' ? 'selected' : '' %>>Canceled</option>
+                                    <option value="Return" <%= order.order_status === 'Return' ? 'selected' : '' %>>Return</option>
+                                </select>
+                            <% } %>
+                            
                         </td>
                     
                     
@@ -251,7 +259,75 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 </script>
+<script>
+ const socket = io(); // Admin socket client-side initialization
 
+socket.on('order_cancellation_request', (data) => {
+    console.log(`Received cancellation request for order ID: ${data.orderId}`);
+
+    // Show a notification or update the admin dashboard
+    displayCancellationRequest(data); // Function to display the request in the admin UI
+});
+
+// Function to handle admin decision (Approve or Reject)
+const handleAdminDecision = async (orderId, action) => {
+    try {
+        const response = await fetch(`/admin/cancel-order/${orderId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action }), 
+        });
+
+        const result = await response.json();
+        console.log(`Order ${orderId} ${action}d:`, result);
+    } catch (error) {
+        console.error('Error handling admin decision:', error);
+    }
+};
+
+</script>
+
+<script>
+    document.addEventListener("click", async (event) => {
+    if (event.target.classList.contains("approve-cancel-btn") || event.target.classList.contains("reject-cancel-btn")) {
+        const orderId = event.target.getAttribute("data-order-id");
+        const action = event.target.classList.contains("approve-cancel-btn") ? "approve" : "reject";
+
+        Swal.fire({
+            title: "Are you sure?",
+            text: `Do you want to ${action} this cancellation request?`,
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: action === "approve" ? "#28a745" : "#d33",
+            cancelButtonColor: "#6c757d",
+            confirmButtonText: `Yes, ${action} it!`,
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    const response = await fetch(`/admin/cancel-order/${orderId}`, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({ action }),
+                    });
+
+                    if (response.ok) {
+                        Swal.fire("Success", `Cancellation request has been ${action}d.`,"success");
+                        location.reload();
+                    } else {
+                        Swal.fire("Error", "Failed to process the request.", "error");
+                    }
+                } catch (error) {
+                    Swal.fire("Error", "Something went wrong.", "error");
+                    console.error("Admin action error:", error);
+                }
+            }
+        });
+    }
+});
+
+</script>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 

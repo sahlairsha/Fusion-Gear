@@ -25,7 +25,7 @@
     font-size: 12px;
     font-weight: bold;
     text-transform: uppercase;
-    z-index: 10;
+    z-index: 1;
 }
 .product-price-container {
     position: relative;
@@ -35,26 +35,27 @@
 }
 
 .sale-price {
-    font-size: 14px;
-    color: #777;
-    text-decoration: line-through;
+    font-size: 16px;
+    color: #000;
+    /* text-decoration: line-through; */
     position: absolute;
-    top: 0;
+    top: 20px;
     left: 0;
-    transform: translateY(0);
-    animation: moveUpAndDisappear 2s forwards;
+    transform: translateY(100);
+    animation: slideInFromBottom 2s forwards;
 }
 
-.offer-price {
+/* .offer-price {
     font-size: 18px;
     font-weight: bold;
     color: #000;
+    margin-top: 20px;
     position: absolute;
     top: 100%;
-    left: 0;
+    left: 30%;
     transform: translateY(100%);
     animation: slideInFromBottom 2s 1s forwards;
-}
+} */
 
 @keyframes moveUpAndDisappear {
     0% {
@@ -138,18 +139,10 @@
     border-radius: 5px;
     font-size: 12px;
     font-weight: 600;
-   margin-right: 65px;
+     margin-right: 65px;
 }
 
-/* Styling for product price */
-.product-header .product-price {
-    font-size: 14px;
-    font-weight: bold;
-    color: #ff6b6b; 
-    margin-top: 20px;
-   
- 
-}
+
 
 
     .stock-left{
@@ -284,8 +277,14 @@
                     <div class="shop__sidebar__search">
                         <form action="/products" method="GET">
                             <input type="text" name="search" placeholder="Search..." value="<%= search %>" />
+                            <input type="hidden" name="sort" value="<%= sort %>">
+                            <input type="hidden" name="category" value="<%= category %>">
+                            <input type="hidden" name="priceRange" value="<%= priceRange %>">
+                            <input type="hidden" name="size" value="<%= size %>">
+                            <input type="hidden" name="color" value="<%= color %>">
                             <button type="submit"><span class="icon_search"></span></button>
                         </form>
+                        
                     </div>
                     <div class="shop__sidebar__accordion">
                         <div class="accordion" id="accordionExample">
@@ -490,7 +489,7 @@
                                                     <% if (product.variants[0].salePrice > product.variants[0].offerPrice) { %>
                                                         <div class="product-price-container">
                                                             <span class="sale-price"><span>&#8377;<%= product.variants[0].salePrice %></span></span>
-                                                            <span class="offer-price"><span>&#8377;<%= product.variants[0].offerPrice %></span></span>
+                                                            <!-- <span class="offer-price"><span>&#8377;<%= product.variants[0].offerPrice %></span></span> -->
                                                         </div>      
                                                     <% } else { %>
                                                         <span class="offer-price">&#8377;<%= product.variants[0].salePrice %></span>
@@ -608,61 +607,6 @@ function addToWishlist(productId, variantId) {
 
 
 <script>
-document.querySelectorAll('.price-filter').forEach(function (link) {
-    link.addEventListener('click', function (event) {
-        event.preventDefault();
-
-        // Get the selected price range from the data attribute
-        const priceRange = this.getAttribute('data-range');
-
-        // Validate the price range format (e.g., "min-max")
-        if (!/^\d+-\d+$/.test(priceRange) && priceRange !== "2500-999999") {
-            console.error("Invalid price range format:", priceRange);
-            return;
-        }
-
-        // Get current query parameters from the URL
-        const urlParams = new URLSearchParams(window.location.search);
-
-        // Add/Update the priceRange in the query parameters
-        urlParams.set('priceRange', priceRange);
-
-        // Always reset to the first page when a filter is applied
-        urlParams.set('page', 1);
-
-        // Construct the new URL with updated parameters
-        const newUrl = `${window.location.pathname}?${urlParams.toString()}`;
-
-        // Redirect to the new URL
-        window.location.href = newUrl;
-    });
-});
-
-
-   document.querySelectorAll('input[name="size"], input[name="color"]').forEach(input => {
-    input.addEventListener('change', function () {
-        updateFilters();
-    });
-});
-
-function updateFilters() {
-    const queryParams = new URLSearchParams(window.location.search);
-
-    // Get size and color values
-    const size = document.querySelector('input[name="size"]:checked')?.value;
-    const color = document.querySelector('input[name="color"]:checked')?.value;
-
-    // Add size and color to the URL query string
-    if (size) queryParams.set('size', size);
-    else queryParams.delete('size'); // Clear filter if no size is selected
-
-    if (color) queryParams.set('color', color);
-    else queryParams.delete('color'); // Clear filter if no color is selected
-
-    // Update the URL
-    window.location.search = queryParams.toString();
-}
-
 
 function addToCart(productId) {
 
@@ -754,79 +698,91 @@ function addToCart(productId) {
 </script>
 
 <script>
-    // Function to check and show/hide clear buttons
-function toggleClearButtons() {
-    const urlParams = new URLSearchParams(window.location.search);
+document.addEventListener('DOMContentLoaded', function () {
+    // Toggle clear buttons visibility
+    toggleClearButtons();
 
-    // Toggle individual clear buttons
-    document.querySelectorAll('.clear-filter').forEach(button => {
-        const filterType = button.getAttribute('data-filter');
-        if (urlParams.has(filterType) && urlParams.get(filterType) !== '') {
-            button.style.display = 'inline-block'; // Show the button
-        } else {
-            button.style.display = 'none'; // Hide the button
+    // Event delegation for dynamically rendered elements
+    document.body.addEventListener('click', function (event) {
+        if (event.target.matches('.clear-filter')) {
+            event.preventDefault();
+            const filterType = event.target.getAttribute('data-filter');
+            const queryParams = new URLSearchParams(window.location.search);
+
+            queryParams.delete(filterType);
+            window.location.search = queryParams.toString();
+        }
+
+        if (event.target.matches('.clear-all a')) {
+            event.preventDefault();
+            window.location.search = '';
         }
     });
 
-    // Toggle "Clear All" button
+    // Handle filter changes
+    document.querySelectorAll('input[name="size"], input[name="color"]').forEach(input => {
+        input.addEventListener('change', updateFilters);
+    });
+
+    // Handle search form submission
+    document.getElementById('searchForm').onsubmit = (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const queryParams = new URLSearchParams(window.location.search);
+
+        for (const [key, value] of formData.entries()) {
+            queryParams.set(key, value);
+        }
+
+        queryParams.set('page', 1); // Reset to page 1
+        window.location.search = queryParams.toString();
+    };
+
+    // Handle price filter
+    document.querySelectorAll('.price-filter').forEach(link => {
+        link.addEventListener('click', function (event) {
+            event.preventDefault();
+            const priceRange = this.getAttribute('data-range');
+
+            if (!/^\d+-\d+$/.test(priceRange)) {
+                console.error('Invalid price range:', priceRange);
+                return;
+            }
+
+            const queryParams = new URLSearchParams(window.location.search);
+            queryParams.set('priceRange', priceRange);
+            queryParams.set('page', 1);
+            window.location.search = queryParams.toString();
+        });
+    });
+});
+
+function toggleClearButtons() {
+    const urlParams = new URLSearchParams(window.location.search);
+
+    document.querySelectorAll('.clear-filter').forEach(button => {
+        const filterType = button.getAttribute('data-filter');
+        button.style.display = urlParams.has(filterType) && urlParams.get(filterType) ? 'inline-block' : 'none';
+    });
+
     const clearAllButton = document.querySelector('.clear-all a');
-    if ([...urlParams].length > 0) {
-        clearAllButton.style.display = 'inline-block'; // Show the button
-    } else {
-        clearAllButton.style.display = 'none'; // Hide the button
-    }
+    clearAllButton.style.display = [...urlParams].length > 0 ? 'inline-block' : 'none';
 }
 
-// Apply filters
 function updateFilters() {
     const queryParams = new URLSearchParams(window.location.search);
-
-    // Get selected size and color values
     const size = document.querySelector('input[name="size"]:checked')?.value;
     const color = document.querySelector('input[name="color"]:checked')?.value;
 
-    // Update query parameters for size and color
     if (size) queryParams.set('size', size);
     else queryParams.delete('size');
 
     if (color) queryParams.set('color', color);
     else queryParams.delete('color');
 
-    // Update the URL and reload the page
+    queryParams.set('page', 1); // Reset to page 1
     window.location.search = queryParams.toString();
 }
-
-// Clear individual filters
-document.querySelectorAll('.clear-filter').forEach(button => {
-    button.addEventListener('click', function (event) {
-        event.preventDefault();
-
-        const filterType = this.getAttribute('data-filter');
-        const queryParams = new URLSearchParams(window.location.search);
-
-        // Remove the specific filter from the URL
-        queryParams.delete(filterType);
-
-        // Update the URL
-        window.location.search = queryParams.toString();
-    });
-});
-
-// Clear all filters
-document.querySelector('.clear-all a').addEventListener('click', function (event) {
-    event.preventDefault();
-
-    // Reload the page without query parameters
-    window.location.search = '';
-});
-
-// Monitor changes to size and color filters
-document.querySelectorAll('input[name="size"], input[name="color"]').forEach(input => {
-    input.addEventListener('change', updateFilters);
-});
-
-// Initial check for active filters
-toggleClearButtons();
 
 </script>
 
