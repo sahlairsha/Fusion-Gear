@@ -149,19 +149,21 @@
         </tbody>
     </table>
 
-    <div class="pagination-container d-flex align-items-center justify-content-center mt-5">
+    <div class="flex items-center justify-center mt-3 space-x-2 mb-3">
         <% if (currentPage > 1) { %>
-            <a class="page-link" href="?page=<%= currentPage - 1 %>">&laquo; Previous</a>
+            <a class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300" href="?page=<%= currentPage - 1 %>">&laquo; Prev</a>
         <% } %>
+        
         <% for (let i = 1; i <= totalPages; i++) { %>
             <% if (i === currentPage) { %>
-                <span class="current-page"><%= i %></span>
+                <span class="px-4 py-2 bg-blue-500 text-white font-semibold rounded-md"> <%= i %> </span>
             <% } else { %>
-                <a class="page-link" href="?page=<%= i %>"><%= i %></a>
+                <a class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300" href="?page=<%= i %>"><%= i %></a>
             <% } %>
         <% } %>
+        
         <% if (currentPage < totalPages) { %>
-            <a class="page-link" href="?page=<%= currentPage + 1 %>">Next &raquo;</a>
+            <a class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300" href="?page=<%= currentPage + 1 %>">Next &raquo;</a>
         <% } %>
     </div>
     

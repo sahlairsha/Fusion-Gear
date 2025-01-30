@@ -42,7 +42,7 @@ const orderSchema = new mongoose.Schema({
     },
     order_status: {
         type: String,
-        enum: ['Pending','Dispatch', 'Shipped', 'Delivered', 'Canceled','Return','Pending Cancellation'],
+        enum: ['Pending','Dispatch', 'Shipped', 'Delivered', 'Canceled','Return','Pending Cancellation', 'Pending Return'],
         default: 'Pending'
 
     },
@@ -70,19 +70,9 @@ const orderSchema = new mongoose.Schema({
         predefined: { type: String }, 
         custom: { type: String } 
     },
-    return_status: {
-        type: String,
-        enum: ['Pending', 'Approved', 'Rejected'],
-        default: 'Pending'
-    },
     return_reason: {
-        type: String, // Reason for the return
-        default: null
-    },
-    refund_status: {
-        type: String,
-        enum: ['Pending', 'Completed', 'Failed'],
-        default: 'Pending'
+        predefined: { type: String }, 
+        custom: { type: String } 
     },
     restocked_at: {
         type: Date,

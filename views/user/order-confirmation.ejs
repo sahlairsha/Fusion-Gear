@@ -267,7 +267,10 @@
         opacity: 1; 
     }
 }
-
+.return-btn{
+    border: none;
+    background-color: transparent;
+}
 
 </style>
 
@@ -334,8 +337,8 @@
                         <% } %>
                         <h5 class="mt-2 ml-2">Total Price: ₹<%= order.total_price %></h5>
 
-                        <% if (order.order_status === 'Delivered' && order.return_status === 'Pending') { %>
-                            <a href="/order/return-form/<%= order._id  %>"><button class="btn btn-success return-btn mt-4">Return</button></a> 
+                        <% if (order.order_status === 'Delivered') { %>
+                            <a href="/order-details/<%= order._id  %>"><button class="return-btn mt-4">Return & Refund</button></a> 
                         <% } %>
                     </div>
                 <% }); %>

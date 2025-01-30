@@ -2,573 +2,262 @@
 <!-- Add these in the head tag -->
 <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.css"/>
 <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick-theme.min.css"/>
-<link href="https://cdn.jsdelivr.net/npm/toastr@2.1.4/build/toastr.min.css" rel="stylesheet" />
-
-<style>
-.TotalAmount{
-  font-size: 16px;
-  font-weight: 500;
-}
-
-    /* Add your existing CSS styles here */
-    #addressFormContainer {
-        display: none;
-        margin-top: 20px;
-        padding: 20px;
-        border: 1px solid #ddd;
-        border-radius: 5px;
-        background-color: #ffff;
-    }
-
-    #showFormBtn + #addressFormContainer {
-        display: block;
-    }
-
-    input[type="text"] {
-        width: 400px;
-        height: 50px;
-       
-        margin-bottom: 20px;
-        padding-left: 20px;
-        border: 1px solid #0000002a;
-        border-radius: 4px;
-    }
-
-    label {
-        padding-top: 20px;
-        padding-bottom: 5px;
-        font-weight: 600;
-    }
-
-    .list-group {
-        border-radius: 4px;
-        margin-left: 20px;
-        padding-left: 20px;
-        
-    }
-
-  .coupon-container {
-  display: flex;
-  overflow-x: auto;
-  gap: 10px;
-  padding: 10px 0;
-
-  
-}
-    .coupon {
-    
-    width: 400px;
-    height: 200px;
-    border-radius: 10px;
-    overflow: hidden;
-    margin: auto;
-    filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.5));
-    display: flex;
-    align-items: stretch;
-    position: relative;
-    text-transform: uppercase;
-  }
-.coupon-description{
-  padding-top: 10px;
-  font-size: 10px;
-  color: #000;
-}
-  .coupon::before,
-  .coupon::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    width: 50%;
-    height: 100%;
-    z-index: -1;
-  }
-
-  .coupon::before {
-    left: 0;
-    background-image: radial-gradient(circle at 0 50%, transparent 25px, #fca311 26px);
-  }
-
-  .coupon::after {
-    right: 0;
-    background-image: radial-gradient(circle at 100% 50%, transparent 25px, #fca311  26px);
-  }
-
-  .coupon > div {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .left {
-    width: 20%;
-    border-right: 2px dashed rgba(0, 0, 0, 0.13);
-  }
-
-  .left div {
-    transform: rotate(-90deg);
-    white-space: nowrap;
-    font-weight: bold;
-  }
-
-  .center {
-    flex-grow: 1;
-    text-align: center;
-    padding: 10px;
-    margin-top: 10px;
-  }
-
-  .right {
-    width: 120px;
-    background-image: radial-gradient(circle at 100% 50%, transparent 25px, #fff 26px);
-  }
-
-  .right div {
-    font-size: 12px;
-    font-weight: 500;
-    transform: rotate(-90deg);
-  }
-
-  .center h2 {
-    background: #000;
-    color: #fff;
-    padding-top:10px;
-    font-size: 1rem;
-    white-space: nowrap;
-  }
-
-  .center h3 {
-    font-size: 1.5rem;
-    padding: 10px;
-  }
-
-  .center small {
-    font-size: 0.625rem;
-    font-weight: 600;
-    letter-spacing: 1px;
-  }
-
-  .copy-btn {
-    background-color: transparent;
-    color: #000;
-    border: none;
-    border-radius: 5px;
-    padding: 5px 10px;
-    cursor: pointer;    
-    display: inline-flex;
-    align-items: center;
-  }
-
-  .copy-btn i {
-    margin-right: 5px;
-  }
-
-  .copy-btn:hover {
-    background-color: transparent;
-  }
 
 
 
-  @media screen and (max-width: 500px) {
-    .coupon {
-      display: grid;
-      grid-template-columns: 1fr;
-    }
-
-    .left div {
-      transform: rotate(0deg);
-    }
-
-    .right div {
-      transform: rotate(0deg);
-    }
-  }
-
-  @media screen and (max-width:500px){
-    .coupon {
-      display:grid;
-      grid-template-columns:1fr;
-    }
-    .left div {
-      transform: rotate(0deg);
-    }
-    .right div {
-      transform: rotate(0deg);
-    }
-  }
-
-    
-
-    .model-form {
-        margin-top: 50px;
-    }
-
-    h6 {
-        font-weight: 600;
-    }
-
-    .checkout__form {
-        display: flex;
-        justify-content: space-between;
-
-    }
-
-    .col-lg-8 {
-        flex: 0 0 60%;
-        max-width: 60%;
-    }
-
-    .col-lg-4 {
-        flex: 0 0 35%;
-        max-width: 35%;
-        position: relative;
-        right: 0;
-    }
-
-    .more-options {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-    }
-
-    .more-options .btn {
-        padding: 0;
-        background: transparent;
-        border: none;
-        cursor: pointer;
-        color: inherit;
-    }
-
-    .more-options i {
-        color: #333;
-    }
-
-    .more-options .btn:hover i {
-        color: #000;
-    }
-
-    .dropdown-list {
-        display: none;
-        position: absolute;
-        right: 0;
-        top: 0;
-        background-color: #fff;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
-        width: 100px;
-        z-index: 10;
-    }
-
-    .more-options:hover .dropdown-list {
-        display: block;
-    }
-
-    .dropdown-item {
-        padding: 8px 12px;
-        text-decoration: none;
-        color: #333;
-        cursor: pointer;
-        display: block;
-        font-size: 14px;
-    }
-
-    .dropdown-item:hover {
-        background-color: #f0f0f0;
-        color: rgba(0, 0, 255, 0.616);
-    }
-
-    .order-details-box {
-        padding: 20px;
-        border: 1px solid #ddd;
-        border-radius: 5px;
-        background-color: #f9f9f9;
-        width: 50%;
-        margin-top: 40px;
-        margin-left: 50px;
-    }
-
-    .order-summary-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 10px;
-    }
-
-    .order-summary-item p {
-        margin: 0;
-        font-size: 16px;
-        color: #333;
-    }
-
-    .save-address {
-        background-color: #000;
-        color: #fff;
-        margin-top: 10px;
-    }
-
-    .save-address:hover {
-        border: 1px solid #000;
-        background-color: #fff;
-        color: #000;
-    }
-
-    .radio-btn{
-        position:absolute;
-        top: 15px;
-        right: 97.5%;
-    }
-#couponCode-form{
-  margin-left: 50px;
-}
-   
-</style>
+<!-- Add these in the head tag -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"/>
 
 <section class="breadcrumb-option">
     <div class="container">
         <div class="row">
             <div class="col-lg-12">
                 <div class="breadcrumb__text">
-                    <h4>Check Out</h4>
+                    <h4 class="text-lg font-semibold">Check Out</h4>
                     <div class="breadcrumb__links">
-                        <a href="/">Home</a>
-                        <a href="/products">Product</a>
-                        <span>Check Out</span>
+                        <a href="/" class="text-blue-600">Home</a>
+                        <a href="/products" class="text-blue-600">Product</a>
+                        <span class="text-gray-500">Check Out</span>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </section>
-
-<section class="checkout spad">
-    <div class="container-checkout">
-        <div class="checkout__form d-flex justify-content-between">
-            <!-- Left Section: Address List -->
-            <div class="col-lg-8">
-                <% if (address.length === 0 || !address.some(doc => doc.address.length > 0)) { %>
-                    <div class="text-center">
-                        <p class="fs-4">There is no address available. <br> <button class="save-address btn" id="showFormBtn">Add New Address</button></p>
-                    </div>
-                <% } else { %>
-                    <!-- Display existing addresses -->
-                    <h3 class="mb-4">Your Addresses</h3>
-                    <ul class="list-group mb-4">
-                        <% address.forEach(function(doc) { %>
-                            <% doc.address.forEach(function(addr) { %>
-                                
-                                <li class="list-group-item pl-4">
-                                    <div class="address-option">
-                                        <input class="radio-btn "  type="radio" name="selectedAddress" value="<%= addr._id %>"> 
-                                    </div>
-                                    
-                                    <h6><%= addr.recipient_name %>
-                                        <% if (addr.addressType) { %>
-                                            <span class="badge badge-warning mb-2"><%=addr.addressType%></span>
-                                        <% } %>
-                                    </h4>
-                                    <strong><%= addr.streetAddress %>, <%= addr.city %>, <%= addr.state %></strong><br>
-                                    Pincode: <%= addr.pincode %> <br>
-                                    Landmark: <%= addr.landMark || 'N/A' %><br>
-                                    <span class="text-muted">Phone: <%= addr.phone || 'N/A' %></span>
-                                    <div class="more-options">
-                                    <button class="btn btn-link"><i class="fa-solid fa-ellipsis-vertical"></i></button>
-                                    <div class="dropdown-list">
-                                      <ul>
-                                      <li><a href="#" class="dropdown-item edit-address" data-id="<%= addr._id %>">Edit</a>
-                                     </ul>
-                                    </div>
-                                    </div>
-                                </li>
-                            <% }); %>
-                        <% }); %>
-                    </ul>
-                    <button class="save-address btn" id="showFormBtn">Add New Address</button>
-                <% } %>
-
-                <button id="continueWithAddress" type="submit"  class="btn btn-dark mt-3 mb-1">
+ 
+<section class="checkout spad py-8 overflow-y-hidden">
+    <div class="container-checkout flex justify-between ">
+      <div class="col-lg-8 flex flex-col">
+        <% if (address.length === 0 || !address.some(doc => doc.address.length > 0)) { %>
+            <div class="text-center">
+                <p class="text-2xl">There is no address available. <br> 
+                    <button class="bg-black text-white px-4 py-2 rounded w-48" id="showFormBtn">Add New Address</button>
+                </p>
+            </div>
+        <% } else { %>
+            <h3 class="mb-4 ml-5 text-xl font-semibold">Your Addresses</h3>
+            <ul class="list-group mb-4 pl-5">
+                <% address.forEach(function(doc) { %>
+                    <% doc.address.forEach(function(addr) { %>
+                        <li class="list-group-item pl-4 mb-3 bg-gray-100 rounded relative">
+                            <!-- Left: Radio Button -->
+                            <div class="absolute top-4 left-4">
+                                <input class="radio-btn" type="radio" name="selectedAddress" value="<%= addr._id %>"> 
+                            </div>
+                            <div class="pl-10"> <!-- Reduced padding for closer alignment with radio button -->
+                                <h6 class="font-semibold">
+                                    <%= addr.recipient_name %>
+                                    <% if (addr.addressType) { %>
+                                        <span class="bg-yellow-500 text-white px-2 py-1 rounded-md text-sm"><%= addr.addressType %></span>
+                                    <% } %>
+                                </h6>
+                                <strong><%= addr.streetAddress %>, <%= addr.city %>, <%= addr.state %></strong><br>
+                                Pincode: <%= addr.pincode %> <br>
+                                Landmark: <%= addr.landMark || 'N/A' %><br>
+                                <span class="text-muted">Phone: <%= addr.phone || 'N/A' %></span>
+            
+                                <div class="absolute top-0 right-4 mt-2"> <!-- Positioned at the top right -->
+                                  <a href="#" class="edit-address text-sm text-Black-600 hover:bg-blue-500 px-2 py-1 rounded-md" data-id="<%= addr._id %>">Edit</a>
+                                </div>
+                            </div>
+                        </li>
+                    <% }); %>
+                <% }); %>
+            </ul>
+            <div class="flex space-x-4">
+                <button class="bg-black text-white px-4 py-2 rounded w-48" id="showFormBtn">Add New Address</button>
+                <button id="continueWithAddress" type="submit" class="bg-dark px-4 py-2 text-white rounded w-48">
                     Continue
                 </button>
-            
-                <!-- Address Form (Initially Hidden) -->
-                <div class="mt-5" id="addressFormContainer" style="display: none;">
-                    <h2 class="mb-4">Add New Address</h2>
-                    <form id="addressForm" action="/save-address" method="post">
-                      <input type="hidden" id="actionType" name="actionType" value="add">
-            
-                        <div class="mb-3">
-                            <label for="name" class="form-label">Name<span class="text-danger">*</span> </label>
-                            <input type="text" class="form-control" id="recipient_name" name="recipient_name">
-                            <div id="error1" class="error-message"></div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="streetAddress" class="form-label">Street Address <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="streetAddress" name="streetAddress">
-                            <div id="error2" class="error-message"></div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="city" class="form-label">City <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="city" name="city">
-                            <div id="error3" class="error-message"></div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="state" class="form-label">State <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="state" name="state">
-                            <div id="error4" class="error-message"></div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="landMark" class="form-label">Landmark (Optional)</label>
-                            <input type="text" class="form-control" id="landMark" name="landMark">
-                        </div>
-                        <div class="mb-3">
-                            <label for="pincode" class="form-label">Pincode <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="pincode" name="pincode">
-                            <div id="error5" class="error-message"></div>
-                        </div>
-            
-                        <div class="mb-3">
-                            <label for="Phone" class="form-label">Phone No <span class="text-danger">*</span></label>
-                            <input type="tel" class="form-control" id="phone" name="phone"  placeholder="10-digit phone number">
-                            <div id="error6" class="error-message"></div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="altPhone" class="form-label">Alternate Phone (Optional)</label>
-                            <input type="tel" class="form-control" id="altPhone" name="altPhone"  placeholder="10-digit phone number">
-                        </div>
-            
-                        <div class="mb-3">
-                            <label class="form-label">Address Type <span class="text-danger">*</span></label><br>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input mt-3" type="radio" name="addressType" id="home" value="Home">
-                                <label class="form-check-label" for="home">Home</label>
-                            </div>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input mt-3" type="radio" name="addressType" id="work" value="Work">
-                                <label class="form-check-label" for="work">Work</label>
-                            </div>
-                            <div id="error7" class="error-message"></div>
-                        </div>
-            
-                        <button type="submit" id="submit-btn" class="save-address btn">Add Address</button>
-                    </form>
-                    </div>
-                </div>
-    
-<!-- Right Section: Order Details -->
+            </div>
+        <% } %>
+            <div class="mt-5 hidden" id="addressFormContainer">
+                <h2 class="text-2xl font-semibold mb-4">Add New Address</h2>
+                <form id="addressForm" action="/save-address" method="post">
+                    <input type="hidden" id="actionType" name="actionType" value="add">
 
-<div class="coupon-carousel-container">
-  <% if (coupons.length === 0) { %>
-    <div class="alert alert-warning text-center">
-      No coupons available for the products in your cart.
-    </div>
-  <% } else { %>
-    <h6 class="mb-2">Available Coupons</h6>
-    <div id="couponCarousel" class="carousel slide" data-ride="carousel">
-      <div class="carousel-inner">
-        <% coupons.forEach((coupon, index) => { %>
-          <div class="carousel-item <%= index === 0 ? 'active' : '' %>">
-            <div class="coupon">
-              <div class="left">
-                <div>Enjoy Your Gift</div>
-              </div>
-              <div class="center">
-                <div>
-                  <h2>
-                    <%= coupon.discountType === 'percentage' 
-                      ? `${coupon.discountValue}%` 
-                      : `₹${coupon.discountValue}` %> OFF
-                  </h2>
-                  <p class="coupon-description"><%= coupon.description %></p>
-                 
-                  <div class="coupon-code">
-                    <button class="copy-btn" data-code="<%= coupon.code %>" title="Copy Code">
-                      <i class="fas fa-copy"></i> Copy
+                    <div class="mb-4">
+                        <label for="name" class="block text-lg font-medium">Name<span class="text-red-600">*</span></label>
+                        <input type="text" class="form-input w-full h-12 px-4 border rounded-md" id="recipient_name" name="recipient_name">
+                        <div id="error1" class="error-message text-red-600"></div>
+                    </div>
+                    <div class="mb-4">
+                        <label for="streetAddress" class="block text-lg font-medium">Street Address <span class="text-red-600">*</span></label>
+                        <input type="text" class="form-input w-full h-12 px-4 border rounded-md" id="streetAddress" name="streetAddress">
+                        <div id="error2" class="error-message text-red-600"></div>
+                    </div>
+                    <div class="mb-4">
+                        <label for="city" class="block text-lg font-medium">City <span class="text-red-600">*</span></label>
+                        <input type="text" class="form-input w-full h-12 px-4 border rounded-md" id="city" name="city">
+                        <div id="error3" class="error-message text-red-600"></div>
+                    </div>
+                    <div class="mb-4">
+                        <label for="state" class="block text-lg font-medium">State <span class="text-red-600">*</span></label>
+                        <input type="text" class="form-input w-full h-12 px-4 border rounded-md" id="state" name="state">
+                        <div id="error4" class="error-message text-red-600"></div>
+                    </div>
+                    <div class="mb-4">
+                        <label for="landMark" class="block text-lg font-medium">Landmark (Optional)</label>
+                        <input type="text" class="form-input w-full h-12 px-4 border rounded-md" id="landMark" name="landMark">
+                    </div>
+                    <div class="mb-4">
+                        <label for="pincode" class="block text-lg font-medium">Pincode <span class="text-red-600">*</span></label>
+                        <input type="text" class="form-input w-full h-12 px-4 border rounded-md" id="pincode" name="pincode">
+                        <div id="error5" class="error-message text-red-600"></div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="Phone" class="block text-lg font-medium">Phone No <span class="text-red-600">*</span></label>
+                        <input type="tel" class="form-input w-full h-12 px-4 border rounded-md" id="phone" name="phone" placeholder="10-digit phone number">
+                        <div id="error6" class="error-message text-red-600"></div>
+                    </div>
+                    <div class="mb-4">
+                        <label for="altPhone" class="block text-lg font-medium">Alternate Phone (Optional)</label>
+                        <input type="tel" class="form-input w-full h-12 px-4 border rounded-md" id="altPhone" name="altPhone" placeholder="10-digit phone number">
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="block text-lg font-medium">Address Type <span class="text-red-600">*</span></label><br>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input mt-3" type="radio" name="addressType" id="home" value="Home">
+                            <label class="form-check-label" for="home">Home</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input mt-3" type="radio" name="addressType" id="work" value="Work">
+                            <label class="form-check-label" for="work">Work</label>
+                        </div>
+                        <div id="error7" class="error-message text-red-600"></div>
+                    </div>
+
+                    <button type="submit" id="submit-btn" class="bg-black text-white px-4 py-2 rounded">
+                        Add Address
                     </button>
-                    <p><%= coupon.code %></p>
+                </form>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+
+          <div class="mt-8 mb-3">
+            <h6 class="text-lg font-semibold">Available Coupons</h6>
+          
+            <div class="coupon-carousel-container bg-white p-6 rounded-lg">
+              <% if (coupons.length === 0) { %>
+                <div class="alert alert-warning text-center text-yellow-600 bg-yellow-100 p-4 rounded-lg">
+                  No coupons available for the products in your cart.
+                </div>
+              <% } else { %>
+          
+                <div id="couponCarousel" class="carousel slide relative">
+                  <div class="carousel-inner">
+                    <% coupons.forEach((coupon, index) => { %>
+                      <div class="carousel-item <%= index === 0 ? 'active' : '' %>">
+                        <div class="flex bg-white-100 p-4 rounded-lg shadow-md mb-6 border-2 border-transparent border-green-300 transition-all duration-300">
+                          
+                          
+                          <div class="flex-1 px-3 py-2 max-w-xs max-h-xs w-full h-full aspect-w-1 aspect-h-1">
+                            <h2 class="text-2xl font-semibold text-gray-800">
+                              <%= coupon.discountType === 'percentage' 
+                                ? `${coupon.discountValue}%` 
+                                : `₹${coupon.discountValue}` %> OFF
+                            </h2>
+                            <p class="text-gray-600 mb-3"><%= coupon.description %></p>
+                           
+                            <div class="coupon-code flex items-center space-x-3">
+                              <button class="copy-btn bg-blue-500 text-white p-2 rounded-md flex items-center space-x-1 hover:bg-blue-600" data-code="<%= coupon.code %>" title="Copy Code">
+                                <i class="fas fa-copy"></i> <span>Copy</span>
+                              </button>
+                              <p class="text-gray-700 font-medium"><%= coupon.code %></p>
+                            </div>
+          
+                            <div class="text-black-500 mt-3">
+                              <small>Valid Till: <%= new Date(coupon.endDate).toDateString() %></small>
+                              <small class="text-muted block mt-2">Min Order: ₹<%= coupon.minOrderValue %></small>
+                            </div>
+                          </div>
+          
+                        </div>
+                      </div>
+                    <% }); %>
                   </div>
-                  <small>Valid Till: <%= new Date(coupon.endDate).toDateString() %></small>
-                  <small class="text-muted">Min Order: ₹<%= coupon.minOrderValue %></small>
+          
+                  <!-- Carousel Controls -->
+                  <a class="carousel-control-prev absolute top-1/2 left-0 transform -translate-y-1/2 text-gray-700 hover:text-blue-500 p-3 rounded-full  border-transparent " href="#couponCarousel" role="button" data-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="sr-only">Previous</span>
+                  </a>
+                  <a class="carousel-control-next absolute top-1/2 right-0 transform -translate-y-1/2 text-gray-700 hover:text-blue-500 p-3 rounded-full  border-transparent" href="#couponCarousel" role="button" data-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="sr-only">Next</span>
+                  </a>
                 </div>
-              </div>
-              <div class="right">
-                <div class="paypal__footer">
-                  <img src="https://i.ibb.co/c8CQvBq/barcode.png" alt="Paypal Barcode" class="paypal__barcode">
-                  <p>FusionGear.com</p>
-                </div>
-              </div>
+              <% } %>
             </div>
           </div>
-        <% }); %>
-      </div>
-      <!-- Controls -->
-      <a class="carousel-control-prev" href="#couponCarousel" role="button" data-slide="prev">
-        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-        <span class="sr-only">Previous</span>
-      </a>
-      <a class="carousel-control-next" href="#couponCarousel" role="button" data-slide="next">
-        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-        <span class="sr-only">Next</span>
-      </a>
+          
+            <div class="order-details-box bg-gray-100 p-6 rounded-lg shadow-md">
+                <h6 class="text-lg font-semibold">Order Summary</h6>
+                <div class="order-summary-item flex justify-between mt-4">
+                    <p>Items:</p>
+                    <span id="cartCount"><%= cartCount %> items</span>
+                </div>
+                <div class="order-summary-item flex justify-between mt-4">
+                    <p>Product Price:</p>
+                    <span id="cartTotal" class="TotalAmount">₹ <%= totalSalePrice %></span>
+                </div>
+                <div class="order-summary-item flex justify-between mt-4">
+                    <p>Offer Discount:</p>
+                    <span id="offerDiscount" class="text-success">-₹<%= offerDiscount %></span>
+                </div>
+                <div class="order-summary-item flex justify-between mt-4">
+                    <p>Subtotal:</p>
+                    <span id="cartTotal" class="TotalAmount">₹ <%= cartTotal %></span>
+                </div>
+                <div class="order-summary-item flex justify-between mt-4">
+                    <p>Coupon Discount:</p>
+                    <span id="couponDiscount" class="text-success">-₹<%= couponDiscount %></span>
+                </div>
+                <div class="order-summary-item flex justify-between mt-4">
+                    <p>Shipping:</p>
+                    <span id="shippingCharges" class="text-danger">₹<%= shippingCharges %></span>
+                </div>
+                <div class="order-summary-item flex justify-between mt-4">
+                    <p>Total:</p>
+                    <span id="netAmount" class="TotalAmount">₹<%= netAmount %></span>
+                </div>
+            </div>
+
+            <!-- Apply Coupon Section -->
+            <h6 class="mt-4 ml-5 mb-3 text-lg font-semibold">Apply Coupon</h6>
+            <div id="coupon-section">
+                <form id="couponCode-form" action="/checkout" method="GET" class="flex items-center space-x-4">
+                    <input type="text" id="couponCode" name="couponCode" placeholder="Enter coupon code" class="w-full py-2 px-4 border rounded-md">
+                    <button type="submit" class="bg-blue-600 text-white py-2 px-6 rounded-md">Apply Coupon</button>
+                    <div id="couponCode-error" class="error-message text-red-600"></div>
+                </form>
+            </div>
+
+
+
+
+
     </div>
-  <% } %>
-</div>
-        </div>
-    
-<div class="order-details-box">
-  <h6>Order Summary</h6>
-  <div class="order-summary-item">
-      <p>Items:</p>
-      <span id="cartCount"><%= cartCount%> items</span>
-  </div>
-  <div class="order-summary-item">
-    <p>Product Price:</p>
-    <span id="cartTotal" class="TotalAmount">₹ <%=totalSalePrice %></span>
-</div>
-  
-  <div class="order-summary-item">
-    <p>Offer Discount:</p>
-    <span id="offerDiscount"  class="text-success">-₹<%= offerDiscount %></span>
-</div>
-
-<div class="order-summary-item">
-  <p>Subtotal:</p>
-  <span id="cartTotal" class="TotalAmount">₹ <%=cartTotal %></span>
-</div>
-
-<div class="order-summary-item">
-    <p>Coupon Discount:</p>
-    <span id="couponDiscount" class="text-success">-₹<%= couponDiscount %></span>
-</div>
-  <div class="order-summary-item">
-      <p>Shipping:</p>
-      <span id="shippingCharges"  class="text-danger">₹<%= shippingCharges  %></span>
-  </div>
-  <div class="order-summary-item">
-      <p>Total:</p>
-      <span id="netAmount"  class="TotalAmount">₹<%= netAmount%></span>
-  </div>
-</div>
-
-        <!-- Apply Coupon Section -->
-        <h6 class="mt-4 ml-5 mb-3">Apply Coupon</h6>
-        <div id="coupon-section">
-                <form id="couponCode-form" action="/checkout" method="GET">
-                  <input type="text" id="couponCode" name="couponCode" placeholder="Enter coupon code"/>
-                  <button type="submit" class="btn btn-primary">Apply Coupon</button>
-                  <div id="couponCode-error" class="error-message"></div>
-              </form>
-        
-      </div>
- </div>
-</div>
-        </div>
 </section>
 
 
 <!-- Add these before closing the body tag -->
 <script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/toastr@2.1.4/build/toastr.min.js"></script>
 
+
+<script>
+  $('#couponCarousel').carousel({
+  interval: 3000, 
+  ride: 'carousel', 
+});
+
+
+</script>
 
 
 <script>
@@ -612,14 +301,6 @@ function updateOrderSummary(data) {
 </script>
 
 
-<script>
-  $('#couponCarousel').carousel({
-  interval: 3000, 
-  ride: 'carousel', 
-});
-
-
-</script>
 
 <script>
     document.getElementById('couponCode-form').addEventListener('submit', async function(e) {

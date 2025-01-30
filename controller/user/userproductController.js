@@ -46,7 +46,7 @@ const loadProducts = async (req, res) => {
         // Handle product variant filters (size, color)
         let variantFilters = {};
         if (size || color) {
-            query.variants = { $elemMatch: {} };
+            query.variants = { $elemMatch:{} };
             if (size) {
                 query.variants.$elemMatch.size = { $regex: `^${size}$`, $options: 'i' };
             }
@@ -58,7 +58,7 @@ const loadProducts = async (req, res) => {
 
         if (priceRange) {
             const [minPrice, maxPrice] = priceRange.split('-').map(Number);
-            query['variants.salePrice'] = { $gte: minPrice, $lte: maxPrice };
+            query['variants.0.salePrice'] = { $gte: minPrice, $lte: maxPrice };
         }
 
         let sortQuery = {};
@@ -69,10 +69,10 @@ const loadProducts = async (req, res) => {
                 sortQuery = { views: -1 };
                 break;
             case 'priceLowToHigh':
-                sortQuery = { 'variants.salePrice': 1 };
+                sortQuery = { 'variants.0.salePrice': 1 };
                 break;
             case 'priceHighToLow':
-                sortQuery = { 'variants.salePrice': -1 };
+                sortQuery = { 'variants.0.salePrice': -1 };
                 break;
             case 'averageRating':
                 sortQuery = { 'ratings.average': -1 };
@@ -118,22 +118,30 @@ const loadProducts = async (req, res) => {
             .sort(sortQuery)
             .exec();
 
-            const productsWithOffers = productData.map(product => {
-                const variantsWithOffer = product.variants.map(variant => {
-                    const offerPrice =
-                        product.offer && product.offer.discountPercentage > 0
-                            ? Math.round(variant.salePrice * (1 - product.offer.discountPercentage / 100))
-                            : variant.salePrice;
-                    return {
-                        ...variant.toObject(),
-                        offerPrice,
-                    };
-                });
-                return {
-                    ...product.toObject(),
-                    variants: variantsWithOffer,
-                };
-            });
+            // Filter variants per product (size, color, price range)
+const productsWithFilteredVariants = productData.map((product) => {
+    const filteredVariants = product.variants.filter((variant) => {
+        const matchSize = size && size !== "N/A" ? new RegExp(`^${size}$`, 'i').test(variant.size) : true;
+        const matchColor = color ? new RegExp(`^${color}$`, 'i').test(variant.color) : true;
+        const matchPrice = priceRange
+            ? variant.salePrice >= parseInt(priceRange.split('-')[0]) &&
+              variant.salePrice <= parseInt(priceRange.split('-')[1])
+            : true;
+
+        return matchSize && matchColor && matchPrice;
+    });
+
+    // Only return products with at least one matching variant
+    if (filteredVariants.length > 0) {
+        return {
+            ...product.toObject(),
+            variants: filteredVariants, // Attach only filtered variants
+        };
+    }
+    return null; 
+}).filter(product => product !== null); 
+
+
     
         
         // Get the total count of products for pagination
@@ -150,7 +158,7 @@ const loadProducts = async (req, res) => {
 
        
         const data = {
-            products: productsWithOffers, 
+            products: productsWithFilteredVariants, 
             totalPages,
             totalProduct: count,
             limit,

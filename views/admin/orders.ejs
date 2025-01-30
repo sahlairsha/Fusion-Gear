@@ -118,12 +118,17 @@
                         <td>
                             <div class="order-status-display text-center bg-<%= order.order_status === 'Pending' ? 'warning' : order.order_status === 'Shipped' ? 'info' : order.order_status === 'Delivered' ? 'success' : 'danger' %>"><%= order.order_status %></div>
                         </td> 
-
+                       
                         <td>
                             <% if (order.order_status === 'Pending Cancellation') { %>
                                 <div>
                                     <button class="btn btn-success btn-sm approve-cancel-btn" data-order-id="<%= order._id %>">Approve</button>
                                     <button class="btn btn-danger btn-sm reject-cancel-btn" data-order-id="<%= order._id %>">Reject</button>
+                                </div>
+                            <% } else if (order.order_status === 'Pending Return') { %>
+                                <div class="return-actions">
+                                    <button class="btn btn-success btn-sm approve-return-btn" data-order-id="<%= order._id %>">Approve</button>
+                                    <button class="btn btn-danger btn-sm reject-return-btn" data-order-id="<%= order._id %>">Reject</button>
                                 </div>
                             <% } else { %>
                                 <!-- Original Dropdown -->
@@ -133,31 +138,31 @@
                                     <option value="Shipped" <%= order.order_status === 'Shipped' ? 'selected' : '' %>>Shipped</option>
                                     <option value="Delivered" <%= order.order_status === 'Delivered' ? 'selected' : '' %>>Delivered</option>
                                     <option value="Canceled" <%= order.order_status === 'Canceled' ? 'selected' : '' %>>Canceled</option>
-                                    <option value="Return" <%= order.order_status === 'Return' ? 'selected' : '' %>>Return</option>
+
                                 </select>
                             <% } %>
-                            
                         </td>
-                    
-                    
+                        
                 </tr>
             <% }); %>
         </tbody>        
     </table>
 
-    <div class="pagination-container d-flex align-items-center justify-content-center mt-5">
+    <div class="flex items-center justify-center mt-3 space-x-2 mb-3">
         <% if (currentPage > 1) { %>
-            <a class="page-link" href="?page=<%= currentPage - 1 %>">&laquo; Previous</a>
+            <a class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300" href="?page=<%= currentPage - 1 %>">&laquo; Prev</a>
         <% } %>
+        
         <% for (let i = 1; i <= totalPages; i++) { %>
             <% if (i === currentPage) { %>
-                <span class="current-page"><%= i %></span>
+                <span class="px-4 py-2 bg-blue-500 text-white font-semibold rounded-md"> <%= i %> </span>
             <% } else { %>
-                <a class="page-link" href="?page=<%= i %>"><%= i %></a>
+                <a class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300" href="?page=<%= i %>"><%= i %></a>
             <% } %>
         <% } %>
+        
         <% if (currentPage < totalPages) { %>
-            <a class="page-link" href="?page=<%= currentPage + 1 %>">Next &raquo;</a>
+            <a class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300" href="?page=<%= currentPage + 1 %>">Next &raquo;</a>
         <% } %>
     </div>
 </div>
@@ -328,6 +333,77 @@ const handleAdminDecision = async (orderId, action) => {
 });
 
 </script>
+
+
+<script>
+// Handle Return Request Approval/Reject
+document.addEventListener("click", async (event) => {
+    if (event.target.classList.contains("approve-return-btn") || event.target.classList.contains("reject-return-btn")) {
+        const orderId = event.target.getAttribute("data-order-id");
+        const action = event.target.classList.contains("approve-return-btn") ? "approve" : "reject";
+
+        Swal.fire({
+            title: "Are you sure?",
+            text: `Do you want to ${action} this return request?`,
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: action === "approve" ? "#28a745" : "#d33",
+            cancelButtonColor: "#6c757d",
+            confirmButtonText: `Yes, ${action} it!`,
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    const response = await fetch(`/admin/orders/${orderId}/return`, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({ action }),
+                    });
+
+                    if (response.ok) {
+                        Swal.fire("Success", `Return request has been ${action}d.`, "success");
+                        location.reload();
+                    } else {
+                        Swal.fire("Error", "Failed to process the request.", "error");
+                    }
+                } catch (error) {
+                    Swal.fire("Error", "Something went wrong.", "error");
+                    console.error("Admin action error:", error);
+                }
+            }
+        });
+    }
+});
+
+</script>
+<script>
+    const socketIo = io(); // Admin socket client-side initialization
+   
+   socketIo.on('order_return_request', (data) => {
+       console.log(`Received return request for order ID: ${data.orderId}`);
+   
+       // Show a notification or update the admin dashboard
+       displayCancellationRequest(data); // Function to display the request in the admin UI
+   });
+   
+   // Function to handle admin decision (Approve or Reject)
+   const handleAdminDecisionReturn = async (orderId, action) => {
+       try {
+           const response = await fetch(`/admin//admin/orders/${orderId}/return`, {
+               method: 'POST',
+               headers: { 'Content-Type': 'application/json' },
+               body: JSON.stringify({ action }), 
+           });
+   
+           const result = await response.json();
+           console.log(`Order ${orderId} ${action}d:`, result);
+       } catch (error) {
+           console.error('Error handling admin decision:', error);
+       }
+   };
+   
+   </script>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 

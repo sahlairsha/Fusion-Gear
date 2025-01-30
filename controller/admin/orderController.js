@@ -16,6 +16,7 @@ const getOrders = async (req, res) => {
             .populate('user_id')
             .populate('products.product_id')
             .populate('shippingAddress.addressDocId')
+            .sort({createdAt : -1})
             .exec();
 
         const count = await Order.find().countDocuments();
@@ -90,7 +91,6 @@ const getDetails = async(req,res)=>{
         const orders = await Order.findById(orderId)
         .populate('products.product_id')
         .populate('shippingAddress.addressDocId')
-        .sort({createdAt: -1})
         .exec()
 
 
@@ -127,7 +127,7 @@ const processRefundAndRestock = async (order) => {
             user.transactions.push({
                 type: "Refund",
                 amount: order.total_price,
-                description: `Refund for canceled order ${order._id}`,
+                description: `Refund for order ${order._id}`,
                 date: new Date(),
             });
             await user.save();
@@ -168,7 +168,7 @@ const adminCancelOrder = async (req, res) => {
             emitToUser(order.user_id, 'order_update', {
                 status: 'approved',
                 orderId: order._id,
-                message: `Your cancellation request for Order ${order._id} has been approved.`,
+                message: `Your cancellation request for Order ${order._id} has been approved.Refunded to the Wallet`,
             });
 
             await order.save();
@@ -195,55 +195,60 @@ const adminCancelOrder = async (req, res) => {
 };
 
 
-const approveReturn = async (req, res) => {
-    try {
-        const { orderId } = req.body;
+// Approve or reject the return request (admin side)
+const handleReturnRequest = async (req, res) => {
 
+    const {orderId} = req.params
+    const { action } = req.body;
+
+    try {
+        // Find the order in the database
         const order = await Order.findById(orderId);
-        if (!order || order.return_status !== 'Pending') {
-            return res.status(400).json({ message: 'Return not pending or order not found.' });
+        if (!order) {
+            return res.status(404).json({ success: false, message: 'Order not found' });
         }
 
-        // Mark return as approved and process refund
-        order.return_status = 'Approved';
-        order.refund_status = 'Completed';
-        order.restocked_at = new Date();
+        if (action === 'approve') {
+            // Change the order status to 'Returned'
+            order.order_status = 'Return';
+            
 
-   
+            await processRefundAndRestock(order);
+            emitToUser(order.user_id, 'order_update', {
+                status: 'approved',
+                orderId: order._id,
+                message: `Your return request for Order ${order._id} has been approved.Refunded to the Wallet`,
+            });
+
+        } else if (action === 'reject') {
+            // Change the order status to 'Delivered'
+            order.order_status = 'Delivered';
+            
+
+            emitToUser(order.user_id, 'order_update', {
+                status: 'rejected',
+                orderId: order._id,
+                message: `Your Return request for Order ${order._id} has been rejected.`,
+            });
+
+        } else {
+            return res.status(400).json({ success: false, message: 'Invalid action' });
+        }
+
         await order.save();
-
-        res.json({ success: true, message: 'Return approved, refund processed.' });
+        res.json({ success: true, message: `Return request ${action}d successfully.` });
     } catch (error) {
-        console.error('Error approving return:', error);
-        res.status(500).json({ success: false, message: 'Failed to approve return' });
+        console.error('Error processing return request:', error);
+        res.status(500).json({ success: false, message: 'Failed to process return request.' });
     }
 };
 
-const rejectReturn = async(req,res)=>{
-    const { orderId } = req.body;
-
-    try {
-        const order = await Order.findById(orderId);
-        if (!order || order.return_status !== 'Pending') {
-            return res.status(400).json({ message: 'Return not pending or order not found.' });
-        }
-
-        // Mark return as rejected
-        order.return_status = 'Rejected';
-        await order.save();
-        res.json({ success: true, message: 'Return rejected.' });
-    } catch (error) {
-        console.error('Error rejecting return:', error);
-        res.status(500).json({ success: false, message: 'Failed to reject return' });
-    }
-}
 
 module.exports = {
     getOrders,
     changeOrderStatus ,
     getDetails,
     adminCancelOrder,
-    approveReturn,
-    rejectReturn
+    handleReturnRequest
 
 }

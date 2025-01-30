@@ -198,8 +198,8 @@ router.post('/verify-payment',userAuth,userOrderController.verifyPayment)
 router.get('/ratings',userAuth,userOrderController.getRating)
 router.post('/ratings/submit',userAuth, userOrderController.submitRating);
 
-router.get('/order/return-form/:orderId',userAuth,userOrderController.getReturnPage)
-router.post('/order/return',userAuth,userOrderController.returnReason )
+router.get('/order/return-form',userAuth,userOrderController.getReturnPage)
+router.post('/order/return/:orderId',userAuth,userOrderController.returnReason )
 
 //whishlist 
 

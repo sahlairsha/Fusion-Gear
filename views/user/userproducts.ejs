@@ -59,27 +59,37 @@
 
 @keyframes moveUpAndDisappear {
     0% {
+    
         transform: translateY(0);
         opacity: 1;
+
     }
     50% {
+
         transform: translateY(-50%);
         opacity: 0.5;
+
     }
     100% {
+
         transform: translateY(-100%);
-        opacity: 0; /* Ensures it's fully hidden */
+        opacity: 0; 
+
     }
 }
 
 @keyframes slideInFromBottom {
     0% {
+
         transform: translateY(100%);
         opacity: 0;
+
     }
     100% {
+
         transform: translateY(0);
         opacity: 1;
+
     }
 }
 
@@ -142,9 +152,6 @@
      margin-right: 65px;
 }
 
-
-
-
     .stock-left{
     font-weight: 600;
     font-size: 14px;
@@ -190,7 +197,7 @@
 }
 
 .product-badge.available {
-    background-color: #28a745; /* Green for Available */
+    background-color: #28a745; 
 }
 
 .product-badge.sold-out {
@@ -277,11 +284,6 @@
                     <div class="shop__sidebar__search">
                         <form action="/products" method="GET">
                             <input type="text" name="search" placeholder="Search..." value="<%= search %>" />
-                            <input type="hidden" name="sort" value="<%= sort %>">
-                            <input type="hidden" name="category" value="<%= category %>">
-                            <input type="hidden" name="priceRange" value="<%= priceRange %>">
-                            <input type="hidden" name="size" value="<%= size %>">
-                            <input type="hidden" name="color" value="<%= color %>">
                             <button type="submit"><span class="icon_search"></span></button>
                         </form>
                         
@@ -390,9 +392,9 @@
                                                 { name: "Black", class: "c-1" },
                                                 { name: "Blue", class: "c-2" },
                                                 { name: "Beige", class: "c-3" },
-                                                { name: "White", class: "c-4" },
-                                                { name: "Yellow", class: "c-5" },
-                                                { name: "Pink", class: "c-6" },
+                                                { name: "Gray", class: "c-4" },
+                                                { name: "Pink", class: "c-5" },
+                                                { name: "Yellow", class: "c-6" },
                                                 { name: "Purple", class: "c-7" },
                                                 { name : "Red", class: "c-8" },
                                             ]; %>
@@ -421,7 +423,7 @@
                         <div class="col-lg-6 col-md-6 col-sm-6 d-flex me-auto">
                             <div class="shop__product__option__right">
                                 <form method="GET" action="/products">
-                                    <select name="sort" id="sort" onchange="this.form.submit()">
+                                    <select name="sort" id="sort" onchange="updateSortAndFilters(this)">
                                         <option value="popularity" <%= sort === 'popularity' ? 'selected' : '' %>>Popularity</option>
                                         <option value="priceLowToHigh" <%= sort === 'priceLowToHigh' ? 'selected' : '' %>>Price: Low to High</option>
                                         <option value="priceHighToLow" <%= sort === 'priceHighToLow' ? 'selected' : '' %>>Price: High to Low</option>
@@ -485,15 +487,11 @@
                                     
                                             <% if (product.variants.length > 0) { %>
                                                 <div class="product-price">
-                                                    <!-- Strike-through for sale price if offer is applied -->
-                                                    <% if (product.variants[0].salePrice > product.variants[0].offerPrice) { %>
+                                                  
                                                         <div class="product-price-container">
-                                                            <span class="sale-price"><span>&#8377;<%= product.variants[0].salePrice %></span></span>
-                                                            <!-- <span class="offer-price"><span>&#8377;<%= product.variants[0].offerPrice %></span></span> -->
+                                                            <span class="sale-price"><span>&#8377;<%= product.variants[0].salePrice %></span></span>    
                                                         </div>      
-                                                    <% } else { %>
-                                                        <span class="offer-price">&#8377;<%= product.variants[0].salePrice %></span>
-                                                    <% } %>
+                                                    
                                                 </div>
                                             <% } else { %>
                                                 <div class="product-price">Price Not Available</div>
@@ -507,7 +505,9 @@
                                         <!-- Wishlist button with the heart icon -->
                                         <button class="wishlist-btn" onclick="addToWishlist('<%= product._id %>', '<%= product.variants[0]._id %>')">
                                             <i id="heart-icon" class="far fa-heart"></i>
-                                        </button>
+                                           </button>
+                                           
+
                                         <button class="add-cart-btn">
                                             <a href="#" onclick="addToCart('<%= product._id %>','<%= product.variants[0]._id %>')" class="add-cart-link">+ Add to Cart</a>
                                         </button>
@@ -517,6 +517,7 @@
                                
                             </div>
                         <% }); %>
+                       
                     <% } %>
                 </div>
                 
@@ -547,244 +548,6 @@
                 </div>
 </section>
 
-<script>
-function addToWishlist(productId, variantId) {
-    const quantity = 1;
-    fetch('/wishlist/add', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-        },
-        body: JSON.stringify({
-            productId: productId,
-            variantId: variantId,
-            quantity : quantity
-        }),
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.message === 'Product added to wishlist') {
-            const heartIcon = document.getElementById('heart-icon');
-            heartIcon.classList.remove('far', 'fa-heart');
-            heartIcon.classList.add('fas', 'fa-heart');
-            
-            // Show success alert without redirecting
-            Swal.fire({
-                title: 'Product added to wishlist',
-                  icon: 'success',
-                showCancelButton: true,
-                confirmButtonText: 'Go to Wishlist',
-                    cancelButtonText: 'Stay Here',
-            }).then((result) => {
-                if (result.isConfirmed) {
-        window.location.href = '/wishlist';
-     }
-            });
-        } else {
-            Swal.fire({
-                title: 'Error',
-                icon: 'error',
-                text: data.message || 'Failed to add to wishlist',
-                confirmButtonText: 'Try Again',
-            });
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        Swal.fire({
-            title: 'Error',
-            icon: 'error',
-            text: 'Internal Server Error',
-            confirmButtonText: 'Try Again',
-        });
-    });
-}
-
-
-</script>
-
-
-
-<script>
-
-function addToCart(productId) {
-
-    const quantity = document.querySelector('.pro-qty input').value;
-
-    // Proceed with AJAX
-    $.ajax({
-        url: `/cart/add/${productId}`,
-        method: 'POST',
-        contentType: 'application/json',
-        data: JSON.stringify({ quantity: parseInt(quantity, 10) }),
-        success: function(response) {
-            Swal.fire({
-                title: "Success",
-                icon: "success",
-                text: "Product added successfully",
-                showConfirmButton: true,
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    window.location.href = '/cart';
-                }
-            });
-        },
-        error: function() {
-            Swal.fire({
-                title: "Error",
-                icon: "error",
-                text: "Failed to add product to cart!",
-                showConfirmButton: true,
-            });
-        }
-    });
-}
-
-
-
-</script>
-
-<script>
-   function addToCart(productId, variantId) {
-    const quantity = 1;  // Default quantity set to 1
-
-    fetch('/cart/add', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-        },
-        body: JSON.stringify({
-            productId: productId,
-            variantId: variantId,
-            quantity: quantity, 
-        }),
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            Swal.fire({
-                title: 'Added to Cart',
-                text: 'The product has been added to your cart.',
-                icon: 'success',
-                confirmButtonText: 'Go to Cart',
-            }).then(result => {
-                if (result.isConfirmed) {
-                    window.location.href = '/cart';
-                }
-            });
-        } else {
-            Swal.fire({
-                title: 'Error',
-                text: data.message || 'Failed to add product to cart.',
-                icon: 'error',
-                confirmButtonText: 'Try Again',
-            });
-        }
-    })
-    .catch(error => {
-        console.error('Error adding product to cart:', error);
-        Swal.fire({
-            title: 'Error',
-            text: 'Internal Server Error',
-            icon: 'error',
-            confirmButtonText: 'Try Again',
-        });
-    });
-}
-
-
-</script>
-
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    // Toggle clear buttons visibility
-    toggleClearButtons();
-
-    // Event delegation for dynamically rendered elements
-    document.body.addEventListener('click', function (event) {
-        if (event.target.matches('.clear-filter')) {
-            event.preventDefault();
-            const filterType = event.target.getAttribute('data-filter');
-            const queryParams = new URLSearchParams(window.location.search);
-
-            queryParams.delete(filterType);
-            window.location.search = queryParams.toString();
-        }
-
-        if (event.target.matches('.clear-all a')) {
-            event.preventDefault();
-            window.location.search = '';
-        }
-    });
-
-    // Handle filter changes
-    document.querySelectorAll('input[name="size"], input[name="color"]').forEach(input => {
-        input.addEventListener('change', updateFilters);
-    });
-
-    // Handle search form submission
-    document.getElementById('searchForm').onsubmit = (e) => {
-        e.preventDefault();
-        const formData = new FormData(e.target);
-        const queryParams = new URLSearchParams(window.location.search);
-
-        for (const [key, value] of formData.entries()) {
-            queryParams.set(key, value);
-        }
-
-        queryParams.set('page', 1); // Reset to page 1
-        window.location.search = queryParams.toString();
-    };
-
-    // Handle price filter
-    document.querySelectorAll('.price-filter').forEach(link => {
-        link.addEventListener('click', function (event) {
-            event.preventDefault();
-            const priceRange = this.getAttribute('data-range');
-
-            if (!/^\d+-\d+$/.test(priceRange)) {
-                console.error('Invalid price range:', priceRange);
-                return;
-            }
-
-            const queryParams = new URLSearchParams(window.location.search);
-            queryParams.set('priceRange', priceRange);
-            queryParams.set('page', 1);
-            window.location.search = queryParams.toString();
-        });
-    });
-});
-
-function toggleClearButtons() {
-    const urlParams = new URLSearchParams(window.location.search);
-
-    document.querySelectorAll('.clear-filter').forEach(button => {
-        const filterType = button.getAttribute('data-filter');
-        button.style.display = urlParams.has(filterType) && urlParams.get(filterType) ? 'inline-block' : 'none';
-    });
-
-    const clearAllButton = document.querySelector('.clear-all a');
-    clearAllButton.style.display = [...urlParams].length > 0 ? 'inline-block' : 'none';
-}
-
-function updateFilters() {
-    const queryParams = new URLSearchParams(window.location.search);
-    const size = document.querySelector('input[name="size"]:checked')?.value;
-    const color = document.querySelector('input[name="color"]:checked')?.value;
-
-    if (size) queryParams.set('size', size);
-    else queryParams.delete('size');
-
-    if (color) queryParams.set('color', color);
-    else queryParams.delete('color');
-
-    queryParams.set('page', 1); // Reset to page 1
-    window.location.search = queryParams.toString();
-}
-
-</script>
-
+<script src="/js/user/product-list.js"></script>
 
 <%-include('../../views/partials/user/footer') %>

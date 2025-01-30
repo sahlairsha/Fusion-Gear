@@ -1,176 +1,155 @@
 <%- include('../../views/partials/user/header') %>
 
+
 <style>
-.wishlist-container {
-    margin: 20px;
-    font-family: 'Poppins', sans-serif;
-    color: #333;
-}
-
-h3 {
-    text-align: center;
-    font-size: 24px;
-    font-weight: 600;
-    margin-bottom: 20px;
-    color: #2c3e50;
-}
-
-.empty-wishlist {
-    text-align: center;
-    font-size: 16px;
-    color: #7f8c8d;
-    font-weight: 500;
-    padding: 15px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    background-color: #f7f7f7;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.wishlist-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 15px;
-    margin-top: 20px;
-}
-
-.wishlist-card {
-    border: none;
-    border-radius: 10px;
-    background: linear-gradient(145deg, #ffffff, #f0f0f0);
-    box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.1), -3px -3px 8px rgba(255, 255, 255, 0.7);
-    padding: 15px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    margin-bottom: 50px;
-    margin-top: 50px;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.wishlist-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.15), -4px -4px 10px rgba(255, 255, 255, 0.9);
-}
-
-.wishlist-card img {
-    width: 90px;
-    height: 90px;
-    object-fit: cover;
-    object-position: top center;
-    border-radius: 8px;
-    margin-bottom: 10px;
-    border: 2px solid #eee;
-}
-
-.wishlist-card h4 {
-    font-size: 16px;
-    font-weight: 600;
-    margin: 8px 0;
-    color: #34495e;
-    line-height: 1.2;
-}
-
-.wishlist-inline-details {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    font-size: 12px;
-    margin: 5px 0;
-    color: #7f8c8d;
-    font-weight: 500;
-}
-
-.stock-status {
-    font-weight: 500;
-    padding: 4px 10px;
-    border-radius: 20px;
-    display: inline-block;
-    margin-top: 8px;
-}
-
-.stock-status.available {
-    background-color: #27ae60;
-    color: white;
-}
-
-.stock-status.out-of-stock {
-    background-color: #e74c3c;
-    color: white;
-}
-
-.stock-status.unavailable {
-    background-color: #95a5a6;
-    color: white;
-}
-
-.remove-btn {
-    background-color: transparent;
-    border: none;
-    color: #e74c3c;
-    font-size: 16px;
-    cursor: pointer;
-    margin-top: 10px;
-    transition: color 0.2s ease;
-}
-
-.remove-btn:hover {
-    color: #c0392b;
-}
-
-.add-cart-btn {
-    background-color: #000;
-    color: white;
-    padding: 6px 12px;
-    border: none;
-    border-radius: 20px;
-    cursor: pointer;
-    font-weight: 500;
-    margin-top: 10px;
-    font-size: 14px;
-    transition: background-color 0.2s ease, transform 0.2s ease;
-}
-
-.add-cart-btn:hover {
-    background-color: #2980b9;
-    transform: scale(1.05);
-}
-</style>
-
-<div class="wishlist-container">
-    <h3>My Wishlist</h3>
-
-    <% if (wishlistItems.length === 0) { %>
-        <div class="empty-wishlist">
-            <p>Your wishlist is empty.</p>
-        </div>
-    <% } else { %>
-        <div class="wishlist-grid">
-            <% wishlistItems.forEach(item => { 
-                const product = item.product_id;
-                const firstVariant = product.variants[0];
-            %>
-                <div class="wishlist-card">
-                    <a href="/product/view?id=<%=product._id%>"><img src="/uploads/public-image/<%= product.productImage[0] %>" alt="<%= product.productName %>"></a>
-                    <h4><%= product.productName %></h4>
-                    <div class="wishlist-inline-details">
-                        <span>Size: <%= firstVariant.size %></span>
-                        <span>Color: <%= firstVariant.color %></span>
-                        <span>Price: &#8377;<%= firstVariant.salePrice || firstVariant.regularPrice %></span>
-                    </div>
-                    <span class="stock-status <%= firstVariant.status.toLowerCase().replace(/ /g, '-') %>">
-                        <%= firstVariant.status %>
-                    </span>
-                    <button class="add-cart-btn" onclick="addToCart('<%= product._id %>', '<%= firstVariant._id %>')">Add to Cart</button>
-                    <button class="remove-btn" onclick="removeFromWishlist('<%= product._id %>')">Remove</button>
-                </div>
-            <% }); %>
-        </div>
-
-    <% } %>
-</div>
-
+    .wishlist-container {
+        margin: 20px;
+        font-family: 'Poppins', sans-serif;
+        color: #333;
+    }
+    
+    h3 {
+        text-align: center;
+        font-size: 24px;
+        font-weight: 600;
+        margin-bottom: 20px;
+        color: #2c3e50;
+    }
+    
+    .empty-wishlist {
+        padding: 60px;
+        text-align: center;
+        font-size: 16px;
+      
+        color: #7f8c8d;
+        font-weight: 500;
+     
+        
+    }
+    
+    .wishlist-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+        margin-bottom: 60px;
+    }
+    
+    .wishlist-table th, .wishlist-table td {
+        padding: 12px;
+       
+        text-align: center;
+    }
+    
+    .wishlist-table th {
+        background-color: #f3f4f6;
+        color: #2c3e50;
+        font-weight: 600;
+    }
+    
+    .wishlist-table img {
+        width: 60px;
+        height: 60px;
+        object-fit: cover;
+        border-radius: 5px;
+    }
+    
+    .stock-status {
+        margin: 30px;
+        font-weight: 500;
+        border-radius: 20px;
+        display: inline-block;
+    }
+    
+    .stock-status.available {
+        background-color: #27ae60;
+        color: white;
+    }
+    
+    .stock-status.out-of-stock {
+        background-color: #e74c3c;
+        color: white;
+    }
+    
+    .stock-status.unavailable {
+        background-color: #95a5a6;
+        color: white;
+    }
+    
+    .add-cart-btn {
+        padding: 6px 12px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: 500;
+    }
+    
+    .remove-btn {
+        margin-left: 10px;
+        padding: 6px 12px;
+        border: none;
+        border-radius: 50%;
+        cursor: pointer;
+        font-weight: 500;
+    }
+    
+    .remove-btn:hover {
+        background-color: #000;
+        color: #fff;
+    }
+    
+    .add-cart-btn {
+        background-color: #000;
+        color: white;
+    }
+    
+    .add-cart-btn:hover {
+        background-color: #fff;
+        color: #000;
+    }
+    </style>
+    
+    <div class="wishlist-container">
+        <h3>My Wishlist</h3>
+    
+        <% if (wishlistItems.length === 0) { %>
+           
+                <p class="empty-wishlist">Your wishlist is empty.</p>
+          
+        <% } else { %>
+            <table class="wishlist-table">
+                <thead>
+                    <tr>
+                        <th>Image</th>
+                        <th>Product</th>
+                        <th>Size</th>
+                        <th>Color</th>
+                        <th>Price</th>
+                        <th>Stock</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% wishlistItems.forEach(item => { 
+                        const product = item.product_id;
+                        const firstVariant = product.variants[0];
+                    %>
+                        <tr id="wishlist-item-<%= product._id %>">
+                            <td><a href="/product/view?id=<%= product._id %>"><img src="/uploads/public-image/<%= product.productImage[0] %>" alt="<%= product.productName %>"></a></td>
+                            <td><%= product.productName %></td>
+                            <td><%= firstVariant.size %></td>
+                            <td><%= firstVariant.color %></td>
+                            <td>&#8377;<%= firstVariant.salePrice || firstVariant.regularPrice %></td>
+                            <td class="stock-status <%= firstVariant.status.toLowerCase().replace(/ /g, '-') %>"><%= firstVariant.status %></td>
+                            <td>
+                                <button class="add-cart-btn" onclick="addToCart('<%= product._id %>', '<%= firstVariant._id %>')">Add to Cart</button>
+                                <button class="remove-btn" onclick="removeFromWishlist('<%= product._id %>')">X</button>
+                            </td>
+                        </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+        <% } %>
+    </div>
 <script>
     function removeFromWishlist(productId) {
     Swal.fire({

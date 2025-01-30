@@ -7,6 +7,7 @@ const Product = require('../../models/productSchema')
 const User = require('../../models/userSchema')
 const Coupon = require('../../models/couponSchema')
 const crypto = require("crypto");
+const dayjs = require('dayjs');
 
 const PDFDocument = require('pdfkit');
 const fs = require('fs');
@@ -56,29 +57,25 @@ async function calculateCheckoutTotals(userId, couponCode) {
     if (couponCode) {
         const coupon = await Coupon.findOne({ code: couponCode, status: 'active' });
         if (coupon) {
-            const now = new Date();
-            if (now >= coupon.startDate && now <= coupon.endDate && coupon.timesUsed < coupon.usageLimit) {
-                if (cartTotal >= coupon.minOrderValue) {
-                    if (coupon.discountType === 'percentage') {
-                        couponDiscount = Math.min((cartTotal * coupon.discountValue) / 100, coupon.maxDiscount || Infinity);
-                    } else if (coupon.discountType === 'fixed') {
-                        couponDiscount = Math.min(coupon.discountValue, coupon.maxDiscount || Infinity);
-                    }
-                } else {
-                    couponMessage = 'Order does not meet the minimum value for this coupon.';
-                   
-                }
+            const now = dayjs(); // Using dayjs for date handling
+            const startDate = dayjs(coupon.startDate); // Convert coupon startDate to dayjs
+            const endDate = dayjs(coupon.endDate); // Convert coupon endDate to dayjs
+
+            if (now.isBefore(startDate) || now.isAfter(endDate)) {
+                couponMessage = 'Coupon expired.';
             } else if (coupon.timesUsed >= coupon.usageLimit) {
                 couponMessage = 'Coupon usage limit exceeded.';
-              
-
+            } else if (cartTotal < coupon.minOrderValue) {
+                couponMessage = 'Order does not meet the minimum value for this coupon.';
             } else {
-                couponMessage = 'Coupon expired.';
-              
+                if (coupon.discountType === 'percentage') {
+                    couponDiscount = Math.min((cartTotal * coupon.discountValue) / 100, coupon.maxDiscount || Infinity);
+                } else if (coupon.discountType === 'fixed') {
+                    couponDiscount = Math.min(coupon.discountValue, coupon.maxDiscount || Infinity);
+                }
             }
         } else {
             couponMessage = 'Invalid coupon code.';
-           
         }
     }
 
@@ -104,11 +101,6 @@ const applyCoupon = async (req, res) => {
         }
 
         const user = await User.findById(userId).populate('cart.product_id');
-       
-
-
-       
-        
         if (!user || user.cart.length === 0) {
             return res.status(400).json({ error: "Cart is empty! Please add a product." });
         }
@@ -123,42 +115,44 @@ const applyCoupon = async (req, res) => {
             return res.status(400).json({ couponMessage: "Invalid or expired coupon code." });
         }
 
-        if (coupon.timesUsed >= coupon.usageLimit) {
-            return res.status(400).json({ couponMessage: "Coupon usage limit exceeded." });
+        const now = new Date();
+        if (now < coupon.startDate || now > coupon.endDate) {
+            return res.status(400).json({ couponMessage: "Coupon is not valid at this time." });
         }
 
-        
+        // Check user's usage in the userUsage array
+        const userUsageEntry = coupon.userUsage.find((usage) => usage.userId.toString() === userId.toString());
+
+        if (userUsageEntry && userUsageEntry.usageCount >= coupon.userLimit) {
+            return res.status(400).json({ couponMessage: "You have reached the usage limit for this coupon." });
+        }
 
         const updatedCheckoutTotals = await calculateCheckoutTotals(userId, couponCode);
 
-        
-
-       if(updatedCheckoutTotals.cartTotal < coupon.minOrderValue){
-        return res.status(400).json({ couponMessage: "Order does not meet the minimum value for this coupon." });
-       }
-
-
-        if (!updatedCheckoutTotals.couponMessage) {
-            coupon.timesUsed += 1;
-            await coupon.save();
+        if (updatedCheckoutTotals.cartTotal < coupon.minOrderValue) {
+            return res.status(400).json({ couponMessage: "Order does not meet the minimum value for this coupon." });
         }
 
-        req.session.couponCode = couponCode;
+        // Update user usage
+        if (userUsageEntry) {
+            userUsageEntry.usageCount += 1;
+        } else {
+            coupon.userUsage.push({ userId, usageCount: 1 });
+        }
 
-        console.log("Updated checkout total:",updatedCheckoutTotals)
+        await coupon.save();
+
+        req.session.couponCode = couponCode;
 
         res.json({
             cartCount: user.cart.length,
             cartTotal: updatedCheckoutTotals.cartTotal,
-            offerDiscount: updatedCheckoutTotals.offerDiscount, 
-            couponDiscount: updatedCheckoutTotals.couponDiscount, 
+            offerDiscount: updatedCheckoutTotals.offerDiscount,
+            couponDiscount: updatedCheckoutTotals.couponDiscount,
             shippingCharges: updatedCheckoutTotals.shippingCharges,
             netAmount: updatedCheckoutTotals.netAmount,
             couponMessage: updatedCheckoutTotals.couponMessage || null,
         });
-
-
-        
     } catch (error) {
         console.error("Error applying coupon:", error);
         res.status(500).json({ error: "An error occurred while applying the coupon. Please try again." });
@@ -198,15 +192,18 @@ const getCheckout = async (req, res) => {
             };
         }).filter(item => item !== null);
 
-        // Fetch available coupons
         const now = new Date();
         const coupons = await Coupon.find({
             status: 'active',
             startDate: { $lte: now },
             endDate: { $gte: now },
-        })
+        }).lean();
 
-        // Calculate checkout totals with the applied coupon (if any)
+        for (const coupon of coupons) {
+            const userUsageEntry = coupon.userUsage.find((usage) => usage.userId.toString() === userId.toString());
+            coupon.remainingUses = coupon.userLimit - (userUsageEntry?.usageCount || 0);
+        }
+
         const appliedCoupon = req.session.couponCode || null;
         const updatedCheckoutTotals = await calculateCheckoutTotals(userId, appliedCoupon);
 
@@ -214,17 +211,15 @@ const getCheckout = async (req, res) => {
             return total + item.salePrice * item.quantity;
         }, 0);
 
-        console.log('Updated Checkout Totals:', updatedCheckoutTotals);
-
         res.render('checkout', {
             user,
             address: savedAddress,
             cartCount: user.cart.length,
             coupons,
-            totalSalePrice ,
+            totalSalePrice,
             appliedCoupon,
             isCouponApplied: !!appliedCoupon,
-            ...updatedCheckoutTotals, 
+            ...updatedCheckoutTotals,
         });
     } catch (error) {
         console.error("Error loading checkout page:", error);
@@ -843,7 +838,7 @@ const cancelOrder = async (req, res) => {
         const io = getIo();
         io.emit('order_cancellation_request', cancellationData);
 
-        res.redirect(`/order-details/${orderId}?message=Cancellation request submitted successfully`);
+        res.redirect(`/order-details/${orderId}?action=cancel&message=${encodeURIComponent("Cancellation request submitted successfully")}`);
     } catch (error) {
         console.error("Error in cancelOrder:", error);
         res.status(500).send('Server Error');
@@ -876,7 +871,7 @@ const getRating = async (req, res) => {
         });
 
         if (!hasDeliveredOrder) {
-         req.flash('error',"You have to order the product first");
+         req.flash('error',"You can only submit the rating after delivered product");
          return res.redirect('/products')
         }
 
@@ -1042,38 +1037,14 @@ const removeCoupon = async (req, res) => {
     }
 };
 
-const returnReason = async (req, res) => {
-    const { orderId, returnReason, additionalInfo } = req.body;
-
-    try {
-        // Check if the order exists and is delivered
-        const order = await Order.findById(orderId);
-        if (!order || order.order_status !== 'Delivered') {
-            return res.status(400).json({ success: false, message: 'Order not found or not delivered yet.' });
-        }
-
-        // Update the order's return status and reason
-        order.order_status = "Return"
-        order.return_status = 'Pending';
-        order.return_reason = returnReason;
-        if (additionalInfo) {
-            order.additional_info = additionalInfo;
-        }
-
-        await order.save();
-        res.json({ success: true, message: 'Return request submitted successfully.' });
-    } catch (error) {
-        console.error('Error processing return request:', error);
-        res.status(500).json({ success: false, message: 'Failed to process return request.' });
-    }
-}
-
-
 const getReturnPage = async(req,res)=>{
-    const { orderId } = req.params;
+    const  orderId  = req.query.id;
 
     try {
-        const order = await Order.findById(orderId);
+        const order = await Order.findById(orderId)
+
+        console.log("Order for return page:",order)
+
         if (!order || order.order_status !== 'Delivered') {
             return res.status(400).send('Invalid order or the order is not delivered yet.');
         }
@@ -1085,6 +1056,40 @@ const getReturnPage = async(req,res)=>{
         res.status(500).send('An error occurred.');
     }
 }
+
+const returnReason = async (req, res) => {
+    const { orderId } = req.params;
+    const {return_reason , customReason} = req.body;
+
+    try {
+        // Check if the order exists and is delivered
+        const order = await Order.findById(orderId);
+        if (!order || order.order_status !== 'Delivered') {
+            return res.status(400).json({ success: false, message: 'Order not found or not delivered yet.' });
+        }
+
+        order.order_status = 'Pending Return';
+        order.return_reason =  { predefined: return_reason, custom: customReason} 
+        await order.save();
+
+        const returnOrderData = {
+            orderId: orderId,
+            reason: return_reason,
+            customReason: customReason || '',
+
+        };
+
+        const io = getIo();
+        io.emit('order_return_request', returnOrderData);
+        res.redirect(`/order-details/${orderId}?action=return&message=${encodeURIComponent("Return request submitted successfully")}`);
+    } catch (error) {
+        console.error('Error processing return request:', error);
+        res.status(500).json({ success: false, message: 'Failed to process return request.' });
+    }
+};
+
+
+
 async function generateInvoice(req, res) {
     const orderId = req.params.orderId;
 

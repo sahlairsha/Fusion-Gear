@@ -1,10 +1,9 @@
 <%- include('../../views/partials/user/header') %>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
-<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
 
 
 <style>
-/* Container Styling */
+
   /* Alert Box Styles */
     .alert {
         position: fixed;
@@ -113,134 +112,81 @@
     color: #2874f0;
     font-size: 16px;
 }
-
-/* Order Status */
 .order-status {
-    flex: 0 0 30%;
-    margin-left: 20px;
+    text-align: center;
 }
-/* Timeline Container */
+
 .timeline {
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    justify-content: space-between;
+    margin-top: 10px;
+    padding: 10px;
     position: relative;
-    width: 100%;
-    margin: 20px auto;
-    padding: 10px 0;
 }
 
-/* Step Container */
 .timeline-step {
     text-align: center;
+    opacity: 0.5;
     position: relative;
-    flex: 1;
+    font-weight: normal; /* Default font weight */
+    color: #888; /* Default color */
 }
 
-/* Step Circle */
-.step-circle {
-    width:15px;
-    height:15px;
-    background-color: #ddd;
-    border-radius: 50%;
-    margin: 3px auto;
-    position: relative;
-    z-index: 2; 
+.timeline-step img {
+    width: 40px; /* Adjust icon size */
+    height: 40px;
 }
 
-/* Step Text */
-.step-text {
-    margin-top: 8px;
-    font-size: 14px;
-    color: #777;
-    font-weight: 300;
+/* Completed status */
+.timeline-step.completed {
+    opacity: 1;
+    font-weight: bold;  /* Bold font weight */
+    color: #28a745; /* Green color for completed */
 }
 
-/* Line Between Steps */
-.timeline-step::after {
+/* Active status */
+.timeline-step.active {
+    opacity: 1;
+    font-weight: bold;  /* Bold font weight */
+    color: #007bff; /* Blue color for active */
+}
+
+/* Dashed line between completed steps */
+.timeline-step.completed + .timeline-step.completed::before {
     content: '';
     position: absolute;
-    top: 9px;
-    left: 50%;
-    width: 100%;
-    height: 4px;
-    background-color: #ddd;
-    z-index: 1;
+    left: -20px;
+    top: 50%;
+    width: calc(100% + 40px); /* Adjust width to match the space between steps */
+    height: 2px;
+    background: #ccc;
+    border-top: 2px dashed #ccc;
+    transform: translateY(-50%); /* Center the dashed line */
 }
 
-/* Hide the line for the last step */
-.timeline-step:last-child::after {
-    display: none;
+/* Status without full timeline */
+.status-alone {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
-/* Completed Step */
-.timeline-step.completed .step-circle {
-    background-color: green;
+.status-alone img {
+    width: 50px;
+    height: 50px;
 }
 
-
-/* Canceled Step */
-.timeline-step.completed.canceled .step-circle {
-    background-color: red;
+/* Hover Effect for Images */
+.timeline-step img:hover {
+    transform: translateY(-10px); /* Moves image 10px upward */
+    transition: transform 0.3s ease-in-out;
 }
 
-.timeline-step.completed.canceled .step-text {
-    color: red;
-    font-weight: bold;
-}
-
-.timeline-step.canceled::after {
-    background-color: red;
-}
-
-/* Inactive Step */
-.timeline-step.inactive .step-circle {
-    background-color: #ddd;
-}
-
-.timeline-step.inactive .step-text {
-    color: #ddd;
-    font-weight: normal;
-}
-
-.timeline-step.inactive::after {
-    background-color: #ddd;
-}
-
-
-.timeline-step.completed .step-text {
-    color: green;
-    font-weight: bold;
-}
-
-.timeline-step.completed::after {
-    background-color: green;
-}
-
-/* Active Step */
-.timeline-step.active .step-circle {
-    background-color: orange;
-}
-
-.timeline-step.active .step-text {
-    color: orange;
-    font-weight: bold;
-}
-
-/* Responsive Alignment */
-@media (max-width: 768px) {
-    .timeline {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .timeline-step {
-        margin-bottom: 20px;
-    }
-
-    .timeline-step::after {
-        display: none;
-    }
+.status-alone img:hover {
+    transform: translateY(-5px); /* Slight upward movement for single status image */
+    transition: transform 0.3s ease-in-out;
 }
 
 .shipping-address{
@@ -261,7 +207,17 @@
 .invoice-btn{
     border : 1px solid #000;
 }
+
+
 </style>
+
+<div id="customAlertOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 1000; display: flex; justify-content: center; align-items: center;">
+    <div style="background: white; padding: 20px; border-radius: 8px; text-align: center;">
+        <p id="customAlertMessage" style="margin: 0; font-size: 16px; font-weight: bold;"></p>
+        <button id="customAlertClose" style="margin-top: 20px; padding: 10px 20px; border: none; background-color: #f44336; color: white; border-radius: 5px; cursor: pointer;">Close</button>
+    </div>
+</div>
+
 <div class="details-container">
     <div class="order-details">
 
@@ -276,9 +232,47 @@
           
             
         </div>
+     
         <a href="/generate-invoice/<%=orders._id%>"><button class="btn invoice-btn">Download Invoice</button></a>
-      
-    <!-- Product Details Section BELOW the Address -->
+        <div class="order-status mt-4">
+            <h4>Order Status</h4>
+        
+            <% 
+                const originalStatuses = ['Pending', 'Dispatch', 'Shipped', 'Delivered'];
+                const isCanceled = orders.order_status === 'Canceled';
+                const isReturned = orders.order_status === 'Return';
+            %>
+        
+            <% if (isCanceled || isReturned) { %>
+                <!-- Display only the Canceled or Return status -->
+                <div class="status-alone">
+                    <img src="/images/<%= isCanceled ? 'canceled.png' : 'return.png' %>" alt="<%= orders.order_status %>">
+                    <p><%= orders.order_status %></p>
+                </div>
+            <% } else { %>
+                <!-- Full timeline for normal statuses -->
+                <div class="timeline">
+                    <% originalStatuses.forEach((status, index) => { 
+                        let stepClass = '';
+                        
+                        if (orders.order_status === status) {
+                            stepClass = 'active';
+                        } else if (originalStatuses.indexOf(orders.order_status) > index) {
+                            stepClass = 'completed';
+                        } else {
+                            stepClass = 'inactive';
+                        }
+                    %>
+                        <div class="timeline-step <%= stepClass %>">
+                            <img src="/images/<%= status.toLowerCase() %>.png" alt="<%= status %>">
+                            <p><%= status %></p>
+                        </div>
+                    <% }); %>
+                </div>
+            <% } %>
+        </div>
+        
+        
     <div class="product-details">
         <% orders.products.forEach(item => { %>
 
@@ -287,7 +281,6 @@
             <img src="/uploads/public-image/<%= item.product_id.productImage[0] %>" 
             alt="<%= item.product_id.productName %>" class="product-img">
            
-            <!-- Product Info -->
             <div class="product-info">
                 <h4><%= item.product_id.productName %></h4>
                 <% if (item.variantDetails) { %>
@@ -302,37 +295,14 @@
 
             <% }) %>
             <h5>Total: ₹<%= orders.total_price %></h3>
-            <!-- Order Status -->
-            <div class="order-status">
-                <h4>Order Status</h4>
-                <% const orderStatuses = ['Pending','Dispatch', 'Shipped', 'Delivered', 'Canceled']; %>
-            
-                <div class="timeline">
-                    <% orderStatuses.forEach((status, index) => { %>
-                        <% 
-                            let stepClass = '';
-                            if (orders.order_status === 'Canceled') {
-                                stepClass = status === 'Canceled' ? 'completed canceled' : 'inactive'; 
-                            } else if (orders.order_status === status) {
-                                stepClass = 'active'; 
-                            } else if (orderStatuses.indexOf(orders.order_status) > index) {
-                                stepClass = 'completed'; 
-                            }
-                        %>
-                        <div class="timeline-step <%= stepClass %>">
-                            <div class="step-circle"></div>
-                            <div class="step-text"><%= status %></div>
-                        </div>
-                    <% }); %>
-                </div>
-            </div>
-            
-            
-                 <!-- Cancel Order Button -->
-<% if (orders.order_status === 'Dispatch') { %>
-        <button type="submit" class="btn btn-danger"><a  class="cancel" href="/orders/cancel/confirm?id=<%= orders._id  %>">Cancel Order</a></button>
-<% } %>
 
+                 
+                 <% if (orders.order_status === 'Dispatch') { %>
+                    <button type="submit" class="btn btn-danger ml-4"><a  class="cancel" href="/orders/cancel/confirm?id=<%= orders._id  %>">Cancel Order</a></button>
+            <% }else if(orders.order_status === 'Delivered') {%>
+                <a  class="return" href="/order/return-form?id=<%= orders._id  %>"><button type="submit" class="btn btn-primary ml-4">Return Order</button></a>
+                <% } %>
+               </div>
             </div>
         </div>
     </div>
@@ -349,7 +319,6 @@
             auth: { userId: "<%= user._id %>" }
         });
 
-        // Handle successful connection
         socket.on("connect", () => {
             console.log("Connected to the server");
         });
@@ -382,29 +351,90 @@
 
         }
 
-        // Helper function to regenerate the timeline HTML based on the current status
         function updateTimeline(currentStatus) {
-            const statuses = ['Pending', 'Dispatch', 'Shipped', 'Delivered', 'Canceled'];
-            const timeline = document.getElementById("timeline");
-            if (timeline) {
-                timeline.innerHTML = statuses
-                    .map((status, index) => {
-                        let stepClass = '';
-                        if (currentStatus === 'Canceled') {
-                            stepClass = status === 'Canceled' ? 'completed canceled' : 'inactive';
-                        } else if (currentStatus === status) {
-                            stepClass = 'active';
-                        } else if (statuses.indexOf(currentStatus) > index) {
-                            stepClass = 'completed';
-                        }
-                        return `
-                            <div class="timeline-step ${stepClass}">
-                                <div class="step-circle"></div>
-                                <div class="step-text">${status}</div>
-                            </div>`;
-                    })
-                    .join('');
-            }
-        }
+    const statuses = ['Pending', 'Dispatch', 'Shipped', 'Delivered', 'Canceled', 'Return'];
+    const timeline = document.getElementById("timeline");
+
+    if (timeline) {
+        timeline.innerHTML = statuses
+            .map((status, index) => {
+                let stepClass = '';
+                let displayText = status; // Default text
+
+                // Handle "Canceled" status
+                if (currentStatus === 'Canceled') {
+                    stepClass = status === 'Canceled' ? 'completed canceled' : 'inactive';
+                    if (status === 'Return') displayText = 'Not Applicable';
+                } 
+                // Handle "Return" status
+                else if (currentStatus === 'Return') {
+                    stepClass = status === 'Return' ? 'active return' : 'inactive';
+                    if (status === 'Canceled') displayText = 'Not Applicable';
+                }
+                // If the current status is at this step
+                else if (currentStatus === status) {
+                    stepClass = 'active';
+                }
+                // If the order has passed this step
+                else if (statuses.indexOf(currentStatus) > index) {
+                    stepClass = 'completed';
+                } 
+                // Future steps remain inactive
+                else {
+                    stepClass = 'inactive';
+                }
+
+                // Return the status step element with the appropriate class and display text
+                return `
+                    <div class="timeline-step ${stepClass}">
+                        <img src="/images/${status.toLowerCase()}.png" alt="${status}">
+                        <p>${displayText}</p>
+                    </div>`;
+            })
+            .join('');
+    }
+}
+
+
 </script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    // Function to clear URL parameters
+    function clearURLParams() {
+        // Replace the current URL with one without query parameters
+        history.replaceState(null, document.title, window.location.pathname);
+    }
+
+    // Detect URL parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    const action = urlParams.get('action');
+    const message = urlParams.get('message');
+    
+    // Only show the alert if the action is 'cancel' or 'return' and message exists
+    if ((action === 'cancel' || action === 'return') && message && message.trim() !== '') {
+        const alertOverlay = document.getElementById('customAlertOverlay');
+        const alertMessage = document.getElementById('customAlertMessage');
+        const alertCloseButton = document.getElementById('customAlertClose');
+        
+        alertMessage.textContent = message;
+        alertOverlay.style.display = 'flex';
+        
+        // Close the alert when the button is clicked
+        alertCloseButton.addEventListener('click', () => {
+            alertOverlay.style.display = 'none';
+            clearURLParams();
+        });
+    } else {
+        // Ensure the alert is hidden if no cancel or return action
+        const alertOverlay = document.getElementById('customAlertOverlay');
+        alertOverlay.style.display = 'none';
+    }
+});
+
+
+</script>
+
+
+
 <%- include('../../views/partials/user/footer') %>

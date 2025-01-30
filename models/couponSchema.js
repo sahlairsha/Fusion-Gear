@@ -32,12 +32,19 @@ const couponSchema = new Schema({
     usageLimit: {
         type: Number,
         required: true,
-        default: 1,
+        default: 1, 
     },
-    timesUsed: {
+    userLimit: {
         type: Number,
-        default: 0,
+        required: true,
+        default: 1, 
     },
+    userUsage: [
+        {
+            userId: { type: Schema.Types.ObjectId, ref: 'User' }, 
+            usageCount: { type: Number, default: 0 }, 
+        },
+    ],
     minOrderValue: {
         type: Number,
         default: 0,

@@ -3,439 +3,59 @@
  
  <link rel="stylesheet" href="/css/user/productlist.css">
 
- <style>
-.wishlist-btn{
-    border-radius: 50%;
-    background-color: transparent;
-    width: 30px;
-    height: 30px;
-    border: 0.5px solid #000;
-    margin-right: 20px;
-}
-.related {
-    padding: 50px 0; 
-    background-color: #f9f9f9; 
-}
-
-.related .related-title {
-    font-size: 24px;
-    font-weight: bold;
-    margin-bottom: 30px;
-    text-align: center;
-    color: #333;
-}
-
-.related .product__item {
-    background-color: #fff;
-    border: 1px solid #eaeaea;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s, box-shadow 0.3s;
-    text-align: center;
-}
-
-.related .product__item:hover {
-    transform: translateY(-5px); /* Lift effect on hover */
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); /* Enhance shadow on hover */
-}
-
-.related .product__item__pic {
-    position: relative;
-    overflow: hidden;
-    border-bottom: 1px solid #eaeaea;
-}
-
-.related .product__item__pic img {
-    width: 100%;
-    height: 300px;
-    object-fit: cover;
-    object-position: top center;
-    border-radius: 8px 8px 0 0;
-}
-
-.related .product__hover {
-    position: absolute;
-    bottom: 10px;
-    right: 10px;
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.related .product__hover li {
-    display: inline-block;
-    margin-right: 5px;
-}
-
-.related .product__hover li a img {
-    width: 24px;
-    height: 24px;
-    transition: transform 0.3s ease-in-out;
-}
-
-.related .product__hover li a:hover img {
-    transform: scale(1.2); /* Slight zoom effect on hover */
-}
-
-.related .product__item__text {
-    padding: 20px;
-}
-
-.product__item__text .product-info {
-    display: flex;
-    align-items: center; /* Aligns items vertically */
-    justify-content: space-between; /* Distributes space evenly */
-    gap: 10px; /* Adds spacing between elements */
-    margin-bottom: 10px; /* Adds spacing below the flex container */
-}
-
-.product__item__text .product-name {
-    font-size: 16px;
-    font-weight: bold;
-    color: #333;
-    margin: 0; /* Removes default margin */
-    flex: 2; /* Allows the name to take more space */
-}
-
-.product__item__text .rating {
-    background-color: #f39c12; /* Gold background for rating */
-    color: #fff;
-    font-size: 14px;
-    font-weight: bold;
-    padding: 4px 4px;
-    border-radius: 12px;
-    flex: 1; 
-    text-align: center; 
-    align-items: flex-start;
-}
-
-.product__item__text .product-price {
-    font-size: 16px;
-    font-weight: bold;
-    color: #e74c3c; 
-    margin: 0;
-    flex: 1; 
-}
-
-
-.related .product__item__text .rating {
-    display: inline-block;
-    background-color: #f39c12; /* Gold color for ratings */
-    color: #fff;
-    font-size: 14px;
-    font-weight: bold;
-    padding: 4px 8px;
-    border-radius: 12px;
-    margin-bottom: 10px;
-}
-
-.related .product__item__text h4 {
-    font-size: 18px;
-    font-weight: 600;
-    margin: 10px 0;
-    color: #333;
-}
-
-.related .product__item__text .product-price {
-    font-size: 14px;
-    color: #777;
-    margin: 5px 0;
-}
-
-.related .product__item__text .product-price:last-of-type {
-    font-size: 16px;
-    font-weight: bold;
-    color: #e74c3c; 
-}
-
-.related .product__item__text .btn {
-    margin-top: 10px;
-    padding: 8px 12px;
-    font-size: 14px;
-    font-weight: 600;
-    background-color: #3498db; /* Blue button */
-    color: #fff;
-    border: none;
-    border-radius: 4px;
-    transition: background-color 0.3s ease-in-out;
-    text-transform: uppercase;
-}
-
-.related .product__item__text .btn:hover {
-    background-color: #2980b9; /* Darker blue on hover */
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-    .related .product__item {
-        margin-bottom: 20px;
-    }
-}
-
-@media (max-width: 576px) {
-    .related .related-title {
-        font-size: 20px;
-    }
-
-    .related .product__item__text h4 {
-        font-size: 16px;
-    }
-
-    .related .product__item__text p {
-        font-size: 12px;
-    }
-}
-
-#productPrice {
-    font-size: 24px;
-    color: #000;
-    font-weight: bold;
-}
-
-
-    input[type="radio"]:checked + label {
-    font-weight: bold;
-    color: #007bff;
-}
-#stock-status.text-danger {
-    color: red;
-}
-    .ratings-reviews {
-        position: absolute;
-        top: 40%;
-        right: 5%;
-        width: 370px;
-        background-color: rgba(255, 255, 255, 0.185);
-        border: 1px solid #ddd;
-        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-        border-radius: 8px;
-        padding: 16px;
-        z-index: 1000;
-    }
-
-    .product-badge {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background-color: #ff6b6b;
-    color: white;
-    padding: 5px 10px;
-    border-radius: 5px;
-    font-size: 10px;
-    font-weight: 600;
-    text-transform: uppercase;
-}
-
-.product-badge.available {
-    background-color: #28a745; /* Green for Available */
-}
-
-.product-badge.sold-out {
-    background-color: #dc3545; /* Red for Sold Out */
-}
-
-.product-badge.unavailable {
-    background-color: #ffc107;
-}
-
-.product-badge.out-of-stock {
-    background-color: #6c757d; /* Grey for Out of Stock */
-}
-
-
-    .ratings-reviews h2 {
-        font-size: 20px;
-        margin-bottom: 10px;
-    }
-
-    .ratings-reviews .rating-summary {
-        display: flex;
-        align-items: center;
-        margin-bottom: 10px;
-    }
-
-    .ratings-reviews .rating-summary .rating-number {
-        font-size: 36px;
-        font-weight: bold;
-        margin-right: 10px;
-    }
-
-    .ratings-reviews .stars {
-        display: flex;
-        margin-bottom: 8px;
-    }
-
-    .ratings-reviews .stars span {
-        font-size: 20px;
-        color: gold;
-    }
-
-    .ratings-reviews .rating-bars {
-        margin-bottom: 10px;
-    }
-
-    .ratings-reviews .rating-bar {
-        display: flex;
-        align-items: center;
-        margin-bottom: 5px;
-    }
-
-    .ratings-reviews .rating-bar .bar {
-        height: 8px;
-        flex: 1;
-        margin: 0 5px;
-        border-radius: 4px;
-    }
-
-    .ratings-reviews .rating-bar .bar-container {
-        flex: 1;
-        background-color: #f1f1f1;
-        border-radius: 4px;
-        overflow: hidden;
-    }
-
-    .ratings-reviews .photos {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 4px;
-        margin-top: 10px;
-    }
-
-    .ratings-reviews .photos img {
-        width: 48px;
-        height: 48px;
-        object-fit: cover;
-        border-radius: 4px;
-    }
-
-    .ratings-reviews button {
-        display: block;
-        width: 100%;
-        padding: 10px;
-        background-color: #000;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        margin-top: 20px;
-        margin-bottom: 10px;
-        font-size: 16px;
-        cursor: pointer;
-    }
-
-    .ratings-reviews button:hover {
-        background-color: #E0FB4A;
-        color: #000;
-    }
-
-    .rating-bars .rating-bar {
-    margin-bottom: 10px;
-}
-
-.bar-container {
-    width: 100%;
-    background-color: #f1f1f1;
-    border-radius: 5px;
-    overflow: hidden;
-}
-
-.bar {
-    height: 100%;
-    background-color:#000;
-}
-
-.reviews-list {
-    list-style-type: none;
-    padding: 0;
-}
-
-.reviews-list li {
-    margin-bottom: 20px;
-}
-.alert{
-    position: relative;
-    left: 38%;
-    z-index: 9999;
-    padding: 10px;
-    background-color: rgba(255, 255, 255, 0.8);
-    border-radius: 5px;
-    font-weight: bold;
-    transition: opacity 0.3s ease;
-}
-
-
-.related .product__item__text .description {
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    max-width: 100%; 
-}
-
-.details-btn{
-   background-color: #000;
-    color: #fff;
-    border: none;
-    padding: 10px;
-    border-radius: 5px;
-    margin-top: 10px;
-}
-</style>
 
 
  <!-- Shop Details Section Begin -->
  <section class="shop-details">
-    <div class="product__details__pic">
-
-        <div class="container">
-            <% if(flash.error){%>
-                <div class="alert alert-danger w-25" role="alert">
-                    <%= flash.error %>
-                </div>
-            <% } %>
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="product__details__breadcrumb">
-                        <a href="/">Home</a>
-                        <a href="/products">Products</a>
-                        <span>Product Details</span>
-                    </div>
-                </div>
+    <div class="container">
+        <% if(flash.error){%>
+            <div class="alert alert-danger w-25" role="alert">
+                <%= flash.error %>
             </div>
-            <div class="row">
-                <!-- Product Images Section -->
-                <div class="col-lg-3 col-md-3">
-                    <ul class="nav nav-tabs" role="tablist">
-                        <% for (let i = 0; i < product.productImage.length; i++) { %>
-                            <li class="nav-item">
-                                <a class="nav-link <%= i === 0 ? 'active' : '' %>" data-toggle="tab" href="#tabs-<%= i + 1 %>" role="tab">
-                                    <img class="product__thumb__pic" src="/uploads/public-image/<%= product.productImage[i] %>">
-                                </a>
-                            </li>
-                        <% } %>
-                    </ul>
-                </div>
-            
-                <!-- Product Image Display -->
-                <div class="col-lg-6 col-md-9">
-                    <div class="tab-content">
-                        <% for (let i = 0; i < product.productImage.length; i++) { %>
-                            <div class="tab-pane <%= i === 0 ? 'active' : '' %>" id="tabs-<%= i + 1 %>" role="tabpanel">
-                                <% if (product.productImage && product.productImage.length > 0) { %>
-                                    <div class="product__details__pic__item">
-                                        <img class="product-image zoom" src="/uploads/public-image/<%= product.productImage[i] %>" data-zoom-image="/uploads/public-image/<%= product.productImage[i] %>" alt="">
-                                    </div>
-                                <% } else { %>
-                                    <p>No images available for this product.</p>
-                                <% } %>
-                            </div>
-                        <% } %>
+        <% } %>
+        <div class="row">
+            <!-- Left Section (Images) -->
+            <div class="col-lg-3 col-md-3">
+                <ul class="nav nav-tabs" role="tablist">
+                    <% for (let i = 0; i < product.productImage.length; i++) { %>
+                        <li class="nav-item">
+                            <a class="nav-link <%= i === 0 ? 'active' : '' %>" data-toggle="tab" href="#tabs-<%= i + 1 %>" role="tab">
+                                <img class="product__thumb__pic" src="/uploads/public-image/<%= product.productImage[i] %>">
+                            </a>
+                        </li>
+                    <% } %>
+                </ul>
+            </div>
+        
+            <!-- Right Section (Details) -->
+            <div class="col-lg-9 col-md-9">
+                <div class="row">
+                    <!-- Product Image Display -->
+                    <div class="col-lg-6 col-md-6">
+                        <div class="tab-content">
+                            <% for (let i = 0; i < product.productImage.length; i++) { %>
+                                <div class="tab-pane <%= i === 0 ? 'active' : '' %>" id="tabs-<%= i + 1 %>" role="tabpanel">
+                                    <% if (product.productImage && product.productImage.length > 0) { %>
+                                        <div class="product__details__pic__item">
+                                            <img class="product-image zoom" src="/uploads/public-image/<%= product.productImage[i] %>" data-zoom-image="/uploads/public-image/<%= product.productImage[i] %>" alt="">
+                                        </div>
+                                    <% } else { %>
+                                        <p>No images available for this product.</p>
+                                    <% } %>
+                                </div>
+                            <% } %>
+                        </div>
                     </div>
-                </div>
             
-                <!-- Ratings and Reviews Section -->
-                <div class="ratings-reviews">
+                    <!-- Product Details Section -->
+                    <div class="col-lg-6 col-md-6">
+                        <div class="product__details__content">
+              
+                            <div class="product__details__text">
+                                              
+                                 <div class="ratings-reviews">
                     <h2>Ratings & Reviews</h2>
-                    <div class="rating-summary">
+                    <div class="rating-summary" id="ratings" data-product-id="<%= product._id  %>">
                         <div class="rating-number"><%= product.ratings.average.toFixed(1) || "0.0" %></div>
                         <div>
                             <div class="stars">
@@ -461,67 +81,53 @@
                     </ul>
                 </div>
             </div>
-            
-            <!-- Product Details Section -->
-            <div class="product__details__content">
-                <div class="container">
-                    <div class="row d-flex justify-content-center">
-                        <div class="col-lg-8">
-                            <div class="product__details__text">
                                 <h4><%= product.productName %></h4>
-            
-                                <!-- Only display once -->
                                 <p><%= product.description %></p>
-            
-                               
-                                    <h3 id="productPrice" style="font-weight: bold;">
-                                     &#8377;<%= product.offerPrice %>
-                                    </h3>
-                                    
-                              
-                                
-            
+                                <h3 id="productPrice" style="font-weight: bold;">&#8377;<%= product.offerPrice %></h3>
+
                                 <!-- Stock Status and Size Selection -->
-                                <div class="">
+                                <div class="shop__sidebar__size">
                                     <span>Size:</span>
                                     <% product.variants.forEach(function (variant, index) { %>
-                                        <label for="<%= variant.size %>">
+                                        <label for="<%= variant.size %>" class="custom-radio">
                                             <input
                                                 type="radio"
+                                                id="<%= variant.size %>"
                                                 name="size"
                                                 value="<%= variant.size %>"
-                                                data-variant-id="<%= variant._id %>" 
+                                                data-variant-id="<%= variant._id %>"
                                                 data-offer-price="<%= variant.offerPrice %>"
                                                 data-sale-price="<%= variant.salePrice %>"
                                                 data-stock="<%= variant.stock %>"
                                                 <%= index === 0 ? 'checked' : '' %>
                                                 onchange="updateProductDetails(this)"
+                                                class="radio-input"
                                             >
-                                            <%= variant.size %>
+                                            <span class="radio-label"><%= variant.size %></span>
                                         </label>
                                     <% }); %>
                                 </div>
                                 
+
                                 <!-- Add to Cart and Other Options -->
                                 <div class="product__details__cart__option">
                                     <div class="quantity">
                                         <div class="pro-qty">
-                                            <input type="text" value="1">
+                                            <input type="number" min="1" value="1">
                                         </div>
                                     </div>
                                     <button class="add-cart-btn"><a href="#" onclick="addToCart('<%= product._id %>')" class="add-cart-link">+ Add to Cart</a></button>
                                 </div>
-            
+
                                 <!-- Other Actions -->
                                 <div class="product__details__btns__option">
                                     <button class="btn add-whish-btn">
-                                        <a href="#" onclick="addToWishlist('<%= product._id %>')">
+                                        <a href="#" onclick="addToWishlistFromDetails('<%= product._id %>')">
                                             <i class="fa fa-heart"></i> Add to Wishlist
                                         </a>
                                     </button> 
-                                   
                                 </div>
-            
+
                                 <div class="product__details__last__option">
                                     <h5><span>Guaranteed Safe Checkout</span></h5>
                                     <img src="/img/shop-details/details-payment.png" alt="">
@@ -531,12 +137,13 @@
                                     </ul>
                                 </div>
                             </div>
-                      
                         </div>
                     </div>
                 </div>
+
             </div>
-            
+        </div>
+    </div>
 </section>
 
 
@@ -583,279 +190,9 @@
     </div>
 </section>
 
-<script src="/js/user/zoom-image.js"></script>
 
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        // Trigger the update for the first selected size (if it's checked by default)
-        const firstRadioButton = document.querySelector('input[name="size"]:checked');
-        if (firstRadioButton) {
-            updateProductDetails(firstRadioButton);
-        }
-    });
-    function updateProductDetails(selectedSize) {
-    const selectedVariant = selectedSize.dataset;
-
-    // Update price: only display the offer price
-    const productPriceElement = document.getElementById("productPrice");
-    productPriceElement.textContent = `₹${selectedVariant.offerPrice}`;
-
-    // Update stock status
-    const stockStatusElement = document.getElementById("stock-status");
-    const stock = parseInt(selectedVariant.stock);
-
-    if (stock < 5 && stock > 0) {
-        stockStatusElement.textContent = `Only ${stock} left, please hurry up!`;
-        stockStatusElement.classList.add("text-danger");
-    } else if (stock === 0) {
-        stockStatusElement.textContent = "Out of Stock";
-        stockStatusElement.classList.add("text-danger");
-    } else {
-        stockStatusElement.textContent = "In Stock";
-        stockStatusElement.classList.remove("text-danger");
-    }
-
-    // Log variant ID for debugging
-    const variantId = selectedVariant.variantId;
-    console.log(`Selected variant ID: ${variantId}`);
-}
-
-    </script>
-
-    
+<script src="/js/user/product-details.js"></script>
 
 
-<script>
-function addToCart(productId) {
-    // Get the selected size input (radio button with the name 'size')
-    const selectedSizeElement = document.querySelector('input[name="size"]:checked');
-    
-    if (!selectedSizeElement) {
-        Swal.fire({
-            title: "Error",
-            icon: "error",
-            text: "Please select a size before adding to cart.",
-            showConfirmButton: true,
-        });
-        return;
-    }
-
-    // Get the selected variant ID from the data-variant-id attribute
-    const selectedVariantId = selectedSizeElement.dataset.variantId;
-
-    if (!selectedVariantId) {
-        Swal.fire({
-            title: "Error",
-            icon: "error",
-            text: "Variant ID is missing.",
-            showConfirmButton: true,
-        });
-        return;
-    }
-
-    // Get the quantity from the input field (use default value of 1 if empty)
-    const quantity = document.querySelector('.pro-qty input').value || 1;
-
-    // Proceed with AJAX to add the product to the cart
-    $.ajax({
-        url: `/cart/add`,
-        method: 'POST',
-        contentType: 'application/json',
-        data: JSON.stringify({ 
-            quantity: parseInt(quantity, 10),
-            productId: productId,
-            variantId: selectedVariantId 
-        }),
-        success: function(response) {
-            Swal.fire({
-                title: "Success",
-                icon: "success",
-                text: "Product added successfully",
-                showConfirmButton: true,
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    window.location.href = '/cart';  // Redirect to cart page
-                }
-            });
-        },
-        error: function() {
-            Swal.fire({
-                title: "Error",
-                icon: "error",
-                text: "Failed to add product to cart!",
-                showConfirmButton: true,
-            });
-        }
-    });
-}
-
-</script>
-
-<script>
-    const productId = '<%= product._id%>'; 
-
-    // Fetch product details
-    fetch(`/product-ratings?productId=${productId}`)
-        .then(response => response.json())
-        .then(data => {
-            // Assuming data contains the required rating information
-            const { totalRatings, ratingPercentages, counts, averageRating } = data;
-
-            // Create the rating overview HTML dynamically
-            let ratingOverviewHtml = `<p>Average Rating: ${averageRating.toFixed(1)}★</p>`;
-            ratingOverviewHtml += `<div class="rating-bars">`;
-
-            // Loop through each star rating (1 to 5)
-            for (let i = 5 -1 ; i >= 0; i--) {
-                ratingOverviewHtml += `
-                    <div class="rating-bar">
-                        <span>${1 + i}★</span>
-                        <div class="bar-container">
-                            <div class="bar" style="width: ${ratingPercentages[i]}%"></div>
-                        </div>
-                        <span>${counts[i]} (${ratingPercentages[i].toFixed(1)}%)</span>
-                    </div>
-                `;
-            }
-
-            ratingOverviewHtml += `</div>`;
-
-            // Insert the generated HTML into the rating-overview div
-            document.getElementById('rating-overview').innerHTML = ratingOverviewHtml;
-        })
-        .catch(error => {
-            console.error('Error fetching product details:', error);
-        });
-
-
-
-</script>
-
-<script>
-            
-        document.getElementById('rateProductBtn').addEventListener('click', function () {
-        const productId = this.getAttribute('data-product-id');
-        if (productId) {
-            window.location.href = `/ratings?id=${productId}`;
-        } else {
-            console.error('Product ID is missing.');
-        }
-    });
-
-</script>
-
-
-<script>
-function addToWishlist(productId) {
-    const selectedSizeElement = document.querySelector('input[name="size"]:checked');
-    
-    if (!selectedSizeElement) {
-        Swal.fire({
-            title: "Error",
-            icon: "error",
-            text: "Please select a size before adding to wishlist.",
-            showConfirmButton: true,
-        });
-        return;
-    }
-
-    const selectedVariantId = selectedSizeElement.dataset.variantId;
-
-    // Log the data being sent to ensure it's correct
-    console.log({
-        productId: productId,
-        variantId: selectedVariantId
-    });
-
-    $.ajax({
-        url: '/wishlist/add',
-        method: 'POST',
-        contentType: 'application/json',
-        data: JSON.stringify({
-            productId: productId,
-            variantId: selectedVariantId
-        }),
-        success: function(response) {
-            Swal.fire({
-                title: "Success",
-                icon: "success",
-                text: "Product added to wishlist successfully",
-                showConfirmButton: true,
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    window.location.href = '/wishlist';
-                }
-            });
-        },
-        error: function(xhr, status, error) {
-            console.error("Error:", error);
-            Swal.fire({
-                title: "Error",
-                icon: "error",
-                text: "Failed to add product to wishlist.",
-                showConfirmButton: true,
-            });
-        }
-    });
-}
-
-</script>
-
-<script>
-    function addToWishlist(productId, variantId) {
-        const quantity = 1;
-        fetch('/wishlist/add', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-            },
-            body: JSON.stringify({
-                productId: productId,
-                variantId: variantId,
-                quantity : quantity
-            }),
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.message === 'Product added to wishlist') {
-                const heartIcon = document.getElementById('heart-icon');
-                heartIcon.classList.remove('far', 'fa-heart');
-                heartIcon.classList.add('fas', 'fa-heart');
-                
-                // Show success alert without redirecting
-                Swal.fire({
-                    title: 'Product added to wishlist',
-                      icon: 'success',
-                    showCancelButton: true,
-                    confirmButtonText: 'Go to Wishlist',
-                        cancelButtonText: 'Stay Here',
-                }).then((result) => {
-                    if (result.isConfirmed) {
-            window.location.href = '/wishlist';
-         }
-                });
-            } else {
-                Swal.fire({
-                    title: 'Error',
-                    icon: 'error',
-                    text: data.message || 'Failed to add to wishlist',
-                    confirmButtonText: 'Try Again',
-                });
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            Swal.fire({
-                title: 'Error',
-                icon: 'error',
-                text: 'Internal Server Error',
-                confirmButtonText: 'Try Again',
-            });
-        });
-    }
-    
-    
-    </script>
 
 <%-include('../../views/partials/user/footer') %>

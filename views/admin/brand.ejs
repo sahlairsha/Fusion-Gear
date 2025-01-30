@@ -1,4 +1,5 @@
 <%- include("../../views/partials/admin/header") %>
+
 <div class="container mt-4">
     <h2 class="mb-4">Brand Details</h2>
 
@@ -62,18 +63,23 @@
         </tbody>
     </table>
 
-    <div class="pagination d-flex align-items-center justify-content-center">
-        <% if (hasPrevPage) { %>
-        <a href="?page=<%= currentPage - 1 %>&limit=<%= limit %>">Previous</a>
+    <div class="flex items-center justify-center mt-3 space-x-2 mb-3">
+        <% if (currentPage > 1) { %>
+            <a class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300" href="?page=<%= currentPage - 1 %>">&laquo; Prev</a>
         <% } %>
+        
         <% for (let i = 1; i <= totalPages; i++) { %>
-            <a href="?page=<%= i %>&limit=<%= limit %>" class="<%= i === currentPage ? 'active' : '' %>"><%= i %></a>
+            <% if (i === currentPage) { %>
+                <span class="px-4 py-2 bg-blue-500 text-white font-semibold rounded-md"> <%= i %> </span>
+            <% } else { %>
+                <a class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300" href="?page=<%= i %>"><%= i %></a>
+            <% } %>
         <% } %>
-        <% if (hasNextPage) { %>
-        <a href="?page=<%= currentPage + 1 %>&limit=<%= limit %>">Next</a>
+        
+        <% if (currentPage < totalPages) { %>
+            <a class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300" href="?page=<%= currentPage + 1 %>">Next &raquo;</a>
         <% } %>
     </div>
-
 </div>
 
 

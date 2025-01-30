@@ -5,7 +5,7 @@ const getStocks = async (req, res) => {
     try {
         const search = req.query.search || "";
         let page = parseInt(req.params.page, 10) || 1;
-        let limit = 6;
+        let limit = 3;
 
         const productData = await Product.find({
             $or: [

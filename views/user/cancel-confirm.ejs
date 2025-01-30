@@ -1,7 +1,11 @@
 <%- include('../../views/partials/user/header') %>
-<link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet">
+
 
 <style>
+
+
+
+
     .cancel-confirm-container {
         width: 90%;
         max-width: 600px;
@@ -176,8 +180,7 @@
 </div>
 
 
-<!-- Include Toastr JS -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
 <script>
 document.getElementById('reason-form').addEventListener('submit', function (e) {
     e.preventDefault();
@@ -206,16 +209,7 @@ document.getElementById('reason-form').addEventListener('submit', function (e) {
 });
 
 </script>
-<script>
-    // Check if a message is passed in the URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const message = urlParams.get('message');
-
-    // Display toastr notification if message exists
-    if (message) {
-        toastr.success(message);  // Show success toastr message
-    }
-</script>
+ 
 
 
 
