@@ -1,0 +1,158 @@
+.table-container {
+    margin-top: 30px;
+    width: 100%;
+    overflow-x: auto;
+    padding: 0 15px;
+}
+
+/* Table */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    white-space: nowrap; /* Prevent text from breaking into multiple lines */
+}
+
+table th,
+table td {
+    padding: 8px 12px;
+    text-align: left;
+    border: 1px solid rgba(0, 0, 0, 0.44);
+    font-size: 14px;
+}
+
+table th {
+    background-color: rgba(0, 0, 0, 0.62);
+    color: white;
+    font-weight: 500;
+    font-size: 12px;
+    text-transform: uppercase;
+}
+
+table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+table tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* Badges */
+.badge {
+    display: inline-block;
+    padding: 5px 10px;
+    font-size: 12px;
+    font-weight: bold;
+    text-align: center;
+    border-radius: 12px;
+    color: white;
+}
+
+.badge-active {
+    background-color: #28a745;
+}
+
+.badge-expired {
+    background-color: #dc3545;
+}
+
+.badge-upcoming {
+    background-color: #007bff;
+}
+
+/* Delete Button */
+.delete-btn {
+    background-color: transparent;
+    border: none;
+    padding: 10px;
+}
+
+/* Add Coupon Button */
+.add-coupon-btn {
+    padding: 10px 20px;
+    background-color: #000;
+    color: white;
+    font-size: 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+.add-coupon-btn:hover {
+    background-color: #fff;
+    color: #000;
+    border: 1px solid #000;
+}
+
+.add-coupon-btn-container {
+    position: absolute;
+    right: 20px;
+    margin-bottom: 20px;
+}
+
+/* Mobile-friendly Table - Convert to List View */
+@media (max-width: 768px) {
+    .table-container {
+        overflow-x: auto;
+    }
+
+    table {
+        display: block;
+        overflow-x: auto;
+        width: 100%;
+    }
+
+    thead {
+        display: none; /* Hide table headers */
+    }
+
+    tbody {
+        display: block;
+    }
+
+    tbody tr {
+        display: flex;
+        flex-direction: column;
+        border: 1px solid #ddd;
+        margin-bottom: 15px;
+        padding: 10px;
+        background: white;
+    }
+
+    tbody tr td {
+        display: flex;
+        justify-content: space-between;
+        font-size: 14px;
+        padding: 5px 10px;
+        border: none;
+        border-bottom: 1px solid #ddd;
+    }
+
+    tbody tr td:last-child {
+        border-bottom: none;
+    }
+
+    tbody tr td::before {
+        content: attr(data-label);
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+
+    .add-coupon-btn-container {
+        position: static;
+        text-align: center;
+        margin-bottom: 15px;
+    }
+}
+@media (max-width: 468px){
+    tbody tr td {
+    
+        font-size: 12px;
+        font-weight: 500;
+        
+    }
+
+}

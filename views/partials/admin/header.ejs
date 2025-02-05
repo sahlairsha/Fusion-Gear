@@ -9,195 +9,39 @@
     <link rel="shortcut icon" type="image/x-icon" href="#">
 
     
-    <script src="https://cdn.tailwindcss.com"></script>
-    
+   
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs/dist/cropper.min.css">
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
    
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10.16.6/dist/sweetalert2.min.css">
 
 
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
  
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <link rel="stylesheet" href="/css/admin/header.css">
+<script src="https://cdn.tailwindcss.com"></script>
 
 
-    <style>
-*{
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-body{
-  background-color: #e3eef1cb;
-}
-.sidebar {
-    width: 70px;
-    background-color:#ffff;
-    height: 500px;
-    overflow: hidden;
-    transition: width 1s ease;
-    position: relative;
-    border-radius: 8px;
-    margin-left: 20px;
-    margin-top: 50px;
-    padding-bottom: 30px;
-}
 
-.sidebar:hover {
-    width: 250px;
-   
-}
 
-a {
-    text-decoration: none;
-}
-
-.sidebar .nav-link {
-    transition: background-color 0.5s, padding 0.5s;
-    color: #000;
-    font-weight: 500;
-    font-size: 14px;
-    padding: 15px;
-    text-align: center;
-    display: flex;
-    align-items: center;
-    justify-content: start;
-}
-
-.sidebar .nav-link i {
-    margin-right: 10px;
-    font-size: 15px;
-    min-width: 30px;
-    text-align: center;
-}
-
-.sidebar .nav-link span {
-    display: none;
-    white-space: nowrap;
-}
-
-.sidebar:hover .nav-link span {
-    display: inline;
-    margin-left: 10px;
-}
-
-.sidebar .nav-link:hover {
-    background-color: #219ebc;
-    color: #fff;
-    padding: 15px;
-    
-}
-
-.icon-custom {
-    margin-right: 10px;
-}
-
-.table-light {
-    background-color: #f8f9fa;
-}
-
-.table-secondary {
-    font-size: 14px;
-}
-
-.table-light th,
-.table-light td {
-    vertical-align: middle;
-}
-
-.btn-sm {
-    margin-right: 5px;
-    margin-left: 5px;
-}
-
-.pagination-container .page-link {
-    color: #000;
-    padding: 0.5rem 1rem;
-    border: none;
-}
-
-.pagination-container .current-page {
-    padding: 0.5rem 1rem;
-    color: red;
-}
-
-.error-message {
-    font-size: 14px;
-    color: red;
-}
-
-.profile-section {
-    position: absolute;
-    bottom: 20px;
-    width: 100%;
-    text-align: center;
-    transition: opacity 0.3s;
-    opacity: 0;
-}
-
-.sidebar:hover .profile-section {
-    opacity: 1;
-}
-
-.profile-section img {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    margin-bottom: 10px;
-}
-
-.profile-section span {
-    display: none;
-    font-size: 14px;
-    color: #000;
-}
-
-.sidebar:hover .profile-section span {
-    display: block;
-}
-
-@media (max-width: 768px) {
-    .sidebar {
-        width: 100%;
-        height: auto;
-    }
-}
-
-.nav-link.active {
-    position: relative;
-    background-color: transparent;
-    color: #219ebc;
-}
-
-.nav-link.active::before {
-    content: "";
-    position: absolute;
-    left: 0;
-    top: 5px;
-    height: 70%;
-    width: 4px;
-    background-color: #219ebc;
-    border-radius: 2px;
-}
-
-.nav-link:hover::before {
-    background-color: #219ebc; /* Slightly darker color for hover */
-}
-
-.nav-link.active:hover {
-    color: #fff; /* Change text color slightly on hover */
-}
-
-    </style>
 </head>
 <body>
-    <header class="d-flex justify-content-between align-items-center p-3 bg-light border-bottom">
+    
+    <header class="top-nav d-flex justify-content-between align-items-center p-3 border-bottom">
+        <div class="d-flex align-items-center">
+           
+            <button class="hamburger me-2 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasMenu" aria-controls="offcanvasMenu">
+              <i class="fas fa-bars"></i>
+            </button>
+          </div>
         <div class="admin-title">Admin Dashboard</div>
         <div class="profile-dropdown">
           <div class="dropdown">
-            <button class="btn btn-secondary dropdown-toggle" type="button" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-            Admin
+            <button class="dropdown-toggle" type="button" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+            <img src="<%= admin.profile_pic %>" alt="Profile picture" class="profile-img rounded-circle">
             </button>
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
               <li><a class="dropdown-item" href="/admin_profile">Profile</a></li>
@@ -242,10 +86,88 @@ a {
             </a>
         </nav>
         <div class="profile-section">
-            <img src="/path/to/profile.jpg" alt="Profile">
+            
             <span>Admin Name</span>
         </div>
 
+
+        <!-- Offcanvas Menu for Mobile Devices -->
+<div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasMenu" aria-labelledby="offcanvasMenuLabel">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title" id="offcanvasMenuLabel">Menu</h5>
+   
+      <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+      <ul class="nav flex-column">
+        <li class="nav-item">
+          <a class="nav-link" href="/admin_profile">
+            <i class="fa-solid fa-user-circle fa-2x"></i>Profile
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/admin/dashboard">
+            <i class="icon-custom fas fa-tachometer-alt"></i> Dashboard
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/admin/users">
+            <i class="icon-custom fas fa-users"></i> Customers
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/admin/category">
+            <i class="icon-custom fas fa-th-list"></i> Category
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/admin/brands">
+            <i class="fa-brands fa-bandcamp"></i> Brands
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/admin/products">
+            <i class="icon-custom fas fa-box"></i> Product
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/admin/add-products">
+            <i class="icon-custom fas fa-plus"></i> Add Product
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/admin/coupons">
+            <i class="icon-custom fas fa-tags"></i> Coupon
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/admin/orders">
+            <i class="icon-custom fas fa-shopping-cart"></i> Orders
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/admin/stock">
+            <i class="icon-custom fas fa-warehouse"></i> Stock/Inventory
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  
+
+        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"
+        integrity="sha384-IQsoLXl2NHjG+g/mJ8v+X0X7mfn38p4eH/2mGhVn8voU8c0UEfs5m9N2LRV4I/IL"
+        crossorigin="anonymous"></script>
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js"
+        integrity="sha384-cVKIPhG81rK/Spz7WTRpP7TjyQ0O1H8ABK3f3iGk0y5hpe5JZ9ZZd+6bT1V9KKP1"
+        crossorigin="anonymous"></script>
+        <script>
+            $(document).ready(function () {
+              $('#hamburgerBtn').click(function () {
+                $('#sidebar').toggleClass('open');
+              });
+            });
+          </script>
         <script>
           // Get the current URL path
           const currentPath = window.location.pathname;
@@ -260,4 +182,20 @@ a {
 
               }
           });
+
+
+          $(document).ready(function() {
+    // Get the current URL path
+    var currentPath = window.location.pathname;
+    
+    // Loop through each offcanvas nav-link
+    $('.offcanvas-body .nav-link').each(function() {
+      var linkPath = $(this).attr('href');
+      
+      // If the link's href matches the current URL, add the active class
+      if (linkPath === currentPath) {
+        $(this).addClass('active');
+      }
+    });
+  });
       </script>

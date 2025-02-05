@@ -29,10 +29,13 @@ const customerInfo = async(req,res)=>{
                     {email : { $regex :".*" + search + ".*" }}
                 ]
             }).countDocuments();
+
+            const adminData = await User.findById(req.session.admin)
         res.render("customers",{
+            admin: adminData,
             data : userData,
             totalPages : Math.ceil(count/limit),
-            currentPage : page
+            currentPage : page,
         })
         } catch (error) {
             console.log("There is error in customer info",error)

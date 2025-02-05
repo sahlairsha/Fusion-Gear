@@ -1,112 +1,8 @@
 <%- include('../../views/partials/user/header') %>
 
+<link rel="stylesheet" href="/css/user/wishlist.css">
 
-<style>
-    .wishlist-container {
-        margin: 20px;
-        font-family: 'Poppins', sans-serif;
-        color: #333;
-    }
-    
-    h3 {
-        text-align: center;
-        font-size: 24px;
-        font-weight: 600;
-        margin-bottom: 20px;
-        color: #2c3e50;
-    }
-    
-    .empty-wishlist {
-        padding: 60px;
-        text-align: center;
-        font-size: 16px;
-      
-        color: #7f8c8d;
-        font-weight: 500;
-     
-        
-    }
-    
-    .wishlist-table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 20px;
-        margin-bottom: 60px;
-    }
-    
-    .wishlist-table th, .wishlist-table td {
-        padding: 12px;
-       
-        text-align: center;
-    }
-    
-    .wishlist-table th {
-        background-color: #f3f4f6;
-        color: #2c3e50;
-        font-weight: 600;
-    }
-    
-    .wishlist-table img {
-        width: 60px;
-        height: 60px;
-        object-fit: cover;
-        border-radius: 5px;
-    }
-    
-    .stock-status {
-        margin: 30px;
-        font-weight: 500;
-        border-radius: 20px;
-        display: inline-block;
-    }
-    
-    .stock-status.available {
-        background-color: #27ae60;
-        color: white;
-    }
-    
-    .stock-status.out-of-stock {
-        background-color: #e74c3c;
-        color: white;
-    }
-    
-    .stock-status.unavailable {
-        background-color: #95a5a6;
-        color: white;
-    }
-    
-    .add-cart-btn {
-        padding: 6px 12px;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        font-weight: 500;
-    }
-    
-    .remove-btn {
-        margin-left: 10px;
-        padding: 6px 12px;
-        border: none;
-        border-radius: 50%;
-        cursor: pointer;
-        font-weight: 500;
-    }
-    
-    .remove-btn:hover {
-        background-color: #000;
-        color: #fff;
-    }
-    
-    .add-cart-btn {
-        background-color: #000;
-        color: white;
-    }
-    
-    .add-cart-btn:hover {
-        background-color: #fff;
-        color: #000;
-    }
-    </style>
+ 
     
     <div class="wishlist-container">
         <h3>My Wishlist</h3>
@@ -139,7 +35,7 @@
                             <td><%= firstVariant.size %></td>
                             <td><%= firstVariant.color %></td>
                             <td>&#8377;<%= firstVariant.salePrice || firstVariant.regularPrice %></td>
-                            <td class="stock-status <%= firstVariant.status.toLowerCase().replace(/ /g, '-') %>"><%= firstVariant.status %></td>
+                            <td><div class="stock-status <%= firstVariant.status.toLowerCase().replace(/ /g, '-') %>"><%= firstVariant.status %></div> </td>
                             <td>
                                 <button class="add-cart-btn" onclick="addToCart('<%= product._id %>', '<%= firstVariant._id %>')">Add to Cart</button>
                                 <button class="remove-btn" onclick="removeFromWishlist('<%= product._id %>')">X</button>
@@ -150,113 +46,9 @@
             </table>
         <% } %>
     </div>
-<script>
-    function removeFromWishlist(productId) {
-    Swal.fire({
-        title: 'Are you sure?',
-        text: "Do you want to remove this product from your wishlist?",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#3085d6',
-        confirmButtonText: 'Yes, remove it!',
-        cancelButtonText: 'Cancel',
-    }).then((result) => {
-        if (result.isConfirmed) {
-            // Make a DELETE request to the server
-            fetch(`/wishlist/remove`, {
-                method: 'DELETE',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ productId }),
-            })
-                .then((response) => response.json())
-                .then((data) => {
-                    if (data.success) {
-                        Swal.fire(
-                            'Removed!',
-                            'The product has been removed from your wishlist.',
-                            'success'
-                        );
-
-                        // Safely remove the element from the DOM
-                        const element = document.getElementById(`wishlist-item-${productId}`);
-                        if (element) {
-                            element.remove();
-                        } else {
-                            console.warn(`No element found with ID wishlist-item-${productId}`);
-                        }
-                    } else {
-                        Swal.fire(
-                            'Error!',
-                            data.message || 'Failed to remove the product from your wishlist.',
-                            'error'
-                        );
-                    }
-                })
-                .catch((error) => {
-                    console.error('Error:', error);
-                    Swal.fire(
-                        'Error!',
-                        'An error occurred while removing the product.',
-                        'error'
-                    );
-                });
-        }
-    });
-}
 
 
-
-
-function addToCart(productId, variantId) {
-    const quantity = 1;  // Default quantity set to 1
-
-    fetch('/cart/add', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-        },
-        body: JSON.stringify({
-            productId: productId,
-            variantId: variantId,
-            quantity: quantity, // Send quantity in the request body
-        }),
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            Swal.fire({
-                title: 'Added to Cart',
-                text: 'The product has been added to your cart.',
-                icon: 'success',
-                confirmButtonText: 'Go to Cart',
-            }).then(result => {
-                if (result.isConfirmed) {
-                    window.location.href = '/cart';
-                }
-            });
-        } else {
-            Swal.fire({
-                title: 'Error',
-                text: data.message || 'Failed to add product to cart.',
-                icon: 'error',
-                confirmButtonText: 'Try Again',
-            });
-        }
-    })
-    .catch(error => {
-        console.error('Error adding product to cart:', error);
-        Swal.fire({
-            title: 'Error',
-            text: 'Internal Server Error',
-            icon: 'error',
-            confirmButtonText: 'Try Again',
-        });
-    });
-}
-
-</script>
+<script src="/js/user/wishlist.js"></script>
 
 
 <%- include('../../views/partials/user/footer') %>

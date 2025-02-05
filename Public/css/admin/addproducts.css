@@ -1,0 +1,300 @@
+.container-main {
+    width: 90%;
+    margin-left: 50px;
+    padding-left: 10px;
+    overflow-x: hidden;
+
+}
+
+.publish-btn {
+    border-radius: 20px;
+    background-color: #9FEEA7;
+    color: #000;
+    font-weight: 500;
+    width: 100px;
+}
+
+/* Adjust grid layout for the form */
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-gap: 20px;
+    align-items: start;
+    overflow: hidden;
+}
+
+/* Add margin between the variant table and other sections */
+.variant-tablev {
+    margin-top: 20px;
+    border: 1px solid #ddd;
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.variant-tablev th,
+.variant-tablev td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: left;
+}
+
+.variant-tablev th {
+    background-color: #f8f9fa;
+    font-weight: bold;
+}
+
+.add-variant-btn {
+    margin-top: 15px;
+}
+
+/* Place the category section to the right side */
+.category-section {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: start;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #f8f9fa;
+    margin-top: 20px;
+}
+
+/* Adjust spacing for the category dropdown */
+.category-section .form-label {
+    margin-bottom: 5px;
+}
+
+.form-label {
+    font-weight: 500;
+}
+
+.category-section select {
+    width: 100%;
+    max-width: 200px;
+    padding: 8px;
+    border-radius: 5px;
+}
+
+/* Other styles (no change) */
+.form-control {
+    font-size: 13px;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+    width: 100%;
+    margin: 5px;
+}
+
+.file-input-container {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    margin: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px dashed #ccc;
+    border-radius: 5px;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.file-input-container input {
+    opacity: 0;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+}
+
+.add-icon {
+    font-size: 40px;
+    color: #ccc;
+    font-weight: bold;
+    text-align: center;
+}
+
+/* Thumbnail Container */
+.thumbnail-container {
+    display: none;
+    position: relative;
+    width: 180px;
+    height: 180px;
+    margin-top: 10px;
+    margin-left: 22px;
+}
+
+.thumbnail-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 5px;
+}
+
+.remove-btn {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background-color: rgba(255, 0, 0, 0.6);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    font-size: 16px;
+    width: 25px;
+    height: 25px;
+    text-align: center;
+    cursor: pointer;
+}
+
+.remove-btn:hover {
+    background-color: rgba(255, 0, 0, 0.8);
+}
+
+.crop-btn {
+    position: absolute;
+    bottom: 5px;
+    left: 5px;
+    background-color: rgba(0, 255, 0, 0.6);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 14px;
+    padding: 5px;
+    width: 150px;
+    height: 30px;
+    cursor: pointer;
+}
+
+.crop-btn:hover {
+    background-color: rgba(0, 255, 0, 0.8);
+}
+
+/* Crop Modal */
+.crop-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    padding: 20px;
+}
+
+.crop-modal-content {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    width: 80%;
+    max-width: 600px;
+    text-align: center;
+    position: relative;
+}
+
+.crop-container {
+    width: 100%;
+    height: 300px;
+    /* Adjustable height */
+    margin-bottom: 20px;
+}
+
+#cropImage {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: space-between;
+}
+
+.btn-sm {
+    padding: 10px;
+    font-size: 14px;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    border: 1px solid #007bff;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    border: 1px solid #6c757d;
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268;
+}
+
+
+
+@media (max-width: 576px) {
+
+.container-main{
+width: 90%;
+margin: 0 auto;
+padding: 0 10px;
+}
+
+
+.form-grid {
+grid-template-columns: 1fr;
+width: 90%;
+
+}
+
+
+.form-control, .form-select {
+font-size: 14px;
+padding: 12px;
+}
+
+.publish-btn {
+width: 100%;
+padding: 12px;
+font-size: 16px;
+}
+
+
+.file-input-container {
+width: 80px;
+height: 80px;
+}
+
+.add-icon {
+font-size: 30px;
+}
+
+.thumbnail-container {
+width: 150px;
+height: 150px;
+margin-left: 0;
+margin-top: 10px;
+}
+
+/* Category section full width */
+.category-section {
+width: 100%;
+}
+
+/* Variant table font size and padding adjustments */
+.variant-tablev th,
+.variant-tablev td {
+font-size: 0.8rem;
+padding: 8px;
+}
+
+
+
+
+}

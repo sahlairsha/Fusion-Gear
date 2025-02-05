@@ -1,12 +1,14 @@
 const Category = require('../../models/categorySchema');
+const User = require('../../models/userSchema');
 
-const Products = require('../../models/productSchema')
 
 
 const inputCategories = async(req,res)=>{
     try {
-        return res.render('addCategory')
+        const adminData = await User.findById(req.session.admin)
+        return res.render('addCategory',{admin:adminData})
     } catch (error) {
+
         console.error('error in loading the add category page',error)
         res.status(500).json({error : "Internal Server Error"})
     }
@@ -27,11 +29,13 @@ const categoryInfo = async(req,res)=>{
 
         const totalPages = Math.ceil(totalCategories / limit);
 
+        const adminData = await User.findById(req.session.admin)
         res.render("category",{
-            category : categoryData ,
+            category : categoryData ,   
             currentPage : page,
             totalPages : totalPages,
-            totalCategories : totalCategories
+            totalCategories : totalCategories,
+            admin: adminData
         })
 
     } catch (error) {
@@ -44,8 +48,8 @@ const categoryInfo = async(req,res)=>{
 
 const addCategories = async (req, res) => {
     try {
-        const { name, description,discount,startDate, endDate} = req.body;
-        const newCategory = new Category({ name, description,discount,startDate, endDate});
+        const { name,description,discount,startDate, endDate} = req.body;
+        const newCategory = new Category({ name, description,percentage:discount,startDate, endDate});
         await newCategory.save();
 
         req.flash('success', 'Category added successfully!');

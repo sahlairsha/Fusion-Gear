@@ -2,7 +2,8 @@
 const Product = require( "../../models/productSchema" );
 const User = require("../../models/userSchema");
 const Category = require('../../models/categorySchema');
-const Coupon = require("../../models/couponSchema")
+
+const Brand = require('../../models/brandSchema')
 
 
 
@@ -12,9 +13,10 @@ const loadProducts = async (req, res) => {
         let { priceRange, size, color } = req.query; 
         let search = req.query.search ? req.query.search.trim() : "";
         let page = parseInt(req.query.page) || 1;
-        const limit = 9;
+        const limit = 12;
         const sort = req.query.sort || "productName";
         const filters = {};
+    
 
         let query = {
             isDeleted: false,
@@ -26,11 +28,20 @@ const loadProducts = async (req, res) => {
             const matchingCategory = await Category.findOne({
                 name: { $regex: search, $options: 'i' },
             });
-
-            query.$or = [
-                { productName: { $regex: search, $options: 'i' } },
-                { category: matchingCategory ? matchingCategory._id : null },
-            ];
+        
+            const matchBrand = await Brand.findOne({
+                brand_name: { $regex: search, $options: 'i' },
+            });
+        
+            query.$or = [{ productName: { $regex: search, $options: 'i' } }];
+        
+            // Only push category/brand conditions if they are found
+            if (matchingCategory) {
+                query.$or.push({ category: matchingCategory._id });
+            }
+            if (matchBrand) {
+                query.$or.push({ brands: matchBrand._id });
+            }
         }
 
         // Handle category filter (if explicitly selected)
@@ -155,6 +166,10 @@ const productsWithFilteredVariants = productData.map((product) => {
             res.redirect('/');
             return;
         }
+// Fetch unique categories, sizes, and colors from the database
+const categories = await Category.find({}, 'name')
+const sizes = await Product.distinct('variants.size')
+
 
        
         const data = {
@@ -169,7 +184,12 @@ const productsWithFilteredVariants = productData.map((product) => {
             priceRange,
             size,
             color,
-            user
+            user,
+            categories: categories.map(cat => cat.name),
+            sizes: sizes.filter(Boolean), 
+  
+           
+           
         };
 
        

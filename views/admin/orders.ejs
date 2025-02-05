@@ -1,152 +1,81 @@
 <%- include('../../views/partials/admin/header')  %>
-<style>
-    table {
-        table-layout: fixed;
-        width: 100%;
-        text-align: center;
-    }
-    .product_image{
-        border-radius: 10px;
-    }
-    .actions{
-        width: 200px;
-        align-items: center;
-    }
-    .order-status-display{
-    background-color: #ff6b6b;
-    color: white;
-    padding: 5px 10px;
-    border-radius: 5px;
-    font-size: 10px;
-    font-weight: 600;
-    text-transform: uppercase;
-    }
-    .payment-badge{
-     
-      
-        padding: 5px 10px;
-        border-radius: 5px;
-        font-size: 10px;
-        font-weight: 600;
-        text-transform: uppercase;
-       
-    }
-    .payment-badge.pending{
-        background-color:#ffc10770;
-        border: 1px solid #FFC107;
-        color: #443a3a;
-      
-    }
-    .payment-badge.completed{
-        background-color: #2ecc7013;
-        border: 1px solid  #2ecc7044;
-        color: #132a13;
-    }
-
-    .payment-badge.failed{
-        background-color: #ff6b6b60;
-        color: white;
-        border:1px solid #ff6b6b;
-    }
-
-    .shipping{
-        overflow: hidden;
-        white-space: nowrap;
-        text-overflow: ellipsis;
-        width: 30%;
-    }
-
-</style>
-
-
-
+<link rel="stylesheet" href="/css/admin/order-list.css">
 <div class="container mt-4">
-    <h2 class="mb-4">Order Details </h2>
-  
+    <h2 class="mb-4">Order Details</h2>
+
     <div class="mb-3">
         <input type="text" class="form-control" id="searchBar" placeholder="Search product by name or category">
     </div>
 
-    <table class="table table-light">
-        <thead class="table-secondary">
-            <tr>
-                <th scope="col">User Name</th>
-                <th scope="col">Product Image</th>
-                <th scope="col">Product Name</th>
-                <th scope="col">Qty</th>               
-                <th scope="col">Total Price</th>
-                <th scope="col">Shipping Address</th>
-                <th scope="col">Payment Status</th>
-                <th scope="col">Order Status</th>
-                <th scope="col" class="actions">Actions</th>
-            </tr>
-        </thead>
-        <tbody id="tableBody">
-            <% orders.forEach((order, index) => { %>
-                
-                <tr data-order-id="<%= order._id %>" class="table-row">
-                    <td><%= order.user_id.full_name || order.user_id.username  %> </td>
-                    <td>
-                        <% order.products.forEach(product => { %>
-                            <img class="product_image mb-2" src="/uploads/public-image/<%= product.product_id.productImage[0] %>" alt="<%= product.product_id.productName %>" width="50" height="50">
-                        <% }); %>
-                    </td>
-                    <td>
-                        <%= order.products.map(product => product.product_id.productName).join(', ') %>
-                    </td>
-                    <td><%= order.products.map(product => product.quantity).join(',') %></td> 
-                    <td><%= order.total_price %></td>
-                    <td class="shipping">
-                       
-                        <% if (order.specificAddress) { %>
-                            <p> <%= order.specificAddress.recipient_name %></p>
-                            <p> <%= order.specificAddress.streetAddress %>, <%= order.specificAddress.city %>, <%= order.specificAddress.state %>, <%= order.specificAddress.pincode %></p>
-                            <p> <%= order.specificAddress.phone %></p>
-                        <% } else { %>
-                            <p>No shipping address available</p>
-                        <% } %>
-                    </td>
-                    
-                    <%if(order.payment_status === 'Pending'){%>
-                    <td><div class="payment-badge pending"> <%= order.payment_status %> </div></td> 
-                    <% } else if(order.payment_status === 'Completed') {%>
-                        <td><div class="payment-badge completed"> <%= order.payment_status %> </div>
-                    </td>
-                    <% } else{%>
-                        <td><div class="payment-badge failed"> <%= order.payment_status %> </div></td>
-                        <% } %>
-                        <td>
-                            <div class="order-status-display text-center bg-<%= order.order_status === 'Pending' ? 'warning' : order.order_status === 'Shipped' ? 'info' : order.order_status === 'Delivered' ? 'success' : 'danger' %>"><%= order.order_status %></div>
-                        </td> 
-                       
-                        <td>
-                            <% if (order.order_status === 'Pending Cancellation') { %>
-                                <div>
-                                    <button class="btn btn-success btn-sm approve-cancel-btn" data-order-id="<%= order._id %>">Approve</button>
-                                    <button class="btn btn-danger btn-sm reject-cancel-btn" data-order-id="<%= order._id %>">Reject</button>
-                                </div>
-                            <% } else if (order.order_status === 'Pending Return') { %>
-                                <div class="return-actions">
-                                    <button class="btn btn-success btn-sm approve-return-btn" data-order-id="<%= order._id %>">Approve</button>
-                                    <button class="btn btn-danger btn-sm reject-return-btn" data-order-id="<%= order._id %>">Reject</button>
-                                </div>
+    <div class="table-container">
+        <table class="table table-light">
+            <thead class="table-secondary">
+                <tr>
+                    <th>User Name</th>
+                    <th>Product Image</th>
+                    <th>Product Name</th>
+                    <th>Qty</th>
+                    <th>Total Price</th>
+                    <th>Shipping Address</th>
+                    <th>Payment Status</th>
+                    <th>Order Status</th>
+                    <th class="actions">Actions</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                <% orders.forEach((order, index) => { %>
+                    <tr data-order-id="<%= order._id %>" class="table-row">
+                        <td data-label="User Name"><%= order.user_id.full_name || order.user_id.username %></td>
+                        <td data-label="Product Image">
+                            <% order.products.forEach(product => { %>
+                                <img class="product_image mb-2" src="/uploads/public-image/<%= product.product_id.productImage[0] %>" 
+                                     alt="<%= product.product_id.productName %>" width="50" height="50">
+                            <% }); %>
+                        </td>
+                        <td data-label="Product Name"><%= order.products.map(product => product.product_id.productName).join(', ') %></td>
+                        <td data-label="Qty"><%= order.products.map(product => product.quantity).join(', ') %></td>
+                        <td data-label="Total Price">$<%= order.total_price %></td>
+                        <td data-label="Shipping Address:" class="shipping">
+                            <% if (order.specificAddress) { %>
+                                <p><%= order.specificAddress.recipient_name %></p>
+                                <p><%= order.specificAddress.streetAddress %>, <%= order.specificAddress.city %>, <%= order.specificAddress.state %>, <%= order.specificAddress.pincode %></p>
+                                <p><%= order.specificAddress.phone %></p>
                             <% } else { %>
-                                <!-- Original Dropdown -->
+                                <p>No shipping address available</p>
+                            <% } %>
+                        </td>
+                        <td data-label="Payment Status">
+                            <div class="payment-badge <%= order.payment_status.toLowerCase() %>">
+                                <%= order.payment_status %>
+                            </div>
+                        </td>
+                        <td data-label="Order Status">
+                            <div class="order-status-display bg-<%= order.order_status === 'Pending' ? 'warning' : order.order_status === 'Shipped' ? 'info' : order.order_status === 'Delivered' ? 'success' : 'danger' %>">
+                                <%= order.order_status %>
+                            </div>
+                        </td>
+                        <td data-label="Actions">
+                            <% if (order.order_status === 'Pending Cancellation') { %>
+                                <button class="btn btn-success btn-sm approve-cancel-btn" data-order-id="<%= order._id %>">Approve</button>
+                                <button class="btn btn-danger btn-sm reject-cancel-btn" data-order-id="<%= order._id %>">Reject</button>
+                            <% } else if (order.order_status === 'Pending Return') { %>
+                                <button class="btn btn-success btn-sm approve-return-btn" data-order-id="<%= order._id %>">Approve</button>
+                                <button class="btn btn-danger btn-sm reject-return-btn" data-order-id="<%= order._id %>">Reject</button>
+                            <% } else { %>
                                 <select class="form-select order-status-dropdown" data-order-id="<%= order._id %>" style="width: 150px;">
                                     <option value="Pending" <%= order.order_status === 'Pending' ? 'selected' : '' %>>Pending</option>
                                     <option value="Dispatch" <%= order.order_status === 'Dispatch' ? 'selected' : '' %>>Dispatch</option>
                                     <option value="Shipped" <%= order.order_status === 'Shipped' ? 'selected' : '' %>>Shipped</option>
                                     <option value="Delivered" <%= order.order_status === 'Delivered' ? 'selected' : '' %>>Delivered</option>
                                     <option value="Canceled" <%= order.order_status === 'Canceled' ? 'selected' : '' %>>Canceled</option>
-
                                 </select>
                             <% } %>
                         </td>
-                        
-                </tr>
-            <% }); %>
-        </tbody>        
-    </table>
+                    </tr>
+                <% }); %>
+            </tbody>
+        </table>
+
 
     <div class="flex items-center justify-center mt-3 space-x-2 mb-3">
         <% if (currentPage > 1) { %>
@@ -168,242 +97,10 @@
 </div>
 
 <script src="/js/admin/customer-search.js"></script>
+<script src="/js/admin/orders.js"></script>
+<script src="/js/admin/order-cancel.js"></script>
+<script src="/js/admin/order-return.js"></script>
 
-<script>
-  
-  document.addEventListener('change', function (event) {
-        if (event.target.classList.contains('order-status-dropdown')) {
-            const orderId = event.target.getAttribute('data-order-id');
-            const newStatus = event.target.value;
-
-            Swal.fire({
-                title: "Are you sure?",
-                text: `Do you want to change the order status to "${newStatus}"?`,
-                icon: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#3085d6",
-                cancelButtonColor: "#d33",
-                confirmButtonText: "Yes, update it!",
-                cancelButtonText: "Cancel"
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    fetch(`/admin/orders/${orderId}/status`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({ status: newStatus }),
-                    })
-                    .then((response) => {
-                        if (response.ok) {
-                            const statusCell = event.target.closest('tr').querySelector('.order-status-display');
-                            statusCell.textContent = newStatus;
-                            statusCell.className = `order-status-display text-center bg-${getStatusColor(newStatus)}`;
-                            Swal.fire("Updated!", "Order status has been updated.", "success");
-                        } else {
-                            Swal.fire("Error!", "Failed to update order status.", "error");
-                        }
-                    })
-                    .catch((error) => {
-                        console.error('Error:', error);
-                        Swal.fire("Error!", "Something went wrong.", "error");
-                    });
-                } else {
-                    event.target.value = event.target.getAttribute('data-current-status');
-                }
-            });
-        }
-    });
-
-    function getStatusColor(status) {
-        switch (status) {
-            case 'Pending': return 'warning';
-            case 'Dispatch': return 'primary';
-            case 'Shipped': return 'info';
-            case 'Delivered': return 'success';
-            case 'Canceled': return 'danger';
-            default: return 'secondary';
-        }
-    }
-
-
-document.getElementById('searchBar').addEventListener('input', function() {
-    const query = this.value.toLowerCase();
-    const rows = document.querySelectorAll('#tableBody tr');
-
-    rows.forEach(row => {
-        const productName = row.querySelector('td:nth-child(3)').textContent.toLowerCase();
-        const category = row.querySelector('td:nth-child(5)').textContent.toLowerCase();
-
-        if (productName.includes(query) || category.includes(query)) {
-            row.style.display = '';
-        } else {
-            row.style.display = 'none';
-        }
-    });
-});
-
-
-document.addEventListener("DOMContentLoaded", () => {
-        const orderCards = document.querySelectorAll(".table-row")
-
-        const images = document.querySelectorAll(".product_image");
-
-        images.forEach(image => {
-            image.addEventListener("click", (e) => {
-                e.stopPropagation();
-                const orderId = image.closest(".table-row").getAttribute("data-order-id");
-                window.location.href = `/admin/order-details/${orderId}`;
-            });
-        });
-    });
-
-
-
-
-
-
-</script>
-<script>
- const socket = io(); // Admin socket client-side initialization
-
-socket.on('order_cancellation_request', (data) => {
-    console.log(`Received cancellation request for order ID: ${data.orderId}`);
-
-    // Show a notification or update the admin dashboard
-    displayCancellationRequest(data); // Function to display the request in the admin UI
-});
-
-// Function to handle admin decision (Approve or Reject)
-const handleAdminDecision = async (orderId, action) => {
-    try {
-        const response = await fetch(`/admin/cancel-order/${orderId}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action }), 
-        });
-
-        const result = await response.json();
-        console.log(`Order ${orderId} ${action}d:`, result);
-    } catch (error) {
-        console.error('Error handling admin decision:', error);
-    }
-};
-
-</script>
-
-<script>
-    document.addEventListener("click", async (event) => {
-    if (event.target.classList.contains("approve-cancel-btn") || event.target.classList.contains("reject-cancel-btn")) {
-        const orderId = event.target.getAttribute("data-order-id");
-        const action = event.target.classList.contains("approve-cancel-btn") ? "approve" : "reject";
-
-        Swal.fire({
-            title: "Are you sure?",
-            text: `Do you want to ${action} this cancellation request?`,
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: action === "approve" ? "#28a745" : "#d33",
-            cancelButtonColor: "#6c757d",
-            confirmButtonText: `Yes, ${action} it!`,
-        }).then(async (result) => {
-            if (result.isConfirmed) {
-                try {
-                    const response = await fetch(`/admin/cancel-order/${orderId}`, {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                        },
-                        body: JSON.stringify({ action }),
-                    });
-
-                    if (response.ok) {
-                        Swal.fire("Success", `Cancellation request has been ${action}d.`,"success");
-                        location.reload();
-                    } else {
-                        Swal.fire("Error", "Failed to process the request.", "error");
-                    }
-                } catch (error) {
-                    Swal.fire("Error", "Something went wrong.", "error");
-                    console.error("Admin action error:", error);
-                }
-            }
-        });
-    }
-});
-
-</script>
-
-
-<script>
-// Handle Return Request Approval/Reject
-document.addEventListener("click", async (event) => {
-    if (event.target.classList.contains("approve-return-btn") || event.target.classList.contains("reject-return-btn")) {
-        const orderId = event.target.getAttribute("data-order-id");
-        const action = event.target.classList.contains("approve-return-btn") ? "approve" : "reject";
-
-        Swal.fire({
-            title: "Are you sure?",
-            text: `Do you want to ${action} this return request?`,
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: action === "approve" ? "#28a745" : "#d33",
-            cancelButtonColor: "#6c757d",
-            confirmButtonText: `Yes, ${action} it!`,
-        }).then(async (result) => {
-            if (result.isConfirmed) {
-                try {
-                    const response = await fetch(`/admin/orders/${orderId}/return`, {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                        },
-                        body: JSON.stringify({ action }),
-                    });
-
-                    if (response.ok) {
-                        Swal.fire("Success", `Return request has been ${action}d.`, "success");
-                        location.reload();
-                    } else {
-                        Swal.fire("Error", "Failed to process the request.", "error");
-                    }
-                } catch (error) {
-                    Swal.fire("Error", "Something went wrong.", "error");
-                    console.error("Admin action error:", error);
-                }
-            }
-        });
-    }
-});
-
-</script>
-<script>
-    const socketIo = io(); // Admin socket client-side initialization
-   
-   socketIo.on('order_return_request', (data) => {
-       console.log(`Received return request for order ID: ${data.orderId}`);
-   
-       // Show a notification or update the admin dashboard
-       displayCancellationRequest(data); // Function to display the request in the admin UI
-   });
-   
-   // Function to handle admin decision (Approve or Reject)
-   const handleAdminDecisionReturn = async (orderId, action) => {
-       try {
-           const response = await fetch(`/admin//admin/orders/${orderId}/return`, {
-               method: 'POST',
-               headers: { 'Content-Type': 'application/json' },
-               body: JSON.stringify({ action }), 
-           });
-   
-           const result = await response.json();
-           console.log(`Order ${orderId} ${action}d:`, result);
-       } catch (error) {
-           console.error('Error handling admin decision:', error);
-       }
-   };
-   
-   </script>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 

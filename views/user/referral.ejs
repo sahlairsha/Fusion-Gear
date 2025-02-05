@@ -1,89 +1,6 @@
 <%- include('../../views/partials/user/header') %>
+<link rel="stylesheet" href="/css/user/profile-sidebar.css">
 
-<%-include('../../views/partials/user/user-side') %>
-
-  <!-- Toastr CSS -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
-  
-  <!-- Font Awesome for icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
-
-  <style>
-    .referral-container {
-      background: #ffffff;
-      width: 90%;
-      height: 50vh;
-      max-width: 600px;
-      margin-top: 100px;
-      text-align: center;
-      margin-left: auto;
-      margin-right: auto;
-      border-radius: 10px;
-      padding: 20px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
-
-    .refferal-head {
-      color: #4CAF50;
-      font-size: 1.5rem;
-    }
-
-    .referral-code-container {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-radius: 40px;
-      border: 1px solid #33333325;
-      margin: 10px auto;
-      width: 90%;
-      max-width: 400px;
-      height: 50px;    
-      padding: 20px;
-      background-color: #f8f8f8;
-    }
-
-    .referral-code {
-      font-size: 14px;
-      color: #3333333f;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .share-btn {
-      width: 40px;
-      height: 40px;
-      background-color: #007bff; 
-      color: white;
-      border: none;
-      border-radius: 50%;
-      cursor: pointer;
-      font-size: 1rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: background-color 0.3s ease;
-    }
-
-    .share-btn:hover {
-      background-color: #0056b3; /* Darker blue on hover */
-    }
-
-    .stats {
-      margin: 20px 0;
-      font-size: 1rem;
-      color: #555;
-    }
-
-    .code {
-      color: #00000060;
-      font-size: 14px;
-      cursor: pointer;
-      transition: color 0.3s ease;
-    }
-  </style>
-</head>
-<body>
   <!-- Referral Page -->
   <div class="referral-container">
     <h6 class="refferal-head">🎉 Congratulations! 🎉</h6>
@@ -93,17 +10,15 @@
         <i class="fas fa-rocket share-icon"></i>
       </button>
     </div>
-    <p class="stats">Successful Referrals: <span id="referralCount">0</span></p>
-    <p class="stats">Rewards Earned: <span id="rewards">0.00</span></p>
+    <p class="stats">Share your referral code with friends and family to earn rewards!</p>
+
   </div>
 </div>
-  <!-- Toastr and Confetti Libraries -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti"></script>
 
   <script>
-    // Trigger confetti animation on page load
+ 
     window.onload = () => {
       confetti({
         particleCount: 100,
@@ -112,13 +27,12 @@
       });
     };
 
-    // Function to share referral code
     function shareReferral() {
       const referralCode = document.getElementById("referralCode").innerText;
       navigator.clipboard
         .writeText(`Use my referral code: ${referralCode}`)
         .then(() => {
-          // Show a toast notification
+          
           toastr.success(`Your referral code "${referralCode}" has been copied!`, "Code Copied", {
             closeButton: true,
             progressBar: true,

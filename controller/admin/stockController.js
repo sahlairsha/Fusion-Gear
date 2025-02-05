@@ -1,5 +1,5 @@
 const Product = require('../../models/productSchema');
-
+const User = require('../../models/userSchema')
 
 const getStocks = async (req, res) => {
     try {
@@ -24,13 +24,13 @@ const getStocks = async (req, res) => {
         }).countDocuments();
 
 
-       
-
+       const adminData = await User.findById(req.session.admin)
 
         res.render('inventory', {
             products : productData ,
             totalPages: Math.ceil(count / limit),
-            currentPage: page
+            currentPage: page,
+            admin : adminData
         });
 
 

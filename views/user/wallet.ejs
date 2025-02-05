@@ -1,256 +1,14 @@
 <%-include('../../views/partials/user/header') %>
-<%-include('../../views/partials/user/user-side') %>
-<style>
 
-
-   /* Container */
-   .wallet-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-top: 30px;
-    margin-bottom: 50px; 
-    padding: 20px;
-  }
-
-  /* Wallet Card */
-  .wallet-card {
-    margin-top: 20px;
-    width: 450px;
-    height: auto;
-    padding: 20px;
-    background-color: #f0f8ff;
-    border-radius: 15px;
-    border: 1px solid #dcdcdc;
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-    text-align: left;
-  }
-
-  .wallet-card h6 {
-    margin-bottom: 10px;
-    padding-left: 20px;
-    font-size: 1.3rem;
-    font-weight: bold;
-    color: #333;
-  }
-
-  .wallet-card p {
-    color: #333;
-    font-size: 1.1rem;
-    font-weight: 600;
-    padding-left: 20px;
-  }
-
-  .wallet-card button {
-    margin-top: 15px;
-    padding: 12px 20px;
-    background-color: #4CAF50;
-    color: #fff;
-    font-weight: 600;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-
-  .wallet-card button:hover {
-    background-color: #45a049;
-  }
-
-  /* Transaction History */
-  .transaction-history {
-    margin-top: 30px;
-    padding: 20px;
-    width: 600px;
-    background-color: #fff;
-    border-radius: 15px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  }
-
-  .transaction-history h2 {
-    font-size: 1.5rem;
-    color: #333;
-    margin-bottom: 15px;
-  }
-
-  .transaction-history table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-
-  .transaction-history th,
-  .transaction-history td {
-    padding: 10px;
-    border: 1px solid #ddd;
-    text-align: left;
-    font-size: 1rem;
-  }
-
-  .transaction-history th {
-    background-color: #f4f4f4;
-    color: #333;
-  }
-
-  .transaction-history td {
-    color: #333;
-  }
-
-  .transaction-history td.amount {
-    font-weight: bold;
-  }
-
-  /* Add Money Form */
-  #addMoneyFormContainer {
-    display: none;
-    width: 100%;
-    max-width: 600px;
-    margin: 20px auto;
-    padding: 30px;
-    background-color: #fff;
-    border: 1px solid #e1e1e1;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  }
-
-  #addMoneyFormContainer h2 {
-    margin-bottom: 20px;
-    font-size: 1.8rem;
-    color: #333;
-    text-align: center;
-  }
-
-  #addMoneyForm {
-    display: flex;
-    flex-direction: column;
-  }
-
-  #addMoneyForm label {
-    margin-bottom: 10px;
-    font-weight: 600;
-    color: #333;
-    font-size: 1rem;
-  }
-
-  #addMoneyForm input[type="number"] {
-    padding: 12px;
-    margin-bottom: 20px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    font-size: 1rem;
-    color: #333;
-  }
-
-  #addMoneyForm fieldset {
-    margin-top: 15px;
-    padding: 15px;
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    background-color: #fff;
-  }
-
-  #addMoneyForm fieldset legend {
-    font-size: 1.1rem;
-    color: #555;
-  }
-
-  .custom-radio-container {
-    display: flex;
-    gap: 20px;
-    margin-bottom: 15px;
-  }
-
-  .custom-radio input[type="radio"] {
-    display: none;
-  }
-
-  .custom-radio label {
-    padding: 10px 20px;
-    font-size: 1.1rem;
-    font-weight: 600;
-    width: 200px;
-    height: 50px;
-    color: #fff;
-    background-color: #fff;
-    border: 1px dotted #000;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    transition: box-shadow 0.3s ease-in-out; 
-  }
-
-  .custom-radio input[type="radio"]:checked + label {
-
-    border: 1px solid  rgba(18, 240, 18, 0.541);
-    box-shadow: 0 0 1px rgba(18, 240, 18, 0.541), 0 0 2px rgba(18, 240, 18, 0.541),0 0 3px rgba(18, 240, 18, 0.541);
-   
-  }
-
-  #addMoneyForm button {
-    margin-top: 20px;
-    padding: 12px;
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: #fff;
-    background-color: #000;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-
-  #addMoneyForm button:hover {
-    background-color: #000;
-  }
-  .pagination-container {
-    margin-top: 20px;
-    text-align: center;
-}
-
-.pagination {
-    list-style: none;
-    padding: 0;
-    display: inline-block;
-}
-
-.pagination li {
-  position: relative;
-    display: inline;
-    margin: 0 5px;
-}
-
-.pagination li a {
-    text-decoration: none;
-    padding: 8px 12px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    color: #333;
-    transition: background-color 0.3s;
-}
-
-.pagination li a:hover {
-    background-color: #f0f0f0;
-}
-
-.pagination li.active a {
-    background-color: #333;
-    color: #fff;
-    border-color: #333;
-}
-
-</style>
-
-
-
+<link rel="stylesheet" href="/css/user/wallet.css">
 
 <div class="wallet-container">
-  <!-- Wallet Details Card -->
   <div class="wallet-card">
     <h6>Wallet Details</h6>
     <p>Balance: <span id="balance">₹<%= walletBalance %></span></p>
     <button onclick="toggleAddMoneyForm()">+ Add Money</button>
   </div>
 
-  <!-- Add Money Form -->
   <div id="addMoneyFormContainer" style="display: none;">
     <h2>Add Money</h2>
     <form id="addMoneyForm">
@@ -271,183 +29,63 @@
     </form>
   </div>
 
-  <!-- Transaction History -->
   <div class="transaction-history">
     <h2>Transaction History</h2>
-    <table class="table">
-        <thead>
+    <table>
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Description</th>
+          <th>Amount</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (transactions.length > 0) { %>
+          <% transactions.forEach(transaction => { %>
             <tr>
-                <th>Date</th>
-                <th>Description</th>
-                <th>Amount</th>
+              <td><%= new Date(transaction.date).toLocaleString() %></td>
+              <td><%= transaction.type %></td>
+              <td class="<%= transaction.type === 'Debit' ? 'text-danger' : 'text-success' %>">
+                <%= transaction.type === 'Debit' ? '-' : '+' %>₹<%= transaction.amount.toFixed(2) %>
+              </td>
             </tr>
-        </thead>
-        <tbody id="transactionTable">
-          <% if (transactions.length > 0) { %>
-            <% transactions.forEach(transaction => { %>
-              <tr>
-                <td><%= new Date(transaction.date).toLocaleString() %></td>
-                <td><%= transaction.type %></td>
-                <td class="<%= transaction.type === 'Debit' ? 'text-danger' : (['Credit', 'Referral_bonus', 'Refund'].includes(transaction.type) ? 'text-success' : '') %>">
-                  <%= transaction.type === 'Debit' ? '-' : '+' %>₹<%= transaction.amount.toFixed(2) %>
-                </td>
-              </tr>
-            <% }) %>
-          <% } else { %>
-            <tr>
-              <td colspan="3">No transactions yet.</td>
-            </tr>
-          <% } %>
-        </tbody>
-    </table>
-  </div>
-  
-  
-        
-        
+          <% }) %>
+        <% } else { %>
+          <tr>
+            <td colspan="3">No transactions yet.</td>
+          </tr>
+        <% } %>
+      </tbody>
     </table>
 
-    <!-- Pagination -->
     <div class="pagination-container">
       <% if (totalPages > 1) { %>
-          <nav>
-              <ul class="pagination">
-                  <% if (currentPage > 1) { %>
-                      <li><a href="?page=<%= currentPage - 1 %>">Prev</a></li>
-                  <% } %>
-                  <% for (let i = 1; i <= Math.min(5, totalPages); i++) { %>
-                      <li class="<%= currentPage === i ? 'active' : '' %>">
-                          <a href="?page=<%= i %>"><%= i %></a>
-                      </li>
-                  <% } %>
-                  <% if (totalPages > 5) { %>
-                      <li>...</li>
-                      <li><a href="?page=<%= totalPages %>"><%= totalPages %></a></li>
-                  <% } %>
-                  <% if (currentPage < totalPages) { %>
-                      <li><a href="?page=<%= currentPage + 1 %>">Next</a></li>
-                  <% } %>
-              </ul>
-          </nav>
+        <nav>
+          <ul class="pagination">
+            <% if (currentPage > 1) { %>
+              <li><a href="?page=<%= currentPage - 1 %>">Prev</a></li>
+            <% } %>
+            <% for (let i = 1; i <= Math.min(5, totalPages); i++) { %>
+              <li class="<%= currentPage === i ? 'active' : '' %>">
+                <a href="?page=<%= i %>"><%= i %></a>
+              </li>
+            <% } %>
+            <% if (totalPages > 5) { %>
+              <li>...</li>
+              <li><a href="?page=<%= totalPages %>"><%= totalPages %></a></li>
+            <% } %>
+            <% if (currentPage < totalPages) { %>
+              <li><a href="?page=<%= currentPage + 1 %>">Next</a></li>
+            <% } %>
+          </ul>
+        </nav>
       <% } %>
+    </div>
   </div>
-  
-</div>
 </div>
 </div>
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
-<script>
-function toggleAddMoneyForm() {
-  const formContainer = document.getElementById('addMoneyFormContainer');
-  formContainer.style.display = formContainer.style.display === 'none' ? 'block' : 'none';
-}
-
-document.getElementById("addMoneyForm").addEventListener("submit", async function (event) {
-    event.preventDefault();
-
-    // Safely retrieve the amount input and payment method
-    const amountElement = document.getElementById("addMoneyAmount");
-    const paymentMethodElement = document.querySelector('input[name="payment_method"]:checked');
-
-    // Check if the elements exist and have valid values
-    if (!amountElement || !paymentMethodElement) {
-        Swal.fire({
-            icon: "error",
-            title: "Invalid Form",
-            text: "Please fill in all the required fields."
-        });
-        return;
-    }
-
-    const amount = parseFloat(amountElement.value);
-    console.log("Ammount in frontend:",amount)
-    const paymentMethod = paymentMethodElement.value;
-
-    // Validate the amount
-    if (isNaN(amount) || amount <= 0) {
-        Swal.fire({
-            icon: 'error',
-            title: 'Invalid amount',
-            text: "Please enter a valid amount greater than zero."
-        });
-        return;
-    }
-
-    try {
-        // Create an order on the backend
-        const orderResponse = await fetch("/wallet/create-order", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ amount, paymentMethod }),
-        });
-
-        const { orderId, currency } = await orderResponse.json();
-
-        // Initialize Razorpay
-        const razorpayOptions = {
-            key: "rzp_test_slK6OGJAoLPk9J",
-            amount: amount * 100,
-            currency: currency,
-            order_id: orderId,
-            name: "Fusion-Gear",
-            description: "Add Money to Wallet",
-            handler: async function (response) {
-                // Verify payment on the backend
-                const verifyResponse = await fetch("/wallet/verify-payment", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        razorpayOrderId: response.razorpay_order_id,
-                        razorpayPaymentId: response.razorpay_payment_id,
-                        razorpaySignature: response.razorpay_signature,
-                        amount: amount,
-                    }),
-                });
-
-                const verifyResult = await verifyResponse.json();
-                if (verifyResponse.ok) {
-                    document.getElementById("balance").innerText = `₹${verifyResult.newBalance.toFixed(2)}`;
-                    addTransactionToTable(verifyResult.transaction);
-                    Swal.fire("Success!", "Money added to wallet successfully!", "success");
-                } else {
-                    Swal.fire("Error!", verifyResult.message || "Payment failed.", "error");
-                }
-            },
-            theme: { color: "#528FF0" },
-        };
-
-        const rzp = new Razorpay(razorpayOptions);
-        rzp.open();
-    } catch (error) {
-        console.error("Error initiating payment:", error);
-        Swal.fire({
-            icon: "error",
-            title: "Error",
-            text: "An error occurred while initiating payment. Please try again later.",
-        });
-    }
-});
-
-function addTransactionToTable(transaction) {
-  const table = document.getElementById("transactionTable");
-  const row = document.createElement("tr");
-
-  const dateCell = document.createElement("td");
-  dateCell.innerText = new Date(transaction.date).toLocaleString();
-
-  const descCell = document.createElement("td");
-  descCell.innerText = transaction.type;
-
-  const amountCell = document.createElement("td");
-  amountCell.innerText = `₹${transaction.amount.toFixed(2)}`;
-  amountCell.style.color = transaction.amount > 0 ? "green" : "red";
-
-  row.appendChild(dateCell);
-  row.appendChild(descCell);
-  row.appendChild(amountCell);
-  table.appendChild(row);
-}
-</script>
+<script src="/js/user/wallet.js"></script>
 
 <%-include('../../views/partials/user/footer') %>

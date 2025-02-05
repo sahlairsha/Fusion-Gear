@@ -13,9 +13,11 @@ const getProduct = async(req,res)=>{
     try {
         const category = await Category.find({isListed : true});
         const brand = await Brand.find({});
+        const adminData = await User.findById(req.session.admin)
         res.render("addProduct",{
             cat : category,
-            brand : brand
+            brand : brand,
+            admin:adminData
         })
     } catch (error) {
         console.error("Error in loading the add product page")
@@ -51,21 +53,21 @@ const addProducts = async (req, res) => {
                 }
             }
         } else {
-            req.flash("error", "No images uploaded");
+          
             return res.status(400).redirect('/admin/add-products');
         }
 
         // Validate the category
         const categoryId = product.category;
         if (!categoryId) {
-            req.flash("error", "Category is required");
+            
             return res.status(400).redirect('/admin/add-products');
         }
 
         // Validate the brand
         const brandId = product.brands;
         if (!brandId) {
-            req.flash("error", "Brand is required");
+          
             return res.status(400).redirect('/admin/add-products');
         }
 
@@ -75,17 +77,14 @@ const addProducts = async (req, res) => {
             try {
                 variants = JSON.parse(product.variants);
             } catch (error) {
-                req.flash("error", "Invalid variants data");
                 return res.status(400).redirect('/admin/add-products');
             }
 
             if (!Array.isArray(variants) || variants.length === 0) {
-                req.flash("error", "At least one product variant is required");
                 return res.status(400).redirect('/admin/add-products');
             }
 
         } else {
-            req.flash("error", "Product variants are required");
             return res.status(400).redirect('/admin/add-products');
         }
 
@@ -148,6 +147,8 @@ const getAllProducts = async (req, res) => {
 
         // Fetch categories
         const category = await Category.find({ isListed: true });
+
+        const adminData = await User.findById(req.session.admin)
          
         if (category) {
             res.render("products", {
@@ -155,6 +156,7 @@ const getAllProducts = async (req, res) => {
                 category: category,
                 totalPages: Math.ceil(count / limit),
                 currentPage: page,
+                admin: adminData,
             });
         } else {
             req.flash("error", "Category not found. Please try again.");
@@ -177,11 +179,12 @@ const getEditProducts = async (req, res) => {
         const product = await Product.findOne({_id: id})
         const category = await Category.find({})
         const brand = await Brand.find({})
-
+        const adminData = await User.findById(req.session.admin)
         res.render("edit-product",{
             product : product,
             category: category,
-            brands: brand
+            brands: brand,
+            admin: adminData,
         })
 
     } catch (error) {
@@ -435,8 +438,9 @@ const getProductDetails = async (req, res) => {
             req.flash("error", "Product not found");
             return res.redirect("/products");
         }
-
-        res.render("admin-product-details", { product });
+        
+const adminData = await User.findById(req.session.admin)
+        res.render("admin-product-details", { product , admin: adminData })
     } catch (error) {
         console.error(error);
         res.redirect("/pageerror");

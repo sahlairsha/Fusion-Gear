@@ -15,8 +15,6 @@ function filterOrdersByDate(startDate, endDate) {
     };
 }
 
-
-// Helper function to fetch data for top sellers (products, categories, or brands)
 async function getTopSellers(collection, field, timeRange, startDate, endDate) {
     let matchCriteria = {};
 
@@ -30,6 +28,7 @@ async function getTopSellers(collection, field, timeRange, startDate, endDate) {
         matchCriteria = filterOrdersByDate(startDate, endDate);
     }
 
+    // Update mapping: note the key for categories is now "categories"
     const nameField = {
         products: "productName",
         categories: "name",
@@ -41,18 +40,19 @@ async function getTopSellers(collection, field, timeRange, startDate, endDate) {
         { $unwind: "$products" },
         {
             $lookup: {
-                from: collection, // Products, Categories, or Brands collection
-                localField: `products.${field}`, // e.g., products.product_id
-                foreignField: "_id", // e.g., _id in Products collection
-                as: field, 
+                from: collection, // e.g., 'categories' or 'brands'
+                localField: `products.${field}`, // for categories: products.category; for brands: products.brands
+                foreignField: "_id",
+                as: field, // this will create a field named "category" or "brands"
             },
         },
         { $unwind: { path: `$${field}`, preserveNullAndEmptyArrays: true } },
         {
             $group: {
-                _id: `$products.${field}._id`, // Group by ID
-                name: { $first: `$${field}.${nameField[collection]}` }, // Get the correct name field
+                _id: `$${field}._id`,
+                name: { $first: `$${field}.${nameField[collection]}` },
                 totalSales: { $sum: "$products.quantity" },
+                totalRevenue: { $sum: { $multiply: ["$products.quantity", "$products.price"] } }
             },
         },
         { $sort: { totalSales: -1 } },
@@ -64,9 +64,8 @@ async function getTopSellers(collection, field, timeRange, startDate, endDate) {
 
 
 
-const topProducts = async(req,res)=>{
+const topProducts = async (req, res) => {
     const { timeRange, startDate, endDate } = req.query;
-
     try {
         const topProducts = await getTopSellers("products", "product_id", timeRange, startDate, endDate);
         res.json(topProducts);
@@ -74,31 +73,32 @@ const topProducts = async(req,res)=>{
         console.error("Error fetching top products:", error);
         res.status(500).json({ message: "Error fetching top products" });
     }
-}
+};
 
 
-const topCategories = async(req,res)=>{
+const topCategories = async (req, res) => {
     const { timeRange, startDate, endDate } = req.query;
     try {
-        const topCategories = await getTopSellers('Category', 'category', timeRange, startDate, endDate);
+        const topCategories = await getTopSellers('categories', 'category', timeRange, startDate, endDate);
         res.json(topCategories);
     } catch (error) {
         console.error("Error fetching top category:", error);
         res.status(500).json({ message: "Error fetching top categories" });
     }
-}
+};
 
 
-const topBrands = async(req,res) => {
+
+const topBrands = async (req, res) => {
     const { timeRange, startDate, endDate } = req.query;
     try {
-        const topBrands = await getTopSellers('Brand', 'brands', timeRange, startDate, endDate);
+        const topBrands = await getTopSellers('brands', 'brands', timeRange, startDate, endDate);
         res.json(topBrands);
     } catch (error) {
         console.error("Error fetching top brand:", error);
         res.status(500).json({ message: "Error fetching top brand" });
     }
-}
+};
 
 
 module.exports={

@@ -1,189 +1,138 @@
 <%- include('../../views/partials/admin/header')  %>
-<style>
-    table {
-        table-layout: fixed;
-        width: 100%;
-    }
-    .description {
-        overflow: hidden;
-        white-space: nowrap;
-        text-overflow: ellipsis;
-        width: 30%;
-    }
-    .product_image{
-        border-radius: 4px;
-    }
-
-    /* Style for the variant list */
-.variant-list {
-  list-style-type: none;
-  padding: 0;
-  margin: 0;
-}
-
-.variant-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: #f9f9f9;
-  padding: 10px;
-  margin-bottom: 10px;
-  border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  transition: background-color 0.3s, transform 0.3s;
-}
-
-.variant-item:hover {
-  background-color: #f1f1f1;
-  transform: translateY(-2px);
-}
-
-.variant-info {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  font-size: 14px;
-  color: #555;
-  font-weight: 600;
-}
-
-.variant-info span {
-  font-weight: bold;
-}
-
-.variant-price {
-  color: #28a745;
-}
-
-.variant-stock {
-  color: #17a2b8;
-}
-
-.variant-color {
-  color: #007bff;
-}
-
-.variant-size {
-  color: #dc3545;
-}
-
-.remove-variant-btn {
-  background-color: #000;
-  border: none;
-  color: white;
-  padding: 6px 12px;
-  font-size: 14px;
-  cursor: pointer;
-  border-radius: 50%;
-  margin-left: 20px;
-  transition: background-color 0.3s;
-}
-
-.remove-variant-btn:hover {
-  background-color: #fff;
-  color: #000;
-  border:1px solid #00000094;
-}
-
-
-</style>
+<link rel="stylesheet" href="/css/admin/product.css">
 
 
 
 <div class="container mt-4">
-    <h2 class="mb-4">Product Details </h2>
-  
-    <div class="mb-3">
-        <input type="text" class="form-control" id="searchBar" placeholder="Search product by name or category">
-    </div>
+  <h2 class="mb-4 text-center">Product Details</h2>
 
-    <table class="table table-light">
-        <thead class="table-secondary">
-            <tr>
-                <th scope="col">Name</th>
-                <th scope="col">Image</th>
-                <th scope="col">Description</th>
-                <th scope="col">Brands</th>
-                <th scope="col">Category</th>
-                <th scope="col">Offer(%)</th> 
-                <th scope="col">Price</th>
-                <th scope="col">Stock</th>
-                <th scope="col">Color</th>
-                <th scope="col">Size</th>        
-                <th scope="col">Actions</th>
-            </tr>
-        </thead>
-        <tbody id="tableBody">
-            <% data.forEach((product, index) => { %>
-              <tr data-product-id="<%= product._id %>">
-                <td><%= product.productName %></td>
-                <td>
-                  <a href="/admin/product-details/<%= product._id %>">
-                    <img class="product_image" src="/uploads/public-image/<%= product.productImage[0] %>" alt="<%= product.productName %>" width="50" height="50">
-                  </a>
-                </td>
-                <td class="description"><%= product.description %></td>
-                <td><%= product.brands? product.brands.brand_name:"No Brand"%></td>
-                <td><%= product.category ? product.category.name : 'No Category' %></td>
-                <td><%= product.offer.discountPercentage %>%</td> 
-                
-                  <% if (product.variants && product.variants.length > 0) { %>
-                    
-                      <% product.variants.forEach((variant, variantIndex) => { %>
-                        <% if(variantIndex === 0) {%>
-                        <td><%= variant.salePrice  %></td>
-                        <td><%= variant.stock  %></td>
-                        <td>
-                          <%=variant.color  %>
-                        </td>
-                        <td>
-                          <%=variant.size  %>
-                        </td>
-                        <% } %>
-                      <% }); %>
-                    
-                  <% } else { %>
-                    <td colspan="4" class="text-center">No Variants Available</td>
-                  <% } %>
-               
-                <td>
-                  <button class="btn btn-primary btn-sm edit-button mb-2">
-                    <a class="text-white" href="/admin/editproducts?id=<%= product._id %>">Edit</a>
-                  </button>
-                  <% if (product.isDeleted === false) { %>
-                    <button class="btn btn-info btn-sm">
-                      <a href="/admin/deleteproducts?id=<%= product._id %>" class="text-white" style="text-decoration: none;">Delete</a>
-                    </button>
-                  <% } else { %>
-                    <button class="btn btn-success btn-sm">
-                      <a href="/admin/restoreproducts?id=<%= product._id %>" class="text-white" style="text-decoration: none;">Restore</a>
-                    </button>
-                  <% } %>
-                </td>
-              </tr>
-            <% }); %>
-          </tbody>
-    </table>
-    
-
-    <div class="flex items-center justify-center mt-3 space-x-2 mb-3">
-      <% if (currentPage > 1) { %>
-          <a class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300" href="?page=<%= currentPage - 1 %>">&laquo; Prev</a>
-      <% } %>
-      
-      <% for (let i = 1; i <= totalPages; i++) { %>
-          <% if (i === currentPage) { %>
-              <span class="px-4 py-2 bg-blue-500 text-white font-semibold rounded-md"> <%= i %> </span>
-          <% } else { %>
-              <a class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300" href="?page=<%= i %>"><%= i %></a>
-          <% } %>
-      <% } %>
-      
-      <% if (currentPage < totalPages) { %>
-          <a class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300" href="?page=<%= currentPage + 1 %>">Next &raquo;</a>
-      <% } %>
+  <!-- Search Bar -->
+  <div class="mb-3">
+    <input type="text" class="form-control" id="searchBar" placeholder="Search product by name or category">
   </div>
+
+  <!-- Desktop Table View -->
+  <div class="table-responsive d-none d-md-block">
+    <table class="table table-light">
+      <thead class="table-secondary">
+        <tr>
+          <th scope="col">Name</th>
+          <th scope="col">Image</th>
+          <th scope="col">Description</th>
+          <th scope="col">Brands</th>
+          <th scope="col">Category</th>
+          <th scope="col">Offer(%)</th>
+          <th scope="col">Price</th>
+          <th scope="col">Stock</th>
+          <th scope="col">Color</th>
+          <th scope="col">Size</th>
+          <th scope="col">Actions</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody">
+        <% data.forEach((product) => { %>
+          <tr data-product-id="<%= product._id %>">
+            <td><%= product.productName %></td>
+            <td>
+              <a href="/admin/product-details/<%= product._id %>">
+                <img class="product_image" src="/uploads/public-image/<%= product.productImage[0] %>" alt="<%= product.productName %>" width="50" height="50">
+              </a>
+            </td>
+            <td class="description"><%= product.description %></td>
+            <td><%= product.brands ? product.brands.brand_name : "No Brand" %></td>
+            <td><%= product.category ? product.category.name : "No Category" %></td>
+            <td><%= product.offer.discountPercentage %>%</td>
+            <% if (product.variants && product.variants.length > 0) { %>
+              <% product.variants.forEach((variant, variantIndex) => { %>
+                <% if (variantIndex === 0) { %>
+                  <td><%= variant.salePrice %></td>
+                  <td><%= variant.stock %></td>
+                  <td><%= variant.color %></td>
+                  <td><%= variant.size %></td>
+                <% } %>
+              <% }); %>
+            <% } else { %>
+              <td colspan="4" class="text-center">No Variants Available</td>
+            <% } %>
+            <td>
+              <button class="btn btn-sm edit-button mb-2">
+                <a class="text-white" href="/admin/editproducts?id=<%= product._id %>"><i class="fa-solid fa-edit"></i></a>
+              </button>
+              <% if (product.isDeleted === false) { %>
+                <button class="btn btn-sm">
+                  <a href="/admin/deleteproducts?id=<%= product._id %>" class="text-white"><i class="fa-solid fa-trash"></i></a>
+                </button>
+              <% } else { %>
+                <button class="btn btn-sm">
+                  <a href="/admin/restoreproducts?id=<%= product._id %>" class="text-white"><i class="fa-solid fa-rotate-left"></i></a>
+                </button>
+              <% } %>
+            </td>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="flex items-center justify-center mt-3 space-x-2 mb-3">
+    <% if (currentPage > 1) { %>
+        <a class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300" href="?page=<%= currentPage - 1 %>">&laquo; Prev</a>
+    <% } %>
+    
+    <% for (let i = 1; i <= totalPages; i++) { %>
+        <% if (i === currentPage) { %>
+            <span class="px-4 py-2 bg-blue-500 text-white font-semibold rounded-md"> <%= i %> </span>
+        <% } else { %>
+            <a class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300" href="?page=<%= i %>"><%= i %></a>
+        <% } %>
+    <% } %>
+    
+    <% if (currentPage < totalPages) { %>
+        <a class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300" href="?page=<%= currentPage + 1 %>">Next &raquo;</a>
+    <% } %>
 </div>
+
+  <!-- Mobile Card View -->
+  <div class="d-block d-md-none">
+    <% data.forEach((product) => { %>
+      <div class="card mb-3">
+        <div class="card-body">
+          <h5 class="card-title"><%= product.productName %></h5>
+          <div class="d-flex align-items-center mb-2">
+            <img class="product_image me-2" src="/uploads/public-image/<%= product.productImage[0] %>" alt="<%= product.productName %>" width="50" height="50">
+            <span class="badge bg-secondary"><%= product.brands ? product.brands.brand_name : "No Brand" %></span>
+          </div>
+          <p class="card-text-description"><%= product.description %></p>
+          <p class="card-text">
+            <strong>Category:</strong> <%= product.category ? product.category.name : "No Category" %><br>
+            <strong>Offer:</strong> <%= product.offer.discountPercentage %>%<br>
+            <% if (product.variants && product.variants.length > 0) { 
+                  let variant = product.variants[0]; %>
+              <strong>Price:</strong> <%= variant.salePrice %><br>
+              <strong>Stock:</strong> <%= variant.stock %><br>
+              <strong>Color:</strong> <%= variant.color %><br>
+              <strong>Size:</strong> <%= variant.size %>
+            <% } else { %>
+              <strong>No Variants Available</strong>
+            <% } %>
+          </p>
+          <div class="d-flex justify-content-end gap-2">
+            <a class="btn btn-sm" href="/admin/editproducts?id=<%= product._id %>" title="Edit"><i class="fa-solid fa-edit"></i></a>
+            <% if (product.isDeleted === false) { %>
+              <a class="btn btn-sm " href="/admin/deleteproducts?id=<%= product._id %>" title="Delete"><i class="fa-solid fa-trash"></i></a>
+            <% } else { %>
+              <a class="btn btn-sm " href="/admin/restoreproducts?id=<%= product._id %>" title="Restore"><i class="fa-solid fa-rotate-left"></i></a>
+            <% } %>
+          </div>
+        </div>
+      </div>
+
+    <% }); %>
+ 
+   
+  
+   
+
 
 <script src="/js/admin/customer-search.js"></script>
 

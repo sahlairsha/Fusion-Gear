@@ -105,38 +105,38 @@ const viewAddress = async(req,res)=>{
 
 
 const addAddress = async (req, res) => {
-  try {
-    const { recipient_name, streetAddress, city, state, landMark, pincode, phone, altPhone, addressType } = req.body;
+  const userId = req.session.user;
+    const { recipient_name, streetAddress, city, state, landmark, pincode, addressType, phone, altPhone } = req.body;
 
-    if (!req.session.user) {
-      return res.status(401).json({ message: 'User not logged in' });
+    try {
+        const newAddress = {
+            recipient_name,
+            streetAddress,
+            city,
+            state,
+            landmark,
+            pincode,
+            addressType,
+            phone,
+            altPhone
+        };
+
+       
+        const updatedAddress = await Address.findOneAndUpdate(
+            { user_id: userId }, 
+            { $push: { address: newAddress } },
+            { new: true, upsert: true } 
+        );
+
+        if (!updatedAddress) {
+            return res.status(404).json({ message: 'Address is not added.' });
+        }
+
+        res.json({ message: 'Address added successfully!',updatedAddress });
+    } catch (error) {
+        console.error('Error adding address:', error);
+        res.status(500).json({ message: 'Internal server error.' });
     }
-
-
-    // Create a new address
-    const newAddress = new Address({
-      user_id: req.session.user,
-      address: {
-        recipient_name,
-        streetAddress,
-        city,
-        state,
-        landMark,
-        pincode,
-        phone,
-        altPhone,
-        addressType
-      }
-    });
-
-    await newAddress.save();
-
-    req.flash('success_msg', 'Address added successfully!');
-    res.status(200).json({ _id: newAddress._id, message: 'Address added successfully!' });
-  } catch (error) {
-    console.error('Error adding address:', error);
-    res.status(500).json({ message: 'Failed to add address', error: error.message });
-  }
 };
 
 

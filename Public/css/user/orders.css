@@ -1,0 +1,464 @@
+.order-container {
+    max-width: 800px;
+    margin: auto;
+    padding: 10px;
+    font-family: Arial, sans-serif;
+    margin-bottom: 50px;
+}
+
+.search-container {
+    display: flex;
+    flex-wrap: wrap;
+    width: 500px;
+    justify-content: space-between;
+    margin-bottom: 40px;
+    margin-top: 20px;
+}
+
+.search-bar {
+    
+    flex: 1;
+    padding: 10px;
+    margin-right: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.search-button {
+    padding: 10px 20px;
+    background-color: #000;
+    color: white;
+    border: none;
+    font-size:14px;
+    border-radius: 5px;
+    cursor: pointer;
+    text-transform: uppercase;
+}
+
+.order-card {
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 10px;
+    background: #fff;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    transform: translateY(50px);
+    transition: none; 
+    cursor: pointer;
+    margin-bottom: 20px;
+}
+
+
+.status-text{
+    font-weight: 700;
+    font-size: 14px;
+    text-transform: uppercase;
+}
+.order-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 10px;
+    width: 100%;
+    flex-wrap: wrap;
+}
+
+.product-info {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    flex: 1;
+}
+.product-info img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    margin-top: 40px;
+    margin-left: 20px;
+}
+
+.product-details {
+    font-size: 14px;
+    color: #555; 
+    margin-top: 40px;   
+    width: 400px;
+    margin-left: 10px;
+}
+.order-status {
+    text-align: right;
+    flex: 1;
+    font-size: 14px;
+    color: #555;
+    margin-right: 40px;  
+    margin-top: 30px;
+ 
+}
+
+.order-status h4 {
+    font-size: 18px;
+    margin-top: 10px;
+    margin-left: 30px;
+    color: #333;
+    
+}
+
+.order-status h6 {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #333;
+}
+
+
+.order-status .status-icon {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-right: 5px;
+    
+    font-weight: 800;
+}
+
+.status-icon.dispatch{
+    background-color: #FFC107;
+  
+}
+.status-icon.pending{
+    background-color: #007bff;
+  
+}
+.status-icon.shipped{
+    background-color : blue;
+}
+
+.status-icon.delivered {
+    background-color: green;
+}
+
+.status-icon.canceled {
+    background-color: red;
+}
+
+.status-icon.refund-completed {
+    background-color: orange;
+}
+
+.order-actions {
+    text-align: left;
+    margin-top: 10px;
+}
+
+.rate-btn {
+    background-color: #ffc107;
+    color: black;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 15px;
+    font-size: 14px;
+    cursor: pointer;
+    text-align: center;
+    margin-left: 10px;
+    transition: background-color 0.3s ease;
+    margin-top: 10px;
+    display: inline-block; 
+}
+.go-to-shop-btn{
+    background-color: #000;
+    color: #fff;
+    margin-top: 50px;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+.go-to-shop-btn:hover{
+    border: 1px solid #000;
+    background-color: #fff;
+    color: #000;
+}
+.product-details,h6{
+
+    font-size: 16px;
+    font-weight: 600;
+
+}
+
+.product-details p {
+    display: inline;
+    margin-right: 10px; 
+    font-size: 14px;
+    color: #555;
+}
+
+.order-summary {
+    text-align: left;
+    margin-top: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    margin-left: 10px;
+    margin-bottom: 10px;
+}
+.order-summary h6{
+    margin-bottom: 5px;
+    margin-top: 10px;
+    margin-left: 10px;
+}
+
+
+/* Responsive Fix */
+@media screen and (max-width: 768px) {
+    .order-content {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .product-info img {
+        width: 70px;
+        height: 70px;
+    }
+
+    .search-container {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .search-button {
+        width: 100%;
+    }
+}
+
+
+    @keyframes fadeIn {
+        0% { opacity: 0; }
+        100% { opacity: 1; }
+
+
+    }
+
+    /* Slide-in animation */
+@keyframes slideIn {
+    0% {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+    100% {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Fade-in animation */
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+  
+@keyframes bottomToTop {
+    0% {
+        transform: translateY(50px); 
+        opacity: 0; 
+    }
+    100% {
+        transform: translateY(0);
+        opacity: 1; 
+    }
+}
+.return-btn{
+    border: none;
+    background-color: transparent;
+    color: #000;
+}
+.return-btn:hover{
+    color:#FFC107;
+}
+
+
+.pagination {
+            
+            margin-bottom: 10px;
+           
+        }
+        .pagination .page-link {
+            margin-left: 10px;
+            background-color: #fff;
+            color: #000;
+            border: 1px solid #fff;
+        }
+        .pagination .page-link:hover {
+            background-color: #000;
+            color: #fff;
+        }
+        .pagination .active .page-link {
+            background-color: #000;
+            border-color: #000;
+        }
+
+
+        @media (min-width: 768px) and (max-width: 1199px) {
+    .order-container {
+        max-width: 90%;
+        padding: 15px;
+    }
+
+    .search-bar {
+        padding: 8px;
+        font-size: 14px;
+        margin-right: 8px;
+    }
+
+    .search-button {
+        padding: 8px 15px;
+        font-size: 12px;
+    }
+
+    .order-card {
+        padding: 12px;
+    }
+
+    .product-info img {
+        width: 80px;
+        height: 80px;
+    }
+
+    .product-details {
+        font-size: 13px;
+        width: 300px;
+    }
+
+    .order-status {
+        font-size: 13px;
+    }
+
+    .pagination .page-link {
+        padding: 5px 10px;
+    }
+}
+
+@media (max-width: 767px) {
+    .order-container {
+        max-width: 95%;
+        padding: 10px;
+    }
+
+    .search-container {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+    }
+
+    .search-bar,
+    .search-button {
+        width: 48%; 
+    }
+
+    .search-bar {
+        padding: 8px;
+        font-size: 12px;
+    }
+
+    .search-button {
+        padding: 8px;
+        font-size: 12px;
+    }
+
+    .order-card {
+        padding: 10px;
+    }
+
+    .order-content {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .product-info img {
+        width: 70px;
+        height: 70px;
+    }
+
+    .product-details {
+        font-size: 12px;
+        width: 100%;
+    }
+
+    .order-status {
+        font-size: 12px;
+        text-align: right;  /* Align the order status to the right */
+        width: 100%;
+        margin-top: 15px;
+    }
+
+    .order-summary {
+        font-size: 12px;
+        text-align: right;  /* Align the order summary to the right */
+    }
+
+    .pagination .page-link {
+        padding: 5px 8px;
+        font-size: 12px;
+    }
+}
+
+
+@media (max-width: 479px) {
+    .order-container {
+        padding: 5px; 
+        margin: 0 auto;
+    }
+
+    .search-container {
+        display: flex;
+        justify-content: space-between;
+        gap: 5px;
+    }
+
+    .search-bar,
+    .search-button {
+        width: 35%; /* Both elements will occupy equal width */
+    }
+
+    .search-bar {
+        font-size: 12px;  /* Smaller font size */
+        padding: 6px;  /* Adjusted padding */
+    }
+
+    .search-button {
+        padding: 6px;
+        font-size: 10px;  /* Smaller font size for the button */
+    }
+
+    .order-card {
+        padding: 8px;
+        margin-bottom: 15px;
+    }
+
+    .product-info img {
+        width: 60px;
+        height: 60px;  /* Smaller product image */
+    }
+
+    .product-details {
+        font-size: 12px;  /* Smaller font size for product details */
+    }
+
+    .order-status {
+        font-size: 12px;  /* Smaller font size for order status */
+        text-align: right;  /* Align order status to the right */
+    }
+
+    .order-summary {
+        font-size: 12px;  /* Smaller font size for order summary */
+        text-align: right;  /* Align order summary to the right */
+    }
+
+    .pagination .page-link {
+        font-size: 12px;  /* Reduced font size for pagination */
+        padding: 4px;
+    }
+}
+

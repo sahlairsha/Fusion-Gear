@@ -1,0 +1,248 @@
+
+
+
+
+.cancel-confirm-container {
+    width: 90%;
+    max-width: 600px;
+    margin: 50px auto;
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.cancel-confirm-container h3 {
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.cancel-confirm-container p {
+    color: #555;
+    margin-bottom: 20px;
+}
+
+.cancel-confirm-container .btn {
+    padding: 10px 20px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: 5px;
+}
+
+.btn-confirm {
+    background-color: #d33;
+    color: #fff;
+}
+
+.btn-confirm:hover {
+    background-color: #a00;
+}
+
+.btn-cancel {
+    background-color: #3085d6;
+    color: #fff;
+}
+
+.btn-cancel:hover {
+    background-color: #1a73e8;
+}
+
+.order-summary {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.order-summary h5 {
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.order-summary p {
+    color: #555;
+}
+
+.product-img {
+    max-width: 100px;
+    margin: 5px 0;
+    display: block;
+    border-radius: 5px;
+}
+
+/* Form styles */
+form {
+    text-align: left;
+    margin-top: 20px;
+}
+
+form p {
+    font-weight: bold;
+    color: #333;
+}
+
+.radio-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.radio-group label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #555;
+    font-size: 14px;
+}
+
+.radio-group input[type="radio"] {
+    accent-color: #3085d6;
+    transform: scale(1.2);
+    margin-right: 5px;
+}
+
+textarea {
+    width: 100%;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 10px;
+    font-size: 14px;
+    resize: none;
+    margin-top: 10px;
+}
+
+textarea:focus {
+    border-color: #3085d6;
+    outline: none;
+    box-shadow: 0 0 5px rgba(48, 133, 214, 0.5);
+}
+
+@media (min-width: 768px) and (max-width: 1199px) {
+.cancel-confirm-container {
+    max-width: 500px;
+    padding: 15px;
+}
+
+.cancel-confirm-container h3 {
+    font-size: 22px;
+}
+
+.cancel-confirm-container p {
+    font-size: 14px;
+}
+
+.btn {
+    padding: 8px 16px;
+    font-size: 14px;
+}
+
+.product-img {
+    max-width: 90px;
+}
+
+/* Form */
+.radio-group {
+    gap: 8px;
+}
+
+textarea {
+    font-size: 13px;
+}
+}
+
+/* For mobile screens (max-width: 767px) */
+@media (max-width: 767px) {
+.cancel-confirm-container {
+    max-width: 90%;
+    padding: 15px;
+}
+
+.cancel-confirm-container h3 {
+    font-size: 20px;
+}
+
+.cancel-confirm-container p {
+    font-size: 13px;
+}
+
+.btn {
+    padding: 8px 16px;
+    font-size: 14px;
+}
+
+.product-img {
+    max-width: 80px;
+}
+
+.order-summary {
+    text-align: left;
+}
+
+.radio-group {
+    gap: 8px;
+}
+
+textarea {
+    font-size: 13px;
+}
+
+.btn-cancel {
+    width: 100%;
+    text-align: center;
+}
+
+.btn-confirm {
+    width: 100%;
+    text-align: center;
+}
+}
+
+/* For small mobile screens (max-width: 479px) */
+@media (max-width: 479px) {
+.cancel-confirm-container {
+    max-width: 95%;
+    padding: 10px;
+}
+
+.cancel-confirm-container h3 {
+    font-size: 18px;
+}
+
+.cancel-confirm-container p {
+    font-size: 12px;
+}
+
+.btn {
+    padding: 6px 12px;
+    font-size: 12px;
+}
+
+.product-img {
+    max-width: 70px;
+}
+
+.order-summary {
+    text-align: left;
+}
+
+.radio-group {
+    gap: 6px;
+}
+
+textarea {
+    font-size: 12px;
+}
+
+/* Buttons to fill the container width */
+.btn-cancel {
+    width: 100%;
+    text-align: center;
+}
+
+.btn-confirm {
+    width: 100%;
+    text-align: center;
+}
+}

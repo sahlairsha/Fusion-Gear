@@ -1,278 +1,5 @@
 <%- include('../../views/partials/user/header') %>
-
-
-<style>
-.order-container {
-    max-width: 800px;
-    margin: auto;
-    padding: 10px;
-    font-family: Arial, sans-serif;
-    margin-bottom: 50px;
-}
-
-.search-container {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 40px;
-    margin-top: 20px;
-}
-
-.search-bar {
-    flex: 1;
-    padding: 10px;
-    margin-right: 10px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-}
-
-.search-button {
-    padding: 10px 20px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-.order-card {
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    padding: 10px;
-    background: #fff;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-    transform: translateY(50px);
-    transition: none; 
-    cursor: pointer;
-    margin-bottom: 20px;
-}
-
-
-.status-text{
-    font-weight: 700;
-    font-size: 14px;
-    text-transform: uppercase;
-}
-.order-content {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 10px;
-    width: 100%;
-    flex-wrap: wrap;
-}
-
-.product-info {
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    flex: 1;
-}
-.product-info img {
-    width: 80px;
-    height: 80px;
-    object-fit: cover;
-    border-radius: 5px;
-    border: 1px solid #ddd;
-    margin-top: 40px;
-    margin-left: 20px;
-}
-
-.product-details {
-    font-size: 14px;
-    color: #555; 
-    margin-top: 40px;   
-    width: 400px;
-    margin-left: 10px;
-}
-.order-status {
-    text-align: right;
-    flex: 1;
-    font-size: 14px;
-    color: #555;
-    margin-right: 40px;  
-    margin-top: 30px;
- 
-}
-
-.order-status h4 {
-    font-size: 18px;
-    margin-top: 10px;
-    margin-left: 30px;
-    color: #333;
-    
-}
-
-.order-status h6 {
-    margin-top: 10px;
-    font-size: 14px;
-    color: #333;
-}
-
-
-.order-status .status-icon {
-    display: inline-block;
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    margin-right: 5px;
-    
-    font-weight: 800;
-}
-
-.status-icon.dispatch{
-    background-color: #FFC107;
-  
-}
-.status-icon.pending{
-    background-color: #007bff;
-  
-}
-.status-icon.shipped{
-    background-color : blue;
-}
-
-.status-icon.delivered {
-    background-color: green;
-}
-
-.status-icon.canceled {
-    background-color: red;
-}
-
-.status-icon.refund-completed {
-    background-color: orange;
-}
-
-.order-actions {
-    text-align: left;
-    margin-top: 10px;
-}
-
-.rate-btn {
-    background-color: #ffc107;
-    color: black;
-    border: none;
-    border-radius: 5px;
-    padding: 10px 15px;
-    font-size: 14px;
-    cursor: pointer;
-    text-align: center;
-    margin-left: 10px;
-    transition: background-color 0.3s ease;
-    margin-top: 10px;
-    display: inline-block; 
-}
-.go-to-shop-btn{
-    background-color: #000;
-    color: #fff;
-    margin-top: 50px;
-    margin-bottom: 20px;
-    text-transform: uppercase;
-    font-weight: 600;
-}
-.go-to-shop-btn:hover{
-    border: 1px solid #000;
-    background-color: #fff;
-    color: #000;
-}
-.product-details,h6{
-
-    font-size: 16px;
-    font-weight: 600;
-
-}
-
-.product-details p {
-    display: inline;
-    margin-right: 10px; 
-    font-size: 14px;
-    color: #555;
-}
-
-.order-summary {
-    text-align: left;
-    margin-top: 10px;
-    font-size: 14px;
-    font-weight: 700;
-    margin-left: 10px;
-    margin-bottom: 10px;
-}
-.order-summary h6{
-    margin-bottom: 5px;
-    margin-top: 10px;
-    margin-left: 10px;
-}
-
-
-/* Responsive Fix */
-@media screen and (max-width: 768px) {
-    .order-content {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 15px;
-    }
-
-    .product-info img {
-        width: 70px;
-        height: 70px;
-    }
-
-    .search-container {
-        flex-direction: column;
-        gap: 10px;
-    }
-
-    .search-button {
-        width: 100%;
-    }
-}
-
-
-    @keyframes fadeIn {
-        0% { opacity: 0; }
-        100% { opacity: 1; }
-
-
-    }
-
-    /* Slide-in animation */
-@keyframes slideIn {
-    0% {
-        transform: translateX(-100%);
-        opacity: 0;
-    }
-    100% {
-        transform: translateX(0);
-        opacity: 1;
-    }
-}
-
-/* Fade-in animation */
-@keyframes fadeIn {
-    0% {
-        opacity: 0;
-    }
-    100% {
-        opacity: 1;
-    }
-}
-  
-@keyframes bottomToTop {
-    0% {
-        transform: translateY(50px); 
-        opacity: 0; 
-    }
-    100% {
-        transform: translateY(0);
-        opacity: 1; 
-    }
-}
-.return-btn{
-    border: none;
-    background-color: transparent;
-}
-
-</style>
+<link rel="stylesheet" href="/css/user/orders.css">
 
 <section class="breadcrumb-option">
     <div class="container">
@@ -291,40 +18,37 @@
     </div>
 </section>
 
-
-
 <div class="order-container">
     <h2>Your Orders</h2>
 
     <div class="search-container">
-        <input type="text" class="search-bar" placeholder="Search your orders here">
-        <button class="search-button">Search Orders</button>
+        <form action="/order-confirm" method="GET">
+            <input type="text" name="search" class="search-bar" placeholder="Search your orders here" value="<%= searchQuery || '' %>">
+            <button type="submit" class="search-button">Search Orders</button>
+        </form>
     </div>
 
-  <% orders.forEach(order => { %>
-   
-    <div class="order-card" data-order-id="<%=order._id%>">
-        <% order.products.forEach(product => { %>
-            <div class="order-content">
-                <div class="product-info">
-                  
+    <% orders.forEach(order => { %>
+        <div class="order-card" data-order-id="<%= order._id %>">
 
-                    </a>
-                   <img  class="product-image" 
-                    src="/uploads/public-image/<%= product.product_id.productImage[0] %>" 
-                    alt="<%= product.product_id.productName %>">
-                    <div class="product-details">
-                        <h6><%= product.product_id.productName %></h6>
-                        <% if (product.variantDetails) { %>
-                            <p>Color: <%= product.variantDetails.color %></p>
-                            <p>Size: <%= product.variantDetails.size %></p>
-                            <p>Quantity: <%= product.quantity %></p>
-                            <h6>Price: ₹<%= product.variantDetails.salePrice || product.variantDetails.regularPrice %></h6>
-                        <% } else { %>
-                            <p>No variant details available</p>
-                        <% } %>
-                    </div>
-                    </div>
+            <% order.products.forEach(product => { %>
+                <div class="order-content">
+                    <div class="product-info">
+                        <img class="product-image" 
+                            src="/uploads/public-image/<%= product.product_id.productImage[0] %>" 
+                            alt="<%= product.product_id.productName %>">
+                        <div class="product-details">
+                            <h6><%= product.product_id.productName %></h6>
+                            <% if (product.variantDetails) { %>
+                                <p>Color: <%= product.variantDetails.color %></p>
+                                <p>Size: <%= product.variantDetails.size %></p>
+                                <p>Quantity: <%= product.quantity %></p>
+                                <h6>Price: ₹<%= product.variantDetails.salePrice || product.variantDetails.regularPrice %></h6>
+                            <% } else { %>
+                                <p>No variant details available</p>
+                            <% } %>
+                        </div>
+                    </div>    
 
                     <div class="order-status">
                         <p>
@@ -338,15 +62,16 @@
                         <h5 class="mt-2 ml-2">Total Price: ₹<%= order.total_price %></h5>
 
                         <% if (order.order_status === 'Delivered') { %>
-                            <a href="/order-details/<%= order._id  %>"><button class="return-btn mt-4">Return & Refund</button></a> 
+                            <a href="/order-details/<%= order._id %>">
+                                <button class="return-btn mt-4">Return & Refund</button>
+                            </a> 
                         <% } %>
                     </div>
-                <% }); %>
-                </div>
+                </div> 
+            <% }); %>
 
             <!-- Order summary -->
             <div class="order-summary">
-                
                 <% if (order.order_status === 'Delivered') { %>
                     <% order.products.forEach(product => { %>
                         <a href="/ratings/?id=<%= product.product_id._id %>" class="rate-btn mb-5">
@@ -355,7 +80,7 @@
                     <% }); %>
                 <% } %>
             </div>
-            
+
             <!-- Handle Payment Pending -->
             <% if (order.payment_status === 'Pending') { %>
                 <div class="payment-pending">
@@ -367,18 +92,48 @@
                     <p class="text-success">Your payment has been completed successfully.</p>
                 </div>
             <% } %>
-            
-        </div>
-    
+
+        </div> <!-- End of .order-card -->
     <% }); %>
 
-        
+    <% if (orders.length === 0) { %>
+        <p>No orders found.</p>
+    <% } %>
+
+    <nav>
+        <ul class="pagination justify-content-center">
+            <% if (currentPage > 1) { %>
+                <li class="page-item">
+                    <a class="page-link" href="?page=<%= currentPage - 1 %>">Previous</a>
+                </li>
+            <% } %>
+
+            <% for (let i = 1; i <= totalPages; i++) { %>
+                <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+                    <a class="page-link" href="?page=<%= i %>"><%= i %></a>
+                </li>
+            <% } %>
+
+            <% if (currentPage < totalPages) { %>
+                <li class="page-item">
+                    <a class="page-link" href="?page=<%= currentPage + 1 %>">Next</a>
+                </li>
+            <% } %>
+        </ul>
+    </nav>
+
     <a href="/products" class="btn go-to-shop-btn">Continue Shopping</a>
-</div>
+</div> <!-- End of .order-container -->
 
 
-</div>
-</div>
+<script>
+    document.querySelector('.search-bar').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            document.querySelector('.search-button').click();
+        }
+    });
+</script>
 
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script>
@@ -449,99 +204,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
 </script>
-<script>
-function retryPayment(orderId) {
-    console.log("Retrying payment for orderId:", orderId);
-    if (!orderId) {
-        console.error("Invalid order ID");
-        return;
-    }
-
-    fetch('/retry-payment', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ orderId })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            const options = {
-                key: data.keyId,
-                amount: data.amount * 100, // Convert to paise for Razorpay
-                currency: 'INR',
-                name: 'Fusion Gear',
-                description: 'Order Payment',
-                order_id: data.razorpay_order_id, // Razorpay order ID
-                handler: function (response) {
-                    console.log("Payment response received:", response);
-                    fetch('/retry-payment-verify', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            razorpay_payment_id: response.razorpay_payment_id,
-                            razorpay_order_id: response.razorpay_order_id,
-                            razorpay_signature: response.razorpay_signature,
-                        })
-                    })
-                    .then(res => res.json())
-                    .then(result => {
-                        if (result.success) {
-                            Swal.fire({
-                                title: 'Payment Successful!',
-                                text: 'Your order has been paid successfully.',
-                                icon: 'success',
-                            }).then(() => {
-                                window.location.reload(); // Reload to show updated order status
-                            });
-                        } else {
-                            Swal.fire({
-                                title: 'Payment Verification Failed!',
-                                text: 'The payment could not be verified. Please try again later.',
-                                icon: 'error',
-                            });
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error verifying payment:', error);
-                        Swal.fire({
-                            title: 'Payment Verification Error!',
-                            text: 'Error verifying payment, please try again later.',
-                            icon: 'error',
-                        });
-                    });
-                },
-                prefill: {
-                    name: 'User Name',
-                    email: 'user@example.com',
-                    contact: '1234567890',
-                },
-            };
-
-            const rzp1 = new Razorpay(options);
-            rzp1.open();
-        } else {
-            Swal.fire({
-                title: 'Payment Failed',
-                text: data.message || 'Failed to retry payment. Please try again later.',
-                icon: 'error',
-            });
-        }
-    })
-    .catch(error => {
-        console.error('Error retrying payment:', error);
-        Swal.fire({
-            title: 'Payment Failed',
-            text: 'Failed to retry payment. Please try again later.',
-            icon: 'error',
-        });
-    });
-}
-
-</script>
+<script src="/js/user/orders.js"></script>
 
 
 

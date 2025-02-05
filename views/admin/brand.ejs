@@ -19,7 +19,7 @@
         <input type="text" class="form-control" id="searchBar" placeholder="Search brands by name or description">
     </div>
 
-    <button class="btn btn-success text-white mb-2 d-flex w-20 ms-auto">
+    <button class="btn btn-success text-white mb-2 d-flex w-22 ms-auto ">
         <a class="text-white" href="/admin/addBrand" style="text-decoration: none;">Add Brand</a>
     </button>
 
@@ -49,12 +49,12 @@
                         <% } %>
                     </td>
                                      <td>
-                        <button class="btn btn-primary btn-md">
-                            <a href="/admin/editBrand/<%= brand._id %>" class="text-white" style="text-decoration: none;">Edit</a>
+                        <button class="btn btn-md">
+                            <a href="/admin/editBrand/<%= brand._id %>" class="text-white" style="text-decoration: none;"><i class="fa-solid fa-edit"></i></a>
                         </button>
                         
-                            <button class="btn btn-warning btn-md">
-                                <a href="/admin/brands/delete/<%=brand._id %>" class="text-white" style="text-decoration: none;">Delete</a>
+                            <button class="btn btn-md">
+                                <a href="/admin/brands/delete/<%=brand._id %>" class="text-white" style="text-decoration: none;"><i class="fa-solid fa-trash"></i></a>
                             </button>
 
                     </td>

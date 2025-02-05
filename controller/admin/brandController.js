@@ -1,4 +1,5 @@
 const Brand = require('../../models/brandSchema');
+const User = require('../../models/userSchema');
 const path = require('path');
 const fs = require('fs')
 
@@ -7,17 +8,17 @@ const getAllBrands = async (req, res) => {
         const { page = 1, limit = 5 } = req.query;
         const skip = (page - 1) * limit;
 
-        // Retrieve paginated brands
+        
         const brands = await Brand.find({})
             .skip(skip)
             .limit(parseInt(limit));
 
-        // Get the total number of brands for pagination calculations
+        
         const totalBrands = await Brand.countDocuments();
 
-        // Calculate the total number of pages
+       
         const totalPages = Math.ceil(totalBrands / limit);
-
+       const adminData = await User.findById(req.session.admin)
         res.render('brand', {
             brands,
             currentPage: parseInt(page),
@@ -25,6 +26,7 @@ const getAllBrands = async (req, res) => {
             totalPages,
             hasNextPage: page < totalPages,
             hasPrevPage: page > 1,
+            admin:adminData 
         });
     } catch (error) {
         console.log(error);
@@ -34,8 +36,10 @@ const getAllBrands = async (req, res) => {
 
 
 const getAddBrand = async(req,res)=>{
+
+    const adminData = await User.findById(req.session.admin)
    
-    res.render('add-brand');
+    res.render('add-brand',{admin: adminData});
 
 }
 
@@ -43,20 +47,18 @@ const addBrands = async (req, res) => {
     try {
         const { brand_name, description } = req.body;
 
-        // Validate required fields
+        
         if (!brand_name || !description || !req.file) {
             req.flash('error', 'All fields are required, including the logo.');
             return res.redirect('/admin/addBrand');
         }
 
-        // Check for duplicate brand names
         const existingBrand = await Brand.findOne({ brand_name });
         if (existingBrand) {
             req.flash('error', 'Brand name already exists.');
             return res.redirect('/admin/addBrand');
         }
 
-        // Create and save the new brand
         const newBrand = new Brand({
             brand_name,
             description,
@@ -78,9 +80,10 @@ const getEditBrand = async(req,res) =>{
     try{
         const brandId = req.params.id;
         const brand = await Brand.findById(brandId);
+        const adminData = await User.findById(req.session.admin)
         if(!brand)            
             return res.status(404).json({ message: 'Brand not found.'});
-            res.render('edit-brand',{brand});
+            res.render('edit-brand',{brand , admin: adminData});
             
     }catch(error){
       console.log(error);

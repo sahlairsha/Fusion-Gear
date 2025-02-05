@@ -40,16 +40,47 @@
     });
 
     //Search Switch
-    $('.search-switch').on('click', function () {
-        $('.search-model').fadeIn(400);
-    });
-
-    $('.search-close-switch').on('click', function () {
-        $('.search-model').fadeOut(400, function () {
-            $('#search-input').val('');
+    $(document).ready(function () {
+        $('.search-switch').on('click', function (e) {
+            e.preventDefault(); 
+            $('.search-model').fadeIn(400);
         });
+    
+        $('.search-close-switch').on('click', function () {
+            $('.search-model').fadeOut(400, function () {
+                $('#search-input').val('');
+            });
+        });
+    
+        // Trigger search on Enter key
+        $('#search-input').on('keypress', function (e) {
+            if (e.which === 13) {
+                e.preventDefault();
+                performSearch();
+            }
+        });
+    
+        // Click event for search button
+        $('#search-button').on('click', function (e) {
+            e.preventDefault();
+            performSearch();
+        });
+    
+        function performSearch() {
+            let searchTerm = $('#search-input').val().trim();
+         
+    
+            if (searchTerm) {
+                let searchURL = `/products?search=${encodeURIComponent(searchTerm)}`;
+              
+                window.location.href = searchURL;
+            } else {
+                console.log("No search term entered."); // Debugging for empty input
+            }
+        }
     });
-
+    
+    
     /*------------------
 		Navigation
 	--------------------*/
@@ -83,19 +114,49 @@
     /*-----------------------
         Hero Slider
     ------------------------*/
-    $(".hero__slider").owlCarousel({
-        loop: true,
-        margin: 0,
-        items: 1,
-        dots: false,
-        nav: true,
-        navText:[ "<span class='arrow_left'><span/>", "<span class='arrow_right'><span/>"],
-        animateOut: 'fadeOut',
-        animateIn: 'fadeIn',
-        smartSpeed: 1200,
-        autoHeight: false,
-        autoplay: false
+    $(document).ready(function(){
+        function initOwlCarousel() {
+            if ($(window).width() <= 767) {
+                $(".hero__slider").owlCarousel({
+                    loop: true,
+                    margin: 0,
+                    items: 1,
+                    dots: false,
+                    nav: false,   // Hide navigation buttons
+                    animateOut: 'fadeOut',
+                    animateIn: 'fadeIn',
+                    smartSpeed: 1200,
+                    autoHeight: false,
+                    autoplay: true,  // Enable auto-scroll
+                    autoplayTimeout: 4000, // Change slide every 4 seconds
+                    autoplayHoverPause: false
+                });
+            } else {
+                $(".hero__slider").owlCarousel({
+                    loop: true,
+                    margin: 0,
+                    items: 1,
+                    dots: false,
+                    nav: true,   // Show navigation buttons for larger screens
+                    navText:[ "<span class='arrow_left'><span/>", "<span class='arrow_right'><span/>"],
+                    animateOut: 'fadeOut',
+                    animateIn: 'fadeIn',
+                    smartSpeed: 1200,
+                    autoHeight: false,
+                    autoplay: false  // Disable auto-scroll for larger screens
+                });
+            }
+        }
+    
+        initOwlCarousel();
+    
+        // Reinitialize when window resizes
+        $(window).resize(function() {
+            $(".hero__slider").trigger('destroy.owl.carousel'); // Destroy current instance
+            initOwlCarousel(); // Reinitialize based on screen size
+        });
     });
+    
 
     /*--------------------------
         Select
@@ -122,32 +183,7 @@
         horizrailenabled: false
     });
 
-    /*------------------
-        CountDown
-    --------------------*/
-    // For demo preview start
-    var today = new Date();
-    var dd = String(today.getDate()).padStart(2, '0');
-    var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
-    var yyyy = today.getFullYear();
-
-    if(mm == 12) {
-        mm = '01';
-        yyyy = yyyy + 1;
-    } else {
-        mm = parseInt(mm) + 1;
-        mm = String(mm).padStart(2, '0');
-    }
-    var timerdate = mm + '/' + dd + '/' + yyyy;
-    // For demo preview end
-
-
-    /* var timerdate = "2020/12/30" */
-
-    $("#countdown").countdown(timerdate, function (event) {
-        $(this).html(event.strftime("<div class='cd-item'><span>%D</span> <p>Days</p> </div>" + "<div class='cd-item'><span>%H</span> <p>Hours</p> </div>" + "<div class='cd-item'><span>%M</span> <p>Minutes</p> </div>" + "<div class='cd-item'><span>%S</span> <p>Seconds</p> </div>"));
-    });
-
+    
     /*------------------
 		Magnific
 	--------------------*/

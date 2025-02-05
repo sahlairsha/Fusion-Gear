@@ -11,8 +11,7 @@
                     <%= shippingAddress.recipient_name %>
                 </p>
                 <p><strong>Street Address:</strong>
-                    <%= shippingAddress.streetAddress %>, <%= shippingAddress.city %>, <%= shippingAddress.state %>, <%=
-                                    shippingAddress.pincode %>
+                    <%= shippingAddress.streetAddress %>, <%= shippingAddress.city %>, <%= shippingAddress.state %>, <%= shippingAddress.pincode %>
                 </p>
                 <p><strong>Phone:</strong>
                     <%= shippingAddress.phone %>
@@ -26,42 +25,24 @@
                     <div class="product-card">
 
                         <img src="/uploads/public-image/<%= item.product_id.productImage[0] %>"
-                            alt="<%= item.product_id.productName %>" class="product-img">
-                        <h5>
-                            <%= item.product_id.productName %>
-                                </h5>
+                            alt="<%= item.product_id.productName %>" class="product-img w-20" >
 
-                                <% if (item.variantDetails && item.variantDetails.length > 0) { %>
-                                    <% item.variantDetails.forEach(variant => { %>
-
-                                <div class="product-info">
-
-                                    <p><strong>Color:</strong>
-                                        <%= variant.color %>
-                                    </p>
-                                    <p><strong>Size:</strong>
-                                        <%= variant.size %>
-                                    </p>
-                                    <p><strong>Qty:</strong>
-                                        <%= item.quantity %>
-                                    </p>
-                                    <p><strong>Price:</strong> ₹<%= variant.salePrice %>
-                                    </p>
-
-                                    <% }); %>
+                                <div class="product-info ms-0">
+                                    <h4><%= item.product_id.productName %></h4>
+                                    <% if (item.variantDetails) { %>
+                                        <p>Color: <%= item.variantDetails.color %></p>
+                                        <p>Size: <%= item.variantDetails.size %></p>
+                                        <p>Quantity: <%= item.quantity %></p>
+                                <p>Price: ₹<%= item.variantDetails.salePrice || item.variantDetails.regularPrice %></p>
+                                <h5>Total: ₹<%= orders.total_price %></h5>
                                     <% } else { %>
                                         <p>No variant details available</p>
                                     <% } %>
                                 </div>
-
-                             
                     </div>
                     <% }) %>
 
-
-
-                        <h5>Total: ₹<%= orders.total_price %>
-                        </h5>
+                     
             </div>
 
             <div class="delivery-date">
@@ -74,75 +55,44 @@
 
             </div>
 
-            <div class="order-status">
+            <div class="order-status mt-4">
                 <h4>Order Status</h4>
-                <% const orderStatuses=['Pending', 'Shipped' , 'Delivered' , 'Canceled' ]; %>
-
-                    <div class="timeline">
-                        <% orderStatuses.forEach((status, index)=> { %>
-                            <% let stepClass='' ; if (orders.order_status===status) { stepClass='active' ; 
-
-                            }else if(orderStatuses.indexOf(orders.order_status)> index) {
-                                stepClass = 'completed';
-                                }
-                                %>
-                                <div class="timeline-step <%= stepClass %>">
-                                    <div class="step-circle"></div>
-                                    <div class="step-text">
-                                        <%= status %>
-                                    </div>
-                                </div>
-                                <% }); %>
+            
+                <% 
+                    const originalStatuses = ['Pending', 'Dispatch', 'Shipped', 'Delivered'];
+                    const isCanceled = orders.order_status === 'Canceled';
+                    const isReturned = orders.order_status === 'Return';
+                %>
+            
+                <% if (isCanceled || isReturned) { %>
+                    <!-- Display only the Canceled or Return status -->
+                    <div class="status-alone">
+                        <img src="/images/<%= isCanceled ? 'canceled.png' : 'return.png' %>" alt="<%= orders.order_status %>">
+                        <p><%= orders.order_status %></p>
                     </div>
+                <% } else { %>
+                    <!-- Full timeline for normal statuses -->
+                    <div class="timeline">
+                        <% originalStatuses.forEach((status, index) => { 
+                            let stepClass = '';
+                            
+                            if (orders.order_status === status) {
+                                stepClass = 'active';
+                            } else if (originalStatuses.indexOf(orders.order_status) > index) {
+                                stepClass = 'completed';
+                            } else {
+                                stepClass = 'inactive';
+                            }
+                        %>
+                            <div class="timeline-step <%= stepClass %>">
+                                <img src="/images/<%= status.toLowerCase() %>.png" alt="<%= status %>">
+                                <p><%= status %></p>
+                            </div>
+                        <% }); %>
+                    </div>
+                <% } %>
             </div>
 
-        
-            <div class="admin-controls">
-                <% if (orders.order_status !=='Canceled' ) { %>
-                    <form id="cancelOrderForm" action="/admin/orders/cancel/<%= orders._id %>" method="POST">
-                    <button 
-                        type="button" 
-                        class="btn btn-danger" 
-                        onclick="confirmationMessage(this.dataset.status)" 
-                        data-status="Delivered">Cancel Order
-                    </button>
-                    </form>
-                    <% } else { %>
-                        <p class="cancel-message">Order has been canceled.</p>
-                        <% } %>
-        </div>
-
-
-    <script>
-        function confirmationMessage(orderStatus) {
-            if (orderStatus === "Delivered") {
-                Swal.fire({
-                    title: "Action Not Allowed",
-                    text: "This order has already been delivered and cannot be canceled.",
-                    icon: "error",
-                    confirmButtonColor: "#3085d6",
-                    confirmButtonText: "OK"
-                });
-            } else {
-                Swal.fire({
-                    title: "Warning",
-                    text: "Are you sure you want to cancel the order?",
-                    icon: "warning",
-                    showCancelButton: true,
-                    confirmButtonColor: "#d33",
-                    cancelButtonColor: "#3085d6",
-                    confirmButtonText: "Yes, cancel it!",
-                    cancelButtonText: "No, keep it"
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        document.getElementById('cancelOrderForm').submit();
-                    }
-                });
-            }
-        }
-    </script>
     
-
-
 
     <%- include('../../views/partials/admin/footer') %>

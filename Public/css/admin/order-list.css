@@ -1,0 +1,166 @@
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+    padding: 0 15px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+    text-align: center;
+    white-space: nowrap;
+}
+
+table th, table td {
+    padding: 8px 12px;
+    font-size: 14px;
+}
+
+table th {
+    background-color: rgba(0, 0, 0, 0.62);
+    color: #000;
+    text-transform: uppercase;
+    font-size: 12px;
+}
+
+.product_image {
+    border-radius: 10px;
+}
+
+.actions {
+    width: 200px;
+    align-items: center;
+}
+
+.order-status-display {
+    background-color: #ff6b6b;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.payment-badge {
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.payment-badge.pending {
+    background-color: #ffc10770;
+    border: 1px solid #FFC107;
+    color: #443a3a;
+}
+
+.payment-badge.completed {
+    background-color: #2ecc7013;
+    border: 1px solid #2ecc7044;
+    color: #132a13;
+}
+
+.payment-badge.failed {
+    background-color: #ff6b6b60;
+    color: white;
+    border: 1px solid #ff6b6b;
+}
+.payment-badge.refunded{
+    background-color: #2ecc7013;
+    border: 1px solid #2ecc7044;
+    color: #132a13;
+}
+
+.shipping {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    width: 30%;
+}
+
+
+@media (max-width: 768px) {
+    .table-container {
+        overflow-x: auto;
+        margin-bottom: 10px;
+    }
+
+    table {
+        display: block;
+        width: 100%;
+    }
+
+    thead {
+        display: none;
+    }
+
+    tbody {
+        display: block;
+    }
+
+    tbody tr {
+        display: flex;
+        flex-direction: column;
+        border: 1px solid #000;
+        margin-bottom: 15px;
+        padding: 10px;
+        background: white;
+    }
+
+    tbody tr td {
+        display: flex;
+        justify-content: space-between;
+        font-size: 14px;
+        padding: 5px 10px;
+        border: none;
+        border-bottom: 1px solid #ddd;
+    }
+
+    tbody tr td:last-child {
+        border-bottom: none;
+    }
+
+    tbody tr td::before {
+        content: attr(data-label);
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+
+    .order-status-dropdown {
+        width: 50% !important;
+    }
+   
+}
+
+/* Extra Small Devices (≤ 480px) */
+@media (max-width: 480px) {
+    tbody tr {
+        padding: 5px;
+    }
+
+    tbody tr td {
+        font-size: 12px;
+        padding: 4px 8px;
+    }
+
+    .product_image {
+        width: 40px;
+        height: 40px;
+    }
+
+    .order-status-dropdown, .actions button {
+        font-size: 12px;
+        padding: 3px 6px;
+    }
+
+    .shipping {
+   
+   white-space: wrap;text-overflow: ellipsis;
+   width: 100%;
+
+}
+
+}

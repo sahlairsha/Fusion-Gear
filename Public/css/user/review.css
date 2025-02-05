@@ -1,0 +1,303 @@
+.product-review-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Product Details Section */
+.product-details {
+    background-color: #fff;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+}
+
+.product-image {
+    flex: 1;
+    max-width: 300px;
+    height: auto;
+}
+
+.product-info {
+    flex: 2;
+}
+
+.product-info h2 {
+    margin-bottom: 10px;
+}
+
+.product-info p {
+    font-size: 1rem;
+    color: #555;
+}
+
+/* Review Container */
+.review-container {
+    display: flex;
+    gap: 20px;
+    flex-direction: row;
+    align-items: flex-start;
+}
+
+/* Review Form */
+.review-form {
+    flex: 2;
+    background-color: #fff;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    max-width: 600px;
+    width: 100%;
+}
+
+.form-group {
+    margin: 15px 0;
+}
+
+.form-group label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.form-group textarea,
+.form-group input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    font-size: 1rem;
+}
+
+.form-group textarea {
+    height: 100px;
+}
+
+.submit-btn {
+    background-color: #2874f0;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 3px;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.submit-btn:hover {
+    background-color: #1b5dcc;
+}
+
+/* Star Rating */
+.stars {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.star {
+    width: 30px;
+    height: 30px;
+    background-color: #d3d3d3;
+    cursor: pointer;
+    display: inline-block;
+    clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+    transition: background-color 0.2s ease;
+}
+
+.star.filled {
+    background-color: gold;
+}
+
+.star.highlight {
+    background-color: #ffcc00;
+}
+
+/* Review Sidebar */
+.review-sidebar {
+    flex: 1;
+    background-color: #fff;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+
+.ratings-text{
+    font-size: 14px;
+    color: green;
+    margin-bottom: 20px;
+}
+.rating-status{
+    font-size: 14px;
+    font-weight: 600;
+    padding-left: 10px;
+    padding-top: 5px;
+}
+
+
+
+/* @media (min-width: 768px) and (max-width: 1199px) */
+@media (min-width: 768px) and (max-width: 1199px) {
+.product-image {
+    max-width: 250px; /* Adjust max-width for tablet-sized screens */
+}
+.product-details {
+    flex-direction: row;
+}
+
+.product-info h2 {
+    font-size: 1.2rem;
+}
+
+.product-info p {
+    font-size: 0.9rem;
+}
+
+.review-container {
+    flex-direction: row;
+}
+
+.review-form {
+    max-width: 500px;
+    padding: 15px;
+}
+
+.stars {
+    gap: 8px;
+}
+
+.star {
+    width: 28px;
+    height: 28px;
+}
+
+.submit-btn {
+    font-size: 0.9rem;
+    padding: 8px 18px;
+}
+
+.ratings-text {
+    font-size: 13px;
+}
+
+.rating-status {
+    font-size: 13px;
+}
+}
+
+/* @media (max-width: 767px) */
+@media (max-width: 767px) {
+.product-image {
+    max-width: 200px; /* Adjust max-width for smaller screens */
+}
+.product-review-container {
+    padding: 15px;
+}
+
+.product-details {
+    flex-direction: column;
+    gap: 15px;
+}
+
+.product-info h2 {
+    font-size: 1.1rem;
+}
+
+.product-info p {
+    font-size: 0.85rem;
+}
+
+.review-container {
+    flex-direction: column;
+    gap: 15px;
+}
+
+.review-form {
+    max-width: 100%;
+    padding: 12px;
+}
+
+.stars {
+    gap: 6px;
+}
+
+.star {
+    width: 25px;
+    height: 25px;
+}
+
+.submit-btn {
+    font-size: 0.9rem;
+    padding: 8px 16px;
+}
+
+.ratings-text {
+    font-size: 12px;
+}
+
+.rating-status {
+    font-size: 12px;
+}
+}
+
+/* @media (max-width: 479px) */
+@media (max-width: 479px) {
+.product-image {
+    max-width: 150px; /* Further reduce the image size for very small screens */
+}
+.product-review-container {
+    padding: 10px;
+}
+
+.product-details {
+    flex-direction: column;
+    gap: 10px;
+}
+
+.product-info h2 {
+    font-size: 1rem;
+}
+
+.product-info p {
+    font-size: 0.8rem;
+}
+
+.review-container {
+    flex-direction: column;
+    gap: 10px;
+}
+
+.review-form {
+    max-width: 100%;
+    padding: 10px;
+}
+
+.stars {
+    gap: 4px;
+}
+
+.star {
+    width: 20px;
+    height: 20px;
+}
+
+.submit-btn {
+    font-size: 0.8rem;
+    padding: 6px 14px;
+}
+
+.ratings-text {
+    font-size: 10px;
+}
+
+.rating-status {
+    font-size: 10px;
+}
+}

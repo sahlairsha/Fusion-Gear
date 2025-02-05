@@ -1,75 +1,79 @@
-<%- include('../../views/partials/admin/header')  %>
+<%- include('../../views/partials/admin/header') %>
+
+<link rel="stylesheet" href="/css/admin/customers.css">
+
 <div class="container mt-4">
-    <h2 class="mb-4">Customer Details</h2>
+  <h2 class="mb-4 text-center">Customer Details</h2>
   
-    <div class="mb-3">
-        <input type="text" class="form-control" id="searchBar" placeholder="Search customers by name or email">
-    </div>
-
+  <!-- Search Bar -->
+  <div class="mb-3">
+    <input type="text" class="form-control" id="searchBar" placeholder="Search customers by name or email">
+  </div>
+  
+  <!-- Responsive Table Wrapper -->
+  <div class="table-responsive">
     <table class="table table-light">
-        <thead class="table-secondary">
-            <tr>
-                <th scope="col"><input type="checkbox" id="selectAll" ></th>
-                <th scope="col">SL. No.</th>
-                <th scope="col">Name</th>
-                <th scope="col">Email</th>
-                <th scope="col">Phone</th>
-                <th scope="col">Block/Unblock</th>
-                <th scope="col">Status</th>
-            </tr>
-        </thead>
-        <tbody id="tableBody">
-            <% data.forEach((data, index) => { %>
-                <tr>
-                    <td><input type="checkbox" class="checkbox"></td>
-                    <td><%= index + 1 %></td>
-                    <td><%= data.full_name %></td>
-                    <td><%= data.email %></td>
-                    <td><%= data.phone %></td>
-                    <td>
-                        <% if(data.isBlocked === false) { %>
-                        <button class="btn btn-warning btn-sm">
-                            <a href="/admin/blockedUser?id=<%=data._id%>" class="text-white" style="text-decoration: none;">Block</a>
-                        </button>
-                        <% }else{ %>
-                        <button class="btn btn-success btn-sm">
-                            <a href="/admin/unblockedUser?id=<%=data._id%>" class="text-white" style="text-decoration: none;">Unblock</a>
-                        </button>
-                        <% } %>
-                </td>
-
-                <td>
-                    <span class="badge <%= data.isBlocked ? 'bg-danger' : 'bg-success' %>">
-                        <%= data.isBlocked ? 'Blocked' : 'Active' %>
-                    </span>
-                </td>
-                </tr>
-            <% }); %>
-        </tbody>
+      <thead class="table-secondary">
+        <tr>
+          <th scope="col"  class="checkbox-col" data-label="Select" ><input type="checkbox" class="checkbox" id="selectAll"></th>
+          <th scope="col">SL. No.</th>
+          <th scope="col">Name</th>
+          <th scope="col">Email</th>
+          <th scope="col">Phone</th>
+          <th scope="col">Block/Unblock</th>
+          <th scope="col">Status</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody">
+        <% data.forEach((data, index) => { %>
+          <tr>
+            <td data-label="Select"><input type="checkbox" class="checkbox"></td>
+            <td data-label="SL. No."><%= index + 1 %></td>
+            <td data-label="Name"><%= data.full_name %></td>
+            <td data-label="Email"><%= data.email %></td>
+            <td data-label="Phone"><%= data.phone %></td>
+            <td data-label="Block/Unblock">
+              <% if(data.isBlocked === false) { %>
+                <button class="btn btn-sm">
+                  <a href="/admin/blockedUser?id=<%= data._id %>" class="text-black text-decoration-none">Block <i class="fa-solid fa-ban"></i></a>
+                </button>
+              <% } else { %>
+                <button class="btn btn-sm">
+                  <a href="/admin/unblockedUser?id=<%= data._id %>" class="text-black text-decoration-none">Unblock <i class="fa-solid fa-user-check"></i></a>
+                </button>
+              <% } %>
+            </td>
+            <td data-label="Status">
+              <span class="badge <%= data.isBlocked ? 'bg-danger' : 'bg-success' %>">
+                <%= data.isBlocked ? 'Blocked' : 'Active' %>
+              </span>
+            </td>
+          </tr>
+        <% }); %>
+      </tbody>
     </table>
+  </div>
 
 
-    <div class="flex items-center justify-center mt-3 space-x-2 mb-3">
-        <% if (currentPage > 1) { %>
-            <a class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300" href="?page=<%= currentPage - 1 %>">&laquo; Prev</a>
-        <% } %>
-        
-        <% for (let i = 1; i <= totalPages; i++) { %>
-            <% if (i === currentPage) { %>
-                <span class="px-4 py-2 bg-blue-500 text-white font-semibold rounded-md"> <%= i %> </span>
-            <% } else { %>
-                <a class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300" href="?page=<%= i %>"><%= i %></a>
-            <% } %>
-        <% } %>
-        
-        <% if (currentPage < totalPages) { %>
-            <a class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300" href="?page=<%= currentPage + 1 %>">Next &raquo;</a>
-        <% } %>
-    </div>
+  <!-- Pagination -->
+  <div class="d-flex flex-wrap justify-content-center align-items-center mt-3 mb-3 gap-2">
+    <% if (currentPage > 1) { %>
+      <a class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300" href="?page=<%= currentPage - 1 %>">&laquo; Prev</a>
+    <% } %>
+    
+    <% for (let i = 1; i <= totalPages; i++) { %>
+      <% if (i === currentPage) { %>
+        <span class="px-4 py-2 bg-blue-500 text-white font-semibold rounded-md"><%= i %></span>
+      <% } else { %>
+        <a class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300" href="?page=<%= i %>"><%= i %></a>
+      <% } %>
+    <% } %>
+    
+    <% if (currentPage < totalPages) { %>
+      <a class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300" href="?page=<%= currentPage + 1 %>">Next &raquo;</a>
+    <% } %>
+  </div>
 </div>
 
-
-
-
 <script src="/js/admin/customer-search.js"></script>
-<%- include('../../views/partials/admin/footer')  %>
+<%- include('../../views/partials/admin/footer') %>

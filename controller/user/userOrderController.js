@@ -685,16 +685,33 @@ const getOrderConfirmation = async (req, res) => {
     try {
         const userId = req.session.user;
         console.log("User ID:", userId);
+        let page = parseInt(req.query.page) || 1 ;
+        let limit = 5
+
+        let searchQuery = req.query.search ? req.query.search.trim().toLowerCase() : '';
 
         const userData = await User.findById(userId);
 
-        // Fetch orders and populate product details
-        const orders = await Order.find({ user_id: userId })
-            .populate('products.product_id', 'productName productImage variants') 
-            .sort({ createdAt: -1 }) 
+        // Fetch all orders for the user
+        let orders = await Order.find({ user_id: userId })
+            .populate('products.product_id', 'productName productImage variants')
+            .sort({ createdAt: -1 })
             .exec();
 
-        console.log("Orders:", orders);
+        // **Apply search filter in JavaScript**
+        if (searchQuery) {
+            orders = orders.filter(order =>
+                order.products.some(product =>
+                    product.product_id &&
+                    product.product_id.productName.toLowerCase().includes(searchQuery)
+                )
+            );
+        }
+
+        // Pagination after filtering
+        const totalOrders = orders.length;
+        orders = orders.slice((page - 1) * limit, page * limit);
+     
 
         // Add variant details for each product
         const structuredOrders = orders.map((order) => {
@@ -706,7 +723,7 @@ const getOrderConfirmation = async (req, res) => {
 
                 return {
                     ...product.toObject(),
-                    variantDetails: variantDetails || {}, // Attach variant details
+                    variantDetails: variantDetails || {},
                 };
             });
 
@@ -733,6 +750,11 @@ const getOrderConfirmation = async (req, res) => {
             isPaymentPending: pendingOrders.length > 0,
             payment_method: pendingOrder ? pendingOrder.payment_method : null,
             razorpay_order_id: pendingOrder ? pendingOrder.razorpay_order_id : null,
+            totalPages: Math.ceil(totalOrders / limit),
+            currentPage: page,
+            totalOrders,
+            searchQuery
+           
         });
     } catch (error) {
         console.error("Error fetching orders:", error);

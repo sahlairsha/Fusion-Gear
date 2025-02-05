@@ -69,101 +69,69 @@
 
 
 .order-status {
-    flex: 0 0 30%;
-    margin-left: 20px;
-}
-
-
-.timeline {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    position: relative;
-    width: 100%;
-    margin: 20px auto;
-    padding: 10px 0;
-}
-
-
-.timeline-step {
     text-align: center;
-    position: relative;
-    flex: 1;
-}
-
-
-.step-circle {
-    width:15px;
-    height:15px;
-    background-color: #ddd;
-    border-radius: 50%;
-    margin: 3px auto;
-    position: relative;
-    z-index: 2;
-}
-
-
-.step-text {
-    margin-top: 8px;
-    font-size: 14px;
-    color: #777;
-    font-weight: 300;
-}
-
-
-.timeline-step::after {
-    content: '';
-    position: absolute;
-    top: 9px;
-    left: 50%;
-    width: 100%;
-    height: 4px;
-    background-color: #ddd;
-    z-index: 1;
-}
-
-
-.timeline-step:last-child::after {
-    display: none;
-}
-
-
-.timeline-step.completed .step-circle {
-    background-color: green;
-}
-
-.timeline-step.completed .step-text {
-    color: green;
-    font-weight: bold;
-}
-
-.timeline-step.completed::after {
-    background-color: green;
-}
-
-/* Active Step */
-.timeline-step.active .step-circle {
-    background-color: orange;
-}
-
-.timeline-step.active .step-text {
-    color: orange;
-    font-weight: bold;
-}
-
-/* Admin Controls */
-.admin-controls {
+    }
+    
+    .timeline {
     display: flex;
+    align-items: center;
     justify-content: space-between;
-    margin-top: 20px;
-}
-
-.status-select {
+    margin-top: 10px;
     padding: 10px;
-    font-size: 16px;
-    margin-right: 20px;
-    width: 150px;
-}
+    position: relative;
+    }
+    
+    .timeline-step {
+    text-align: center;
+    opacity: 0.5;
+    position: relative;
+    font-weight: normal; 
+    color: #888; 
+    }
+    
+    .timeline-step img {
+    width: 40px;
+    height: 40px;
+    }
+    
+   
+    .timeline-step.completed {
+    opacity: 1;
+    font-weight: bold; 
+    color: #28a745; 
+    }
+    
+
+    .timeline-step.active {
+    opacity: 1;
+    font-weight: bold;  
+    color: #007bff; 
+    }
+    
+    
+   
+    .status-alone {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    }
+    
+    .status-alone img {
+    width: 50px;
+    height: 50px;
+    }
+    
+   
+    .timeline-step img:hover {
+    transform: translateY(-10px);
+    transition: transform 0.3s ease-in-out;
+    }
+    
+    .status-alone img:hover {
+    transform: translateY(-5px);
+    transition: transform 0.3s ease-in-out;
+    }
 
 .update-btn {
     padding: 10px 20px;

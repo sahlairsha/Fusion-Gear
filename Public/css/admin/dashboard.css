@@ -1,0 +1,208 @@
+.container {
+    display: flex;
+    flex-wrap: wrap; /* Allow wrapping on smaller screens */
+    gap: 30px;
+    margin-top: 30px;
+    padding: 0 20px;
+  }
+
+  /* Sales Report Container (Left Side) */
+  .sale-container {
+    flex: 1 1 450px;  /* Grow/shrink basis for responsiveness */
+    background: #fff;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.08);
+    border-radius: 10px;
+    max-height: 550px;
+    overflow-y: auto;
+  }
+
+  .sale-container h1 {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 1.5em;
+    color: #333;
+  }
+
+  .form-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 15px;
+  }
+
+  .form-group {
+    flex: 1;
+    min-width: 150px;
+  }
+
+  label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 14px;
+    color: #555;
+  }
+
+  input,
+  select {
+    width: 100%;
+    padding: 6px 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+  }
+
+  button#generate-button {
+    background-color: #28a745;
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-bottom: 10px;
+  }
+
+  button#generate-button:hover {
+    background-color: #218838;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    font-size: 14px;
+  }
+
+  table,
+  th,
+  td {
+    border: 1px solid #ddd;
+  }
+
+  th,
+  td {
+    padding: 10px;
+    text-align: center;
+  }
+
+  .hidden {
+    display: none;
+  }
+
+  #download-buttons {
+    text-align: center;
+    margin-top: 20px;
+  }
+
+  #download-pdf,
+  #download-excel {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    margin: 5px;
+    border-radius: 4px;
+    font-size: 14px;
+  }
+
+  #download-pdf:hover,
+  #download-excel:hover {
+    background-color: #0056b3;
+  }
+
+  /* Charts Container (Right Side) */
+  .charts-container {
+    flex: 1 1 450px;  /* Grow/shrink basis for responsiveness */
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.08);
+    max-height: 550px;
+    overflow-y: auto;
+  }
+
+  .charts-container h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 1.5em;
+    color: #333;
+  }
+
+  .charts-container canvas {
+    display: block;
+    max-width: 100%;
+    margin: 20px auto;
+    height: 200px !important;  /* Reduced chart height */
+  }
+
+  /* Filters Section within Charts Container */
+  .filters {
+    margin-bottom: 20px;
+  }
+
+  .filters select,
+  .filters input {
+    width: 100%;
+    padding: 6px 8px;
+    margin: 5px 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+  }
+
+  .filters button {
+    background-color: #007bff;
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 10px;
+    font-size: 14px;
+  }
+
+  .filters button:hover {
+    background-color: #0056b3;
+  }
+
+
+
+
+.charts-container::-webkit-scrollbar {
+width: 8px; 
+}
+
+.charts-container::-webkit-scrollbar-track {
+background: #f1f1f1; 
+border-radius: 4px;
+}
+
+.charts-container::-webkit-scrollbar-thumb {
+background-color: #007bff; 
+border-radius: 4px;
+border: 2px solid #f1f1f1; 
+}
+
+.charts-container::-webkit-scrollbar-thumb:hover {
+background-color: #0056b3; 
+
+}
+.charts-container {
+scrollbar-width: thin; 
+scrollbar-color: #007bff #f1f1f1;
+}
+
+
+  /* Responsive Tweaks */
+  @media (max-width: 768px) {
+    .container {
+      flex-direction: column;
+    }
+    .sale-container, .charts-container {
+      max-height: none;
+    }
+  }

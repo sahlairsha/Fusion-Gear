@@ -1,251 +1,5 @@
 <%-include('../../views/partials/user/header') %>
 
-<style>
-
-.active {
-    font-weight: bold;
-    color: #ff6600;
-}
-
-.product-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px; 
-    margin-bottom: 10px; 
-}
-.offer-badge {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    background-color: #ff6b6b;
-    color: white;
-    padding: 5px 10px;
-    border-radius: 5px;
-    font-size: 12px;
-    font-weight: bold;
-    text-transform: uppercase;
-    z-index: 1;
-}
-.product-price-container {
-    position: relative;
-    margin-right: 50px;
-    display: inline-block;
-    margin-bottom: 20px;
-}
-
-.sale-price {
-    font-size: 16px;
-    color: #000;
-    /* text-decoration: line-through; */
-    position: absolute;
-    top: 20px;
-    left: 0;
-    transform: translateY(100);
-    animation: slideInFromBottom 2s forwards;
-}
-
-/* .offer-price {
-    font-size: 18px;
-    font-weight: bold;
-    color: #000;
-    margin-top: 20px;
-    position: absolute;
-    top: 100%;
-    left: 30%;
-    transform: translateY(100%);
-    animation: slideInFromBottom 2s 1s forwards;
-} */
-
-@keyframes moveUpAndDisappear {
-    0% {
-    
-        transform: translateY(0);
-        opacity: 1;
-
-    }
-    50% {
-
-        transform: translateY(-50%);
-        opacity: 0.5;
-
-    }
-    100% {
-
-        transform: translateY(-100%);
-        opacity: 0; 
-
-    }
-}
-
-@keyframes slideInFromBottom {
-    0% {
-
-        transform: translateY(100%);
-        opacity: 0;
-
-    }
-    100% {
-
-        transform: translateY(0);
-        opacity: 1;
-
-    }
-}
-
-
-/* Ensure Specificity for Clear Filter Links */
-.clear-filter{
-    display: inline-block;
-    margin-top: 10px;
-    color: #219ebc; 
-    font-size: 14px;
-    cursor: pointer;
-    text-decoration: none; 
-}
-
-.clear-filter:hover {
-    color: #000 !important;
-    text-decoration: underline; 
-}
-
-
-/* Clear All Button */
-.clear-all {
-    margin-top: 20px;
-    text-align: center;
-}
-
-.clear-all a {
-    color: #fff; 
-    padding: 10px 20px;
-    border-radius: 5px;
-    background-color: #000; 
-    text-transform: uppercase;
-    font-weight: bold;
-    text-decoration: none; 
-}
-
-.clear-all a:hover {
-    background-color: #780000; 
-    color: #fff; 
-}
-
-
-
-/* Styling for product name */
-.product-header .product-name {
-    font-size: 16px;
-    font-weight: 600;
-    margin: 0;
-    flex-grow: 1;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-/* Styling for rating badge */
-.product-header .product-rating { 
-    border-radius: 5px;
-    font-size: 12px;
-    font-weight: 600;
-     margin-right: 65px;
-}
-
-    .stock-left{
-    font-weight: 600;
-    font-size: 14px;
-    margin-bottom: 4px;
-    position: absolute;
-    top: 120px;
-    right: 50px;
-    background-color: #ff6b6b8c;
-    color: white;
-    padding: 5px 10px;
-    border-radius: 5px;
-    font-size: 10px;
-    font-weight: 600;
-    text-transform: uppercase;
-    }
-    .product__item{
-        border-radius: 2px;
-        border : 1px solid #0000;
-    }
-    .alert{
-        margin-top: -100px;
-        margin-left: 500px;
-    }
-
-    .description p {
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    max-width: 100%; /* Adjust to fit your layout */
-}
-
-.product-badge {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background-color: #ff6b6b;
-    color: white;
-    padding: 5px 10px;
-    border-radius: 5px;
-    font-size: 10px;
-    font-weight: 600;
-    text-transform: uppercase;
-}
-
-.product-badge.available {
-    background-color: #28a745; 
-}
-
-.product-badge.sold-out {
-    background-color: #dc3545; /* Red for Sold Out */
-}
-
-.product-badge.unavailable {
-    background-color: #ffc107;
-}
-
-.product-badge.out-of-stock {
-    background-color: #6c757d; 
-}
-
-.product-empty{
-    margin-left: 300px;
-    margin-top: 200px;
-}
-
-.wishlist-btn{
-    border-radius: 50%;
-    background-color: transparent;
-    width: 30px;
-    height: 30px;
-    border: 0.5px solid #000;
-}
-
-/* Style for the heart icon */
-.heart-icon {
-    font-size: 24px;
-    transition: color 0.3s ease, transform 0.3s ease;
-}
-
-/* Optional: Heart icon animation */
-.wishlist-btn i {
-    transition: transform 0.2s ease;
-}
-
-.wishlist-btn i.fas.fa-heart {
-    color: red;
-    transform: scale(1.2); /* Make the icon slightly bigger when filled */
-}
-
-.add-cart-btn{
-    margin-left: 20px;
-}
-
-    </style>
 <link rel="stylesheet" href="/css/user/product-display.css">
   <!-- Breadcrumb Section Begin -->
   <section class="breadcrumb-option">
@@ -299,18 +53,6 @@
                                     <div class="card-body">
                                         <div class="shop__sidebar__categories">
                                             <ul class="nice-scroll">
-                                                <% const categories = [
-                                                    "men's wear",
-                                                    "men's accessories",
-                                                    "men's footware",
-                                                    "men's active wear",
-                                                    "smart watch",
-                                                    "tech accessories",
-                                                    "women's clothing",
-                                                    "women's accessories",
-                                                    "women's activewear",
-                                                    "women's footwear"
-                                                ]; %>
                                                 <% categories.forEach(cat => { %>
                                                     <li>
                                                         <a href="?page=1&category=<%= encodeURIComponent(cat) %>&sort=<%= sort %>&search=<%= search %>&priceRange=<%= priceRange %>" 
@@ -366,14 +108,18 @@
                                 <div id="collapseFour" class="collapse show" data-parent="#accordionExample">
                                     <div class="card-body">
                                         <div class="shop__sidebar__size">
-                                            <% const sizes = ["XS", "S", "M", "L", "XL", "XXL", "3XL", "4XL", "5", "6", "7", "8"]; %>
+                                           
                                             <% sizes.forEach(sizeOption => { %>
+                                              <% if(sizeOption !== 'NA'){%>
                                                 <label for="<%= sizeOption.toLowerCase() %>" class="<%= size === sizeOption ? 'active' : '' %>">
                                                     <%= sizeOption %>
                                                     <input type="radio" name="size" value="<%= sizeOption %>" id="<%= sizeOption.toLowerCase() %>" 
                                                            <%= size === sizeOption ? 'checked' : '' %>>
                                                 </label>
+                                                
+                                              <% } %>
                                             <% }); %>
+                                            
                                             <a href="?clearSize=true" class="clear-filter" data-filter="size">Clear Sizes</a>
                                         </div>
                                     </div>

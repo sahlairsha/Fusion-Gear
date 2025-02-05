@@ -160,12 +160,12 @@ function updateProfile(event) {
         }
     }
 
-    // Validate inputs
+
     nameValidation();
     usernameValidation();
     phoneValidation();
 
-    // Check if there are any validation errors
+   
     const hasError = [err1, err2, err3].some(err => err.innerText !== "");
     if (hasError) {
         return;

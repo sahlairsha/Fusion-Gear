@@ -37,11 +37,12 @@ const getOrders = async (req, res) => {
                 };
             }
         });
-
+        const adminData = await User.findById(req.session.admin)
         res.render('orders', {
             orders: ordersWithAddresses,
             totalPages: Math.ceil(count / limit),
-            currentPage: page
+            currentPage: page,
+            admin:adminData
         });
     } catch (error) {
         console.error(error);
@@ -89,23 +90,36 @@ const getDetails = async(req,res)=>{
         const orderId = req.params.id;
 
         const orders = await Order.findById(orderId)
-        .populate('products.product_id')
+        .populate({
+            path: 'products.product_id',
+            select: 'productName productImage salePrice regularPrice',
+        })
         .populate('shippingAddress.addressDocId')
         .exec()
 
-
         for (let item of orders.products) {
-            const productVariant = await ProductVariant.findOne({ product_id: item.product_id._id });
-            item.variantDetails = productVariant ? productVariant.variant : [];
+            const variant = await Product.findOne({
+                _id: item.product_id._id,
+                "variants._id": item.variant_id,
+            });
+
+            if (variant) {
+                const variantDetails = variant.variants.find(v => v._id.toString() === item.variant_id.toString());
+                item.variantDetails = variantDetails || {}; 
+            } else {
+                item.variantDetails = {}; 
+            }
         }
 
     const specificAddress = orders.shippingAddress.addressDocId.address[orders.shippingAddress.addressIndex];
     console.log("Order with specific address:", specificAddress);
 
+const adminData = await User.findById(req.session.admin)
 
         res.render("admin-order-details",{
             orders,
-            shippingAddress : specificAddress
+            shippingAddress : specificAddress,
+            admin: adminData
         })
 
     }catch(error){

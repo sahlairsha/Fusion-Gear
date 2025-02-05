@@ -1,86 +1,6 @@
 <%- include("../../views/partials/admin/header") %>
 
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs/dist/cropper.min.css">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-
-    <style>
-        .thumbnails-container {
-        display: flex;
-        overflow-x: auto;
-        gap: 10px;
-        }
-
-.thumbnail {
-    position: relative;
-    width: 100px;
-    height: 100px;
-    border: 1px solid #ddd;
-    padding: 5px;
-    background-color: #f9f9f9;
-    display: inline-block;
-    margin-left: 30px;
-
-}
-
-.thumbnail img {
-    width: 50px;
-    height: 50px;
-    object-fit: contain;
-
-}
-
-.remove-icon {
-    position: relative;
-    top: 0;
-    right: 0;
-    font-size: 20px;
-    color:#000;
-    padding: 2px 5px;
-    cursor: pointer;
-}
-
-        .image-cropper {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            width: 300px;
-            height: 200px;
-            margin-bottom: 20px;
-            border: 1px solid #ddd;
-            margin-left: 30px;
-        }
-
-        .image-cropper img {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: cover;
-        }
-
-        .content-main {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-left: 30px;
-            margin-top: 30px;
-        }
-        .remove-variant{
-            background-color:transparent;
-            border-radius: 50%;
-            text-align: center;
-            width: 44px;
-            height: 30px;
-            font-size: 12px;
-            margin-top: 30px;
-            border: 1px solid #000;
-        }
-        .remove-variant:hover{
-            background-color: #000;
-            color: #fff;
-        }
-
- 
-    </style>
+<link rel="stylesheet" href="/css/admin/edit-product.css">
     <section class="content-main">
         <div class="row">
             <div class="col-9">
@@ -204,9 +124,9 @@
                                 <div class="row">
                                     <div class="card-body align-items-center " style="margin-bottom: 20px;">
                                         <img src="" alt="" id="imgView1">
-                                        <input class="form-control" type="file" name="image" id="input1"
-                                            accept="image/png, image/jpeg, image/jpg"
-                                            onchange="viewImage1(event), viewImage(event, 1)">
+<input class="form-control" type="file" name="image" id="input1"
+accept="image/png, image/jpeg, image/jpg"
+onchange="viewImage1(event)">
                                         <div id="image-error" class="error-message"></div>
                                     </div>
                                     <div class="image-cropper d-flex align-items-center"
@@ -221,10 +141,13 @@
                                     <div class="card-body align-items-center" style="margin-bottom: 20px;">
                                         <img src="" alt="" id="imgView2">
 
-
                                         <input class="form-control" type="file" name="image" id="input2"
-                                            accept="image/png, image/jpeg, image/jpg"
-                                            onchange="viewImage2(event),viewImage(event, 2)">
+                                               accept="image/png, image/jpeg, image/jpg"
+                                              onchange="viewImage2(event)">
+
+
+                                        
+
                                             <div id="image-error" class="error-message"></div>
                                     </div>
                                     <div class="image-cropper d-flex align-items-center"
@@ -240,8 +163,8 @@
 
 
                                         <input class="form-control" type="file" name="image" id="input3"
-                                            accept="image/png, image/jpeg, image/jpg"
-                                            onchange="viewImage3(event),viewImage(event, 3)">
+                                        accept="image/png, image/jpeg, image/jpg"
+                                        onchange="viewImage3(event)">
                                             <div id="image-error" class="error-message"></div>
                                     </div>
                                     <div class="image-cropper d-flex align-items-center"
@@ -258,8 +181,8 @@
 
 
                                         <input class="form-control" type="file" name="image" id="input4"
-                                            accept="image/png, image/jpeg, image/jpg"
-                                            onchange="viewImage4(event),viewImage(event, 4)">
+                                          accept="image/png, image/jpeg, image/jpg"
+                                           onchange="viewImage4(event)">
                                             <div id="image-error" class="error-message"></div>
                                     </div>
                                     <div class="image-cropper d-flex align-items-center"
@@ -281,249 +204,10 @@
         </div>
         </div>
     </section>
+
+
     <script src="https://cdn.jsdelivr.net/npm/cropperjs/dist/cropper.min.js"></script>
 
-    <script>
-        // Function to add a new variant
-        function addVariant() {
-            const variantIndex = document.querySelectorAll(".variant-row").length; // Determine the index dynamically
-            const variantContainer = document.getElementById("variant-container");
-        
-            // Create a new variant row
-            const variantRow = document.createElement("div");
-            variantRow.className = "variant-row d-flex align-items-center mb-3";
-            variantRow.id = `variant-row-${variantIndex}`;
-        
-            variantRow.innerHTML = `
-                <div class="me-3">
-                    <label for="variantColor${variantIndex}" class="form-label">Color</label>
-                    <input type="text" class="form-control" id="variantColor${variantIndex}" name="variants[${variantIndex}][color]">
-                </div>
-                <div class="me-3">
-                    <label for="variantSize${variantIndex}" class="form-label">Size</label>
-                    <input type="text" class="form-control" id="variantSize${variantIndex}" name="variants[${variantIndex}][size]">
-                </div>
-                <div class="me-3">
-                    <label for="variantStock${variantIndex}" class="form-label">Stock</label>
-                    <input type="number" class="form-control" id="variantStock${variantIndex}" name="variants[${variantIndex}][stock]">
-                </div>
-                <div class="me-3">
-                    <label for="variantRegularPrice${variantIndex}" class="form-label">Regular Price</label>
-                    <input type="number" class="form-control" id="variantRegularPrice${variantIndex}" name="variants[${variantIndex}][regularPrice]">
-                </div>
-                <div class="me-3">
-                    <label for="variantSalePrice${variantIndex}" class="form-label">Sale Price</label>
-                    <input type="number" class="form-control" id="variantSalePrice${variantIndex}" name="variants[${variantIndex}][salePrice]">
-                </div>
-                <button type="button" class="remove-variant" data-product-id="<%= product._id %>">X</button>
-            `;
-        
-            variantContainer.appendChild(variantRow);
-        }
-        
-        // Event delegation to handle removing a variant dynamically
-        document.addEventListener("DOMContentLoaded", () => {
-            document.querySelector("#variant-container").addEventListener("click", function (event) {
-                if (event.target && event.target.classList.contains("remove-variant")) {
-                    const variantRow = event.target.closest(".variant-row");
-                    const productId = event.target.getAttribute("data-product-id");
-                    const variantIndex = variantRow.id.split("-")[1]; // Extract variant index
-        
-                    // Restrict removal of the last variant
-                    const variantCount = document.querySelectorAll("#variant-container .variant-row").length;
-                   
-        
-                    // Confirm before deletion
-                    Swal.fire({
-                        title: 'Are you sure?',
-                        text: 'You won’t be able to revert this!',
-                        icon: 'warning',
-                        showCancelButton: true,
-                        confirmButtonText: 'Yes, remove it!',
-                        cancelButtonText: 'Cancel',
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            // Send request to remove the variant
-                            fetch(`/admin/remove-variant/${productId}/${variantIndex}`, {
-                                method: "DELETE",
-                                headers: {
-                                    "Content-Type": "application/json"
-                                },
-                            })
-                                .then(response => response.json())
-                                .then(data => {
-                                    if (data.success) {
-                                        // Remove the variant from UI
-                                        variantRow.remove();
-                                        Swal.fire({
-                                            icon: 'success',
-                                            title: 'Removed!',
-                                            text: 'Variant has been removed successfully.',
-                                            confirmButtonText: 'Ok',
-                                        });
-                                    } else {
-                                        Swal.fire({
-                                            icon: 'error',
-                                            title: 'Error',
-                                            text: data.message || 'An error occurred.',
-                                            confirmButtonText: 'Ok',
-                                        });
-                                    }
-                                })
-                                .catch(error => {
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'Error',
-                                        text: 'Something went wrong while removing the variant.',
-                                        confirmButtonText: 'Ok',
-                                    });
-                                });
-                        }
-                    });
-                }
-            });
-        });
-        
-        // Function to validate and submit the form
-        function validateAndSubmit() {
-            if (validateForm()) {
-                document.forms[0].submit();
-            }
-        }
-        
-        // Form validation function
-        function validateForm() {
-            clearErrorMessages();
-            const name = document.getElementsByName('productName')[0].value;
-            const description = document.getElementById('descriptionid').value;
-            const category = document.getElementsByName('category')[0].value;
-            const offer = document.getElementsById('product_offer')[0].value;
-            const startDate = document.getElementsByName('startDate').value;
-            const endDate = document.getElementsByName('endDate').value;
-            let isValid = true;
-        
-            // Product Name Validation
-            if (name.trim() === "" || !/^[a-zA-Z\s]+$/.test(name)) {
-                displayErrorMessage('productName-error', 'Please enter a valid product name with alphabetic characters.');
-                isValid = false;
-            }
-        
-            // Description Validation
-            if (description.trim() === "" || description.trim().length < 10) {
-                displayErrorMessage('description-error', 'Description should be at least 10 characters.');
-                isValid = false;
-            }
-        
-            // Category Validation
-            if (category.trim() === "") {
-                displayErrorMessage('category-error', 'Please select a category.');
-                isValid = false;
-            }
-
-            // Offer Validation
-
-            if(offer === ''){
-                displayErrorMessage('-error', 'Please select an offer.');
-                isValid = false;
-            }
-            // Start Date Validation
-            if(startDate === ''){
-                displayErrorMessage('startDate-error', 'Please select a start date.');
-                isValid = false;
-            }
-            // End Date Validation
-            if(endDate === ''){
-                displayErrorMessage('endDate-error', 'Please select an end date.');
-                isValid = false;
-            }
-        
-           
-            return isValid;
-        }
-        
-        // Function to display error messages
-        function displayErrorMessage(elementId, message) {
-            let errorElement = document.getElementById(elementId);
-            errorElement.innerText = message;
-            errorElement.style.display = "block";
-        }
-        
-        // Function to clear error messages
-        function clearErrorMessages() {
-            const errorElements = document.getElementsByClassName('error-message');
-            Array.from(errorElements).forEach(element => {
-                element.innerText = '';
-            });
-            const errorMessage = document.getElementById('errorMessage');
-        }
-
-
-        function deleteSingleImage(imageId,productId){
-                $.ajax({
-                    url:"/deleteImage",
-                    method : "POST",
-                    data : {
-                        imageNameToServer : imageId,
-                        productIdToServer : productId
-                    },
-                    success : ((response)=>{
-                        if(response.status === true){
-                            window.location.reload()
-                        }
-                    })
-                })
-               }
-        
-        // Image preview functionality
-        function viewImage1(event) {
-            document.getElementById('imgView1').src = URL.createObjectURL(event.target.files[0]);
-        }
-        
-        function viewImage2(event) {
-            document.getElementById('imgView2').src = URL.createObjectURL(event.target.files[0]);
-        }
-        
-        function viewImage3(event) {
-            document.getElementById('imgView3').src = URL.createObjectURL(event.target.files[0]);
-        }
-        
-        function viewImage4(event) {
-            document.getElementById('imgView4').src = URL.createObjectURL(event.target.files[0]);
-        }
-        
-        // Handle image selection and thumbnail creation
-        const selectedImages = [];
-        document.getElementById("imageInput").addEventListener("change", handleFileSelect);
-        
-        function handleFileSelect(event) {
-            const addedImagesContainer = document.getElementById("addedImagesContainer");
-            addedImagesContainer.innerHTML = "";
-            const files = event.target.files;
-            for (let i = 0; i < files.length; i++) {
-                const file = files[i];
-                selectedImages.push(file);
-                const thumbnail = document.createElement("div");
-                thumbnail.classList.add("thumbnail");
-                const img = document.createElement("img");
-                img.src = URL.createObjectURL(file);
-                img.alt = "thumbnail";
-                img.style.width = "100px";
-                img.style.height = "auto";
-                const removeIcon = document.createElement("span");
-                removeIcon.classList.add("remove-icon");
-                removeIcon.innerHTML = "&times;";
-                removeIcon.addEventListener("click", function () {
-                    const index = selectedImages.indexOf(file);
-                    if (index !== -1) {
-                        selectedImages.splice(index, 1);
-                    }
-                    thumbnail.remove();
-                });
-                thumbnail.appendChild(img);
-                thumbnail.appendChild(removeIcon);
-                addedImagesContainer.appendChild(thumbnail);
-            }
-        };
-        </script>
+    <script src="/js/admin/edit-product.js"> </script>
         
     <%- include("../../views/partials/admin/footer") %>

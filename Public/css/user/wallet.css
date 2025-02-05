@@ -1,0 +1,297 @@
+.wallet-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 30px auto;
+    padding: 20px;
+    width: 100%;
+    max-width: 800px;
+  }
+
+  /* Wallet Card */
+  .wallet-card {
+    width: 100%;
+    max-width: 450px;
+    padding: 20px;
+    background-color: #ffff;
+    border-radius: 15px;
+    border: 1px dotted #000;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .wallet-card:hover{
+    border: 1px solid #000;
+  }
+
+  .wallet-card h6, .wallet-card p {
+    text-align: left;
+    font-size: 15px;
+  }
+
+  .wallet-card button {
+    width: 100%;
+    padding: 10px;
+    background-color: #000;
+    color: #fff;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+
+  .wallet-card button:hover {
+    background-color: #fff;
+    color: #000;
+    border:1px solid #000;
+
+  }
+
+  /* Add Money Form */
+  #addMoneyFormContainer {
+    display: none;
+    width: 100%;
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 30px;
+    background-color: #fff;
+    border: 1px solid #e1e1e1;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  #addMoneyFormContainer h2 {
+    margin-bottom: 20px;
+    font-size: 1.8rem;
+    color: #333;
+    text-align: center;
+  }
+
+  #addMoneyForm {
+    display: flex;
+    flex-direction: column;
+  }
+
+  #addMoneyForm label {
+    margin-bottom: 10px;
+    font-weight: 600;
+    color: #333;
+    font-size: 1rem;
+  }
+
+  #addMoneyForm input[type="number"] {
+    padding: 12px;
+    margin-bottom: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+    color: #333;
+  }
+
+  #addMoneyForm fieldset {
+    margin-top: 15px;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    background-color: #fff;
+  }
+
+  #addMoneyForm fieldset legend {
+    font-size: 1.1rem;
+    color: #555;
+  }
+
+  .custom-radio-container {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 15px;
+  }
+
+  .custom-radio input[type="radio"] {
+    display: none;
+  }
+
+  .custom-radio label {
+    padding: 10px 20px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    width: 200px;
+    height: 50px;
+    color: #fff;
+    background-color: #fff;
+    border: 1px dotted #000;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    transition: box-shadow 0.3s ease-in-out; 
+  }
+
+  .custom-radio input[type="radio"]:checked + label {
+    border: 1px solid  rgba(18, 240, 18, 0.541);
+    box-shadow: 0 0 1px rgba(18, 240, 18, 0.541), 0 0 2px rgba(18, 240, 18, 0.541),0 0 3px rgba(18, 240, 18, 0.541);
+  }
+
+  #addMoneyForm button {
+    margin-top: 20px;
+    padding: 12px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #fff;
+    background-color: #000;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  #addMoneyForm button:hover {
+    background-color: #000;
+  }
+
+  /* Transaction History */
+  .transaction-history {
+    width: 100%;
+    max-width: 800px;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+    overflow-x: auto;
+  }
+
+  .transaction-history h2 {
+    font-size: 1.5rem;
+    text-align: left;
+  }
+
+  .transaction-history table {
+    width: 100%;
+    min-width: 350px;
+    border-collapse: collapse;
+    white-space: nowrap;
+  }
+
+  .transaction-history th, .transaction-history td {
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: left;
+  }
+
+  .transaction-history th {
+    background-color: #f4f4f4;
+  }
+
+  .pagination-container {
+    margin-top: 20px;
+    text-align: center;
+  }
+
+  .pagination {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+  }
+
+  .pagination li {
+    margin: 0 5px;
+  }
+
+  .pagination li a {
+    padding: 6px 12px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    color: #333;
+    text-decoration: none;
+    transition: background-color 0.3s;
+  }
+
+  .pagination li a:hover {
+    background-color: #f0f0f0;
+  }
+
+  .pagination li.active a {
+    background-color: #333;
+    color: #fff;
+  }
+
+  @media only screen and (max-width: 767px) {
+    .wallet-card, .transaction-history, #addMoneyFormContainer {
+      max-width: 100%;
+      padding: 15px;
+    }
+
+    .wallet-card h6, .transaction-history h2, #addMoneyFormContainer h2 {
+      font-size: 1.2rem;
+    }
+
+    .wallet-card p, .transaction-history table, #addMoneyForm label {
+      font-size: 0.9rem;
+    }
+
+    .transaction-history table {
+      display: block;
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+  }
+
+  @media only screen and (max-width: 468px) {
+  /* Adjusting the wallet card */
+  .wallet-card, .transaction-history, #addMoneyFormContainer {
+    padding: 12px;
+    margin: 8px auto;
+  }
+
+  /* Adjusting text sizes */
+  .wallet-card h6, .transaction-history h2, #addMoneyFormContainer h2 {
+    font-size: 1rem;
+  }
+
+  .wallet-card p, .transaction-history table, #addMoneyForm label {
+    font-size: 0.85rem;
+  }
+
+  /* Adjust transaction table layout */
+  .transaction-history table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  #addMoneyForm input[type="number"], #addMoneyForm button {
+    font-size: 0.85rem;
+    padding: 8px;
+  }
+
+  .pagination-container {
+    padding: 8px;
+  }
+
+  .pagination li a {
+    padding: 5px 8px;
+    font-size: 0.8rem;
+  }
+
+  .pagination li a:hover {
+    background-color: #f0f0f0;
+  }
+
+  .pagination li.active a {
+    background-color: #333;
+    color: #fff;
+  }
+
+  
+  .custom-radio label {
+    font-size: 0.85rem;
+    width: auto;
+    padding: 7px 12px;
+  }
+
+  .wallet-card button {
+    padding: 8px;
+    font-size: 0.9rem;
+  }
+}

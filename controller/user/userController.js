@@ -23,9 +23,12 @@ const pageNotFound = async(req,res) =>{
 
 const loadHomePage = async (req, res) => {
     try{
+        
     const productData = await Product.find().populate('category')
     .sort({createdAt: -1})
     .limit(6)
+
+
     if (!req.session.user) {
         
         res.render('home', { user: null, products: productData });
@@ -42,7 +45,9 @@ const loadHomePage = async (req, res) => {
     console.log("Home page is not loading", error.message);
     res.redirect('/pagenotfound')
 }
-};
+}
+
+
 const loadSignup = async(req,res)=>{
     try {
         return res.render('signup')

@@ -74,7 +74,7 @@
                         </div>
                         <div class="banner__item__text">
                             <h2>Accessories</h2>
-                            <a href="/products?page=1&category=tech%20accessories&sort=productName&search=&priceRange=">Shop now</a>
+                            <a href="/products?page=1&category=women%27s%20accessories&sort=productName&search=&priceRange=">Shop now</a>
                         </div>
                     </div>
                 </div>
@@ -92,7 +92,7 @@
             </div>
         </div>
     </section>
-    <!-- Banner Section End -->
+    
 
     <!-- Product Section Begin -->
     <section class="product spad">
@@ -100,7 +100,7 @@
             <div class="row">
                 <div class="col-lg-12">
                     <ul class="filter__controls">
-                        <li data-filter=".new-arrivals">New Arrivals</li>
+                        <li data-filter="new-arrivals">New Arrivals</li>
                     </ul>
                 </div>
             </div>
@@ -110,15 +110,15 @@
                 <% } else { %>
                     <% products.forEach(product => { %>
                         <div class="col-lg-4 col-md-6 col-sm-6">
-                            <div class="product-card mb-4">
-                                <div class="product-image">
+                            <div class="home-product-card mb-4">
+                                <div class="home-product-image">
                                     <img src="/uploads/public-image/<%= product.productImage[0] %>" alt="<%= product.productName %>">
                                 </div>
                                 
                                 <!-- Product Overlay with Name and View Product -->
-                                <div class="product-overlay">
-                                    <h6 class="product-name"><%= product.productName %></h6>
-                                    <a href="/product/view?id=<%= product._id %>" class="overlay-icon">View Product</a>
+                                <div class="home-product-overlay">
+                                    <h6 class="home-product-name"><%= product.productName %></h6>
+                                    <a href="/product/view?id=<%= product._id %>" class="home-overlay-icon">View Product</a>
                                 </div>
                             </div>
                         </div>
@@ -128,7 +128,7 @@
             
             
     </section>
-    <!-- Product Section End -->
+
 
     <!-- Categories Section Begin -->
     <section class="categories spad">

@@ -1,6 +1,7 @@
 const Coupon = require('../../models/couponSchema');
 const Product = require('../../models/productSchema');
 const Category = require('../../models/categorySchema');
+const User = require('../../models/userSchema');
 
 const getCouponPage = async (req, res) => {
     try {
@@ -13,14 +14,13 @@ const getCouponPage = async (req, res) => {
             .skip((page - 1) * limit)
             .exec();
 
-        // Get the total count of coupons in the database
-        const count = await Coupon.countDocuments(); // Await the count
-
-        // Render the page with the coupons and pagination data
+        const count = await Coupon.countDocuments(); 
+        const adminData = await User.findById(req.session.admin)
         res.render('coupon', { 
             coupons,
             totalPages: Math.ceil(count / limit),
-            currentPage: page,                  
+            currentPage: page,     
+            admin: adminData             
         });
         
     } catch (error) {
@@ -37,7 +37,8 @@ const getAddCouponPage = async (req, res) => {
         
      
         // Render the form with products and categories
-        res.render('add-coupon', { products, categories });
+        const adminData = await User.findById(req.session.admin)
+        res.render('add-coupon', { products, categories, admin : adminData });
     } catch (e) {
         console.log(e);
         res.status(500).json({ message: 'Error fetching products or categories' });

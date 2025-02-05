@@ -8,7 +8,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Fusion Gear</title>
-   
+   <!-- Add these in the head tag -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"/>
     <!-- Google Font -->
     <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700;800;900&display=swap"
     rel="stylesheet">
@@ -26,32 +27,21 @@
     <link rel="stylesheet" href="/css/slicknav.min.css" type="text/css">
     <link rel="stylesheet" href="/css/style.css" type="text/css">
     <link href="https://cdn.jsdelivr.net/npm/toastr@2.1.4/build/toastr.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="/css/user/header.css" />
 </head>
 
-<style>
-
-
-.logo-head{
-        font-weight: 700;
-    }
-</style>
-
 <body>
-
-    <!-- Page Preloder -->
     <div id="preloder">
         <div class="loader"></div>
     </div>
 
-
-
-    <!-- Header Section Begin -->
+   
     <header class="header">
         <div class="container">
             <div class="row">
                 <div class="col-lg-3 col-md-3">
                     <div class="header__logo d-flex align-item-center justify-content-center flex-row" >
-                        <a href="/" class="mb-5"><img src="/logo/logo.png" alt="" srcset=""></a>
+                        <a href="/" class="mb-5"><img src="/img/logo.png" alt="" srcset=""></a>
                         <p class="logo-head mt-3">Fusion Gear</p><div class="round"></div>
                     </div>
                 </div>
@@ -79,7 +69,7 @@
                                 </div>
                             </div>
                         <% } %>
-                        <a href="#" class="search-switch"><img src="/img/icon/search.png" alt=""></a>
+                        <a href="javascript:void(0);" class="search-switch"><img src="/img/icon/search.png" alt=""></a>
                         <a href="/wishlist"><img src="/img/icon/heart.png" alt=""></a>
                         <a href="/cart"><img src="/img/icon/cart.png" alt=""></a>
                     </div>
@@ -89,6 +79,41 @@
             <div class="canvas__open"><i class="fa fa-bars"></i></div>
         </div>
 
+        <!-- Offcanvas Menu (hidden initially) -->
+        <div class="offcanvas-menu-overlay"></div>
+        <div class="offcanvas-menu-wrapper">
+            <div class="offcanvas__menu">
+                <div class="offcanvas__top__hover">
+                    <span>Explore<i class="fa fa-chevron-down"></i></span>
+                    <ul>
+                        <li> <a href="/">Home</a></li>
+                        <li><a href="/products">Products</a></li>
+                        <li> <a href="/wishlist">Wishlist</a></li>
+                        <li> <a href="/cart">Cart</a></li>
+                        <li> <a href="/wallet">Wallet</a></li>
+                        <li><a href="/order-confirm">  Orders</a></li>
+                    </ul>
+                </div>
+            </div>
 
+            <div class="offcanvas__nav__option">
+               
+              
+                <a href="javascript:void(0);" class="search-switch"><img src="/img/icon/search.png" alt="">Search</a>
+               
+               
+            </div>
+
+            <div class="offcanvas__links">
+                <% if(!user) { %>
+                    <a href="/signup" class="signup-link text-danger">Sign Up</a>
+                    <a href="/login" class="login-link text-danger">Login</a>
+                <% } else { %>
+                    <div class="dropdown">
+                        <a href="/userProfile?id=<%=user._id%>" class="sign-in-link"><%= user.full_name %></a>
+                    </div>
+                <% } %>
+            </div>
+        </div>
     </header>
-  
+ 

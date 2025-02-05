@@ -144,22 +144,6 @@
     background-color: #780000;
   }
 
-  /* Responsive design */
-  @media (max-width: 768px) {
-    .profile-container {
-      flex-direction: column;
-    }
-    .sidebar {
-      width: 100%;
-      border-right: none;
-      border-bottom: 1px solid #e0e0e0;
-    }
-    .content-area {
-      padding: 15px;
-    }
-  }
-
-
 
   .nav-list a.active {
     background-color: #0000006e;
@@ -172,4 +156,208 @@
 }
 .logout-btn a:hover{
   color:#fff;
+}
+
+.referral-container {
+  background: #ffffff;
+  width: 90%;
+  height: 50vh;
+  max-width: 600px;
+  margin-top: 100px;
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+  border-radius: 10px;
+  padding-top: 40px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.137);
+  margin-bottom: 20px;
+}
+
+.refferal-head {
+  color: #4CAF50;
+  font-size: 1.5rem;
+}
+
+.referral-code-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: 40px;
+  border: 1px solid #33333325;
+  margin: 10px auto;
+  width: 90%;
+  
+  max-width: 400px;
+  height: 50px;    
+  padding: 20px;
+  background-color: #f8f8f8;
+}
+
+.referral-code {
+  font-size: 14px;
+  color: #3333333f;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.share-btn {
+  width: 40px;
+  height: 40px;
+  background-color: #007bff; 
+  color: white;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s ease;
+}
+
+.share-btn:hover {
+  background-color: #0056b3; /* Darker blue on hover */
+}
+
+.stats {
+  margin: 20px 0;
+  font-size: 1rem;
+  color: #555;
+}
+
+.code {
+  color: #00000060;
+  font-size: 14px;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+
+/* Medium Screens (Tablets: 768px to 1199px) */
+@media only screen and (min-width: 768px) and (max-width: 1199px) {
+  .sidebar {
+      width: 250px;
+  }
+  .content-area {
+      margin:0 auto;
+  }
+
+  .profile-details {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.profile-pic .avatar {
+  width: 50px;
+  height:50px;
+
+}
+
+
+}
+
+/* Small Screens (Mobiles: 480px to 767px) */
+@media only screen and (max-width: 767px) {
+  .sidebar {
+      width: 220px;
+      padding: 15px;
+  }
+  .profile-container{
+    margin-left:40px;
+    margin-top: 30px;
+  }
+  .profile-details {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+.user-info {
+font-size: 12px;
+}
+
+.user-name {
+  font-size: 12px;
+}
+
+.user-email {
+  font-size: 12px;
+}
+
+.edit-btn, .logout-btn {
+  margin: 5px 0;
+  padding: 5px 10px;
+  
+}
+
+.nav-list {
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* Content area styles */
+.content-area {
+
+  margin-left: 30px;
+
+}
+
+.content-area h2 {
+  
+  font-size: 14px;
+
+}
+
+
+form label {
+  font-size: 14px;
+}
+
+.nav-list a.active {
+font-size: 14px;
+}
+
+
+
+
+ 
+}
+
+
+@media only screen and (max-width: 479px) {
+  .sidebar {
+      width: 180px;
+      padding: 5px;
+  }
+  .profile-pic .avatar {
+    width: 45px;
+    height:45px;
+  
+  }
+  .user-info {
+  margin-left: 10px;
+  }
+    
+
+
+
+    .profile-container{
+      margin-left:20px;
+     
+    }
+
+    form input {
+      font-size: 12px;
+      padding: 10px;
+      margin: 5px 0 10px;
+   
+    }
+
+
+    .content-area {
+
+      margin-left: 10px;
+    
+    }
 }

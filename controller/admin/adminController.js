@@ -21,10 +21,13 @@ const pageerror = async(req,res)=>{
 const getProfile = async(req,res) =>{
 
         if(req.session.admin){
-            res.render('admin-profile', { user : req.session.admin })
+            const adminData = await User.findById(req.session.admin);
+
+        
+            res.render('admin-profile', {admin : adminData})
         }else{
             console.log("Some Error Occure to load the profile page")
-            res.redirect('/admin/login')
+            res.redirect('/admin/login',{admin:null})
         }
 }
 
