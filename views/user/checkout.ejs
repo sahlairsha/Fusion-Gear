@@ -40,14 +40,14 @@
                     <% doc.address.forEach(function(addr) { %>
                         <li class="list-group-item pl-4 mb-3 bg-gray-100 rounded relative">
                             <!-- Left: Radio Button -->
-                            <div class="absolute top-4 left-4">
+                            <div class="absolute top-4 left-2">
                                 <input class="radio-btn" type="radio" name="selectedAddress" value="<%= addr._id %>"> 
                             </div>
-                            <div class="pl-10"> <!-- Reduced padding for closer alignment with radio button -->
+                            <div class="pl-2"> <!-- Reduced padding for closer alignment with radio button -->
                                 <h6 class="font-semibold">
                                     <%= addr.recipient_name %>
                                     <% if (addr.addressType) { %>
-                                        <span class="bg-yellow-500 text-white px-2 py-1 rounded-md text-sm"><%= addr.addressType %></span>
+                                        <span class="badge badge-warning text-xs "><%= addr.addressType %></span>
                                     <% } %>
                                 </h6>
                                 <strong><%= addr.streetAddress %>, <%= addr.city %>, <%= addr.state %></strong><br>

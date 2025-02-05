@@ -116,8 +116,7 @@
                                                     <input type="radio" name="size" value="<%= sizeOption %>" id="<%= sizeOption.toLowerCase() %>" 
                                                            <%= size === sizeOption ? 'checked' : '' %>>
                                                 </label>
-                                                
-                                              <% } %>
+                                                <% } %>
                                             <% }); %>
                                             
                                             <a href="?clearSize=true" class="clear-filter" data-filter="size">Clear Sizes</a>
@@ -144,12 +143,12 @@
                                                 { name: "Purple", class: "c-7" },
                                                 { name : "Red", class: "c-8" },
                                             ]; %>
-                                            <% colors.forEach(color => { %>
-                                                <label class="<%= color.class %> <%= color.name === color ? 'active' : '' %>" for="sp-<%= color.class %>">
-                                                    <input type="radio" name="color" value="<%= color.name %>" id="sp-<%= color.class %>" 
-                                                           <%= color === color.name ? 'checked' : '' %>>
-                                                </label>
-                                            <% }); %>
+                                           <% colors.forEach(color => { %>
+                                            <label class="<%= color.class %> <%= color.name === color ? 'active' : '' %>" for="sp-<%= color.class %>">
+                                                <input type="radio" name="color" value="<%= color.name %>" id="sp-<%= color.class %>" 
+                                                       <%= color === color.name ? 'checked' : '' %>>
+                                            </label>
+                                        <% }); %>
                                         </div>
                                         <a href="?clearColor=true" class="clear-filter" data-filter="color">Clear Colors</a>
                                     </div>

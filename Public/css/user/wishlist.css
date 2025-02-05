@@ -155,28 +155,47 @@ h3 {
 }
 
 
-@media only screen and (max-width: 479px) {
-    .sidebar {
-        width: 100%;
-        height: auto;
-        position: relative; 
-        border-right: none;
-        border-bottom: 1px solid #ddd;
-        padding: 15px;
+@media (max-width: 576px) {
+    /* Hide the table header */
+    .wishlist-table thead {
+      display: none;
     }
-
-    .nav-list {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
+    
+    /* Display tbody rows as blocks */
+    .wishlist-table tbody, .wishlist-table tr {
+      display: block;
+      width: 100%;
     }
-
-    .nav-list li {
-        margin: 5px;
+    
+    .wishlist-table tbody tr {
+      display: block;
+      margin-bottom: 15px;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      background: #fff;
     }
-
-    .content-area {
-        margin-left: 0;
-        padding: 10px;
+    
+    /* Style each cell as a row in the card */
+    .wishlist-table tbody tr td {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.85rem;
+      padding: 8px 10px;
+      border: none;
+      border-bottom: 1px solid #ddd;
     }
-}
+    
+    .wishlist-table tbody tr td:last-child {
+      border-bottom: none;
+    }
+    
+    /* Add a label before the cell content based on data-label attribute */
+    .wishlist-table tbody tr td::before {
+      content: attr(data-label);
+      font-weight: bold;
+      text-transform: uppercase;
+      margin-right: 10px;
+    }
+  }
