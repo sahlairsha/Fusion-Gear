@@ -136,6 +136,7 @@ const getAllProducts = async (req, res) => {
             .populate('brands')
             .populate('category')
             .populate('variants') 
+            .sort({createdAt : -1})
             .exec();
 
       
