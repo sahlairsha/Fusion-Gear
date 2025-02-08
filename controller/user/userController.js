@@ -397,7 +397,7 @@ const forgotPassword = async (req, res) => {
         user.resetTokenExpiry = Date.now() + 3600000;
         await user.save();
 
-        const resetLink = `http://localhost:3001/reset-password?token=${resetToken}`;
+        const resetLink = `https://www.fusion-gear.shop/reset-password?token=${resetToken}`;
         await sendResetEmail(email, resetLink);
 
         req.flash('success', 'Password reset link sent to your email.');

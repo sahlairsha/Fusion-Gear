@@ -114,8 +114,8 @@ const loadProducts = async (req, res) => {
             priceRange = '';
             size = '';
             color = '';
-            search = '';
             sort = '';
+            search = ''
         }
         
 

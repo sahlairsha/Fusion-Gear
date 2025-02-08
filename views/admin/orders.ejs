@@ -32,7 +32,10 @@
                                      alt="<%= product.product_id.productName %>" width="50" height="50">
                             <% }); %>
                         </td>
-                        <td data-label="Product Name"><%= order.products.map(product => product.product_id.productName).join(', ') %></td>
+                        <td data-label="Product Name">
+                            <%- order.products.map(product => product.product_id.productName).join(',<br>') %>
+                        </td>
+                        
                         <td data-label="Qty"><%= order.products.map(product => product.quantity).join(', ') %></td>
                         <td data-label="Total Price">$<%= order.total_price %></td>
                         <td data-label="Shipping Address:" class="shipping">

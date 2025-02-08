@@ -60,7 +60,6 @@ background-color: #fff;
 display: flex;
 justify-content: space-between;
 align-items: center;
-padding: 20px;
 background-color: #fff;
 
 }
@@ -68,7 +67,6 @@ background-color: #fff;
 .product-card {
 display: flex;
 align-items: center;
-padding: 20px;
 width: 100%;
 flex-wrap: wrap;
 }
@@ -79,10 +77,11 @@ height: auto;
 margin-right: 20px;
 border: 1px solid #ddd;
 border-radius: 5px;
+margin-bottom:10px;
 }
 
 .product-info {
-flex: 1; /* Allows the product-info to take up the remaining space */
+flex: 1;
 padding: 10px;
 box-sizing: border-box;
 }
@@ -106,70 +105,71 @@ margin-top: 10px;
 color: #2874f0;
 font-size: 16px;
 }
+
 .order-status {
-text-align: center;
-}
+    text-align: center;
+    }
+    
+    .timeline {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 10px;
+    padding: 10px;
+    position: relative;
+    }
+    
+    .timeline-step {
+    text-align: center;
+    opacity: 0.5;
+    position: relative;
+    font-weight: normal; 
+    color: #888; 
+    }
+    
+    .timeline-step img {
+    width: 40px;
+    height: 40px;
+    }
+    
+   
+    .timeline-step.completed {
+    opacity: 1;
+    font-weight: bold; 
+    color: #28a745; 
+    }
+    
 
-.timeline {
-display: flex;
-align-items: center;
-justify-content: space-between;
-margin-top: 10px;
-padding: 10px;
-position: relative;
-}
-
-.timeline-step {
-text-align: center;
-opacity: 0.5;
-position: relative;
-font-weight: normal; /* Default font weight */
-color: #888; /* Default color */
-}
-
-.timeline-step img {
-width: 40px; /* Adjust icon size */
-height: 40px;
-}
-
-/* Completed status */
-.timeline-step.completed {
-opacity: 1;
-font-weight: bold;  /* Bold font weight */
-color: #28a745; /* Green color for completed */
-}
-
-/* Active status */
-.timeline-step.active {
-opacity: 1;
-font-weight: bold;  /* Bold font weight */
-color: #007bff; /* Blue color for active */
-}
-
-
-/* Status without full timeline */
-.status-alone {
-display: flex;
-flex-direction: column;
-align-items: center;
-justify-content: center;
-}
-
-.status-alone img {
-width: 50px;
-height: 50px;
-}
-
-/* Hover Effect for Images */
-.timeline-step img:hover {
-transform: translateY(-10px); /* Moves image 10px upward */
-transition: transform 0.3s ease-in-out;
-}
-
-.status-alone img:hover {
-transform: translateY(-5px); /* Slight upward movement for single status image */
-transition: transform 0.3s ease-in-out;
-}
+ .timeline-step.active {
+    opacity: 1;
+    font-weight: bold;  
+    color: #007bff; 
+    }
+    
+    
+   
+    .status-alone {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    }
+    
+    .status-alone img {
+    width: 50px;
+    height: 50px;
+    }
+    
+   
+    .timeline-step img:hover {
+    transform: translateY(-10px);
+    transition: transform 0.3s ease-in-out;
+    }
+    
+    .status-alone img:hover {
+    transform: translateY(-5px);
+    transition: transform 0.3s ease-in-out;
+    }
 
 .shipping-address{
 font-weight: 800;

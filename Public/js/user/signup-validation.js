@@ -7,7 +7,7 @@ const emailid = document.getElementById('email');
 const passwordId = document.getElementById('password');
 const cpasswordId = document.getElementById('cpassword');
 const phoneId = document.getElementById('phone');
-
+const singupButton = document.getElementById('signup-btn')
 
 const err1 = document.getElementById('error1');
 const err2 = document.getElementById('error2');
@@ -67,7 +67,8 @@ function emailValidation() {
 
 function passwordValidation() {
     const password = passwordId.value.trim();
-    const passwordpattern = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    const passwordpattern = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,}$/;
+
     if (password === "") {
         err4.innerText = "Please enter a valid password";
     } else if (!passwordpattern.test(password)) {
@@ -124,6 +125,12 @@ signupForm.addEventListener('submit', (e) => {
     const hasError = [err1, err2, err3, err4, err5, err6].some(err => err.innerText !== "");
     if (hasError) {
         e.preventDefault();
+        singupButton.disabled = false;
+        singupButton.innerHTML="Signup"
+    }else{
+        singupButton.disabled = false;
+        singupButton.innerHTML="<span class='spinner'></span>"
+      
     }
 
 },{once: true});

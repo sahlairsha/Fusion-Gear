@@ -6,7 +6,7 @@ const passwordId = document.getElementById('password');
 const err1 = document.getElementById('error1')
 const err2 = document.getElementById('error2')
 
-
+const loginBtn = document.getElementById('login-btn');
 
 function emailValidation() {
     const email = emailId.value.trim();
@@ -22,11 +22,8 @@ function emailValidation() {
 
 function passwordValidation() {
     const password = passwordId.value.trim();
-    const passwordpattern = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
     if (password === "") {
         err2.innerText = "Please enter a valid password";
-    } else if (!passwordpattern.test(password)) {
-        err2.innerText = "Minimum 8 characters, at least one letter and one number";
     } else {
         err2.innerText = "";
     }
@@ -47,7 +44,18 @@ const hasError = [err1,err2].some(err=> err.innerText !== "")
 
 if(hasError){
     e.preventDefault()
-}
 
+    loginBtn.disabled = false;
+    loginBtn.innerHTML = 'Login';
+}else{
+    loginBtn.disabled = true;
+    loginBtn.innerHTML = '<span class="spinner"></span>';
+
+    setTimeout(() => {  
+        window.location.href = '/';  
+      }, 2000);  
+    
+    
+}
 
 })

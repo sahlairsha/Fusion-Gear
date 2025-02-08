@@ -67,8 +67,8 @@ const productSchema = new Schema({
     },
     variants: [
         {
-            color: { type: String, required: true },
-            size: { type: String, required: true },
+            color: { type: String },
+            size: { type: String },
             stock: { type: Number, required: true, default: 0 },
             regularPrice: { type: Number, required: true },
             salePrice: { type: Number, required: false },

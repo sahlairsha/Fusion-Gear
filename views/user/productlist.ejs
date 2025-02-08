@@ -53,33 +53,7 @@
               
                             <div class="product__details__text">
                                               
-                                 <div class="ratings-reviews">
-                    <h2>Ratings & Reviews</h2>
-                    <div class="rating-summary" id="ratings" data-product-id="<%= product._id  %>">
-                        <div class="rating-number"><%= product.ratings.average.toFixed(1) || "0.0" %></div>
-                        <div>
-                            <div class="stars">
-                                <% for (let i = 0; i < 5; i++) { %>
-                                    <span><%= i < Math.round(product.ratings.average) ? "★" : "☆" %></span>
-                                <% } %>
-                            </div>
-                            <div><%= product.ratings.count %> Ratings & <%= product.reviews.length %> Reviews</div>
-                        </div>
-                    </div>
-                    <div id="rating-overview"></div>
-                    <button id="rateProductBtn" data-product-id="<%= product._id %>">Rate Product</button>
-            
-                    <h2>Reviews</h2>
-                    <ul class="reviews-list">
-                        <% product.reviews.forEach(function(review) { %>
-                            <li>
-                                <p><strong><%= review.user_id.full_name %></strong></p>
-                                <p><%= review.review %></p>
-                                <p>Rating: <%= review.rating %>★</p>
-                            </li>
-                        <% }); %>
-                    </ul>
-                </div>
+               
             </div>
                                 <h4><%= product.productName %></h4>
                                 <p><%= product.description %></p>
@@ -107,6 +81,8 @@
                                         </label>
                                     <% }); %>
                                 </div>
+
+                            
                                 
 
                                 <!-- Add to Cart and Other Options -->
@@ -120,13 +96,13 @@
                                 </div>
 
                                 <!-- Other Actions -->
-                                <div class="product__details__btns__option">
+                             <div class="product__details__btns__option">
                                     <button class="btn add-whish-btn">
                                         <a href="#" onclick="addToWishlistFromDetails('<%= product._id %>')">
                                             <i class="fa fa-heart"></i> Add to Wishlist
                                         </a>
                                     </button> 
-                                </div>
+                             </div>
 
                                 <div class="product__details__last__option">
                                     <h5><span>Guaranteed Safe Checkout</span></h5>
@@ -134,6 +110,34 @@
                                     <ul>
                                         <li><span>Categories: <%= category.name %></span></li>
                                         <li><span>Tag:</span> Clothes, Skin, Body</li>
+                                    </ul>
+                                </div>
+
+                                <div class="ratings-reviews">
+                                    <h2>Ratings & Reviews</h2>
+                                    <div class="rating-summary" id="ratings" data-product-id="<%= product._id  %>">
+                                        <div class="rating-number"><%= product.ratings.average.toFixed(1) || "0.0" %></div>
+                                        <div>
+                                            <div class="stars">
+                                                <% for (let i = 0; i < 5; i++) { %>
+                                                    <span><%= i < Math.round(product.ratings.average) ? "★" : "☆" %></span>
+                                                <% } %>
+                                            </div>
+                                            <div><%= product.ratings.count %> Ratings & <%= product.reviews.length %> Reviews</div>
+                                        </div>
+                                    </div>
+                                    <div id="rating-overview"></div>
+                                    <button id="rateProductBtn" data-product-id="<%= product._id %>">Rate Product</button>
+                            
+                                    <h2>Reviews</h2>
+                                    <ul class="reviews-list">
+                                        <% product.reviews.forEach(function(review) { %>
+                                            <li>
+                                                <p><strong><%= review.user.full_name|| review.user.username %></strong></p>
+                                                <p><%= review.review %></p>
+                                                <p>Rating: <%= review.rating %>★</p>
+                                            </li>
+                                        <% }); %>
                                     </ul>
                                 </div>
                             </div>

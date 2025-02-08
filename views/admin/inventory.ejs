@@ -56,7 +56,9 @@
                 </tr>
             <% }) %>
         </tbody>
+    
     </table>
+    
     <div class="flex items-center justify-center mt-3 space-x-2 mb-3">
         <% if (currentPage > 1) { %>
             <a class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300" href="?page=<%= currentPage - 1 %>">&laquo; Prev</a>
@@ -75,7 +77,6 @@
         <% } %>
     </div>
 </div>
-
 <!-- Modal -->
 <div class="overlay" id="overlay"></div>
 <div class="modal" id="modal">

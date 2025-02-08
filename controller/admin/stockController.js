@@ -15,6 +15,7 @@ const getStocks = async (req, res) => {
         .limit(limit * 1)
         .skip((page - 1) * limit)
         .populate('category', 'name')
+        .sort({createdAt:-1})
         .exec();
 
         const count = await Product.find({

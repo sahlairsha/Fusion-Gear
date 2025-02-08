@@ -13,9 +13,12 @@ table {
 }
 
 table th, table td {
-    padding: 8px 12px;
+    padding: 8px;
     font-size: 14px;
+   
 }
+
+
 
 table th {
     background-color: rgba(0, 0, 0, 0.62);

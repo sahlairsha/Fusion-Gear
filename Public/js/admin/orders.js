@@ -50,6 +50,7 @@ function getStatusColor(status) {
         case 'Shipped': return 'info';
         case 'Delivered': return 'success';
         case 'Canceled': return 'danger';
+        case 'Return': return 'warning'
         default: return 'secondary';
     }
 }

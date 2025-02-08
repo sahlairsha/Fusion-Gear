@@ -13,7 +13,7 @@ video{
 .videoInsert {
     position: relative;
     display: block;
-    width: 100vw;
+    width: 40%;
     -o-object-fit: cover;
     object-fit: cover;
     height: 100vh;
@@ -196,7 +196,7 @@ input[type="email"]:not(:placeholder-shown)::placeholder {
 }
 
 
-@media screen and (max-width: 567px) {
+@media screen and (max-width: 767px) {
     /* Make video full-width */
     .videoInsert {
         width: 100%;
@@ -261,6 +261,24 @@ input[type="email"]::placeholder {
         font-size: 12px;
     }
 }
+
+.spinner {
+    border: 2px solid #f3f3f3;      
+    border-top: 2px solid #3498db; 
+    border-radius: 50%;
+    width: 16px;
+    height: 16px;
+    animation: spin 1s linear infinite;
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 8px; 
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
 
 /* For screens up to 479px (if further tweaks are needed) */
 @media screen and (max-width: 479px) {

@@ -35,13 +35,32 @@
 
             <div class="col-lg-3">
                 <div class="shop__sidebar">
-                    <div class="shop__sidebar__search">
-                        <form action="/products" method="GET">
-                            <input type="text" name="search" placeholder="Search..." value="<%= search %>" />
-                            <button type="submit"><span class="icon_search"></span></button>
+                    <div class="shop__sidebar__search" style="position: relative;">
+                        <form action="/products" method="GET" style="display: flex; align-items: center;">
+                            <input 
+                                type="text" 
+                                name="search" 
+                                placeholder="Search..." 
+                                value="<%= search %>" 
+                                id="searchInput" 
+                            />
+                            <!-- Search Button -->
+                            <button type="submit" style="border: none; background: none;">
+                                <% if (search && search.length > 0) { %>
+                                    <span 
+                                        class="icon_clear" 
+                                        id="clearSearch" 
+                                    ><i class="fas fa-close"></i></span>
+                                <% }else{ %>
+                                <span  class="icon_search"></span>
+                                <% } %>
+                            </button>
+                    
+                            <!-- Clear Icon -->
+                           
                         </form>
-                        
                     </div>
+                    
                     <div class="shop__sidebar__accordion">
                         <div class="accordion" id="accordionExample">
                             <!-- Categories -->
@@ -292,6 +311,7 @@
                     </div>
                 </div>
 </section>
+
 
 <script src="/js/user/product-list.js"></script>
 

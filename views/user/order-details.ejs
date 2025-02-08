@@ -14,7 +14,7 @@
 
         <div class="delivery-address">
             <h3>Order Details</h3>
-  <br>
+            <br>
             <h5 class="shipping-address">Shipping Address</h4>
             <p><strong>Recipient Name:</strong> <%=  shippingAddress.recipient_name %></p>
             <p><strong>Street Address:</strong> <%=  shippingAddress.streetAddress %>, <%=shippingAddress.city%>,<%= shippingAddress.state%>,<%= shippingAddress.pincode%></p>
@@ -25,6 +25,7 @@
         </div>
      
         <a href="/generate-invoice/<%=orders._id%>"><button class="btn invoice-btn">Download Invoice</button></a>
+
         <div class="order-status mt-4">
             <h4>Order Status</h4>
         
@@ -66,7 +67,6 @@
         
     <div class="product-details">
         <% orders.products.forEach(item => { %>
-
         <div class="product-card">
          
             <img src="/uploads/public-image/<%= item.product_id.productImage[0] %>" 
@@ -85,7 +85,11 @@
             </div>
 
             <% }) %>
-            <h5>Total: ₹<%= orders.total_price %></h3>
+            <div class="price-details">
+                <h6 class="text-success mb-2">Discount:₹<%= orders.discountAmount.toFixed(2) %></h6>
+                <h5>Total: ₹<%= orders.total_price %></h3>
+            </div>
+
 
                  
                  <% if (orders.order_status === 'Dispatch') { %>
@@ -93,11 +97,11 @@
             <% }else if(orders.order_status === 'Delivered') {%>
                 <a  class="return" href="/order/return-form?id=<%= orders._id  %>"><button type="submit" class="btn btn-primary ml-4">Return Order</button></a>
                 <% } %>
-               </div>
-            </div>
+    
         </div>
+   </div>
     </div>
-
+</div>
 </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.8.1/socket.io.js" integrity="sha512-8BHxHDLsOHx+flIrQ0DrZcea7MkHqRU5GbTHmbdzMRnAaoCIkZ97PqZcXJkKZckMMhqfoeaJE+DNUVuyoQsO3Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -114,7 +118,7 @@
 
         
         socket.on("connect_error", (err) => {
-                 showAlert("Connection to the server lost. Please check your network.", "error");
+         showAlert("Connection to the server lost. Please check your network.", "error");
         });
 
      
@@ -125,7 +129,6 @@
         
         });
 
-        // Function to display custom styled alert
         function showAlert(message, type) {
             const alertBox = document.createElement('div');
             alertBox.classList.add('alert', type);
