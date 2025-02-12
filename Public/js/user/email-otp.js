@@ -29,7 +29,21 @@ otpForm.addEventListener('submit', (event) => {
     const verifyButton = document.querySelector('button[type="submit"]');
     verifyButton.innerHTML='Verfiying <span class="btn-loading"><span>'
 
-    const otpInput = document.getElementById('otp').value;
+
+    const otpInput = document.getElementById('otp').value.trim();
+    
+
+    if (!otpInput) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Empty OTP',
+            text: 'Please enter the OTP before submitting.'
+        });
+        
+        verifyButton.innerHTML = 'Verify Email';
+        document.getElementById("otp").focus();
+        return;
+    }
     $.ajax({
         type: "POST",
         url: "/email-otp",
