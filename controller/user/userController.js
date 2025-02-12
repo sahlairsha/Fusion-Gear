@@ -430,7 +430,8 @@ const resetPassword = async (req, res) => {
             return res.redirect('/forgot-password');
         }
 
-        const hashedPassword =  securePassword(newPassword);
+        // Await the securePassword function to get the hashed password as a string
+        const hashedPassword = await securePassword(newPassword);
 
         user.password = hashedPassword;
         user.resetToken = undefined;
