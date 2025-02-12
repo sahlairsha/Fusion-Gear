@@ -6,7 +6,7 @@
 <div class="wallet-container">
   <div class="wallet-card">
     <h6>Wallet Details</h6>
-    <p>Balance: <span id="balance">₹<%= walletBalance %></span></p>
+    <p>Balance: <span id="balance">₹<%= walletBalance.toFixed(2) %></span></p>
     <button onclick="toggleAddMoneyForm()">+ Add Money</button>
   </div>
 
