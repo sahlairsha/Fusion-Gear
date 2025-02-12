@@ -12,6 +12,7 @@ const getCouponPage = async (req, res) => {
         const coupons = await Coupon.find({})
             .limit(limit)
             .skip((page - 1) * limit)
+            .sort({createdAt:-1})
             .exec();
 
         const count = await Coupon.countDocuments(); 

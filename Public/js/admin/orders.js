@@ -29,7 +29,11 @@
                         statusCell.className = `order-status-display text-center bg-${getStatusColor(newStatus)}`;
                         Swal.fire("Updated!", "Order status has been updated.", "success");
                     } else {
-                        Swal.fire("Error!", "Failed to update order status.", "error");
+                        Swal.fire({
+                            title: "Error!",
+                            text: response.message || "You can't change the order status",
+                            icon: "error",
+                        })
                     }
                 })
                 .catch((error) => {

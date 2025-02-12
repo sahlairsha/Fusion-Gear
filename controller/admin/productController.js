@@ -362,10 +362,14 @@ const deleteProducts = async (req, res) => {
             { $set: { isDeleted: true, deletedAt: new Date() } },
             { new: true }
         );
-        res.redirect('/admin/products');
+        if (!updatedProduct) {
+            return res.status(404).json({ message: 'Product not found.' });
+        }
+
+        res.status(200).json({ message: 'Product deleted successfully.' });
     } catch (error) {
         console.error("There is an error in deleting", error);
-        res.status(500).redirect('/pageerror')
+        res.status(500).json({ message: 'Server error. Could not delete product.' });
     }
 }
 
@@ -388,13 +392,12 @@ const restoreProduct = async (req, res) => {
         );
 
         if (!restoredProduct) {
-            return res.status(404).redirect('/pageerror');
+            return res.status(404).json({ message: 'Product not found.' });
         }
-
-        res.redirect('/admin/products');
+        res.status(200).json({ message: 'Product restored successfully.' });
     } catch (error) {
         console.error("There is an error in restoring product:", error);
-        res.status(500).redirect('/pageerror');
+        res.status(500).json({ message: 'Server error. Could not restore product.' });
     }
 }
 

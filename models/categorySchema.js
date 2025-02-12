@@ -36,7 +36,6 @@ const categorySchema = new Schema({
         percentage:{
             type: Number,
             default: 0,
-
         },
         startDate:{
             type: Date
@@ -45,10 +44,7 @@ const categorySchema = new Schema({
             type: Date
         },
     },
-    createdAt: {
-        type: Date,
-        default: Date.now,
-    },
+  
     isDeleted: {
         type: Boolean,
         default: false,
@@ -57,7 +53,7 @@ const categorySchema = new Schema({
         type: Date,
         default: null,
     },
-});
+},{timestamp : true})
 
 // Create the model
 const Category = mongoose.model('Category', categorySchema);

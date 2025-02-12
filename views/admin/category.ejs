@@ -48,19 +48,19 @@
                 <td class="editable" contenteditable="false">
                     <%= category.categoryDiscount.endDate ? new Date(category.categoryDiscount.endDate).toLocaleDateString() : 'NA' %>
                 </td>
-           <td>
-    <button class="btn  btn-md edit-button"><i class="fa-solid fa-edit"></i></button>
-    <% if (category.isDeleted === false) { %>
-        <button class="btn btn-md">
-            <a href="/admin/deletecategory?id=<%= category._id %>" class="text-white text-decoration-none" > <i class="fa-solid fa-trash"></i></a>
-        </button>
-    <% } else { %>
-        <button class="btn  btn-md">
-            <a href="/admin/restorecategory?id=<%= category._id %>" class="text-white" style="text-decoration: none;"> <i class="fa-solid fa-rotate-left"></i></a>
-        </button>
-    <% } %>
-    </td>
-
+                <td>
+                    <button class="btn btn-md edit-button"><i class="fa-solid fa-edit"></i></button>
+                    <% if (category.isDeleted === false) { %>
+                        <button class="btn btn" onclick="deleteCategory('<%= category._id %>')">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    <% } else { %>
+                        <button class="btn btn-md" onclick="restoreCategory('<%= category._id %>')">
+                            <i class="fa-solid fa-rotate-left"></i>
+                        </button>
+                    <% } %>
+                  </td>
+                  
                 </tr>
             <% }); %>
         </tbody>
@@ -87,8 +87,8 @@
 
 
 <script src="/js/admin/customer-search.js"></script>
-
 <script src="/js/admin/edit-category.js"></script>
+<script src="/js/admin/delete-category.js"></script>
 
 
 

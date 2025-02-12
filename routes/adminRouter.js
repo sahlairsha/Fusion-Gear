@@ -21,7 +21,8 @@ const { storage, editedStorage } = require("../helper/multer");
 const logoUpload = require('../helper/logoUpload');
 
 const{logoStorage} = logoUpload
-const upload = multer({ storage: logoStorage });
+
+const upload = require('../helper/logoUpload');
 
 
 const uploads = multer({ storage });
@@ -109,8 +110,8 @@ router.get('/admin/addbrand',adminAuth,brandController.getAddBrand)
 router.post('/admin/addbrand',adminAuth,logoUpload.single('logo'),brandController.addBrands)
 router.get('/admin/editbrand/:id', adminAuth, brandController.getEditBrand);
 router.post('/admin/editbrand/:id', adminAuth, upload.single('logo'), brandController.editBrand);
-
-router.delete('/admin/brands/delete/:id',adminAuth, brandController.deleteBrand);
+router.get('/admin/brands/delete/:id',adminAuth, brandController.deleteBrand);
+router.get('/admin/brands/restore/:id',adminAuth, brandController.restoreBrand);
 
 
 

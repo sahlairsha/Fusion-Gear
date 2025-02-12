@@ -57,9 +57,9 @@ async function calculateCheckoutTotals(userId, couponCode) {
     if (couponCode) {
         const coupon = await Coupon.findOne({ code: couponCode, status: 'active' });
         if (coupon) {
-            const now = dayjs(); // Using dayjs for date handling
-            const startDate = dayjs(coupon.startDate); // Convert coupon startDate to dayjs
-            const endDate = dayjs(coupon.endDate); // Convert coupon endDate to dayjs
+            const now = dayjs(); 
+            const startDate = dayjs(coupon.startDate); 
+            const endDate = dayjs(coupon.endDate); 
 
             if (now.isBefore(startDate) || now.isAfter(endDate)) {
                 couponMessage = 'Coupon expired.';
@@ -94,71 +94,62 @@ async function calculateCheckoutTotals(userId, couponCode) {
 
 const applyCoupon = async (req, res) => {
     try {
-        const userId = req.session.user;
-
-        if (!userId) {
-            return res.status(401).json({ error: "Please login to apply a coupon." });
-        }
-
-        const user = await User.findById(userId).populate('cart.product_id');
-        if (!user || user.cart.length === 0) {
-            return res.status(400).json({ error: "Cart is empty! Please add a product." });
-        }
-
-        const couponCode = req.query.couponCode;
-        if (!couponCode) {
-            return res.status(400).json({ error: "Coupon code is required." });
-        }
-
-        const coupon = await Coupon.findOne({ code: couponCode, status: 'active' });
-        if (!coupon) {
-            return res.status(400).json({ couponMessage: "Invalid or expired coupon code." });
-        }
-
-        const now = new Date();
-        if (now < coupon.startDate || now > coupon.endDate) {
-            return res.status(400).json({ couponMessage: "Coupon is not valid at this time." });
-        }
-
-        // Check user's usage in the userUsage array
-        const userUsageEntry = coupon.userUsage.find((usage) => usage.userId.toString() === userId.toString());
-
-        if (userUsageEntry && userUsageEntry.usageCount >= coupon.userLimit) {
-            return res.status(400).json({ couponMessage: "You have reached the usage limit for this coupon." });
-        }
-
-        const updatedCheckoutTotals = await calculateCheckoutTotals(userId, couponCode);
-
-        if (updatedCheckoutTotals.cartTotal < coupon.minOrderValue) {
-            return res.status(400).json({ couponMessage: "Order does not meet the minimum value for this coupon." });
-        }
-
-        // Update user usage
-        if (userUsageEntry) {
-            userUsageEntry.usageCount += 1;
-        } else {
-            coupon.userUsage.push({ userId, usageCount: 1 });
-        }
-
-        await coupon.save();
-
-        req.session.couponCode = couponCode;
-
-        res.json({
-            cartCount: user.cart.length,
-            cartTotal: updatedCheckoutTotals.cartTotal,
-            offerDiscount: updatedCheckoutTotals.offerDiscount,
-            couponDiscount: updatedCheckoutTotals.couponDiscount,
-            shippingCharges: updatedCheckoutTotals.shippingCharges,
-            netAmount: updatedCheckoutTotals.netAmount,
-            couponMessage: updatedCheckoutTotals.couponMessage || null,
-        });
+      const userId = req.session.user;
+      if (!userId) {
+        return res.status(401).json({ error: "Please login to apply a coupon." });
+      }
+  
+      const user = await User.findById(userId).populate('cart.product_id');
+      if (!user || user.cart.length === 0) {
+        return res.status(400).json({ error: "Cart is empty! Please add a product." });
+      }
+  
+      const couponCode = req.query.couponCode;
+      if (!couponCode) {
+        return res.status(400).json({ error: "Coupon code is required." });
+      }
+  
+      const coupon = await Coupon.findOne({ code: couponCode, status: 'active' });
+      if (!coupon) {
+        return res.status(400).json({ couponMessage: "Invalid or expired coupon code." });
+      }
+  
+      const now = new Date();
+      if (now < coupon.startDate || now > coupon.endDate) {
+        return res.status(400).json({ couponMessage: "Coupon is not valid at this time." });
+      }
+  
+      // Check if the user has already reached his/her per-user limit
+      const userUsageEntry = coupon.userUsage.find(
+        (usage) => usage.userId.toString() === userId.toString()
+      );
+      if (userUsageEntry && userUsageEntry.usageCount >= coupon.userLimit) {
+        return res.status(400).json({ couponMessage: "You have reached the usage limit for this coupon." });
+      }
+  
+      const updatedCheckoutTotals = await calculateCheckoutTotals(userId, couponCode);
+      if (updatedCheckoutTotals.cartTotal < coupon.minOrderValue) {
+        return res.status(400).json({ couponMessage: "Order does not meet the minimum value for this coupon." });
+      }
+  
+      // Store the coupon code in session for later use in confirmOrder.
+      req.session.couponCode = couponCode;
+  
+      res.json({
+        cartCount: user.cart.length,
+        cartTotal: updatedCheckoutTotals.cartTotal,
+        offerDiscount: updatedCheckoutTotals.offerDiscount,
+        couponDiscount: updatedCheckoutTotals.couponDiscount,
+        shippingCharges: updatedCheckoutTotals.shippingCharges,
+        netAmount: updatedCheckoutTotals.netAmount,
+        couponMessage: updatedCheckoutTotals.couponMessage || null,
+      });
     } catch (error) {
-        console.error("Error applying coupon:", error);
-        res.status(500).json({ error: "An error occurred while applying the coupon. Please try again." });
+      console.error("Error applying coupon:", error);
+      res.status(500).json({ error: "An error occurred while applying the coupon. Please try again." });
     }
-};
-
+  };
+  
 
 const getCheckout = async (req, res) => {
     try {
@@ -548,7 +539,8 @@ const verifyPayment = async (req, res) => {
         }
 
         // Calculate checkout totals, including discount
-        const { netAmount, discount } = await calculateCheckoutTotals(userId, couponCode);
+        const { netAmount,couponDiscount,offerDiscount } = await calculateCheckoutTotals(userId, couponCode);
+        
         const deliveryDate = getRandomDeliveryDate();
 
         // Fetch variant details and build the order products array
@@ -611,9 +603,10 @@ const verifyPayment = async (req, res) => {
         const newOrder = new Order({
             user_id: userId,
             products: orderProducts,
+            offerAmount : offerDiscount,
             total_price: netAmount,
             payment_method,
-            discountAmount: discount,
+            discountAmount: couponDiscount,
             payment_status: paymentStatus,
             order_status : "Dispatch",
             razorpay_order_id: razorpayOrderId,
@@ -635,6 +628,30 @@ const verifyPayment = async (req, res) => {
                 orderId: savedOrder._id,
             });
         }
+
+        if (couponCode) {
+            const coupon = await Coupon.findOne({ code: couponCode, status: 'active' });
+            if (coupon) {
+              const now = new Date();
+              if (now >= coupon.startDate && now <= coupon.endDate) {
+                const userUsageEntry = coupon.userUsage.find(
+                  (usage) => usage.userId.toString() === userId.toString()
+                );
+                if (userUsageEntry) {
+                  if (userUsageEntry.usageCount < coupon.userLimit) {
+                    userUsageEntry.usageCount += 1;
+                  } else {
+                    console.warn(`User ${userId} has already reached the coupon usage limit.`);
+                  }
+                } else {
+                  coupon.userUsage.push({ userId, usageCount: 1 });
+                }
+                await coupon.save();
+              }
+            }
+       
+            req.session.couponCode = null;
+          }
 
         for (const item of user.cart) {
             // Fetch the product and specific variant
@@ -1218,7 +1235,8 @@ async function generateInvoice(req, res) {
             const variant = product.variants.find((v) => v._id.equals(item.variant_id));
             const unitPrice = variant.salePrice || variant.regularPrice;
             const itemTotal = unitPrice * item.quantity;
-            totalPrice += itemTotal;
+            const offerPrice = itemTotal * product.offer.discountPercentage/100
+            totalPrice += itemTotal - offerPrice;
 
             doc
                 .fontSize(12)
@@ -1231,7 +1249,7 @@ async function generateInvoice(req, res) {
                 })
                 .text(item.quantity, 250, y, { width: 100, align: 'center' })
                 .text(`₹${unitPrice.toFixed(2)}`, 350, y, { width: 100, align: 'center'})
-                .text(`₹${itemTotal.toFixed(2)}`, 450, y, { width: 100, align: 'center'});
+                .text(`₹${itemTotal.toFixed(2)}`, 450, y, { width: 100, align: 'center'})
             y += 20;
         });
 
@@ -1252,7 +1270,7 @@ async function generateInvoice(req, res) {
             .font('Helvetica')
             .fillColor('#000000')
             .fontSize(12)
-            .text(`Total Price (before discount): ₹${totalPrice.toFixed(2)}`, leftColumnX, doc.y)
+            .text(`Total Price (after offer): ₹${totalPrice.toFixed(2)}`, leftColumnX, doc.y)
             .text(`Discount Applied: -₹${order.discountAmount.toFixed(2)}`, leftColumnX, doc.y)
             .text(
                 `Final Amount to Pay: ₹${(

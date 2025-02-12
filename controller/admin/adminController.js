@@ -4,8 +4,7 @@ const Order = require('../../models/orderSchema');
 const PDFDocument = require('pdfkit');
 const ExcelJS = require('exceljs');
 const bcrypt = require('bcrypt')
-
-
+const dayjs = require('dayjs')
 
 const pageerror = async(req,res)=>{
     try {
@@ -112,10 +111,15 @@ const generateReport = async (req, res) => {
     const { startDate, endDate, reportType } = req.body;
 
     try {
-        let matchQuery = {
-            createdAt: { $gte: new Date(startDate), $lte: new Date(endDate) },
-            order_status: { $ne: 'Canceled' } // Exclude canceled orders
-        };
+    const adjustedEndDate = dayjs(endDate).endOf('day').toDate();
+const matchQuery = {
+    createdAt: {
+        $gte: new Date(startDate),
+        $lte: adjustedEndDate  // now includes the full day
+    },
+    order_status: { $ne: 'Canceled' }
+};
+
 
         const salesReport = await Order.aggregate([
             { $match: matchQuery },
@@ -126,7 +130,7 @@ const generateReport = async (req, res) => {
                     },
                     salesCount: { $sum: 1 },
                     totalOrderAmount: { $sum: "$total_price" },
-                    totalDiscount:  { $sum:"$discountAmount" }      
+                    totalDiscount:  { $sum: "$discountAmount" }      
                 }
             },
             { $sort: { _id: 1 } }
@@ -144,17 +148,17 @@ const generateReport = async (req, res) => {
 const downloadPdf = async (req, res) => {
     const { startDate, endDate } = req.query;
 
+
     const doc = new PDFDocument();
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', 'attachment; filename=sales-report.pdf');
 
     try {
-        // Fetch data for the report
         const data = await Order.aggregate([
             {
                 $match: {
                     createdAt: { $gte: new Date(startDate), $lte: new Date(endDate) },
-                    order_status: { $ne: 'Canceled' }, // Exclude canceled orders
+                    order_status: { $ne: 'Canceled' }
                 }
             },
             {
@@ -167,31 +171,24 @@ const downloadPdf = async (req, res) => {
             }
         ]);
 
-        // Handle case where no data is returned
         const reportData = data.length > 0 ? data[0] : { salesCount: 0, totalOrderAmount: 0, totalDiscount: 0 };
 
-        // Add content to the PDF document
         doc.fontSize(16).text(`Sales Report: ${startDate} to ${endDate}`, { align: 'center' });
         doc.moveDown(1);
 
-        // Add table header
         doc.fontSize(12).text('Sales Count', 50, 100);
         doc.text('Total Order Amount', 150, 100);
         doc.text('Total Discount', 300, 100);
 
-        // Add data row
         doc.text(reportData.salesCount, 50, 120);
         doc.text(reportData.totalOrderAmount.toFixed(2), 150, 120);
         doc.text(reportData.totalDiscount.toFixed(2), 300, 120);
 
-        // Draw lines to simulate a table
-        doc.moveTo(50, 110).lineTo(550, 110).stroke(); // Header line
-        doc.moveTo(50, 130).lineTo(550, 130).stroke(); // Data line
+        doc.moveTo(50, 110).lineTo(550, 110).stroke(); 
+        doc.moveTo(50, 130).lineTo(550, 130).stroke(); 
 
-        // End and send the PDF document
         doc.end();
         doc.pipe(res);
-
     } catch (error) {
         console.error("Error generating PDF report:", error);
         res.status(500).send("Error generating PDF report");
@@ -207,11 +204,11 @@ const downloadExcel = async (req, res) => {
 
     try {
         // Fetch data for the report
-        const data = await Order.aggregate([
+         const data = await Order.aggregate([
             {
                 $match: {
                     createdAt: { $gte: new Date(startDate), $lte: new Date(endDate) },
-                    order_status: { $ne: 'Canceled' } // Exclude canceled orders
+                    order_status: { $ne: 'Canceled' }
                 }
             },
             {
@@ -224,7 +221,6 @@ const downloadExcel = async (req, res) => {
             }
         ]);
 
-        // Handle case where no data is returned
         const reportData = data.length > 0 ? data[0] : { salesCount: 0, totalOrderAmount: 0, totalDiscount: 0 };
 
         // Add header row

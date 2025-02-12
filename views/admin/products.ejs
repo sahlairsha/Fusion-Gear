@@ -56,18 +56,21 @@
             <% } %>
             <td>
               <button class="btn btn-sm edit-button mb-2">
-                <a class="text-white" href="/admin/editproducts?id=<%= product._id %>"><i class="fa-solid fa-edit"></i></a>
+                <a class="text-white" href="/admin/editproducts?id=<%= product._id %>">
+                  <i class="fa-solid fa-edit"></i>
+                </a>
               </button>
               <% if (product.isDeleted === false) { %>
-                <button class="btn btn-sm">
-                  <a href="/admin/deleteproducts?id=<%= product._id %>" class="text-white"><i class="fa-solid fa-trash"></i></a>
+                <button class="btn btn-sm" onclick="deleteProduct('<%= product._id %>')">
+                  <i class="fa-solid fa-trash"></i>
                 </button>
               <% } else { %>
-                <button class="btn btn-sm">
-                  <a href="/admin/restoreproducts?id=<%= product._id %>" class="text-white"><i class="fa-solid fa-rotate-left"></i></a>
+                <button class="btn btn-sm" onclick="restoreProduct('<%= product._id %>')">
+                  <i class="fa-solid fa-rotate-left"></i>
                 </button>
               <% } %>
             </td>
+            
           </tr>
         <% }); %>
       </tbody>
@@ -119,9 +122,9 @@
           <div class="d-flex justify-content-end gap-2">
             <a class="btn btn-sm" href="/admin/editproducts?id=<%= product._id %>" title="Edit"><i class="fa-solid fa-edit"></i></a>
             <% if (product.isDeleted === false) { %>
-              <a class="btn btn-sm " href="/admin/deleteproducts?id=<%= product._id %>" title="Delete"><i class="fa-solid fa-trash"></i></a>
+              <button class="btn" onclick="deleteProduct('<%= product._id%>')"><i class="fa-solid fa-trash"></i></button>
             <% } else { %>
-              <a class="btn btn-sm " href="/admin/restoreproducts?id=<%= product._id %>" title="Restore"><i class="fa-solid fa-rotate-left"></i></a>
+              <button class="btn" onclick="restoreProduct('<%= product._id %>')"><i class="fa-solid fa-rotate-left"></i></button>
             <% } %>
           </div>
         </div>
@@ -136,7 +139,7 @@
 
 <script src="/js/admin/customer-search.js"></script>
 
-
+<script src="/js/admin/deleteproduct.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 

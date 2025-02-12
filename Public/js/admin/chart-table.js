@@ -21,9 +21,8 @@ document.addEventListener("DOMContentLoaded", () => {
         const endDate = endDateInput.value;
 
         // Validate custom date range if selected
-        if (timeRange === "custom" && (!startDate || !endDate)) {
-            alert("Please select both start and end dates.");
-            return;
+        if (!validateDates(startDate, endDate)) {
+            return; 
         }
 
         try {
@@ -65,7 +64,7 @@ if (Chart.getChart(canvasId)) {
 }
 
 const chart = new Chart(ctx, {
-  type: "polarArea", // Polar Area chart type
+  type: "polarArea",
   data: {
     labels: data.map(item => item.name || "Unknown"),
     datasets: [{
@@ -95,16 +94,93 @@ return chart;
 
 
 
+document.getElementById("report-type").addEventListener("change", function () {
+    const reportType = this.value;
+    const dateFields = document.getElementById("date-fields");
+
+    if (reportType === "custom") {
+        dateFields.style.display = "flex"; // Show date inputs
+    } else {
+        dateFields.style.display = "none"; // Hide date inputs
+    }
+});
+
 document.getElementById("report-form").addEventListener("submit", function (e) {
     e.preventDefault();
 
-    const startDate = document.getElementById("start-date").value;
-    const endDate = document.getElementById("end-date").value;
     const reportType = document.getElementById("report-type").value;
+    let startDate, endDate;
+
+    if (reportType === "custom") {
+        startDate = document.getElementById("start-date").value;
+        endDate = document.getElementById("end-date").value;
+
+        if (!validateDates(startDate, endDate)) {
+            return; 
+        }
+    } else {
+        // Automatically calculate date range using Day.js
+        ({ startDate, endDate } = getAutoDateRange(reportType));
+    }
 
     // Fetch sales data for the selected range and type
     fetchSalesReport(startDate, endDate, reportType);
 });
+
+function getAutoDateRange(reportType) {
+    const today = dayjs();
+    let startDate, endDate;
+
+    switch (reportType) {
+        case "daily":
+            startDate = today.startOf('day').format('YYYY-MM-DD');
+            endDate = today.endOf('day').format('YYYY-MM-DD');
+            break;
+        case "weekly":
+            startDate = today.startOf('week').format('YYYY-MM-DD');
+            endDate = today.endOf('week').format('YYYY-MM-DD');
+            break;
+        case "monthly":
+            startDate = today.startOf('month').format('YYYY-MM-DD');
+            endDate = today.endOf('month').format('YYYY-MM-DD');
+            break;
+        default:
+            startDate = today.format('YYYY-MM-DD');
+            endDate = today.format('YYYY-MM-DD');
+    }
+
+    return { startDate, endDate };
+}
+
+function validateDates(startDate, endDate) {
+    if (!startDate || !endDate) {
+       
+        Swal.fire({
+            title: "Error",
+            text: "Please enter valid start and end dates.",
+            icon: "error",
+            confirmButtonText: "OK",
+
+        })
+        return false;
+    }
+
+    const start = dayjs(startDate);
+    const end = dayjs(endDate);
+
+    if (start.isAfter(end)) {
+        Swal.fire({
+            title: "Error",
+            text: "Start date cannot be after end date.",
+            icon: "error",
+            confirmButtonText: "OK",
+        })
+        return false;
+    }
+
+    return true;
+}
+
 
 function fetchSalesReport(startDate, endDate, reportType) {
     fetch(`/generate-report`, {
@@ -154,6 +230,8 @@ function updateSalesTable(data) {
 document.getElementById("download-pdf").addEventListener("click", function () {
     const startDate = document.getElementById("start-date").value;
     const endDate = document.getElementById("end-date").value;
+
+    
     window.location.href = `/download-pdf?startDate=${startDate}&endDate=${endDate}`;
 });
 

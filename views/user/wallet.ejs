@@ -1,5 +1,6 @@
 <%-include('../../views/partials/user/header') %>
 
+
 <link rel="stylesheet" href="/css/user/wallet.css">
 
 <div class="wallet-container">
@@ -31,7 +32,7 @@
 
   <div class="transaction-history">
     <h2>Transaction History</h2>
-    <table>
+    <table   id="transactionTable">
       <thead>
         <tr>
           <th>Date</th>
@@ -84,6 +85,7 @@
   </div>
 </div>
 </div>
+
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
 <script src="/js/user/wallet.js"></script>

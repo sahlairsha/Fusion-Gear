@@ -86,8 +86,9 @@
 
             <% }) %>
             <div class="price-details">
+                <h6 class="mb-2">Offer Amount:₹<%= orders.offerAmount.toFixed(2) %></h5>
                 <h6 class="text-success mb-2">Discount:₹<%= orders.discountAmount.toFixed(2) %></h6>
-                <h5>Total: ₹<%= orders.total_price %></h3>
+                <h5>Total: <strong>₹<%= orders.total_price %></strong> </h3>
             </div>
 
 
@@ -97,10 +98,9 @@
             <% }else if(orders.order_status === 'Delivered') {%>
                 <a  class="return" href="/order/return-form?id=<%= orders._id  %>"><button type="submit" class="btn btn-primary ml-4">Return Order</button></a>
                 <% } %>
-    
-        </div>
-   </div>
+       </div>
     </div>
+</div>
 </div>
 </div>
 </div>
@@ -223,9 +223,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
-
 </script>
-
-
 
 <%- include('../../views/partials/user/footer') %>

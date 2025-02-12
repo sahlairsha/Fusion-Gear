@@ -3,23 +3,17 @@
 <link rel="stylesheet" href="/css/admin/dashboard.css">
   
 
+
+
+
 <div class="container py-5">
-    <!-- Left Side - Sales Report -->
+
     <div class="sale-container">
         <h1>Sales Report</h1>
         <!-- Sales Report Filters Form -->
         <form id="report-form">
             <button id="generate-button" class="d-flex mb-2 ms-auto" type="submit">Generate Report</button>
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="start-date">Start Date:</label>
-                    <input type="date" id="start-date" name="start-date" required>
-                </div>
-                <div class="form-group">
-                    <label for="end-date">End Date:</label>
-                    <input type="date" id="end-date" name="end-date" required>
-                </div>
-            </div>
+            
             <div class="form-row">
                 <div class="form-group">
                     <label for="report-type">Report Type:</label>
@@ -31,7 +25,20 @@
                     </select>
                 </div>
             </div>
+        
+            <!-- Date Fields, hidden by default unless 'custom' is selected -->
+            <div class="form-row" id="date-fields" style="display: none;">
+                <div class="form-group">
+                    <label for="start-date">Start Date:</label>
+                    <input type="date" id="start-date" name="start-date">
+                </div>
+                <div class="form-group">
+                    <label for="end-date">End Date:</label>
+                    <input type="date" id="end-date" name="end-date">
+                </div>
+            </div>
         </form>
+        
 
         <!-- Table to display the sales report -->
         <table id="report-table" class="hidden">
@@ -98,6 +105,8 @@
 </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
+
     <script src="/js/admin/chart-table.js"></script>
    
 

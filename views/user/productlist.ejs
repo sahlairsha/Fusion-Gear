@@ -59,6 +59,15 @@
                                 <p><%= product.description %></p>
                                 <h3 id="productPrice" style="font-weight: bold;">&#8377;<%= product.offerPrice %></h3>
 
+                                <div class="">
+                                    <span>Color:</span>
+                                    <% product.variants.forEach(function (variant, index) { %>
+                                        <label for="<%= variant.color %>" class="custom-radio c-<%=variant.color%>">
+                                            <span class="radio-label"><%= variant.color %></span>
+                                        </label>
+                                    <% }); %>
+                                </div>
+
                                 <!-- Stock Status and Size Selection -->
                                 <div class="shop__sidebar__size">
                                     <span>Size:</span>
@@ -179,7 +188,7 @@
                         </div>
                         <p class="description"><%= product.description %></p>
                         <button class="wishlist-btn" onclick="addToWishlist('<%= product._id %>', '<%= product.variants[0]._id %>')">
-                            <i id="heart-icon" class="far fa-heart"></i>
+                            <i id="heart-icon p-2" class="far fa-heart"></i>
                         </button>
                         <a href="/product/view?id=<%= product._id %>" class="details-btn">View Details</a>
                     </div>

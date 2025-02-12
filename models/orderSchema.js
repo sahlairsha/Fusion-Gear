@@ -29,6 +29,10 @@ const orderSchema = new mongoose.Schema({
         default : 0
 
     },
+    offerAmount :{
+        type: Number,
+        default : 0
+    },
     payment_method: {
         type: String,
         enum: ['UPI', 'Net Banking', 'COD','Razorpay','Wallet'],

@@ -11,7 +11,8 @@ const getAllBrands = async (req, res) => {
         
         const brands = await Brand.find({})
             .skip(skip)
-            .limit(parseInt(limit));
+            .limit(parseInt(limit))
+            .sort({createdAt : -1})
 
         
         const totalBrands = await Brand.countDocuments();
@@ -98,24 +99,23 @@ const editBrand = async (req, res) => {
         const { id } = req.params;
         const { brand_name, description } = req.body;
 
-        // Find the brand by ID
+     
         const brand = await Brand.findById(id);
         if (!brand) {
             req.flash('error', 'Brand not found.');
             return res.redirect('/admin/brands');
         }
 
-        // Update fields
+  
         brand.brand_name = brand_name.trim() || brand.brand_name;
         brand.description = description.trim() || brand.description;
 
-        // Handle logo upload
+   
         if (req.file) {
-            // Dynamically get the root directory
+           
             const rootDir = process.cwd();
             const logoDirectory = path.join(rootDir, 'Public', 'brand-logo');
 
-            // Check if old logo exists before attempting to delete
             if (brand.logo) {
                 const oldLogoPath = path.join(logoDirectory, path.basename(brand.logo));
                 console.log('Old Logo Path:', oldLogoPath);
@@ -149,8 +149,11 @@ const deleteBrand = async (req, res) => {
     try {
         const { id } = req.params;
 
-        // Find and delete the brand
-        const brand = await Brand.findByIdAndDelete(id);
+        const brand = await Brand.updateOne(
+            { _id: id, isDeleted : false},
+            { $set: { isDeleted: true, deletedAt: Date.now() } },
+            { new: true }
+    )
         if (!brand) {
             return res.status(404).json({ message: 'Brand not found.' });
         }
@@ -163,6 +166,26 @@ const deleteBrand = async (req, res) => {
 };
 
 
+const restoreBrand = async(req,res)=>{
+    try{
+        const { id } = req.params;
+        const brand = await Brand.updateOne(
+            { _id: id, isDeleted: true },
+            { $set: { isDeleted: false, deletedAt: null } },
+            { new: true }
+            );
+            if (!brand) {
+                return res.status(404).json({ message: 'Brand not found.' });
+             }
+             res.status(200).json({ message: 'Brand restored successfully.' });
+          } catch (error) {
+                    console.log(error);
+                    res.status(500).json({ message: 'Server error. Could not restore brand.' });
+          }
+    
+}
+
+
 module.exports ={
     getAllBrands,
     addBrands,
@@ -170,4 +193,5 @@ module.exports ={
     editBrand,
     getEditBrand,
     deleteBrand,
+    restoreBrand 
 }

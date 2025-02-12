@@ -48,22 +48,32 @@ const categoryInfo = async(req,res)=>{
 
 const addCategories = async (req, res) => {
     try {
-        const { name,description,discount,startDate, endDate} = req.body;
-        const newCategory = new Category({ name, description,percentage:discount,startDate, endDate});
-        await newCategory.save();
-
-        req.flash('success', 'Category added successfully!');
-        res.redirect('/admin/addCategory');
-    } catch (error) {
-        if (error.name === 'ValidationError') {
-           req.flash('error', error.message);
-        } else {
-            req.flash('error', 'An unexpected error occurred.');
+      const { name, description, percentage, startDate, endDate } = req.body;
+      
+      const newCategory = new Category({ 
+        name,
+        description,
+        categoryDiscount: {
+          percentage: percentage,
+          startDate: startDate,
+          endDate: endDate
         }
-        res.redirect('/admin/addcategory');
+      });
+      
+      await newCategory.save();
+  
+      req.flash('success', 'Category added successfully!');
+      res.redirect('/admin/addCategory');
+    } catch (error) {
+      if (error.name === 'ValidationError') {
+        req.flash('error', error.message);
+      } else {
+        req.flash('error', 'An unexpected error occurred.');
+      }
+      res.redirect('/admin/addCategory');
     }
-};
-
+  };
+  
 
 
 const editCategories = async(req, res) => {
@@ -106,40 +116,39 @@ const editCategories = async(req, res) => {
 const deleteCategories = async (req, res) => {
     try {
         let id = req.query.id;
-        if(!id){
-            return res.status(400).redirect("/pageerror")
+        if (!id) {
+            return res.status(400).json({ success: false, message: "Invalid category ID" });
         }
         await Category.updateOne(
-            {
-                _id: id ,
-                isDeleted : false
-             },
-             {$set : { isDeleted : true , deletedAt : Date.now()}},
-             {new : true});
-        res.redirect('/admin/category');
+            { _id: id, isDeleted: false },
+            { $set: { isDeleted: true, deletedAt: Date.now() } },
+            { new: true }
+        );
+        return res.json({ success: true, message: "Category deleted successfully" });
     } catch (error) {
-        console.error("There is an error in deleting", error);
-        res.status(500).redirect('/pageerror')
+        console.error("Error deleting category:", error);
+        return res.status(500).json({ success: false, message: "Error deleting category" });
     }
 }
 
+
 const restoreCategories = async (req, res) => {
     try {
-        let id = req.query.id;
-        if(!id){
-            return res.status(400).redirect("/pageerror")
+        const id = req.query.id;
+        if (!id) {
+            return res.status(400).json({ success: false, message: "Invalid category ID" });
         }
+        
+     
         await Category.updateOne(
-            {
-                _id: id,
-                isDeleted : true
-             },
-             {$set : {isDeleted : false , deletedAt : null }},
-             {new : true});
-        res.redirect('/admin/category');
+            { _id: id, isDeleted: true },
+            { $set: { isDeleted: false, deletedAt: null } }
+        );
+        
+        return res.json({ success: true, message: "Category restored successfully" });
     } catch (error) {
-        console.error("There is an error in restoring", error);
-        res.status(500).redirect('/pageerror')
+        console.error("Error restoring category:", error);
+        return res.status(500).json({ success: false, message: "Error restoring category" });
     }
 }
 
