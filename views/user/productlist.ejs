@@ -54,19 +54,16 @@
                             <div class="product__details__text">
                                               
                
-            </div>
+                            
                                 <h4><%= product.productName %></h4>
                                 <p><%= product.description %></p>
                                 <h3 id="productPrice" style="font-weight: bold;">&#8377;<%= product.offerPrice %></h3>
 
                                 <div class="">
                                     <span>Color:</span>
-                                    <% product.variants.forEach(function (variant, index) { %>
-                                        <label for="<%= variant.color %>" class="custom-radio c-<%=variant.color%>">
-                                            <span class="radio-label"><%= variant.color %></span>
-                                        </label>
-                                    <% }); %>
+                                    <span class="radio-label"><%= product.variants[0].color %></span>
                                 </div>
+                                
 
                                 <!-- Stock Status and Size Selection -->
                                 <div class="shop__sidebar__size">
