@@ -93,3 +93,42 @@ function filterProducts() {
         row.style.display = matchesSearch && matchesCategory ? '' : 'none';
     });
 }
+
+
+
+
+// Get references to the search input, category dropdown, and the table body
+const searchInput = document.getElementById('searchProduct');
+const categorySelect = document.getElementById('categoryFilter');
+
+
+// Function to filter products based on product name and selected category
+function filterProducts() {
+  // Get the search term and convert it to lowercase for case-insensitive matching
+  const searchTerm = searchInput.value.trim().toLowerCase();
+  
+  // Get the selected category ID; if none is selected, use an empty string (which means "all")
+  const selectedCategory = categorySelect.value;
+  
+  // Get all rows from the product table
+  const rows = productTable.querySelectorAll('tr');
+  
+  rows.forEach(row => {
+
+    const productName = row.querySelector('td:first-child').innerText.toLowerCase();
+    
+
+    const rowCategoryId = row.getAttribute('data-category-id') || "";
+
+    const matchesSearch = productName.includes(searchTerm);
+    
+
+    const matchesCategory = (selectedCategory === "" || rowCategoryId === selectedCategory);
+    
+
+    row.style.display = (matchesSearch && matchesCategory) ? "" : "none";
+  });
+}
+
+searchInput.addEventListener('input', filterProducts);
+categorySelect.addEventListener('change', filterProducts);

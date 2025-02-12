@@ -1,10 +1,10 @@
 const Product = require('../../models/productSchema');
 const User = require('../../models/userSchema')
-
+const Category = require('../../models/categorySchema')
 const getStocks = async (req, res) => {
     try {
         const search = req.query.search || "";
-        let page = parseInt(req.params.page, 10) || 1;
+        let page = parseInt(req.query.page, 10) || 1;
         let limit = 3;
 
         const productData = await Product.find({
@@ -26,12 +26,13 @@ const getStocks = async (req, res) => {
 
 
        const adminData = await User.findById(req.session.admin)
-
+       const categories = await Category.find({});
         res.render('inventory', {
             products : productData ,
             totalPages: Math.ceil(count / limit),
             currentPage: page,
-            admin : adminData
+            admin : adminData,
+            categories
         });
 
 

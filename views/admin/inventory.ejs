@@ -5,9 +5,17 @@
 <div class="container">
     <!-- Stock Table -->
     <div class="search-bar">
-        <input type="text" id="searchProduct" placeholder="Search product..." oninput="filterProducts()" />
+        <!-- Input for product name search -->
+        <input type="text" id="searchProduct" placeholder="Search product..." />
+    
+        <select id="categoryFilter">
+          <option value="">All Categories</option>
+          <% categories.forEach(category => { %>
+            <option value="<%= category._id %>"><%= category.name %></option>
+          <% }) %>
+        </select>
+      </div>
       
-    </div>
     <table class="stock-table">
         <thead>
             <tr>
